@@ -2,8 +2,8 @@
 #+AUTHOR: Prof. Joseph Eremondi
 
 
-#+LaTeX_CLASS_OPTIONS: [dvipsnames]
 #+OPTIONS: toc:nil H:2 num:t
+#+OPTIONS: TODO:nil
 
 #+latex_header: \usepackage[sfdefault]{atkinson} %% Option 'sfdefault' if the base
 #+latex_header: \usepackage[default]{FiraMono}
@@ -15,40 +15,95 @@
 #+startup: beamer
 #+LaTeX_CLASS:beamer
 #+LaTeX_CLASS_OPTIONS: [bigger]
+#+LaTeX_CLASS_OPTIONS: [dvipsnames]
 #+COLUMNS: %45ITEM %10BEAMER_ENV(Env) %10BEAMER_ACT(Act) %4BEAMER_COL(Col)
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 
 #+latex_header: \renewcommand{\pageword}{}
 
 
-#+latex_header: \usetheme[customfont,nofooter]{pureminimalistic}
-#+latex_header:\definecolor{textcolor}{RGB}{0, 0, 0}
+# #+latex_header: \usetheme[customfont,nofooter]{pureminimalistic}
+#+latex_header: \usetheme{moloch}
+# #+latex_header:\definecolor{textcolor}{RGB}{0, 0, 0}
 #+latex_header:\definecolor{title}{RGB}{2, 71, 49}
 #+latex_header:\renewcommand{\beamertextcolor}{textcolor}
-#+latex_header:\renewcommand{\beamerfootertextcolor}{footercolor}
+# #+latex_header:\renewcommand{\beamerfootertextcolor}{footercolor}
 # #+latex_header:\renewcommand{\beamertitlecolor}{title}
-#+latex_header:\setbeamertemplate{frametitle}{\vskip6pt\color{title}\bfseries\insertframetitle\par\vskip-6pt\hrulefill}
+# #+latex_header:\setbeamertemplate{frametitle}{\\setbeamercolor{alerted text}{fg=black}
+#+latex_header: \setbeamercolor{alerted text}{fg=black}
+#+latex_header: \setbeamerfont{alerted text}{series=\bfseries}
+#+latex_header: \newcommand{\colored}[2]{{\color{#1} #2}}
 
 * Introduction
 :PROPERTIES:
-:EXPORT_FILE_NAME: slides001-intro.pdf
+:EXPORT_FILE_NAME: pdf/slides001-intro.pdf
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
-** What is the Purpose of this Course?
-*** Programming Languages
-- What are they made of?
-- How do they work?
-*** Interpreters
-- How to make a programming language
-- Parts of an interpreter
-  + Parsing
+#+OPTIONS: todo:nil
+** Course Overview
+*** Course Objectives
+To learn:
+- Functional programming
+  + Recursion
+  + Immutable data
+  + Programming by cases
+  + Higher-order functions
+- How to write your own programming language
+  + Parsing/Abstract Syntax
   + Desugaring
   + Typechecking
   + Evaluation
-*** What is Racket?
-- LISP-like language
+
+- _To change how you /think/ about programming_
+*** Textbook
+- /Programming Languages: Application and Interpretation/, 2nd edition, by Shriram Krishnamurthi
+  + aka PLAI
+  + Freely avaliable online, pdf in UR Courses
+- 3rd edition also available
+  + Optional additional reference
+  + Similar content but very different approach
+
+*** Structure
+- Grading scheme
+  + 30% assignments
+  + 20% midterm
+    - In-class
+  + 50% final
+    - Aug 19
+    - 2pm-5pm
+    - This room
+**** TODO Midterm date
+*** Assignments
+- Six weekly assignments
+- Due Tuesday at 5pm
+  + No extensions
+  + Lowest grade dropped
+- Submitted over UR Courses
+*** Assignments (ctd.)
+- Mostly programming
+  + Some conceptual questions
+- Score based on running tests
+  + Some public (included in assignment)
+  + Some private (only known by me)
+  + Code doesn't run => no marks
+- Some points for style/documentation/etc.
+  +  Sample based marking
+** Motivation: Functional Programming
+*** Programming in This Class
+- In plait
+  + i.e., "PLAI-typed"
+- Plait is
+  + a programming language
+  + a library for the Racket programming language
+- We'll learn more why this distinction is fuzzy
+*** What is Racket
+- A programming language for writing programming languages
+- LISP-like
   - parentheses
-- A language for writing programming languages
+  - functions are values just like anything else
+- Functional: once a variable has a value, it never changes
+  + Racket does let you mutate variables,
+    but those parts of the language are *forbidden* in this class
 
 *** Will I Ever Use Racket in Industry?
 **** \qquad
@@ -59,10 +114,10 @@
   + If you know how languages work, you can learn /any/ language quickly
   + Racket is effective for learning how languages work
 
-*** Future Proofing
-**** Objective C vs Swift
+*** Language Trends
+**** \colored{RoyalBlue}{Objective C} vs \colored{BrickRed}{Swift}
 [[./img/objc_vs_swift.png]]
-**** C++ vs Python
+**** \colored{RoyalBlue}{C++} vs \colored{BrickRed}{Python}
 [[./img/cpp_vs_python.png]]
 *** Syntax Vs Semantics
 - Semantics
@@ -74,7 +129,7 @@
 - Racket looks very different from other languages
   + Expressions, not statements
   + Recursion, not loops
-  + Parentheses + functions, not operators
+  + Parentheses & functions, not operators
 - Changes how you think about programs
 
 *** Seeing Past Syntax
@@ -113,35 +168,56 @@
 
 
 
-*** Why Functional Programming
-- Sum types
-  + Perfect for modelling syntax
-  + Missing/hard in most imperative languages
-
-*** Functional Programming in Practice
-- Anonymous functions
+*** Functional Programming Going Mainstream?
+- We're seeing more languages adopt functional features
+- Anonymous functions (lambda)
   + Python, Ruby, JS, PHP, Swift, Go, Rust, etc.
 
   + Added to C++11
 
   + Added in Java 8
+  + Most language have some form of ~map~ to apply a function to each element of a list
 
-  + C
+- Sum types
+  + Also called variants, algebraic datatypes
+  + Perfect for syntax trees
+  + Now in Python, Typescript, C++ (~std::variant~), Java (sealed interfaces), Rust (enums)
 
+- Learning these featuers in Racket will help if/when they show up in other languages in the future
+
+
+** Motivation: Interpreters
     
+*** Importance of Programming Languages
+- Interpreter: Code + input => Output + effects (write to disk, display pixels, etc)
+- You interact with a compiler or interpreter every time you:
+  + Write a program
+  + Run a program
+    - Python, JavaScript, JVM all use some kind of interpreter
+    - The CPU is just an interpreter for machine code
+
+*** Programming Languages Aren't Magic
+- Understanding how languages are implemented can help you understand your code
+  + Why is it slow/fast
+  + How to prevent/properly handle errors
+  + How to know that it's doing what you think it does
+
+*** Domain Specific Languages
+- Small language for a particular kind of task
+
 *** Is this a hard course?
-**** Why this course is hard?
+**** Why interpreters are hard
 - By the end if this course, you will be able to write a program that is
   powerful enough to simulate every other computer program that ever has or
   ever will be written
 
-**** Why this course is easy
+**** Why interpreters are easy
 - It's just a bunch of tree traversals
 
 
 * Racket and Plait
 :PROPERTIES:
-:EXPORT_FILE_NAME: slides002-plait.pdf
+:EXPORT_FILE_NAME: pdf/slides002-plait.pdf
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 
