@@ -1,0 +1,167 @@
+#+subtitle: CS 350
+#+AUTHOR: Prof. Joseph Eremondi
+
+
+#+LaTeX_CLASS_OPTIONS: [dvipsnames]
+#+OPTIONS: toc:nil H:2 num:t
+
+#+latex_header: \usepackage[sfdefault]{atkinson} %% Option 'sfdefault' if the base
+#+latex_header: \usepackage[default]{FiraMono}
+#+latex_header: \usepackage[T1]{fontenc}
+
+
+#+EXPORT_FILE_NAME: slides_all.pdf
+#+OPTIONS: toc:nil
+#+startup: beamer
+#+LaTeX_CLASS:beamer
+#+LaTeX_CLASS_OPTIONS: [bigger]
+#+COLUMNS: %45ITEM %10BEAMER_ENV(Env) %10BEAMER_ACT(Act) %4BEAMER_COL(Col)
+#+beamer: \beamerdefaultoverlayspecification{<+->}
+
+#+latex_header: \renewcommand{\pageword}{}
+
+
+#+latex_header: \usetheme[customfont,nofooter]{pureminimalistic}
+#+latex_header:\definecolor{textcolor}{RGB}{0, 0, 0}
+#+latex_header:\definecolor{title}{RGB}{2, 71, 49}
+#+latex_header:\renewcommand{\beamertextcolor}{textcolor}
+#+latex_header:\renewcommand{\beamerfootertextcolor}{footercolor}
+# #+latex_header:\renewcommand{\beamertitlecolor}{title}
+#+latex_header:\setbeamertemplate{frametitle}{\vskip6pt\color{title}\bfseries\insertframetitle\par\vskip-6pt\hrulefill}
+
+* Introduction
+:PROPERTIES:
+:EXPORT_FILE_NAME: slides001-intro.pdf
+:END:
+#+beamer: \beamerdefaultoverlayspecification{<+->}
+** What is the Purpose of this Course?
+*** Programming Languages
+- What are they made of?
+- How do they work?
+*** Interpreters
+- How to make a programming language
+- Parts of an interpreter
+  + Parsing
+  + Desugaring
+  + Typechecking
+  + Evaluation
+*** What is Racket?
+- LISP-like language
+  - parentheses
+- A language for writing programming languages
+
+*** Will I Ever Use Racket in Industry?
+**** \qquad
+*****   \centering\huge _No_
+*****   \centering (probably)
+*** Future Proofing
+- Don't know what you'll use in industry in 10 years
+  + If you know how languages work, you can learn /any/ language quickly
+  + Racket is effective for learning how languages work
+
+*** Future Proofing
+**** Objective C vs Swift
+[[./img/objc_vs_swift.png]]
+**** C++ vs Python
+[[./img/cpp_vs_python.png]]
+*** Syntax Vs Semantics
+- Semantics
+  + What a program /means/
+  + How a program behaves
+- Different syntaxes can have identical semantics
+- _Course goal:_ Learning to see past syntax and understand a program
+  as its semantics
+- Racket looks very different from other languages
+  + Expressions, not statements
+  + Recursion, not loops
+  + Parentheses + functions, not operators
+- Changes how you think about programs
+
+*** Seeing Past Syntax
+ By the end of the course, you should be able to look at these programs and intuitively
+ know that they're doing the same thing:
+
+**** CPP
+:PROPERTIES:
+:BEAMER_col: 0.45
+:END:
+#+latex: {\scriptsize
+  #+begin_src C
+  int pow (int x, int y){
+    int ret = 1;
+    for (int i = 0; i < y; i++){
+      ret *= x;
+    }
+    return ret;
+  }
+  #+end_src
+#+latex: }
+
+**** Racket
+:PROPERTIES:
+:BEAMER_col: 0.45
+:END:
+#+latex: {\scriptsize
+  #+begin_src racket
+  (define (pow x y)
+    (if
+      (<= y 0)
+      0
+      (* x (pow x (- y 1)))))
+  #+end_src
+#+latex: }
+
+
+
+*** Why Functional Programming
+- Sum types
+  + Perfect for modelling syntax
+  + Missing/hard in most imperative languages
+
+*** Functional Programming in Practice
+- Anonymous functions
+  + Python, Ruby, JS, PHP, Swift, Go, Rust, etc.
+
+  + Added to C++11
+
+  + Added in Java 8
+
+  + C
+
+    
+*** Is this a hard course?
+**** Why this course is hard?
+- By the end if this course, you will be able to write a program that is
+  powerful enough to simulate every other computer program that ever has or
+  ever will be written
+
+**** Why this course is easy
+- It's just a bunch of tree traversals
+
+
+* Racket and Plait
+:PROPERTIES:
+:EXPORT_FILE_NAME: slides002-plait.pdf
+:END:
+#+beamer: \beamerdefaultoverlayspecification{<+->}
+
+** Racket
+*** What is Racket?
+- Lisp-style language
+  + ~((((((((Parentheses))))))))~
+- Language for making languages
+
+*** What is Dr. Racket?
+- IDE for Racket
+- Read-Eval-Print-Loop (REPL)
+  + Feedback when writing code
+- Other editors are possible
+  + ... but you're on your own if you have probems
+  + see https://docs.racket-lang.org/guide/other-editors.html
+
+** Plait
+*** What is Plait?
+- Language defined in Racket
+- Type inference
+  + Every expression is typed
+  + Don't have to write down the types
