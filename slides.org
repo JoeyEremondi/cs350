@@ -1,17 +1,19 @@
 #+subtitle: CS 350
-#+AUTHOR: Prof. Joseph Eremondi
+#+AUTHOR: Dr. Joseph Eremondi
+#+DATE: Last updated: \today{}
 
 
-#+OPTIONS: toc:nil H:2 num:t
-#+OPTIONS: TODO:nil
+
+#+OPTIONS: toc:nil H:2 num:t TODO:nil eval:yes
 
 #+latex_header: \usepackage[sfdefault]{atkinson} %% Option 'sfdefault' if the base
-#+latex_header: \usepackage[default]{FiraMono}
+#+latex_header: \usepackage{FiraMono}
 #+latex_header: \usepackage[T1]{fontenc}
 
 
+
+
 #+EXPORT_FILE_NAME: slides_all.pdf
-#+OPTIONS: toc:nil
 #+startup: beamer
 #+LaTeX_CLASS:beamer
 #+LaTeX_CLASS_OPTIONS: [bigger]
@@ -19,20 +21,30 @@
 #+COLUMNS: %45ITEM %10BEAMER_ENV(Env) %10BEAMER_ACT(Act) %4BEAMER_COL(Col)
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 
-#+latex_header: \renewcommand{\pageword}{}
+
+# -*- org-latex-packages-alist: nil; -*-
+
+# #+latex_header: \renewcommand{\pageword}{}
 
 
 # #+latex_header: \usetheme[customfont,nofooter]{pureminimalistic}
 #+latex_header: \usetheme{moloch}
 # #+latex_header:\definecolor{textcolor}{RGB}{0, 0, 0}
 #+latex_header:\definecolor{title}{RGB}{2, 71, 49}
-#+latex_header:\renewcommand{\beamertextcolor}{textcolor}
+# #+latex_header:\renewcommand{\beamertextcolor}{textcolor}
 # #+latex_header:\renewcommand{\beamerfootertextcolor}{footercolor}
 # #+latex_header:\renewcommand{\beamertitlecolor}{title}
 # #+latex_header:\setbeamertemplate{frametitle}{\\setbeamercolor{alerted text}{fg=black}
 #+latex_header: \setbeamercolor{alerted text}{fg=black}
 #+latex_header: \setbeamerfont{alerted text}{series=\bfseries}
 #+latex_header: \newcommand{\colored}[2]{{\color{#1} #2}}
+
+#+latex_header: \usepackage{semantic}
+#+latex_header: \usepackage{stmaryrd}
+#+latex_header: \mathlig{=>}{\Rightarrow}
+#+latex_header: \definecolor{LightGray}{gray}{0.9}
+#+latex_header: \usepackage[outputdir=pdf]{minted}
+#+latex_header: \setminted[racket]{escapeinside=||,bgcolor=LightGray}
 
 * Introduction
 :PROPERTIES:
@@ -64,15 +76,15 @@ To learn:
   + Similar content but very different approach
 
 *** Structure
-- Grading scheme
-  + 30% assignments
-  + 20% midterm
+**** Grading scheme
+  + 25% assignments
+  + 25% midterm
     - In-class
+    - Thursday, July 25
   + 50% final
     - Aug 19
     - 2pm-5pm
     - This room
-**** TODO Midterm date
 *** Assignments
 - Six weekly assignments
 - Due Tuesday at 5pm
@@ -85,9 +97,16 @@ To learn:
 - Score based on running tests
   + Some public (included in assignment)
   + Some private (only known by me)
-  + Code doesn't run => no marks
+  + Code doesn't run $->$ no marks
 - Some points for style/documentation/etc.
   +  Sample based marking
+*** LLM Policy
+**** Use of ChatGPT, GitHub Copilot, or any other Large Language Model or Generative AI is forbidden when completing the assignments for this class
+- Considered a violation of Academic Integrity
+**** ChatGPT has trouble with Racket/plait
+- Don't expect sympathy if you copy/paste code from an LLM that doesn't work
+**** Don't set yourself up for failure on the exams
+- Doing the assignments is the best way to study
 ** Motivation: Functional Programming
 *** Programming in This Class
 - In plait
@@ -99,11 +118,12 @@ To learn:
 *** What is Racket
 - A programming language for writing programming languages
 - LISP-like
-  - parentheses
+  - parentheses ~(((((((((())))))))))~
   - functions are values just like anything else
-- Functional: once a variable has a value, it never changes
+- Immutable: once a variable has a value, it never changes
   + Racket does let you mutate variables,
     but those parts of the language are *forbidden* in this class
+    - Unless otherwise specified
 
 *** Will I Ever Use Racket in Industry?
 **** \qquad
@@ -114,9 +134,11 @@ To learn:
   + If you know how languages work, you can learn /any/ language quickly
   + Racket is effective for learning how languages work
 
-*** Language Trends
+*** Language Trends (from Google Trends)
+
 **** \colored{RoyalBlue}{Objective C} vs \colored{BrickRed}{Swift}
 [[./img/objc_vs_swift.png]]
+
 **** \colored{RoyalBlue}{C++} vs \colored{BrickRed}{Python}
 [[./img/cpp_vs_python.png]]
 *** Syntax Vs Semantics
@@ -141,7 +163,7 @@ To learn:
 :BEAMER_col: 0.45
 :END:
 #+latex: {\scriptsize
-  #+begin_src C
+  #+begin_src C :exports code
   int pow (int x, int y){
     int ret = 1;
     for (int i = 0; i < y; i++){
@@ -157,7 +179,7 @@ To learn:
 :BEAMER_col: 0.45
 :END:
 #+latex: {\scriptsize
-  #+begin_src racket
+  #+begin_src racket :exports code
   (define (pow x y)
     (if
       (<= y 0)
@@ -183,13 +205,14 @@ To learn:
   + Perfect for syntax trees
   + Now in Python, Typescript, C++ (~std::variant~), Java (sealed interfaces), Rust (enums)
 
-- Learning these featuers in Racket will help if/when they show up in other languages in the future
+- Learning these features in Racket will help if/when they show up in other languages in the future
 
 
 ** Motivation: Interpreters
     
 *** Importance of Programming Languages
-- Interpreter: Code + input => Output + effects (write to disk, display pixels, etc)
+- Interpreter: Code + input $\hookrightarrow$ Output + effects
+  + Effects: write to disk, display pixels, etc
 - You interact with a compiler or interpreter every time you:
   + Write a program
   + Run a program
@@ -202,7 +225,7 @@ To learn:
   + How to prevent/properly handle errors
   + How to know that it's doing what you think it does
 
-*** Domain Specific Languages
+*** Domain Specific Languages :noexport:
 - Small language for a particular kind of task
 
 *** Is this a hard course?
@@ -215,12 +238,24 @@ To learn:
 - It's just a bunch of tree traversals
 
 
-* Racket and Plait
+* Functional Programming 1: Recursion and Immutable Data
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides002-plait.pdf
+:header-args:racket: :results code :lang plait
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 
+** Overview
+- Topic: Functional Programming in Racket and plait
+- Required Reading:
+  + Plait tutorial (URCourses)
+- Optional Reference
+  + Plait videos, HtDP videos
+** Programming in CS 350
+*** All coding for this class uses:
+- The Racket Programming Language
+- The ~plait~ library for Racket
+- The Dr. Racket editor
 ** Racket
 *** What is Racket?
 - Lisp-style language
@@ -229,15 +264,181 @@ To learn:
 
 *** What is Dr. Racket?
 - IDE for Racket
+  - Syntax highlighting
+  - Other useful features
 - Read-Eval-Print-Loop (REPL)
   + Feedback when writing code
+  + Can  evaluate expressions while you're writing your code
 - Other editors are possible
-  + ... but you're on your own if you have probems
+  + ... but you're on your own if you have problems
   + see https://docs.racket-lang.org/guide/other-editors.html
 
 ** Plait
 *** What is Plait?
-- Language defined in Racket
+****  "PLAI-typed"
+**** Language defined in Racket
+- Racket functions you can call
+- Adds syntax to Racket
+  + Declaring and pattern matching on data types
+  + Type annotations for functions
+- Minimal
+  + Has what you need to write programming languages
+  + Not much else
+  + You can do a lot with very little
+
+*** Plait features:
+
 - Type inference
   + Every expression is typed
   + Don't have to write down the types
+- Algebraic Data Types
+
+
+
+*** Parentheses
+- Racket programs are trees called "S-expressions"
+- Parentheses give this tree structure
+- Default: parentheses mean function call
+  + Racket writes ~(f x)~, not ~f(x)~
+- ~x~ is not the same as ~(x)~
+  + ~x~ gets the value of the variable ~x~
+  + ~(x)~ is calling a function named ~x~ with zero arguments
+
+*** Numbers
+#+begin_src racket :exports both
+(+ 2 3)
+(- 10 0.5)
+(* 1/3 2/3)
+(/ 1 100000000000000.0)
+(max 10 20)
+(modulo 10 3)
+#+end_src
+
+***  Booleans
+#+begin_src racket  :exports both
+        (= (+ 2 3) 5)
+        (> (/ 0 1) 1)
+        (zero? (- (+ 1 2) (+ 3 0)))
+        (and (< 1 2) (> 1 0))
+        (or (zero? 1) (even? 3))
+#+end_src
+
+
+***  Conditionals
+- Conditionals are *expressions*, not statements
+- Boolean changes what the expression *is*, not what it does
+#+begin_src racket :exports both
+(if (< 2 3) "hello" "goodbye")
+(+ 3
+  (if (= 2 (+ 1 1))
+      3
+      40))
+#+end_src
+
+***  Functions
+- Calling a function replaces variable with concrete argument
+#+begin_src racket :exports both
+(define (addOne [x : Number]) : Number
+  (+ x 1))
+(addOne 10)
+
+(define (isRemainder [x : Number]
+                     [y : Number]
+                     [remainder : Number])
+        : Boolean
+  (= remainder (modulo x y)))
+(isRemainder 10 3 1)
+(isRemainder 10 4 1)
+#+end_src
+
+***  Functions (ctd.)
+- General form:
+
+#+begin_src racket :exports code
+(define (functionName
+         [argName : argType]
+         ...
+         [argNameN : argTypeN]) : returnType
+  functionBody)
+#+end_src
+- Later in the course we'll see another way of defining functions
+
+
+
+** Functional Thinking: Lists And Recursion
+
+*** What Is Functional Programming?
+- Functions in our program correspond to functions in math
+  + Mapping from inputs to outputs
+  + Same inputs always produce the same outputs
+- Talk about what programs *are*, not what programs do
+- Instead of changing variable values
+  + We call functions with different arguments
+- Instead of changing data structures
+  + We decompose them, copy the parts, and reassemble them in new ways
+  + Copying is implemented with pointers
+    - Fast, memory efficient
+
+*** Advantages of Functional Programming
+- All program state is *explicit*
+  + Easy to tell exactly what a function can change
+  + No shared state between components
+    - Other function can't change value without realizing
+    - No data races for threading
+- Programming is *declarative*
+  + Structure of the problem guides structure of the solution
+- Equational reasoning
+  + In imperative languages, equals sign ~=~ is a LIE
+    - Can write ~x = 3; x = 4;~, but ~3 != 4~
+  + If have ~(define (f x) body)~, then for all ~y~,
+    ~(f y)~ and ~body~ are interchangable
+    - after replace ~x~ with ~y~ in ~body~
+    - Easier to tell if your program is correct
+    - Some optimizations easier
+*** Disadvantages of Functional Programming
+- None?
+- Sometimes slower
+  + Very hard to do without Garbage Collection
+    - e.g. see Closures in Rust
+  + Sometimes faster because you need fewer safety checks in your code
+- Farther from what the CPU is actually doing
+- Some algorithms are more concise with mutation
+  + But lots aren't
+*** How to design functional programs
+**** 5 Step method:
+1. Determine the representation of inputs and outputs
+2. Write examples/tests
+3. Create a *template* of the function
+   a. Depends on input/output types
+   b. Covers all cases
+   c. Possibly extracts fields, recursive calls, etc.
+4. Fill in the holes in the template
+
+5. Run tests
+
+**** Further reference:
+http://htdp.org, Matthew Flatt's Notes (URCourses)
+
+
+* Local Variables :noexport:
+Local Variables:
+org-latex-packages-alist: nil
+End:
+
+
+
+# *** What's Algebraic about Algebraic Data Types? :noexport:
+
+**** Boolean logic
+
+- OR acts like + (sum)
+- AND acts like * (product)
+
+**** Sum Types
+- ~(OR A B)~ is either an ~A~ or a ~B~
+**** Algebraic Data Types
+- Sums of Products
+- Is the first constructor type OR the second constructor type OR ...
+- Each constructor has a value of its first field type AND the second field type AND
+- Algbraic laws for how they interact
+  + We'll see more later
