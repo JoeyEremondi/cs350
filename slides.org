@@ -44,7 +44,7 @@
 #+latex_header: \mathlig{=>}{\Rightarrow}
 #+latex_header: \definecolor{LightGray}{gray}{0.9}
 #+latex_header: \usepackage[outputdir=pdf]{minted}
-#+latex_header: \setminted[racket]{escapeinside=||,bgcolor=LightGray,beameroverlays=true}
+#+latex_header: \setminted[racket]{escapeinside=||,bgcolor=LightGray,beameroverlays=true,baselinestretch=1.2}
 
 * Introduction
 :PROPERTIES:
