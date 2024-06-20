@@ -44,7 +44,7 @@
 #+latex_header: \mathlig{=>}{\Rightarrow}
 #+latex_header: \definecolor{LightGray}{gray}{0.9}
 #+latex_header: \usepackage[outputdir=pdf]{minted}
-#+latex_header: \setminted[racket]{escapeinside=||,bgcolor=LightGray}
+#+latex_header: \setminted[racket]{escapeinside=||,bgcolor=LightGray,beameroverlays=true}
 
 * Introduction
 :PROPERTIES:
@@ -75,8 +75,21 @@ To learn:
   + Optional additional reference
   + Similar content but very different approach
 
-*** Structure
-**** Grading scheme
+*** Course Communication
+- Everything on URCourses
+  + Announcements
+  + Assignments and Handin
+  + Textbook, Slides, Videos
+  + Email
+  + Discussion Forum
+
+- Do NOT ask programming/conceptual questions by email
+  + Use the discussion forum
+  + If you're wondering, others are too
+  + EXCEPTION: when you can't ask your question without revealing
+    your solution to the assignment
+
+*** Grading Scheme
   + 25% assignments
   + 25% midterm
     - In-class
@@ -305,14 +318,34 @@ To learn:
   + ~(x)~ is calling a function named ~x~ with zero arguments
 
 *** Numbers
+
+****   
+:PROPERTIES:
+:BEAMER_COL: 0.48
+:BEAMER_ENV: block
+:END:
+
+#+name: plait-numbers
 #+begin_src racket :exports both
-(+ 2 3)
+;;!!appear!!
+;;!!results!!
+(+ 2 7)
 (- 10 0.5)
 (* 1/3 2/3)
-(/ 1 100000000000000.0)
+(/ 1 1000000000000.0)
 (max 10 20)
 (modulo 10 3)
 #+end_src
+
+****    
+:PROPERTIES:
+:BEAMER_COL: 0.48
+:BEAMER_ENV: block
+:END:
+#+BEGIN_EXPORT latex
+  \onslide<1->
+#+END_EXPORT
+#+RESULTS: plait-numbers
 
 ***  Booleans
 #+begin_src racket  :exports both
@@ -409,9 +442,9 @@ To learn:
 1. Determine the representation of inputs and outputs
 2. Write examples/tests
 3. Create a *template* of the function
-   a. Depends on input/output types
-   b. Covers all cases
-   c. Possibly extracts fields, recursive calls, etc.
+   - Depends on input/output types
+   - Covers all cases
+   - Possibly extracts fields, recursive calls, etc.
 4. Fill in the holes in the template
 
 5. Run tests
