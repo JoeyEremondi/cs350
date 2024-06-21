@@ -1,3 +1,8 @@
 *.tex
 _minted*
 .DS_Store
+*.pyg
+.auctex-auto/
+
+/private
+/scratch

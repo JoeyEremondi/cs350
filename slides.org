@@ -44,9 +44,12 @@
 #+latex_header: \mathlig{=>}{\Rightarrow}
 #+latex_header: \definecolor{LightGray}{gray}{0.9}
 #+latex_header: \usepackage[outputdir=pdf]{minted}
-#+latex_header: \setminted[racket]{escapeinside=||,bgcolor=LightGray,beameroverlays=true,baselinestretch=1.2}
+#+latex_header: \usepackage{etoolbox}
+#+latex_header: \usepackage{etoolbox}
+#+latex_header: \AtBeginEnvironment{minted}{\pause} \setminted[racket]{escapeinside=||,bgcolor=LightGray,beameroverlays=true,baselinestretch=1.2,fontsize=\scriptsize}
 
 * Introduction
+
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides001-intro.pdf
 :END:
@@ -74,6 +77,7 @@ To learn:
 - 3rd edition also available
   + Optional additional reference
   + Similar content but very different approach
+  + When in doubt, we're following the 2nd edition
 
 *** Course Communication
 - Everything on URCourses
@@ -100,7 +104,7 @@ To learn:
     - This room
 *** Assignments
 - Six weekly assignments
-- Due Tuesday at 5pm
+- Due Tuesday at noon (11:59am)
   + No extensions
   + Lowest grade dropped
 - Submitted over UR Courses
@@ -113,6 +117,21 @@ To learn:
   + Code doesn't run $->$ no marks
 - Some points for style/documentation/etc.
   +  Sample based marking
+*** Attendance
+- Attendance is mandatory but unenforced
+  + Lecture contents is fair game for exams
+- Lectures will contain walk-throughs of code
+  and problem solving examples
+- This is NOT a memorization-focused class
+- I'll do my best to post slides and example code from lectures
+  + But ultimately it's your responsibility to catch up on missed material
+*** Office Hours :TODO:
+- Mon 2:30-3:45pm
+- Mon 4:30-5:15pm
+- Wed 11:00am-11:45am
+- Thurs 2:30-3:45pm
+- RIC 317
+  + Take the elevator to 3rd floor, then go straight across
 *** LLM Policy
 **** Use of ChatGPT, GitHub Copilot, or any other Large Language Model or Generative AI is forbidden when completing the assignments for this class
 - Considered a violation of Academic Integrity
@@ -258,7 +277,7 @@ To learn:
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 
-** Overview
+*** Overview
 - Topic: Functional Programming in Racket and plait
 - Required Reading:
   + Plait tutorial (URCourses)
@@ -343,20 +362,42 @@ To learn:
 :BEAMER_ENV: block
 :END:
 #+BEGIN_EXPORT latex
-  \onslide<1->
+\onslide<1->
 #+END_EXPORT
 #+RESULTS: plait-numbers
 
-***  Booleans
-#+begin_src racket  :exports both
-        (= (+ 2 3) 5)
-        (> (/ 0 1) 1)
-        (zero? (- (+ 1 2) (+ 3 0)))
-        (and (< 1 2) (> 1 0))
-        (or (zero? 1) (even? 3))
+
+*** Booleans
+
+****   
+:PROPERTIES:
+:BEAMER_COL: 0.68
+:BEAMER_ENV: block
+:END:
+
+#+name: plait-booleans
+#+begin_src racket :exports both
+;;!!appear!!
+;;!!results!!
+(= (+ 2 3) 5)
+(> (/ 0 1) 1)
+(zero? (- (+ 1 2) (+ 3 0)))
+(and (< 1 2) (> 1 0))
+(or (zero? 1) (even? 3))
 #+end_src
 
+****    
+:PROPERTIES:
+:BEAMER_COL: 0.28
+:BEAMER_ENV: block
+:END:
+#+BEGIN_EXPORT latex
+\onslide<1->
+#+END_EXPORT
+#+RESULTS: plait-booleans
 
+
+        
 ***  Conditionals
 - Conditionals are *expressions*, not statements
 - Boolean changes what the expression *is*, not what it does
@@ -374,7 +415,10 @@ To learn:
 (define (addOne [x : Number]) : Number
   (+ x 1))
 (addOne 10)
+#+end_src
 
+***  Functions
+#+begin_src racket :exports both
 (define (isRemainder [x : Number]
                      [y : Number]
                      [remainder : Number])
@@ -396,9 +440,48 @@ To learn:
 #+end_src
 - Later in the course we'll see another way of defining functions
 
+*** Symbols
+- Special type in Racket
+- Written with single quote ~'a~, ~'hello~, ~'foo~
+- Like strings, but you don't ever traverse/concatenate/look inside
+- Only relevant operation is comparison
+  + ~(symbol=? 'a 'b)~
+  + Compares pointers, so very fast
 
 
-** Functional Thinking: Lists And Recursion
+
+
+*** Intermediate definitions
+- Can still define variables
+  + Once they're given a value, never changes
+  + Allows re-use
+    - Only evaluated once, can use multiple times
+#+begin_src  racket :noweb strip-export :exports both
+(define (squaredSum [x : Number]
+                    [y : Number]) : Number
+  (let ([xy (+ x y)])
+    (* xy xy)))
+(squaredSum 1 2)
+#+end_src
+
+#+RESULTS:
+#+begin_src racket
+9
+#+end_src
+
+*** Alternate Versions of Let
+- ~let*~ : multiple definitions, later ones can refer to earlier ones
+- 99% of the time this is what you want to use
+  #+begin_src racket
+    (let* ([x (+ 2 3)]
+           [y (* x x)])
+      (* y y))
+  #+end_src
+
+
+- ~letrec~ : multiple definitions that can all refer to each other
+  + We'll see this later when we learn about lambdas
+** Functional Thinking and Recursion
 
 *** What Is Functional Programming?
 - Functions in our program correspond to functions in math
@@ -439,18 +522,268 @@ To learn:
   + But lots aren't
 *** How to design functional programs
 **** 5 Step method:
-1. Determine the representation of inputs and outputs
-2. Write examples/tests
+1. Determine the *representation* of inputs and outputs
+2. Write *examples* and tests
 3. Create a *template* of the function
    - Depends on input/output types
    - Covers all cases
    - Possibly extracts fields, recursive calls, etc.
-4. Fill in the holes in the template
+4. *Fill* in the holes in the template
 
-5. Run tests
+5. *Run* tests
 
 **** Further reference:
 http://htdp.org, Matthew Flatt's Notes (URCourses)
+
+
+
+
+*** Factorial - Representation
+- $n! = 1 \times 2 \times \ldots n$
+- Takes in a (natural) number, outputs a number
+  #+begin_src racket
+  (define (factorial [n : Number]) : Number
+    (error 'factorial "TODO"))
+  #+end_src
+
+
+*** Factorial - Examples
+  #+begin_src racket
+   ;;!!appear!!
+
+  (test (factorial 0) 1 )
+  (test (factorial 1) 1 )
+  (test (factorial 2) 2 )
+  (test (factorial 3) 6 )
+  (test (factorial 4) 24 )
+  (test (factorial 5) 120 )
+  #+end_src
+- Notice the pattern?
+
+*** Factorial - Template
+- A natural number is either
+  + Zero
+  + One more than some other number
+    - We call this the "successor", written "S" or "suc"
+    - Probably want to use this in the solution
+#+begin_src racket
+(define (factorial [n : Number]) : Number
+  (if (zero? n)
+      (error 'zero "TODO")
+      (let ([n-1 (- n 1)])
+        (error 'suc "TODO"))
+      ))
+#+end_src
+
+
+*** Factorial - Recursion
+- Divide problem into base case and recursive cases
+- Can use recursive calls to smaller arguments
+- Build up solution in terms of solutions to smaller problems
+#+begin_src racket
+(define (factorial [n : Number]) : Number
+  (if (zero? n)
+      (error 'zero "TODO")
+      (let*
+          ([n-1 (- n 1)]
+           [fn-1 (factorial n-1)])
+          (error 'suc "TODO"))
+      ))
+#+end_src
+
+*** Factorial - Filling holes
+- Example gives the base case for 0
+- Notice the pattern
+  + Multiplying the first n numbers is the same as n times the first n-1 numbers
+  + We get that from our recursive call
+#+name: factorial-complete
+#+begin_src racket
+(define (factorial [n : Number]) : Number
+  (if (zero? n)
+      1
+      (let*
+          ([n-1 (- n 1)]
+           [fn-1 (factorial n-1)])
+          (* n fn-1))
+      ))
+#+end_src
+
+
+*** Run Tests
+#+begin_src racket :exports both :noweb strip-export
+<<factorial-complete>>
+(test (factorial 0) 1 )
+(test (factorial 5) 120 )
+#+end_src
+
+
+*** Trust the Natural Recursion
+- The shape of the data guided the shape of the solution
+  + Zero had no sub-data, so there were no recursive calls
+  + $suc\ n$ has one sub-value, namely $n$
+    - One recursive call
+- Note: types not quite precise enough
+  + e.g. ~(factorial -1)~ or ~(factorial 1/2)~ loop forever
+- Precondition: argument is a non-negative whole number
+  + Can't express this in the code, so write in the comments
+  + Aside: I research languages where you /can/ express this with types
+
+*** Another Example: Exponentiation
++ Live coding in Dr. Racket
+
+
+
+** Unbounded Data: Lists
+
+*** Functional Linked Lists
+- Every linked list is one of:
+  + Empty (sometimes called ~nil~ or ~null~)
+  + An element appended to the beginning of another list
+- We call the operation of appending an element to a list ~cons~
+  + Historical name, goes back to LISP days
+- Cons does *not* change its input
+  + Creates a new list whose tail is the old list
+
+*** Lists in Racket
++ Multiple ways to write lists
++ ~'()~ is the empty list, can also write ~empty~
++ Extending lists:  ~(cons h t)~ creates list with element ~h~ appended to list ~t~
+  - ~h~ and ~t~ for ~head~ and ~tail~
++ List literals, can write ~(list 1 2 3 4)~ or ~'(1 2 3 4)~
+  - Shorthand for:
+  - ~(cons 1 (cons 2 (cons 3 (cons 4 '()))))~
++ Lots more helper functions, see the documentation
+
+
+*** Template for Lists
+- Two cases: list is empty or cons
+- Make a recursive call on tail of cons case
+  #+begin_src racket
+  (define (list-template
+           [xs : (Listof Number)])
+    (if (empty? xs)
+        (error 'nil "TODO")
+        (let ([h (first xs)]
+              [t (rest xs)]
+              [tRet (list-template t)])
+          (error 'cons "TODO"))
+        ))
+  #+end_src
+
+*** Example: Sum
+#+begin_src racket :exports both
+  (define (sum [xs : (Listof Number)])
+    : Number
+    (if (empty? xs)
+        0
+        (let* ([h (first xs)]
+               [t (rest xs)]
+               [tRet (sum t)])
+          (+ h tRet))))
+   (sum '())
+   (sum '(1 2 3))
+#+end_src
+
+#+RESULTS:
+#+begin_src racket
+0
+6
+#+end_src
+
+*** Pattern Matching: Motivation
++ Recursive case: used "getter" function to get the sub-data in the recursive case
+  - ~(- x 1)~ for numbers
+  - ~first~ and ~rest~ for lists
++ Always want to have the sub-parts available
++ Don't want to apply getters on the wrong data
+  - e.g. ~first '()~ will raise an error
+
+
+*** Pattern Matching:
+
+
+*** Example: Generating a Modified List
++ e.g. Increment each number in a list
+  + Uses pattern matching
+  + Shows how to create lists recursively
+  #+begin_src racket :exports both
+(define (increment [xs : (Listof Number)])
+        : (Listof Number)
+  (type-case (Listof Number) xs
+    [empty
+       empty]
+    [(cons h t)
+       (cons (+ h 1) (increment t))]))
+(increment '(2 3 4))
+  #+end_src
+
+
+
+*** Parametric Polymorphism
++ Lists are a *parameterized type*
+  - Only need to define once for the different element types
++ Many list functions are *polymorphic*
+  - Work regardless of what type of elements there are
+  - Types contain *type variables*, denoted with single quote ~'x~
+    + Like symbols
+  - Plait type inference figures out solutions for type variables when you call a function
+  - E.g. ~first : ((Listof 'a) -> 'a)~
+    + Input is list whose elements are some type ~'a~
+    + Output has type ~'a~
+    + e.g. ~first '(1 2 3)~ is a ~Number~, but ~first '(#t #f #t)~ is a Boolean
++ Later, this will be very useful for writing generic list operations
+
+*** Example: List Concatenation
+- We can combine two lists into a single list
+- Polymorphic type
+  + Works for list with any contents
+  + We never do anything with the contents other than copy
+  + This function is built into Plait as ~append~
+    #+name: plait-concat-def
+    #+begin_src racket :exports both
+  (define (concat [xs : (Listof 'elem)]
+                  [ys : (Listof 'elem)])
+          : (Listof 'elem)
+    (type-case (Listof 'elem) xs
+      [empty
+         ys]
+      [(cons h t)
+         (cons h (concat t ys))]))
+    #+end_src
+
+*** Example: List Concatenation (ctd.)
+**** Example
+:PROPERTIES:
+:BEAMER_COL: 0.48
+:BEAMER_ENV: block
+:END:
+    #+name: plait-concat
+    #+begin_src racket :exports both :noweb strip-export
+  <<plait-concat-def>>
+  ;;!!appear!!
+  ;;!!results!!
+
+  (concat '(1 2 3) '(4 5 6))
+  (concat '("3" "5") '("0"))
+  (concat '() '(#t))
+  (concat '(#f) '())
+    #+end_src
+
+**** Results
+:PROPERTIES:
+:BEAMER_COL: 0.48
+:BEAMER_ENV: block
+:END:
+#+RESULTS: plait-concat
+
+
+*** More Examples
+- Demo: Dr. Racket (as time permits)
+  + Duplicating each element of a list
+  + "zipping" two lists together
+  + Filtering out odd elements of a list
+
+
 
 
 * Local Variables :noexport:
