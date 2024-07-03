@@ -6,9 +6,9 @@
 
 #+OPTIONS: toc:nil H:2 num:t TODO:nil eval:yes
 
-#+latex_header: \usepackage[sfdefault]{atkinson} %% Option 'sfdefault' if the base
-#+latex_header: \usepackage{FiraMono}
-#+latex_header: \usepackage[T1]{fontenc}
+#+BEAMER_HEADER: \usepackage[sfdefault]{atkinson} %% Option 'sfdefault' if the base
+#+BEAMER_HEADER: \usepackage{FiraMono}
+#+BEAMER_HEADER: \usepackage[T1]{fontenc}
 
 
 
@@ -24,29 +24,29 @@
 
 # -*- org-latex-packages-alist: nil; -*-
 
-# #+latex_header: \renewcommand{\pageword}{}
+# #+BEAMER_HEADER: \renewcommand{\pageword}{}
 
 
-# #+latex_header: \usetheme[customfont,nofooter]{pureminimalistic}
-#+latex_header: \usetheme{moloch}
-# #+latex_header:\definecolor{textcolor}{RGB}{0, 0, 0}
-#+latex_header:\definecolor{title}{RGB}{2, 71, 49}
-# #+latex_header:\renewcommand{\beamertextcolor}{textcolor}
-# #+latex_header:\renewcommand{\beamerfootertextcolor}{footercolor}
-# #+latex_header:\renewcommand{\beamertitlecolor}{title}
-# #+latex_header:\setbeamertemplate{frametitle}{\\setbeamercolor{alerted text}{fg=black}
-#+latex_header: \setbeamercolor{alerted text}{fg=black}
-#+latex_header: \setbeamerfont{alerted text}{series=\bfseries}
-#+latex_header: \newcommand{\colored}[2]{{\color{#1} #2}}
+# #+BEAMER_HEADER: \usetheme[customfont,nofooter]{pureminimalistic}
+#+BEAMER_HEADER: \usetheme{moloch}
+# #+BEAMER_HEADER:\definecolor{textcolor}{RGB}{0, 0, 0}
+#+BEAMER_HEADER:\definecolor{title}{RGB}{2, 71, 49}
+# #+BEAMER_HEADER:\renewcommand{\beamertextcolor}{textcolor}
+# #+BEAMER_HEADER:\renewcommand{\beamerfootertextcolor}{footercolor}
+# #+BEAMER_HEADER:\renewcommand{\beamertitlecolor}{title}
+# #+BEAMER_HEADER:\setbeamertemplate{frametitle}{\\setbeamercolor{alerted text}{fg=black}
+#+BEAMER_HEADER: \setbeamercolor{alerted text}{fg=black}
+#+BEAMER_HEADER: \setbeamerfont{alerted text}{series=\bfseries}
+#+BEAMER_HEADER: \newcommand{\colored}[2]{{\color{#1} #2}}
 
-#+latex_header: \usepackage{semantic}
-#+latex_header: \usepackage{stmaryrd}
-#+latex_header: \mathlig{=>}{\Rightarrow}
-#+latex_header: \definecolor{LightGray}{gray}{0.9}
-#+latex_header: \usepackage[outputdir=pdf]{minted}
-#+latex_header: \usepackage{etoolbox}
-#+latex_header: \usepackage{etoolbox}
-#+latex_header: \AtBeginEnvironment{minted}{\pause} \setminted[racket]{escapeinside=||,bgcolor=LightGray,beameroverlays=true,baselinestretch=1.2,fontsize=\scriptsize}
+#+BEAMER_HEADER: \usepackage{semantic}
+#+BEAMER_HEADER: \usepackage{stmaryrd}
+#+BEAMER_HEADER: \mathlig{=>}{\Rightarrow}
+#+BEAMER_HEADER: \definecolor{LightGray}{gray}{0.9}
+#+BEAMER_HEADER: \usepackage[outputdir=pdf]{minted}
+#+BEAMER_HEADER: \usepackage{etoolbox}
+#+BEAMER_HEADER: \usepackage{etoolbox}
+#+BEAMER_HEADER: \AtBeginEnvironment{minted}{\pause} \setminted[racket]{escapeinside=||,bgcolor=LightGray,beameroverlays=true,baselinestretch=1.2,fontsize=\scriptsize}
 
 * Introduction
 :PROPERTIES:
@@ -620,10 +620,17 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
 
 
 *** Trust the Natural Recursion
+
+- The magic key:
+  + /Assume/ you have a solution already, but only for smaller arguments
+  + Express solution for larger ones in terms of smaller ones
+  + Like induction in math
 - The shape of the data guided the shape of the solution
   + Zero had no sub-data, so there were no recursive calls
   + $suc\ n$ has one sub-value, namely $n$
     - One recursive call
+
+*** Preconditions
 - Note: types not quite precise enough
   + e.g. ~(factorial -1)~ or ~(factorial 1/2)~ loop forever
 - Precondition: argument is a non-negative whole number
@@ -816,214 +823,447 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
 2
 #t
 #+end_src
+*** Pairs in General
+- For any types ~'a~ and ~'b~ there is a type ~('a * 'b)~
+- Build with ~pair : ('a 'b -> ('a * 'b))~
+  + Takes one argument of each type, produces the pair
+- Projections
+  + ~fst : (('a * 'b) -> 'a)~
+  + ~snd : (('a * 'b) -> 'b)~
+
+** Algebraic Data Types
+
+*** "OR" for types
+- Pairs gave us "AND"
+- What does "OR" look like for types?
+  + ~(OR Number Boolean)~ should be the type of values that are either a number or a boolean
+  + Want a tag so we can check which one it is
+    - Called a "constructor"
+    - not the same as Java/OOP constructor
+- Saw some examples like this already
+  + A number is zero OR one plus another number
+  + A list is empty OR an element cons-ed to another list
+- Racket lets us define our own types mixing AND and OR
+
+*** First example
+
+#+name: shape-defn
+#+begin_src racket
+(define-type Shape
+  (Rectangle [length : Number]
+             [width : Number])
+  (Circle [radius : Number]))
+
+(define tv (Rectangle 16 9))
+(define loonie (Circle 1))
+#+end_src
+- ~Shape~ is a /datatype/
+- It has two /constructors/, ~Rectangle~ and ~Circle~
+  + i.e. a Shape is a circle or a rectangle
+- ~Rectangle~ has two fields with type Number, ~length~ and ~width~
+- ~Circle~ has one field with type Number
+
+*** Creating values of a datatype
+#+begin_src racket
+(define-type Shape
+  (Rectangle [length : Number]
+             [width : Number])
+  (Circle [radius : Number]))
+
+(define tv (Rectangle 16 9))
+(define loonie (Circle 1))
+#+end_src
+- We construct a Shape by calling a constructor
+  + Doesn't *do* anything except package the data together
+- A Shape either has two numbers OR one number
+  + Depending on the tag
+*** Auto-generated Functions
+#+begin_src racket :noweb strip-export
+<<shape-defn>>
+(Rectangle? tv)
+(Circle? tv)
+(Rectangle-length tv)
+;; (test/exn (Circle-radius tv) "")
+  ;;raises an error, no such field present
+#+end_src
+
+#+RESULTS:
+#+begin_src racket
+#t
+#f
+16
+#+end_src
+
+*** Pattern matching
+- Don't want to accidentally get a field that doesn't exist
+- Almost always want to use the fields in the solution
+- Solution: pattern-matching
+#+begin_src racket :noweb strip-export :exports both
+<<shape-defn>>
+(define (area [shp : Shape]) : Number
+  (type-case Shape shp
+     [(Rectangle l w)
+       (* l w)]
+     [(Circle r)
+       (* 3.14 (* r r))])
+)
+(area tv)
+(area loonie)
+#+end_src
+
+#+RESULTS:
+#+begin_src racket
+144
+3.14
+#+end_src
+
+*** Total Matching
+- Missing a case in pattern matching is a /syntax error/
+- Lets us know we are safe
+- Can add an else clause to handle multiple cases
+  + See Racket window
+*** E.g. Representing Failure
++ In plait standard library
+#+begin_src racket
+(define-type (Optionof 'a)
+  (none)
+  (some [v : 'a]))
+#+end_src
++ Pattern matching guarantees no null pointer errors
+  - We'll see a more detailed example
+
+*** Most Generic Form
+#+begin_src racket
+(define-type (Either 'a 'b)
+  (Left [inLeft : 'a])
+  (Right [inRight : 'b])
+)
+#+end_src
+- You can define all (non-recursive) datatypes  with this and pairs
+- e.g. Shape is ~(Either (Number * Number) Number)~
+
+** Recursive Data
+
+*** Self-reference in types
+- The real power of datatypes is the ability to have fields of the type being defined
+- This allows us to define *trees*
+  + of arbitrary depth
+- Data can be traversed using recursion
+
+
+*** Example: Lists as a dataype
+#+name: num-list
+#+begin_src racket
+(define-type NumList
+  (Nil)
+  (Cons [head : Number] [tail : NumList]))
+#+end_src
+- Note: this is not quite how lists are defined in Racket/plait
+  + But they could be!
+- Recursive fields in datatype $\to$ recursive calls in template
+#+begin_src racket :noweb strip-export
+<<num-list>>
+(define (sum [xs : NumList])
+  (type-case NumList xs
+             [(Nil)
+              0]
+             [(Cons h t)
+              (let ([sumRest (sum t)])
+                    (+ h (sum t)))
+              ]))
+(sum (Cons 100 (Cons 20 (Cons 3 (Nil)))))
+#+end_src
+
+#+RESULTS:
+#+begin_src racket
+123
+#+end_src
+
+*** Example: Filesystem
++ Model of a file system
+  - Not how is implemented on disk
+#+name: fs-defn
+#+begin_src racket
+(define-type Filesystem
+  (File [name : String]
+        [data : Number])
+  (Folder [name : String]
+          [contents : (Listof Filesystem)]))
+#+end_src
+
+*** Linear Search using Recursion
+
+- Find the first matching file
+#+name: fs-search
+#+begin_src racket :noweb strip-export
+
+(define (search [target : String]
+                [fs : Filesystem]) : (Optionof Number)
+  (type-case Filesystem fs
+             [(File name data)
+              (if (string=? name target)
+                  (some data)
+                  (none))]
+             [(Folder _ contents)
+               (searchList target contents)]))
+#+end_src
+
+*** Helper Function: Searching the list
+- We have mutually recursive types
+  + ~Filesystem~ contains ~(Listof Filesystem)~
+  + ~(Listof Filesystem)~ contains ~Filesystem~
+- So we use mutually-recursive functions
+
+#+name: fs-searchlist
+#+begin_src racket
+
+(define (searchList [target : String]
+                    [files : (Listof Filesystem)])
+        : (Optionof Number)
+  (type-case (Listof Filesystem) files
+             [empty (none)]
+             [(cons h t)
+              (let ([result (search target h)])
+                (if (none? result)
+                    (searchList target t)
+                    result))
+              ]))
+#+end_src
+*** Testing the search
+#+begin_src racket :noweb strip-export
+<<fs-defn>>
+<<fs-search>>
+<<fs-searchlist>>
+(define InnerSolarSystem
+  (Folder "Sun"
+          (list (File "Mercury" 1)
+                (File "Venus" 2)
+                (Folder "EarthSystem"
+                        (list (File "Earth" 3)
+                              (File "Moon" 3.5)))
+                (Folder "MarsSystem"
+                        (list (File "Mars" 4)
+                              (File "Phobos" 4.3)
+                              (File "Diemos" 4.6))))))
+(search "Moon" InnerSolarSystem)
+(search "Jupiter" InnerSolarSystem)
+#+end_src
+
+#+RESULTS:
+#+begin_src racket
+(some 3.5)
+(none)
+#+end_src
+
+
 * Intro to Interpreters
 ** TODO FOO
 *** TITLE
 
 
 *** TITLE
- - An *interpreter *takes a program and returns it value
- - *Plait *= the language that we use to write interpreters
- - *Curly *= the language that to be interpreted
- - ... that keeps changing
+- An *interpreter *takes a program and returns it value
+- *Plait *= the language that we use to write interpreters
+- *Curly *= the language that to be interpreted
+- ... that keeps changing
 
 
 *** Curly Arithmetic
-   #+begin_src racket
-     (+ 2 1)
-   #+end_src racket
-   #+begin_src racket
-     #,step-arrow
-   #+end_src racket
-   #+begin_src racket
-     (* 2 1)
-   #+end_src racket
-   #+begin_src racket
-     #,step-arrow
-   #+end_src racket
-   #+begin_src racket
-     (+ 2 (* 4 3))
-   #+end_src racket
-   #+begin_src racket
-     #,step-arrow
-   #+end_src racket
-   #+begin_src racket
+#+begin_src racket
+(+ 2 1)
+#+end_src racket
+#+begin_src racket
+#,step-arrow
+#+end_src racket
+#+begin_src racket
+(* 2 1)
+#+end_src racket
+#+begin_src racket
+#,step-arrow
+#+end_src racket
+#+begin_src racket
+(+ 2 (* 4 3))
+#+end_src racket
+#+begin_src racket
+#,step-arrow
+#+end_src racket
+#+begin_src racket
 
-   #+end_src racket
-   #+begin_src racket
-     #,step-arrow
-   #+end_src racket
+#+end_src racket
+#+begin_src racket
+#,step-arrow
+#+end_src racket
 
 
 *** Representing Expressions
-   #+begin_src racket
+#+begin_src racket
 
-   #+end_src racket
-   #+begin_src racket
-     (define-type
-        Exp
-        (numE (n : Number))
-        (plusE (l : Exp) (r : Exp))
-        (multE (l : Exp) (r : Exp)))
-   #+end_src racket
+#+end_src racket
+#+begin_src racket
+(define-type
+Exp
+(numE (n : Number))
+(plusE (l : Exp) (r : Exp))
+(multE (l : Exp) (r : Exp)))
+#+end_src racket
 
 
 *** TITLE
 
 
 *** Curly Interpeter
-   #+begin_src racket
-     (define (interp (a : Exp))
-         :
-         Number
-         (type-case
-          Exp
-          a
-          ((numE n) n)
-          ((plusE l r) (+ (interp l) (interp r)))
-          ((multE l r) (* (interp l) (interp r)))))
-   #+end_src racket
+#+begin_src racket
+(define (interp (a : Exp))
+        :
+        Number
+        (type-case
+        Exp
+        a
+        ((numE n) n)
+        ((plusE l r) (+ (interp l) (interp r)))
+        ((multE l r) (* (interp l) (interp r)))))
+#+end_src racket
 
 
 *** TITLE
 
 
 *** Concrete vs. Abstract Syntax
-   #+begin_src racket
-     (+ 2 1)
-   #+end_src racket
-   #+begin_src racket
-     (plusE (numE 2) (numE 1))
-   #+end_src racket
+#+begin_src racket
+(+ 2 1)
+#+end_src racket
+#+begin_src racket
+(plusE (numE 2) (numE 1))
+#+end_src racket
 
 
 *** Concrete Syntax as an S-Expression
-   #+begin_src racket
-     `(+ 2 1)
-   #+end_src racket
-   #+begin_src racket
-     (test (parse `(+ 2 1)) (plusE (numE 2) (numE 1)))
-   #+end_src racket
+#+begin_src racket
+`(+ 2 1)
+#+end_src racket
+#+begin_src racket
+(test (parse `(+ 2 1)) (plusE (numE 2) (numE 1)))
+#+end_src racket
 
 
 *** Concrete Syntax as an S-Expression
-   #+begin_src racket
-     (code:comment "An EXP is either")
-   #+end_src racket
-   #+begin_src racket
-     parse
-   #+end_src racket
-   #+begin_src racket
-     (define-type
-        Exp
-        (numE (n : Number))
-        (plusE (l : Exp) (r : Exp))
-        (multE (l : Exp) (r : Exp)))
-   #+end_src racket
+#+begin_src racket
+(code:comment "An EXP is either")
+#+end_src racket
+#+begin_src racket
+parse
+#+end_src racket
+#+begin_src racket
+(define-type
+Exp
+(numE (n : Number))
+(plusE (l : Exp) (r : Exp))
+(multE (l : Exp) (r : Exp)))
+#+end_src racket
 
 
 *** Concrete Syntax as an S-Expression
-   #+begin_src racket
-     (code:comment "An EXP is either")
-   #+end_src racket
-   #+begin_src racket
-     parse
-   #+end_src racket
-   #+begin_src racket
-     (define-type
-        Exp
-        (numE (n : Number))
-        (plusE (l : Exp) (r : Exp))
-        (multE (l : Exp) (r : Exp)))
-   #+end_src racket
+#+begin_src racket
+(code:comment "An EXP is either")
+#+end_src racket
+#+begin_src racket
+parse
+#+end_src racket
+#+begin_src racket
+(define-type
+Exp
+(numE (n : Number))
+(plusE (l : Exp) (r : Exp))
+(multE (l : Exp) (r : Exp)))
+#+end_src racket
 
 
 *** Concrete Syntax as an S-Expression
-   #+begin_src racket
-     (code:comment "An EXP is either")
-   #+end_src racket
-   #+begin_src racket
-     parse
-   #+end_src racket
-   #+begin_src racket
-     (define-type
-        Exp
-        (numE (n : Number))
-        (plusE (l : Exp) (r : Exp))
-        (multE (l : Exp) (r : Exp)))
-   #+end_src racket
+#+begin_src racket
+(code:comment "An EXP is either")
+#+end_src racket
+#+begin_src racket
+parse
+#+end_src racket
+#+begin_src racket
+(define-type
+Exp
+(numE (n : Number))
+(plusE (l : Exp) (r : Exp))
+(multE (l : Exp) (r : Exp)))
+#+end_src racket
 
 
 *** Matching an S-Expression
-   #+begin_src racket
-     (code:comment "An EXP is either ...")
-   #+end_src racket
-   #+begin_src racket
-     (and (s-exp-list? s)
-            (= 3 (length (s-exp->list s)))
-            (s-exp-symbol? (first (s-exp->list s)))
-            (eq? '* (s-exp->symbol (first (s-exp->list s)))))
-   #+end_src racket
-   #+begin_src racket
-     (s-exp-match? `(* ANY ANY) s)
-   #+end_src racket
-   #+begin_src racket
-     code:blank
-   #+end_src racket
-   #+begin_src racket
-     (define (parse (s : S-Exp))
-         :
-         Exp
-         ....
-         #,(lt-superimpose (ghost big-body) body)
-         ....)
-   #+end_src racket
-   #+begin_src racket
-     (define (parse (s : S-Exp))
-         :
-         Exp
-         ....
-         #,(lt-superimpose (ghost big-body) body)
-         ....)
-   #+end_src racket
-   #+begin_src racket
-     (cond
+#+begin_src racket
+(code:comment "An EXP is either ...")
+#+end_src racket
+#+begin_src racket
+(and (s-exp-list? s)
+        (= 3 (length (s-exp->list s)))
+        (s-exp-symbol? (first (s-exp->list s)))
+        (eq? '* (s-exp->symbol (first (s-exp->list s)))))
+#+end_src racket
+#+begin_src racket
+(s-exp-match? `(* ANY ANY) s)
+#+end_src racket
+#+begin_src racket
+code:blank
+#+end_src racket
+#+begin_src racket
+(define (parse (s : S-Exp))
+        :
+        Exp
         ....
-        (#,g
-         ....
-         (parse (second (s-exp->list s)))
-         ....
-         (parse (third (s-exp->list s)))
-         ....)
+        #,(lt-superimpose (ghost big-body) body)
         ....)
-   #+end_src racket
-   #+begin_src racket
-     (define (parse (s : S-Exp))
-         :
-         Exp
-         ....
-         #,(lt-superimpose (ghost big-body) body)
-         ....)
-   #+end_src racket
-   #+begin_src racket
-     (cond
+#+end_src racket
+#+begin_src racket
+(define (parse (s : S-Exp))
+        :
+        Exp
         ....
-        (#,g
-         ....
-         (parse (second (s-exp->list s)))
-         ....
-         (parse (third (s-exp->list s)))
-         ....)
+        #,(lt-superimpose (ghost big-body) body)
         ....)
-   #+end_src racket
-   #+begin_src racket
-     (define (parse (s : S-Exp))
-         :
-         Exp
-         ....
-         #,(lt-superimpose (ghost big-body) body)
-         ....)
-   #+end_src racket
+#+end_src racket
+#+begin_src racket
+(cond
+....
+(#,g
+        ....
+        (parse (second (s-exp->list s)))
+        ....
+        (parse (third (s-exp->list s)))
+        ....)
+....)
+#+end_src racket
+#+begin_src racket
+(define (parse (s : S-Exp))
+        :
+        Exp
+        ....
+        #,(lt-superimpose (ghost big-body) body)
+        ....)
+#+end_src racket
+#+begin_src racket
+(cond
+....
+(#,g
+        ....
+        (parse (second (s-exp->list s)))
+        ....
+        (parse (third (s-exp->list s)))
+        ....)
+....)
+#+end_src racket
+#+begin_src racket
+(define (parse (s : S-Exp))
+        :
+        Exp
+        ....
+        #,(lt-superimpose (ghost big-body) body)
+        ....)
+#+end_src racket
 
 
 * Local Variables :noexport:
