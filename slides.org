@@ -1030,7 +1030,7 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
               ]))
 #+end_src
 *** Testing the search
-#+begin_src racket :noweb strip-export
+#+begin_src racket :noweb strip-export :exports both
 <<fs-defn>>
 <<fs-search>>
 <<fs-searchlist>>
