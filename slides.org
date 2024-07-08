@@ -45,7 +45,7 @@
 #+BEAMER_HEADER: \definecolor{LightGray}{gray}{0.9}
 #+BEAMER_HEADER: \usepackage[outputdir=pdf]{minted}
 #+BEAMER_HEADER: \usepackage{etoolbox}
-#+BEAMER_HEADER: \usepackage{etoolbox}
+#+BEAMER_HEADER: \usepackage{hyphenat}
 #+BEAMER_HEADER: \AtBeginEnvironment{minted}{\pause} \setminted[racket]{escapeinside=||,bgcolor=LightGray,beameroverlays=true,baselinestretch=1.2,fontsize=\scriptsize}
 
 * Introduction
@@ -1077,8 +1077,7 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
 #+ATTR_LATEX: :align p{0.11\textwidth}p{0.11\textwidth}p{0.11\textwidth}p{0.11\textwidth}p{0.11\textwidth}p{0.11\textwidth}p{0.11\textwidth}
 | Source code | $\xrightarrow{\text{parsing}}$ | Abstract syntax tree | $\xrightarrow{translation}$ | Core Syntax                | $\xrightarrow{evaluation}$  | Result              |
 |             |                                |                      |                             |                            |                             |                     |
-|-------------+--------------------------------+----------------------+-----------------------------+----------------------------+-----------------------------+---------------------|
-| text file   | lexing / tokenizing first      | data structure       | desugaring / compilation    | simpler AST / machine code | interpreter, execute on CPU | value, side effects |
+| \nohyphens{text file} | \nohyphens{lexing / tokenizing first} | \nohyphens{data structure } | \nohyphens{desugaring / compilation} | simpler AST / machine code | interpreter, execute on CPU | value, side effects |
 |             |                                |                      |                             |                            |                             |                     |
 #+latex: }
 
@@ -1210,7 +1209,7 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
   #+begin_src racket
   `a
   `(+ 2 3)
-  `(a b c d (+ 2 3) #t (#f #f))
+  ~(a b c d (+ 2 3) #t (#f #f))
   #+end_src
 - We'll use backtick as the first half of our parser
   + Easier to deal with s-expressions than strings
@@ -1227,215 +1226,172 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
 - Otherwise, fail
 - Uses the ~s-exp-match?~ function
   + Don't need to memorize how it works, we'll give you the parsers for the most part
+*** Example Parser
+#+name: arith-parse
+#+begin_src racket
+(define (parse [s : S-Exp]) : Expr
+  (cond
+    [(s-exp-match? `NUMBER s) (NumLit (s-exp->number s))]
+    [(s-exp-match? `{+ ANY ANY} s)
+     (Plus (parse (second (s-exp->list s)))
+            (parse (third (s-exp->list s))))]
+    [(s-exp-match? `{* ANY ANY} s)
+     (Times (parse (second (s-exp->list s)))
+            (parse (third (s-exp->list s))))]
+    [else (error 'parse "invalid input")]))
+#+end_src
+* Arithmetic: Our First Interpreter
+:PROPERTIES:
+:EXPORT_FILE_NAME: pdf/slides005-arith.pdf
+:header-args:racket: :results code :lang plait
+:END:
+#+beamer: \beamerdefaultoverlayspecification{<+->}
 
-* Intro to Interpreters
-** TODO FOO
-*** TITLE
+** Interpreters: Overview
 
+*** The Church Turing Thesis
 
-*** TITLE
-- An *interpreter *takes a program and returns it value
-- *Plait *= the language that we use to write interpreters
-- *Curly *= the language that to be interpreted
-- ... that keeps changing
-
-
-*** Curly Arithmetic
-#+begin_src racket
-(+ 2 1)
-#+end_src racket
-#+begin_src racket
-#,step-arrow
-#+end_src racket
-#+begin_src racket
-(* 2 1)
-#+end_src racket
-#+begin_src racket
-#,step-arrow
-#+end_src racket
-#+begin_src racket
-(+ 2 (* 4 3))
-#+end_src racket
-#+begin_src racket
-#,step-arrow
-#+end_src racket
-#+begin_src racket
-
-#+end_src racket
-#+begin_src racket
-#,step-arrow
-#+end_src racket
+#+ATTR_LATEX: :align p{0.2\textwidth}p{0.2\textwidth}p{0.2\textwidth}p{0.2\textwidth}
+|   | [[./img/Alonzo_church.jpg]]     | [[./img/goedel.jpg]]                        | [[./img/turing.jpg]]            |
+|   | Alonzo Church                   | Kurt Gödel                                  | Alan Turing                     |
+|   |                                 |                                             |                                 |
+|   | /\nohyphens{(lambda calculus)}/ | /\nohyphens{(general recursive functions)}/ | /\nohyphens{(Turing machines)}/ |
+|   |                                 |                                             |                                 |
 
 
-*** Representing Expressions
-#+begin_src racket
-
-#+end_src racket
-#+begin_src racket
-(define-type
-Exp
-(numE (n : Number))
-(plusE (l : Exp) (r : Exp))
-(multE (l : Exp) (r : Exp)))
-#+end_src racket
 
 
-*** TITLE
+
+*** The Church Turing Thesis
+**** Turing Completeness
+- The following can all simulate each other:
+  + Turing Machines
+  + General-recursive functions
+  + Lambda calculus (we'll see later)
+- We call a programming language that can simulate a Turing machine
+  /Turing Complete/
+  + Any language with ~while~ loops or recursion is Turing Complete
+**** All Turing Complete Languages can simulate each other
 
 
-*** Curly Interpeter
+*** Turing Completeness and Interpreters
+- You can write an interpreter for any language in any Turing-complete language
+- The features of a language you're interpreting are /completely unrelated/ to the features of the language the interpreter is written in
+  +  Sometimes you can piggyback on the implementation language features, but that's a matter what's /convenient/, not what's /possible/
+
+*** Keeping it all straight
+- The implementation language is NOT the language you're interpreting
+- In this class, the implementation language is Racket/plait
+- We'll write interpreters for a bunch of small languages
+  + We'll call them "Curly" because we write them with curly brackets
+  + Write Curly programs in Racket files using quotation
+
+*** General Form of an Interpreter
 #+begin_src racket
-(define (interp (a : Exp))
-        :
-        Number
-        (type-case
-        Exp
-        a
-        ((numE n) n)
-        ((plusE l r) (+ (interp l) (interp r)))
-        ((multE l r) (* (interp l) (interp r)))))
-#+end_src racket
+(define (interp [e : Expr]
+                [x : SomeContext]
+                ...
+                [y : OtherContext])
+        : Value
+  ....)
+#+end_src
+- ~Expr~ is the is the AST datatype for whatever language we're interpreting
+- What the context arguments and ~Value~ datatype are depend on the language
+  + Initially we have no context arguments, and ~Value~ is very simple
+  + Will get more complicated as we go through the course
+
+*** Our First Interpreter
+#+name: arith-ast
+#+begin_src racket
+(define-type Expr
+  (NumLit [n : Number])
+  (Plus [left : Expr]
+        [right : Expr])
+  (Times [left : Expr]
+         [right : Expr]))
+#+end_src
+- Recursive function on structure of syntax
+  + Base cases are literals, translate directly into values
+  + Recursive cases are operations
+    - Interpret sub-expressions recursively
+    - Combine according to value version of the operation
 
 
-*** TITLE
+*** Our First Interpreter
+- Interpreting arithmetic, so values are just plait ~Number~
 
+#+name: arith-interp
+#+begin_src racket :noweb strip-export :exports both
+<<arith-ast>>
+<<arith-parse>>
+(define (interp [e : Expr] ) : Number
+  (type-case Expr e
+             [(NumLit n) n]
+             [(Plus l r)
+                (+ (interp l) (interp r))]
+             [(Times l r)
+                (* (interp l) (interp r))]))
+(define (eval s-exp) (interp (parse s-exp)))
+(eval `3)
+(eval `{+ 2 5})
+(eval `{+ {* 1 {+ 2 1}} {+ {* 3 4} {* 0 1000000}}})
+#+end_src
 
-*** Concrete vs. Abstract Syntax
+#+RESULTS: arith-interp
 #+begin_src racket
-(+ 2 1)
-#+end_src racket
-#+begin_src racket
-(plusE (numE 2) (numE 1))
-#+end_src racket
+3
+7
+15
+#+end_src
 
+*** Adding features
+- Need to update
+  + AST definition
+  + Parser
+  + Interpreter
+- Example: ~{if0 cond x y}~
+  + Evaluates to ~x~ if ~cond~ evaluates to ~0~
+  + Evaluates to ~y~ if ~cond~ evaluates to anything else
 
-*** Concrete Syntax as an S-Expression
+*** Updating the dataype
+#+name: arith-ast
 #+begin_src racket
-`(+ 2 1)
-#+end_src racket
-#+begin_src racket
-(test (parse `(+ 2 1)) (plusE (numE 2) (numE 1)))
-#+end_src racket
+(define-type Expr
+  (NumLit [n : Number])
+  (Plus [left : Expr]
+        [right : Expr])
+  (Times [left : Expr]
+         [right : Expr]))
+  ;;NEW
+  (If0 [test : Expr]
+       [thenBranch : Expr]
+       [elseBranch : Expr])
+#+end_src
 
+*** Updating the parser
+#+begin_src racket
+    [(s-exp-match? `{if0 ANY ANY ANY} s)
+     (If0 (parse (second (s-exp->list s)))
+            (parse (third (s-exp->list s))
+            (parse (fourth (s-exp->list s))]
+#+end_src
 
-*** Concrete Syntax as an S-Expression
-#+begin_src racket
-(code:comment "An EXP is either")
-#+end_src racket
-#+begin_src racket
-parse
-#+end_src racket
-#+begin_src racket
-(define-type
-Exp
-(numE (n : Number))
-(plusE (l : Exp) (r : Exp))
-(multE (l : Exp) (r : Exp)))
-#+end_src racket
-
-
-*** Concrete Syntax as an S-Expression
-#+begin_src racket
-(code:comment "An EXP is either")
-#+end_src racket
-#+begin_src racket
-parse
-#+end_src racket
-#+begin_src racket
-(define-type
-Exp
-(numE (n : Number))
-(plusE (l : Exp) (r : Exp))
-(multE (l : Exp) (r : Exp)))
-#+end_src racket
-
-
-*** Concrete Syntax as an S-Expression
-#+begin_src racket
-(code:comment "An EXP is either")
-#+end_src racket
-#+begin_src racket
-parse
-#+end_src racket
-#+begin_src racket
-(define-type
-Exp
-(numE (n : Number))
-(plusE (l : Exp) (r : Exp))
-(multE (l : Exp) (r : Exp)))
-#+end_src racket
-
-
-*** Matching an S-Expression
-#+begin_src racket
-(code:comment "An EXP is either ...")
-#+end_src racket
-#+begin_src racket
-(and (s-exp-list? s)
-        (= 3 (length (s-exp->list s)))
-        (s-exp-symbol? (first (s-exp->list s)))
-        (eq? '* (s-exp->symbol (first (s-exp->list s)))))
-#+end_src racket
-#+begin_src racket
-(s-exp-match? `(* ANY ANY) s)
-#+end_src racket
-#+begin_src racket
-code:blank
-#+end_src racket
-#+begin_src racket
-(define (parse (s : S-Exp))
-        :
-        Exp
-        ....
-        #,(lt-superimpose (ghost big-body) body)
-        ....)
-#+end_src racket
-#+begin_src racket
-(define (parse (s : S-Exp))
-        :
-        Exp
-        ....
-        #,(lt-superimpose (ghost big-body) body)
-        ....)
-#+end_src racket
-#+begin_src racket
-(cond
-....
-(#,g
-        ....
-        (parse (second (s-exp->list s)))
-        ....
-        (parse (third (s-exp->list s)))
-        ....)
-....)
-#+end_src racket
-#+begin_src racket
-(define (parse (s : S-Exp))
-        :
-        Exp
-        ....
-        #,(lt-superimpose (ghost big-body) body)
-        ....)
-#+end_src racket
-#+begin_src racket
-(cond
-....
-(#,g
-        ....
-        (parse (second (s-exp->list s)))
-        ....
-        (parse (third (s-exp->list s)))
-        ....)
-....)
-#+end_src racket
-#+begin_src racket
-(define (parse (s : S-Exp))
-        :
-        Exp
-        ....
-        #,(lt-superimpose (ghost big-body) body)
-        ....)
-#+end_src racket
+*** Updating the interpreter
+#+begin_src racket :noweb strip-export :exports both
+(define (interp [e : Expr] ) : Number
+  (type-case Expr e
+             [(NumLit n) n]
+             [(Plus l r)
+                (+ (interp l) (interp r))]
+             [(Times l r)
+                (* (interp l) (interp r))])
+             ;; NEW
+             [(If0 test thenBranch elseBranch)
+               (if (= 0 (interp test))
+                 (interp thenBranch)
+                 (interp elseBranch)
+               )])
+#+end_src
 
 
 * Local Variables :noexport:
