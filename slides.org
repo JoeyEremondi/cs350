@@ -1385,15 +1385,170 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
                 (+ (interp l) (interp r))]
              [(Times l r)
                 (* (interp l) (interp r))])
-             ;; NEW
+  
              [(If0 test thenBranch elseBranch)
                (if (= 0 (interp test))
                  (interp thenBranch)
                  (interp elseBranch)
                )])
 #+end_src
+* Desugaring: Our First Elaborator
+:PROPERTIES:
+:EXPORT_FILE_NAME: pdf/slides006-desugar.pdf
+:header-args:racket: :results code :lang plait
+:END:
+#+beamer: \beamerdefaultoverlayspecification{<+->}
+** Syntactic Sugar
+*** What is syntactic sugar
+- Some language features strictly increase the power of a language
+  + Let you do things that can't be done any other way
+- Some language features aren't strictly necessary, but are nice to have
+  + Otherwise we'd just code in machine code/assembly all the time
+- These "nice to haves" are called /syntactic sugar/
+  + They "sweeten" the experience of programming
+*** Desugaring
+- When one feature can be expressed in terms of another, sometimes we implement it by /desugaring/
+  + Translating the AST for a feature into other language features
+- Desugared features: no case in the interpreter
+  + Instead, translate to a smaller "core" AST type
+  + Keeps the interpreter small, easier to maintain
+- Have two types for AST
+  + Surface AST
+  + Core AST
+*** Example: Subtraction
+- We'll add subtraction to our language
+  + /without changing the interpreter at all/
+- Separate AST into surface and core AST
+- Add translation from surface to core AST
+*** Subtraction: Datatype
+- First need the surface AST
+#+begin_src racket
+(define-type SurfaceExpr
+  (SurfNumLit [n : Number])
+  (SurfPlus [left : SurfaceExpr]
+        [right : SurfaceExpr])
+  (SurfTimes [left : SurfaceExpr]
+         [right : SurfaceExpr])
+  (SurfIf0 [test : SurfaceExpr]
+       [thenBranch : SurfaceExpr]
+       [elseBranch : SurfaceExpr])
+  (SurfSub [left : SurfaceExpr]
+       [right : SurfaceExpr]))
+#+end_src
+*** Subtraction: Parser Case
+#+begin_src racket
+(define (parse [s : S-Exp]) : SurfaceExpr
+  ...
+    [(s-exp-match? `{- ANY ANY} s)
+     (SurfSub (parse (second (s-exp->list s)))
+            (parse (third (s-exp->list s))))])
+#+end_src
+*** Subtraction: Elaborator
+- Define function that translates from ~SurfaceExpr~ to ~Expr~
+#+begin_src racket
+(define (elab [surf : SurfaceExpr]) : Expr
+  (type-case SurfaceExpr surf
+             [(SurfNumLit n) (NumLit n)]
+             [(SurfPlus x y) (Plus x y)]
+             [(SurfTimes x y) (Times x y)]
+             [(SurfIf0 test thn els) (If0 test thn els)]
+             ;; Sub isn't in our core syntax
+             [(SurfSub x y) (Plus x (Times (NumLit -1) y))])
+  )
+#+end_src
+*** Compilation vs. Elaboration vs. Desugaring
+- Technically we just wrote our first compiler
+  + Translated a small language into an even smaller one
+- Compilation is just a bunch of desugaring passes
+  + Simpler and simpler languages untill we have something simple enough for assembly code
 
 
+
+
+
+* Functions, Variables and Substitution
+:PROPERTIES:
+:EXPORT_FILE_NAME: pdf/slides007-subst.pdf
+:header-args:racket: :results code :lang plait
+:END:
+#+beamer: \beamerdefaultoverlayspecification{<+->}
+** Overview: Functions
+*** Adding functions to the language
+- Want to be able to re-use code, compute in terms of variables
+- Two new Curly features
+- Function definitions
+  + ~{define {f x} {+ x 3}}~
+- Function calls
+  + Sometimes called /function applications/
+  + ~{f 10}~, produces ~13~
+  + To start: single argument, inputs and outputs number
+*** Syntax: Definitions
+- New datatype for function definitions
+#+begin_src racket
+(define-type FunDef
+  (mkFunDef [name : Symbol]
+            [arg : Symbol]
+            [body : Expr]))
+#+end_src
+*** Parser: Definitions
+- New parser
+  + Note: function definition is not an expression
+  + Need to elaborate body after parsing
+#+begin_src racket
+(define (parse-fundef [s : S-Exp]) : FunDef
+  (cond
+    [(s-exp-match? `{define {SYMBOL SYMBOL} ANY} s)
+     (mkFunDef
+        (s-exp->symbol
+           (first (s-exp->list (second (s-exp->list s)))))
+         (s-exp->symbol
+            (second (s-exp->list (second (s-exp->list s)))))
+         (elab (parse (third (s-exp->list s)))))]
+    [else (error 'parse-fundef "invalid input")]))
+#+end_src
+*** New Expression Syntax
+- We need a way to:
+  + Call a function
+  + Refer to the parameter of a function inside its body
+#+begin_src racket
+(define-type Expr
+  (NumLit [n : Number])
+  (Plus [left : Expr]
+        [right : Expr])
+  (Times [left : Expr]
+         [right : Expr])
+  (If0 [test : Expr]
+       [thenBranch : Expr]
+       [elseBranch : Expr])
+  (Var [x : Symbol])
+  (FunCall [f : Symbol]
+           [arg : Expr]))
+#+end_src
+- Also add variables and calls to surface syntax
+*** Interpreting Variables
+- What is the meaning of a variable in a program?
+  + Variable is just a placeholder for whatever the value is given to the function
+- Interpreting a variable is an *error*
+  + Similar to "out of scope" or "undefined variable" errors
+- Could statically check if variable was out of scope
+  + Might do later in the course
+*** Interpreting Function Calls
+- Function call:
+  + Looks up body of function
+  + Replaces variable with value given
+  + Evaluates the body after that replacement
+- Interpreter needs context now
+  + List of function definitions
+    #+begin_src racket
+     (define (interp [expr : Expr]
+                     [defs : (Listof FunDef)]) : Number
+       ....)
+    #+end_src
+**** How can we replace a variable
+
+*** Substitution
+- More recursion!
+- Traverse the expression
 * Local Variables :noexport:
 Local Variables:
 org-latex-packages-alist: nil
@@ -1401,18 +1556,3 @@ End:
 
 
 
-# *** What's Algebraic about Algebraic Data Types? :noexport:
-
-**** Boolean logic
-
-- OR acts like + (sum)
-- AND acts like * (product)
-
-**** Sum Types
-- ~(OR A B)~ is either an ~A~ or a ~B~
-**** Algebraic Data Types
-- Sums of Products
-- Is the first constructor type OR the second constructor type OR ...
-- Each constructor has a value of its first field type AND the second field type AND
-- Algbraic laws for how they interact
-  + We'll see more later
