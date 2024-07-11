@@ -1548,7 +1548,128 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
 
 *** Substitution
 - More recursion!
-- Traverse the expression
+- "Replace all occurrences of the variable ~x~ with the expression ~s~ inside of the expression ~t~"
+- Do this by traversing the expression recursively
+- Critical operation in programming languages
+*** Cases for Substitution
+  + Variable ~y~: check if ~y~ = ~x~ i.e. it's the variable the one we're replacing
+    - If it is, produce ~s~
+    - Otherwise, produce ~y~ again
+  + Everything else: recursively substitute in the sub-expressions
+    - Will have more complex cases later
+*** Code for Substitution
+#+name: subst-start
+#+begin_src racket
+;; `(subst x s t)` replaces all occurences of `x` in `t` with `s`.
+;; We use this to implement function calls
+(define (subst [toReplace : Symbol]
+               [replacedBy : Expr]
+               [replaceIn : Expr]) : Expr
+  (type-case Expr replaceIn
+    ;; Base case: we're replacing a variable in an expression
+    ;; where that expression is a variable
+    [(Var x)
+     ;; Check if it's the variable we're replacing
+     (if (equal? x toReplace)
+         replacedBy ;; If so, produce what we're replacing it with
+         (Var x))] ;; else produce the original variable
+    ;; Number is a leaf, no sub-expressions
+    ;; so return it unchanged
+    [(NumLit n) (NumLit n)]
+    ;; ...
+#+end_src
+*** Code for Substitution (ctd)
+#+begin_src racket :noweb strip-export
+    <<subst-start>>
+    ;; Plus has two sub-expressions,
+    ;; so we replace the variable in both sub-expressions
+    [(Plus l r)
+     (Plus (subst toReplace replacedBy l)
+           (subst toReplace replacedBy r))]
+    ;; other operations work similarly
+    [(Times l r)
+     (Times (subst toReplace replacedBy l)
+           (subst toReplace replacedBy r))]
+    [(If0 test thn els)
+     (If0 (subst toReplace replacedBy test)
+           (subst toReplace replacedBy thn)
+           (subst toReplace replacedBy els))]
+    ;; Have to decide how to handle namespaces
+    ;; For now, functions and variables are different namespaces
+    ;; so we don't ever replace a function name in subst
+    [(Call funName arg)
+     (Call funName (subst toReplace replacedBy arg))]))
+#+end_src
+* Review
+:PROPERTIES:
+:EXPORT_FILE_NAME: pdf/slides008-review.pdf
+:header-args:racket: :results code :lang plait
+:END:
+#+beamer: \beamerdefaultoverlayspecification{<+->}
+** Overview
+
+*** The Story So Far
+- Functional Programming
+  + Immutable variables
+  + Recursion
+  + Data-types
+  + Type-case
+- Interpreters
+  + BNF
+  + Abstract Syntax
+  + Parsing
+  + Interpretation
+  + Desugaring
+  + Substitution
+** Functional Programming
+** The Languages We've Built
+
+*** Curly
+- Many different languages
+  + Gradually adding features
+  + I'll give them names so we can tell them apart
+- Each time we add a new feature, is a new language
+- Called "curly because" we write with Curly-brackets
+- Write as S-expression strings
+  + Racket backtick ~`~ turns strings into S-expressions
+  + Separates different names/symbols and nests brackets
+  + Parse turns S-expressions into AST
+*** Curly-Arith
+  + Just has addition, multiplication, and numbers
+  + AST type ~Expr~
+  + Value type ~Number~
+  + Pipeline:
+    - String $\to_\text{backtick}$ S-Exp $\to_\text{parse}$ Expr $\to_\text{interp}$ Number
+*** Curly-Cond
+- Adds ~if0~
+  + Conditional expressions, branching depending on whether a value is 0
+  + Adds a constructor to ~Expr~
+  + Adds case to parser and interp
+*** Curly-Sub
+- Adds ~{- x y}~
+- ~interp~ unchanged from Curly-Cond
+- Introduces an intermediate AST type ~SurfExpr~
+  + Expressions with syntactic sugar
+- /Desugaring/ converts ~SurfExpr~ to ~Expr~
+  + Translate away certain features
+  + Also called /elaboration/
+- ~{- x y}~ is the same as ~{+ x {* -1 y}}~
+- String $\to_\text{backtick}$ S-Exp $\to_\text{parse}$ SurfaceExpr $\\ \qquad\qquad \to_{elab}$ Expr $\to_\text{interp}$ Number
+*** Curly-Fun
+- Adds function definitions and function calls
+  + Single parameter functions, number in, number out
+- Functions have /parameters/
+  + So we add variables to ~Expr~ and ~SurfExpr~
+- Interpreter now parameterized by list of function definitions
+  + Parsed separately
+- Function calls interpreted by /substitution/
+  + Replace variable with value of concrete argument
+
+** Where we're going
+*** Functional Programming Features
+- Functions that take functions as arguments
+- Functions that produce functions
+
 * Local Variables :noexport:
 Local Variables:
 org-latex-packages-alist: nil
