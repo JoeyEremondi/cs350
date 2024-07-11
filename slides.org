@@ -1544,9 +1544,24 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
                      [defs : (Listof FunDef)]) : Number
        ....)
     #+end_src
-**** How can we replace a variable
+*** Looking up function definitions
+- Iterate through a list of definitions until we find one that matches
+  #+begin_src racket
+(define (get-fundef [s : Symbol] [defs : (Listof FunDef)]) : FunDef
+  (type-case (Listof FunDef) defs
+    ;; If we hit empty list, then we didn't find the function
+    [empty (error 'get-fundef (string-append "No function with name " (to-string s)))]
+    ;; Check if the first one in the list is what we're looking for
+    ;; If it is, return it.
+    ;; Otherwise, look in the rest of the list.
+    [(cons def otherDefs)
+     (if (equal? (mkFunDef-name def) s)
+         def
+         (get-fundef s otherDefs))]))
+  #+end_src
 
 *** Substitution
+**** How can we replace a variable in an expression?
 - More recursion!
 - "Replace all occurrences of the variable ~x~ with the expression ~s~ inside of the expression ~t~"
 - Do this by traversing the expression recursively
@@ -1600,12 +1615,27 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
     [(Call funName arg)
      (Call funName (subst toReplace replacedBy arg))]))
 #+end_src
+*** Bringing it together
+- Interpret a function call by:
+  + Looking up definition
+  + Evaluating argument
+  + Replacing function parameter with value of argument
+    - using substitution
+#+begin_src racket
+[(Call funName argExpr)
+     (let* ([argVal (interp defs argExpr)]
+            [def (get-fundef funName defs)]
+            [argVar (mkFunDef-arg def)]
+            [funBody (mkFunDef-body def)])
+       (interp defs (subst argVar (NumLit argVal) funBody)))]
+#+end_src
 * Review
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides008-review.pdf
 :header-args:racket: :results code :lang plait
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
+
 ** Overview
 
 *** The Story So Far
@@ -1621,7 +1651,14 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
   + Interpretation
   + Desugaring
   + Substitution
+
 ** Functional Programming
+*** How to evaluate functional programs
+- Repeat until we have a value:
+  + Take all the functions defined with ~define~
+  + Replace them with their definitions, with arguments replacing parameters
+  + Simplify any ~if~, ~cond~, ~type-case~ etc.
+
 ** The Languages We've Built
 
 *** Curly
@@ -1664,11 +1701,6 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
   + Parsed separately
 - Function calls interpreted by /substitution/
   + Replace variable with value of concrete argument
-
-** Where we're going
-*** Functional Programming Features
-- Functions that take functions as arguments
-- Functions that produce functions
 
 * Local Variables :noexport:
 Local Variables:

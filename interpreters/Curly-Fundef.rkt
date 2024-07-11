@@ -226,10 +226,14 @@
          (interp defs els))]
     [(Var x) (error 'interp "undefined variable")]
     [(Call funName argExpr)
-     (let* ([argVal (interp defs argExpr)]
-            [def (get-fundef funName defs)]
-            [argVar (mkFunDef-arg def)]
-            [funBody (mkFunDef-body def)])
+     (let* ([argVal (interp defs argExpr)] ;;Evaluate the argument
+            [def (get-fundef funName defs)] ;; Look up the function definition
+            [argVar (mkFunDef-arg def)] ;; name of the function param
+            [funBody (mkFunDef-body def)]) ;; body of the function
+       ;; Replace the parameter with the argument value in the body,
+       ;; then interpret the resulting body.
+       ;; Need to substitute a NumLit because substition works on expressions,
+       ;; not values.
        (interp defs (subst argVar (NumLit argVal) funBody)))]))
 
 ;; The Language Pipeline
