@@ -11,7 +11,7 @@
                     [run slow-run]
                     [subst old-subst]))
 
-;;NEW: Pairs of variable and values
+; Pairs of variable and values
 (define-type Binding
   (bind [name : Symbol]
         [val : Number]))
@@ -19,7 +19,7 @@
 (test (bind-name (bind 'x 3)) 'x)
 (test (bind-val (bind 'x 3)) 3)
 
-;;NEW
+
 ;; Lets us write Env instead of (Listof Binding)
 ;; But it's not defining a new type,
 ;; just a new name for the same type.
@@ -37,9 +37,8 @@
 (test (extendEnv (bind 'x 3) (extendEnv (bind 'y 4) empty))
       (list (bind 'x 3) (bind 'y 4)))
 
-;;NEW
 ;; Linear search through environments to find a variable
-;; Returns erro
+;; Returns error if var not found
 (define (lookup [n : Symbol] [env : Env]) : Number
   (type-case (Listof Binding) env
     ;; Can't find a variable in an empty env
@@ -55,7 +54,7 @@
 
 
 ;; Evaluate Expressions
-;; NEW: relative to a given context
+;; relative to a given context
 (define (interp [env : Env]
                 [defs : (Listof FunDef)]
                 [e : Expr] ) : Number
@@ -84,7 +83,7 @@
             [def (get-fundef funName defs)] ;; Look up the function definition
             [argVar (mkFunDef-arg def)] ;; name of the function param
             [funBody (mkFunDef-body def)]) ;; body of the function
-       ;; NEW: Finish evaluating the function by interpreting
+       ;; Finish evaluating the function by interpreting
        ;; the function body in the environment with just the variable
        ;; Note: this is Static Scoping, because the only variable
        ;; the function can refer to is its argument
@@ -97,7 +96,7 @@
      (let ([xval (interp env defs xexp)])
        (interp (extendEnv (bind x xval) env) defs body))]))
 
-;;NEW: example of what dynamic scoping looks like
+;; Example of what dynamic scoping looks like
 ;; Dynamic scoping is wrong and you shouldn't use it,
 ;; but you should understand it
 (define (interp-dynscope [env : Env]
@@ -124,6 +123,7 @@
        ;; starting with the empty environment for function calls
        (interp-dynscope (extendEnv (bind argVar argVal) env) ;; !!
                         defs funBody))]
+    ;; NEW
     [(LetVar x xexp body)
      (let ([xval (interp-dynscope env defs xexp)])
        (interp-dynscope (extendEnv (bind x xval) env) defs body))]))
@@ -146,7 +146,6 @@
 ;; We run  program by parsing an s-expression into a surface expression,
 ;; elaboarting (desugaring) the surface expression into a core expression,
 ;; then interpreting it
-;;NEW:
 ;; We always start running a program in an empty environment, since no variables
 ;; have been defined
 (define (runWithDefs defs s-exp) (interp emptyEnv defs (elab (parse s-exp))))

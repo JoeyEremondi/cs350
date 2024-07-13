@@ -39,7 +39,7 @@
 
 ;;NEW
 ;; Linear search through environments to find a variable
-;; Returns erro
+;; Returns error if var not found
 (define (lookup [n : Symbol] [env : Env]) : Number
   (type-case (Listof Binding) env
    ;; Can't find a variable in an empty env
