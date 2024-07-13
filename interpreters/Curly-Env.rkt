@@ -85,9 +85,55 @@
             [argVar (mkFunDef-arg def)] ;; name of the function param
             [funBody (mkFunDef-body def)]) ;; body of the function
        ;; NEW: Finish evaluating the function by interpreting
-       ;; the function body in the extended environment
-       (interp (extendEnv (bind argVar argVal) env) ;; !!
+       ;; the function body in the environment with just the variable
+       ;; Note: this is Static Scoping, because the only variable
+       ;; the function can refer to is its argument
+       ;; e.g. no global variables.
+       ;; We need this for our functions to consistently evaluate to the same thing.
+       (interp (extendEnv (bind argVar argVal) emptyEnv) ;; !!
                defs funBody))]))
+
+;;NEW: example of what dynamic scoping looks like
+;; Dynamic scoping is wrong and you shouldn't use it,
+;; but you should understand it
+(define (interp-dynscope [env : Env]
+                [defs : (Listof FunDef)]
+                [e : Expr] ) : Number
+  (type-case Expr e
+    [(NumLit n) n]
+    [(Plus l r)
+     (+ (interp-dynscope env defs l) (interp-dynscope env defs r))]
+    [(Times l r)
+     (* (interp-dynscope env defs l) (interp-dynscope env defs r))]
+    [(If0 test thn els)
+     (if (= 0 (interp-dynscope env defs test))
+         (interp-dynscope env defs thn)
+         (interp-dynscope env defs els))]
+    [(Var x)
+      (lookup x env)]
+    [(Call funName argExpr)
+     (let* ([argVal (interp-dynscope env defs argExpr)] ;;Evaluate the argument
+            [def (get-fundef funName defs)] ;; Look up the function definition
+            [argVar (mkFunDef-arg def)] ;; name of the function param
+            [funBody (mkFunDef-body def)]) ;; body of the function
+       ;; NEW: dynamic scoping extends the current environment instead of
+       ;; starting with the empty environment for function calls
+       (interp-dynscope (extendEnv (bind argVar argVal) env) ;; !!
+               defs funBody))]))
+
+;; we can use while testing
+(define dynDefs
+  (list
+   (parse-fundef `{define {f x} {+ x y}})
+   (parse-fundef `{define {g y} {f y}})
+   ))
+
+;; Show the difference between static and dynamic scoping
+(test/exn (interp emptyEnv dynDefs  (elab (parse `{g 3})))
+          "undefined")
+(test (interp-dynscope emptyEnv dynDefs (elab (parse `{g 3})))
+                 6)
+
 
 ;; The Language Pipeline
 ;; We run  program by parsing an s-expression into a surface expression,

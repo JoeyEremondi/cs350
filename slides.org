@@ -1824,7 +1824,7 @@ emptyEnv
 - Can't return an error, because we might have added a deferred substitution to the environment
 - So we look in the environment and see if there's a value /bound/ to x
 - If there is return it
-  +  Otherwise, variable nto found error
+  +  Otherwise, variable not found error
 #+begin_src racket
 [(Var x)
       (lookup x env)]
@@ -1840,10 +1840,31 @@ emptyEnv
             [def (get-fundef funName defs)]
             [argVar (mkFunDef-arg def)]
             [funBody (mkFunDef-body def)])
-       (interp (extendEnv (bind argVar argVal) env) ;;<------
+       (interp (extendEnv (bind argVar argVal) emptyEnv) ;;<------
                defs
                funBody))]
 #+end_src
+*** Static Scoping
+- We evaluated the body of the function in the empty environment, plus a value for its variable
+  + Didn't extend the additional environment
+- Want functions to be /abstractions/
+  + Should be able to predict how a function behaves from how it's called
+  + Don't want result to depend on context, just arguments
+- Gives the same results as substitution.
+- We call this /static scoping/
+- If we extend the environment from the call site, we get /dynamic scoping/
+*** Static Scoping Exapmple
+#+begin_src
+{define {f x} {+ x y}}
+{define {g y} {f y}}
+{g 3}
+#+end_src
+- Static scoping says this is an error
+  + No value for ~y~ in body of ~f~
+- Dynamic scoping produces 6
+  + Looks up ~y~ from ~g~ when evaluating ~f~
+- Dynamic scoping is WRONG
+  + You should understand it, but know that static scoping is what we want
 
 ** Implementing Let
 *** Curly-Let
@@ -1897,6 +1918,31 @@ emptyEnv
         (interp (extendEnv (bind x xval) env)
                 defs body))])
 #+end_src
+
+*** Scope
+- Notice that we only add to the env to interp ~body~, not ~xexp~
+- This is because ~x~ is /in scope/ for ~body~ but not ~xexp~
+- We say the *scope of a variable* is the part of the program in which its value is either substituted or bound
+- Let /extends/ scope by adding a variable, while calls /transfer/
+  scope to the function
+- Later we'll see more complex examples of scope
+  + e.g. in Plait, ~let~ and ~let*~ have different rules for what's in scope
+
+*** The Stack
+
+- Environments have a /stack/ structure
+  + Push on new bindings when variables are defined
+  + Don't directly pop, but will sometimes interpret in the unextended environment
+- If we bind a value to a variable that's already in the environment, we say we /shadow/ the old binding
+  + ~lookup~ always takes the most recent binding
+- Part of the /call stack/
+  + Theoretical in Curly
+  + Actually implemented for most languages
+  + Every time we call a function or define a variable we push onto the call stack
+- Curly-Let and others have an /implicit/ call stack
+  + We don't keep the data structure ourselves
+  + Instead, call ~interp~ recursively to add to the /Plait/ call stack
+  + When finished eval, plait returns is to part waiting for the result
 * Local Variables :noexport:
 Local Variables:
 org-latex-packages-alist: nil
