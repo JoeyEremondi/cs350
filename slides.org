@@ -1702,6 +1702,201 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
 - Function calls interpreted by /substitution/
   + Replace variable with value of concrete argument
 
+
+* Environments, Binding, and Scope
+:PROPERTIES:
+:EXPORT_FILE_NAME: pdf/slides009-environments.pdf
+:header-args:racket: :results code :lang plait
+:END:
+#+beamer: \beamerdefaultoverlayspecification{<+->}
+** Overview
+*** The Road to Midterm
+- Today: Environments in Curly
+- Tues: Lambda and First-class Functions in Plait
+- Wed: Replacements for Recursion in Plait
+- Thurs: Implementing Lambda in Curly
+- Mon: Closures and Environments in Curly
+- Tues/Wed: lectures (not included on midterm)
+- Thurs: *MIDTERM*
+**** Everything up to and including Closures may appear on the midterm
+
+** Environments
+
+*** Functions Review
+  + Evaluate their argument
+  + Lookup the function body
+  + Replace the parameter variable with the
+  + Evaluate the result
+  + If we ever interpret a variable, raise an error
+*** The Problem
+- Each substitution is $\mathcal{O}(n)$ where $n$ is the number of nodes in the function body AST
+- This is /in addition/ to the cost of actually evaluating the function
+  + Very slow!
+- Want a way to have $\mathcal{O}(1)$ function calls
+  + Not including the time to evaluate the function body
+- Substitution is forgetful
+  - Just replaces function variable with expression
+  - Not very useful for debugging
+*** The Solution: Environments
+- Data structure for /deferred substitution/
+  + List of variable/value pairs
+- Intuition:
+  - Instead of replacing all ~x~ with value ~v~, keep a list of replacements you need to do
+  - When you interpret ~x~, check the environment before raising an error
+  - If there's an entry for ~x~ in the environment, return that
+    + Error otherwise
+    + Means reference to undefined variable
+*** The Environment Data Structure: Bindings
+
+   #+name: binding-deftype
+#+begin_src racket
+;; Just a pair, but we get better names than fst and snd
+(define-type Binding
+  (bind [name : Symbol]
+        [val : Number]))
+#+end_src
+#+begin_src racket :exports both :noweb strip-export
+<<binding-deftype>>
+;; Get helper functions from the type-def
+(bind-name (bind 'x 3))
+(bind-val (bind 'x 3))
+#+end_src
+
+*** The Environment Data Structure: Environments
+
+#+begin_src racket :noweb strip-export :exports both
+<<binding-deftype>>
+;; Lets us write Env instead of (Listof Binding)
+;; But it's not defining a new type,
+;; just a new name for the same type.
+(define-type-alias Env (Listof Binding))
+;; Environment is either empty or extended env
+(define emptyEnv : Env
+  empty)
+(define (extendEnv [bnd : Binding]
+                   [env : Env])
+        : Env
+  (cons bnd env))
+
+emptyEnv
+(extendEnv (bind 'x 3) (extendEnv (bind 'y 4) empty))
+#+end_src
+
+*** Looking up variables
+- Find the *first* binding in the environment
+  + This is important for shadowing
+- Just a linear search, like we've seen lots already
+#+begin_src  racket
+(define (lookup [n : Symbol] [env : Env]) : Number
+  (type-case (Listof Binding) env
+   ;; Can't find a variable in an empty env
+   [empty (error 'lookup "undefined variable")]
+   ;; Cons: check if the first binding is the var
+   ;; we're looking for.
+   ;; Return its value  if it is, otherwise
+   ;; keep looking in the rest of the list
+   [(cons b rst-env) (cond
+                       [(symbol=? n (bind-name b))
+                        (bind-val b)]
+                       [else (lookup n rst-env)])]))
+#+end_src
+*** Intepreting CurlyFundef with Environments
+- We can change the implementation /without changing the surface language/
+- Programs should run the exact same in both interpreters
+- Strategy: add an extra context argument for Environment
+  + Unlike fundefs, this will /change across recursive calls/
+#+begin_src racket
+(define (interp [env : Env]
+                [defs : (Listof FunDef)]
+                [e : Expr] ) : Number
+  (type-case Expr e
+             ....))
+#+end_src
+*** Case: Plus etc.
+- Exactly like before, except we have to pass the environment in the recursive call
+- Other operations are similar
+#+begin_src racket
+;; {+ e1 e2} evaluates e1 and e2, then adds the results together
+    [(Plus l r)
+     (+ (interp env defs l) (interp env defs r))]
+#+end_src
+*** Case: Variable
+- Can't return an error, because we might have added a deferred substitution to the environment
+- So we look in the environment and see if there's a value /bound/ to x
+- If there is return it
+  +  Otherwise, variable nto found error
+#+begin_src racket
+[(Var x)
+      (lookup x env)]
+#+end_src
+*** Case: Function call
+- Just like before, we get the function body + variable, and value for argument
+- Still interpret body
+- Instead of replacing in body, add variable-value pair to the environment
+  + Called /binding/ the variable to its value
+#+begin_src racket
+[(Call funName argExpr)
+     (let* ([argVal (interp env defs argExpr)]
+            [def (get-fundef funName defs)]
+            [argVar (mkFunDef-arg def)]
+            [funBody (mkFunDef-body def)])
+       (interp (extendEnv (bind argVar argVal) env) ;;<------
+               defs
+               funBody))]
+#+end_src
+
+** Implementing Let
+*** Curly-Let
+- New language: Curly-Let
+- Curly-Fundef, but with one new feature
+  + ~{letvar x e1 e2}~
+    - Gives ~x~ the value ~e1~ in the expression ~e2~
+    - Called letvar so we don't confuse with plait
+- We'll implement with both substitution and environments
+
+*** Abstract Syntax
+#+begin_src racket
+(type-def Expr
+  ....
+  [(Letvar [x : Symbol]
+           [xval : Expr]
+           [body : Expr])]
+          )
+
+#+end_src
+- Parsing and Desugaring are the same as usual
+  + See ~Curly-Let.rkt~
+
+*** Interpreting: Substitution
+- Want variable to have the given value in the body
+  + So just substitute the value for the variable in the body
+- Key detail: expression only evaluated once
+  + Can have exponential speedup in some algorithms
+#+begin_src racket
+(define (interp [defs : (Listof FunDef)] ;;NEW
+                [e : Expr] ) : Number
+  (type-case Expr e
+        ;; ....
+     [(Letvar x xexp body)
+        (interp defs (subst x (interp defs xexp) body))])
+#+end_src
+
+
+*** Interpreting: Environments
+- Interpret the variable's value in the current environment
+- Interpret the let body in the /extended/ environment
+- When we hit ~x~ we'll look in the env
+#+begin_src racket
+(define (interp [env : Env]
+                [defs : (Listof FunDef)]
+                [e : Expr] ) : Number
+  (type-case Expr e
+        ;; ....
+     [(Letvar x xexp body)
+      (let ([xval (interp env defs xexp)])
+        (interp (extendEnv (bind x xval) env)
+                defs body))])
+#+end_src
 * Local Variables :noexport:
 Local Variables:
 org-latex-packages-alist: nil

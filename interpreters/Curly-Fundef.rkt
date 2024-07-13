@@ -1,5 +1,6 @@
 #lang plait
 
+
 ;; Curly-Fundef: A programming language with function definitions
 
 ;; BNF for Curly-Fundef
@@ -224,7 +225,9 @@
      (if (= 0 (interp defs test))
          (interp defs thn)
          (interp defs els))]
+    ;; NEW: If we hit a variable in interp, it's an error
     [(Var x) (error 'interp "undefined variable")]
+    ;; New: Function calls
     [(Call funName argExpr)
      (let* ([argVal (interp defs argExpr)] ;;Evaluate the argument
             [def (get-fundef funName defs)] ;; Look up the function definition
