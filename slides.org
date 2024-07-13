@@ -1898,10 +1898,27 @@ emptyEnv
                 [e : Expr] ) : Number
   (type-case Expr e
         ;; ....
-     [(Letvar x xexp body)
+     [(LetVar x xexp body)
         (interp defs (subst x (interp defs xexp) body))])
 #+end_src
 
+
+*** Substituting in a Let Expression
+- ~{letvar x e1 e2}~ /binds/ ~x~ in e2
+- So when substituting in ~e2~ we don't ever replace x
+- Implements shadowing
+#+begin_src racket
+(define (subst [toReplace : Symbol]
+               [replacedBy : Expr]
+               [replaceIn : Expr]) : Expr
+  (type-case Expr replaceIn
+    [(LetVar x xexp body)
+       (LetVar x
+               (subst toReplace replacedBy xexp)
+               (if (symbol=? x toReplace)
+                   body
+                   (subst toReplace replacedBy body)))]))
+#+end_src
 
 *** Interpreting: Environments
 - Interpret the variable's value in the current environment
@@ -1943,6 +1960,21 @@ emptyEnv
   + We don't keep the data structure ourselves
   + Instead, call ~interp~ recursively to add to the /Plait/ call stack
   + When finished eval, plait returns is to part waiting for the result
+
+*** Shadowing Example
+- ~{letvar x 3 {letvar x 4 {+ 3 x}}}~
+  + Looks at most recent definition
+  + So should be 7
+- Substitution: ~subst~ doesn't replace ~x~ in ~{+ 3 x}~ because it is bound
+- Environments: ~(x,4)~ is at the top of the environment, so ~interp~ of ~x~ finds ~4~
+
+*** Design Choices
+- There are /high level design choices/ for programming languages
+  + How to deal with variable name collisions (shadowing)
+  + How to deal with undefined variables (static vs. dynamic scope)
+- Decisions *are made concrete* in the implementation
+  + Behavior of ~subst~ on bound variables
+  + What environment ~interp~ is passed for function bodies
 * Local Variables :noexport:
 Local Variables:
 org-latex-packages-alist: nil

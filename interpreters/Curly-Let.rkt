@@ -3,8 +3,8 @@
 
 ;; Curly-Fundef: A programming language with function definitions
 
-;; BNF for Curly-Fundef
-;; New forms: x (variable) and {e1 e2} (function calls)
+;; BNF for Curly-Let
+;; New forms: {let x e1 e2}
 ;; 
 ;;  <expr> ::=
 ;;     "{" "+" <expr> <expr> "}"
@@ -12,10 +12,10 @@
 ;;   | "{" "if0" <expr> <expr> <expr> "}"
 ;;   | "{" "-" <expr> <expr> "}"
 ;;   | SYMBOL
+;;   | "{" "let SYMBOL <expr> <expr> "}"
 ;;   | "{" SYMBOL <expr> "}"
 ;;   | NUMBER
 
-;; NEW:
 ;; BNF for Function definitions
 ;; <fundef> ::= "{" "define" "{" SYMBOL SYMBOL "}" <expr> "}"
 
@@ -39,11 +39,15 @@
   ;; This constructor is in SurfExpr but not in Expr
   (SurfSub [left : SurfaceExpr]
            [right : SurfaceExpr])
-  ;; NEW: Variables (will show up in function definitions)
+  ;; Variables (will show up in function definitions)
   (SurfVar [x : Symbol])
-  ;; NEW: Function calls
+  ;;  Function calls
   (SurfCall [funName : Symbol]
-            [arg : SurfaceExpr]))
+            [arg : SurfaceExpr])
+  ;; NEW: variable definitions
+  (SurfLetVar [x : Symbol]
+              [xexp : SurfaceExpr]
+              [body : SurfaceExpr]))
 
 ;; Parse
 ;; Takes an S-expression and turns it into an SurfExpr
@@ -52,7 +56,6 @@
   (cond
     ;; Constant number e.g. 5
     [(s-exp-match? `NUMBER s) (SurfNumLit (s-exp->number s))]
-    ;; NEW: Variable is just a Racket symbol
     ;; x (variable)
     [(s-exp-match? `SYMBOL s) (SurfVar (s-exp->symbol s))]
     ;; {+ s1 s2}
@@ -73,6 +76,11 @@
      (SurfSub (parse (second (s-exp->list s)))
               (parse (third (s-exp->list s))))]
     ;; NEW
+    ;; Same idea as above, but first arg needs to be symbol
+    [(s-exp-match? `{letvar SYMBOL ANY ANY} s)
+     (SurfLetVar (s-exp->symbol (second (s-exp->list s)))
+              (parse (third (s-exp->list s)))
+              (parse (fourth (s-exp->list s))))]
     ;; Function calls {f e1}
     ;; Has to come last, only treat as a function call if it's not a binary operator
     [(s-exp-match? `{SYMBOL ANY} s)
@@ -96,11 +104,16 @@
   (If0 [test : Expr]
        [thenCase : Expr]
        [elseCase : Expr])
-  ;; NEW: Variables (will show up in function definitions)
+  ;; Variables (will show up in function definitions)
   (Var [x : Symbol])
-  ;; NEW: Function calls
+  ;; Function calls
   (Call [funName : Symbol]
-        [arg : Expr]))
+        [arg : Expr])
+  ;; NEW: Local Varible definitions
+  (LetVar [x : Symbol]
+          [xexp : Expr]
+          [body : Expr])
+  )
 
 ;;NEW
 ;; Datatype for storing function definitions
@@ -117,11 +130,11 @@
   (cond
     [(s-exp-match? `{define {SYMBOL SYMBOL} ANY} s)
      (mkFunDef
-        (s-exp->symbol
-           (first (s-exp->list (second (s-exp->list s)))))
-         (s-exp->symbol
-            (second (s-exp->list (second (s-exp->list s)))))
-         (elab (parse (third (s-exp->list s)))))]
+      (s-exp->symbol
+       (first (s-exp->list (second (s-exp->list s)))))
+      (s-exp->symbol
+       (second (s-exp->list (second (s-exp->list s)))))
+      (elab (parse (third (s-exp->list s)))))]
     [else (error 'parse-fundef "invalid fundef input")]))
 
 
@@ -143,10 +156,14 @@
     ;; {- e1 e2} becomes {+ e1 {* -1 e2}}
     [(SurfSub l r)
      (Plus (elab l) (Times (elab r) (NumLit -1)))]
-    ;; NEW: variables are core expressions, so there's nothing to do for desugaring
+    ;; variables are core expressions, so there's nothing to do for desugaring
     [(SurfVar x) (Var x)]
     [(SurfCall f arg)
-     (Call f (elab arg))]))
+     (Call f (elab arg))]
+    ;; NEW: Letvar is desugared in the usual way
+    [(SurfLetVar x xexp body)
+     (LetVar x (elab xexp) (elab body))]
+    ))
 
 
 ;; NEW:
@@ -191,15 +208,22 @@
            (subst toReplace replacedBy r))]
     [(Times l r)
      (Times (subst toReplace replacedBy l)
-           (subst toReplace replacedBy r))]
+            (subst toReplace replacedBy r))]
     [(If0 test thn els)
      (If0 (subst toReplace replacedBy test)
-           (subst toReplace replacedBy thn)
-           (subst toReplace replacedBy els))]
+          (subst toReplace replacedBy thn)
+          (subst toReplace replacedBy els))]
     ;; We can't replace a function name, since the Expr AST requires that the function name be
     ;; a symbol, not an expression. So we just recursively replace in the argument.
     [(Call funName arg)
-     (Call funName (subst toReplace replacedBy arg))]))
+     (Call funName (subst toReplace replacedBy arg))]
+    ;;
+    [(LetVar x xexp body)
+     (LetVar x
+             (subst toReplace replacedBy xexp)
+             (if (symbol=? x toReplace)
+                 body
+                 (subst toReplace replacedBy body)))]))
 
 
 
@@ -235,7 +259,14 @@
        ;; then interpret the resulting body.
        ;; Need to substitute a NumLit because substition works on expressions,
        ;; not values.
-       (interp defs (subst argVar (NumLit argVal) funBody)))]))
+       (interp defs (subst argVar (NumLit argVal) funBody)))]
+    ;; NEW: interpret a let by replacing the bound variable
+    ;; by its defined value in the body
+    [(LetVar x xexp body)
+     (interp defs
+             (subst x
+                    (NumLit (interp defs xexp))
+                    body))]))
 
 ;; The Language Pipeline
 ;; We run  program by parsing an s-expression into a surface expression,
@@ -254,7 +285,10 @@
    (parse-fundef `{define {double y} {* 2 y}})
    (parse-fundef `{define {quadruple x} {double {double x}}})
    (parse-fundef `{define {checkIf0 x} {if0 x 1 0}})
-   (parse-fundef `{define {const0 x} {* 0 {+ 2 {+ 3 {if0 0 {- 3 999999} 40000}}}}})))
+   (parse-fundef `{define {const0 x} {* 0 {+ 2 {+ 3 {if0 0 {- 3 999999} 40000}}}}})
+  ;; NEW
+   (parse-fundef `{define {shadowTriple x} {+ x {letvar x {+ x x} x}}})
+  ))
 
 ;;NEW:
 ;; For testing, we have run work by interpreting
@@ -306,14 +340,31 @@
       8)
 
 (test (run `{if0 {add5 -5} 3 4})
- 3)
+      3)
 
 (test (run `{quadruple 4})
       16)
 
 (test (run `{checkIf0 {+ 3 -3}})
- 1)
+      1)
 
 (test (run `{const0 3})
       0)
+
+;;NEW
+(test (run `{letvar x 3 {+ x 10}})
+      13)
+
+(test (run `{letvar x 3 {letvar x 4 {+ 10 x}}})
+      14)
+
+;; Good example of shadowing, parameter is x
+;; but then defines x to be x + x
+;; so you get paramX + (paramX + paramX)
+(test (run `{shadowTriple 3}) 9)
+
+;; Static scoping: Variable x shouldn't enter function scope 
+(test (run `{letvar x 22 {shadowTriple 3}}) 9)
+
+
 
