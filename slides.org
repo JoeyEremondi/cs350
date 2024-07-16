@@ -39,6 +39,8 @@
 #+BEAMER_HEADER: \setbeamerfont{alerted text}{series=\bfseries}
 #+BEAMER_HEADER: \newcommand{\colored}[2]{{\color{#1} #2}}
 
+#+BEAMER_HEADER: \usepackage[utf8]{inputenc}
+#+BEAMER_HEADER: \DeclareUnicodeCharacter{03BB}{$\lambda$}
 #+BEAMER_HEADER: \usepackage{semantic}
 #+BEAMER_HEADER: \usepackage{stmaryrd}
 #+BEAMER_HEADER: \mathlig{=>}{\Rightarrow}
@@ -468,7 +470,8 @@ To learn:
 
 #+RESULTS:
 #+begin_src racket
-9
+8
+300000
 #+end_src
 
 *** Alternate Versions of Let
@@ -1710,12 +1713,19 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 ** Overview
+*** The Road So Far
+- Functional Programming (Plait Tutorial)
+- Parsing (PLAI ch2)
+- Interpreters (PLAI ch3)
+- Desugaring (PLAI ch4)
+- Functions (PLAI ch5)
 *** The Road to Midterm
-- Today: Environments in Curly
+
+- Today: Environments in Curly (PLAI ch6)
 - Tues: Lambda and First-class Functions in Plait
 - Wed: Replacements for Recursion in Plait
-- Thurs: Implementing Lambda in Curly
-- Mon: Closures and Environments in Curly
+- Thurs: Implementing Lambda in Curly (PLAI ch7)
+- Mon: Closures and Environments in Curly (PLAI ch7)
 - Tues/Wed: lectures (not included on midterm)
 - Thurs: *MIDTERM*
 **** Everything up to and including Closures may appear on the midterm
@@ -1724,8 +1734,8 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
 
 *** Functions Review
   + Evaluate their argument
-  + Lookup the function body
-  + Replace the parameter variable with the
+  + Lookup the function defn (variable, body)
+  + Replace the parameter variable with the argument value in the body
   + Evaluate the result
   + If we ever interpret a variable, raise an error
 *** The Problem
@@ -1832,7 +1842,7 @@ emptyEnv
 *** Case: Function call
 - Just like before, we get the function body + variable, and value for argument
 - Still interpret body
-- Instead of replacing in body, add variable-value pair to the environment
+- Instead of replacing in body, put a variable-value pair in the environment
   + Called /binding/ the variable to its value
 #+begin_src racket
 [(Call funName argExpr)
@@ -1853,6 +1863,12 @@ emptyEnv
 - Gives the same results as substitution.
 - We call this /static scoping/
 - If we extend the environment from the call site, we get /dynamic scoping/
+*** Static Scoping Definition
+- A language has /static scoping/ if undefined variables in a term get their values from the environment where the function is /defined/
+  + Right now, variables come from top-level functions, so undefined variables
+    are always an error
+  + We'll see more of this later
+- A language has /dynamic scoping/ if undefined variables get their values from the point where the function is /called/
 *** Static Scoping Exapmple
 #+begin_src
 {define {f x} {+ x y}}
@@ -1899,7 +1915,7 @@ emptyEnv
   (type-case Expr e
         ;; ....
      [(LetVar x xexp body)
-        (interp defs (subst x (interp defs xexp) body))])
+        (interp defs (subst x (NumLit (interp defs xexp)) body))])
 #+end_src
 
 
@@ -1975,6 +1991,166 @@ emptyEnv
 - Decisions *are made concrete* in the implementation
   + Behavior of ~subst~ on bound variables
   + What environment ~interp~ is passed for function bodies
+
+* Functional Programming 2: First-Class Functions
+:PROPERTIES:
+:EXPORT_FILE_NAME: pdf/slides010-lambda.pdf
+:header-args:racket: :results code :lang plait
+:END:
+#+beamer: \beamerdefaultoverlayspecification{<+->}
+** Higher Order Functions
+*** Functions on Functions
+- Functions let us be abstract over the data they work on
+- But why can't we be abstract over what they do to that data?
+  + We can!
+- A *higher order function* is a function that takes functions as an argument,
+  or returns functions as a value.
+- Examples:
+  + Callbacks
+    - Give a GUI element the function to run when clicked
+  + Threads
+    - Give the function for each thread to compute
+*** Function types
+- Type ~(T1 T2 ... Tn -> S)~
+  + The type of functions that:
+    - take $n$ arguments
+    - each with type $T_i$ respectively
+    - produces a result of type $S$
+- Functions can be defined, where their arguments /are function types!/
+
+*** Example: Repeatedly apply a function
+#+name: applyNTimes
+#+begin_src racket
+(define (applyNTimes [f : (Number -> Number)]
+                     [x : Number]
+                     [nTimes : Number]) : Number
+  (if (<= nTimes 0)
+      x
+      (applyNTimes f (f x) (- nTimes 1))))
+#+end_src
+
+
+- Takes 3 arguments
+  + A function from Number to Number
+  + A number
+  + A number
+- Returns a number
+- In the body:
+  + Calls the parameter ~f~ as a function on ~x~
+
+*** ctd
+#+begin_src racket :noweb strip-export :exports both
+<<applyNTimes>>
+(define (timesTen x) (* 10 x))
+
+(applyNTimes add1 3 5)
+(applyNTimes timesTen 3 5)
+#+end_src
+- Takes whatever function we pass in, applies it to 3, 5 times
+  + ~(f (f (f (f (f 3)))))~
+*** Example: apply an operation to each number in a list
+#+name: mapNum
+#+begin_src racket
+(define (mapNum [f : (Number -> Number)]
+                [xs : (Listof Number)]) : (Listof Number)
+  (type-case (Listof Number) xs
+             [empty empty]
+             [(cons x rest)
+                (cons (f x) (mapNum f rest))]))
+#+end_src
+- Takes a function from Numbers to Numbers, and a list of numbers
+- Applies ~f~ to each element of the list
+  + Apply ~f~ to everything in the empty list
+    - Produces empty list
+  + Apply ~f~ to each in  ~(cons x rest)~
+    - Apply ~f~ to ~x~, recursively apply ~f~ to everything in ~rest~
+    - Combine the results with ~cons~
+
+*** ctd
+#+begin_src racket :exports both :noweb strip-export
+<<mapNum>>
+(define (timesTen x) (* 10 x))
+(mapNum add1 '(1 2 3 4))
+(mapNum timesTen '(1 2 3 4))
+#+end_src
+*** Creating Anonymous Functions
+- So far, have only given functions that we defined with ~define~ as arguments to other functions
+- What if we want to make a small little function that we use only once?
+- What if we want to make a function dynamically?
+*** Lambda
+#+begin_src
+(lambda (x) body)
+#+end_src
+- Creates a function with argument ~x~ that returns ~body~
+- ~x~ may occur in body
+- Is an expression, not a declaration
+  + Can occur anywhere else
+*** Lambda variations
+#+begin_src racket
+;; Type annotation
+(lambda ([x : Number]) : Number
+  (+ x 1))
+
+;; Multiple arguments
+(lambda (x y) (+ x (+ x y)))
+
+;;Multiple type annotations
+(lambda ([x : Number]
+   [y : Number]) (+ x (+ x y)))
+
+;; Unicode Greek lambda
+;; In Dr. Racket: either cmd-\ or ctrl-\ depending on os
+(λ (x) (+ x x))
+#+end_src
+*** Example
+#+begin_src racket :exports both :noweb strip-export
+<<mapNum>>
+(define (timesTen x) (* 10 x))
+(mapNum timesTen '(1 2 3 4))
+(mapNum (lambda (x) (* x 10)) '(1 2 3 4))
+#+end_src
+
+
+*** Define as sugar
+- ~(define (f x) body)~
+- Same as ~(define f (lambda (x) body))~
+- Defining functions is /syntactic sugar/ for lambda in Plait
+
+*** Lambda in a context
+- Don't have to use lambda at the top level
+- Can refer to other variables in the body of the lambda
+#+begin_src racket :noweb strip-export :exports both
+<<mapNum>>
+(define (addNToEach [numToAdd : Number]
+                    [xs : (Listof Number)]) : (Listof Number)
+  (mapNum (lambda (x) (+ x numToAdd)) xs))
+(addNToEach 3 '(1 2 3 4))
+#+end_src
+
+#+RESULTS:
+#+begin_src racket
+'(4 5 6 7)
+#+end_src
+- The lambda *captures* the variable ~numToAdd~
+- Dynamically creates the function that adds its argument to whatever ~numToAdd~ is
+
+*** Functions as return values
+- We can also make functions that produce other functions as a result
+  + Just use ~lambda~ in the body of the function
+*** Polymorphic Functions
+- Higher-order functions are even more powerful when combined with type variables
+- Allows us to say "This works on any type, as long as that type supports this kind of operation"
+Higher-order fun
+  ~(define (sort [xs : (Listof Number)]) : (Listof Number))~
+*** Example: Sorting
+#+begin_src racket
+(define (sortNumbers [xs : (Listof Number)]) : (Listof Number)
+  ....)
+
+
+(define (sort [xs : (Listof Number)]) : (Listof Number)
+  ....)
+#+end_src
 * Local Variables :noexport:
 Local Variables:
 org-latex-packages-alist: nil
