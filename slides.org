@@ -2256,7 +2256,7 @@ emptyEnv
   + Defines a property on that type
 - Returns a new list containing only the elements satisfying the predicate
 #+begin_src racket
-(define (filter [p : ('a 'a -> Boolean)]
+(define (filter [p : ('a  -> Boolean)]
                 [xs : (Listof 'a)]) : (Listof 'a)
   (type-case (Listof 'a) xs
              [empty
@@ -2279,6 +2279,7 @@ emptyEnv
               (none) (none) (some "Cheers") (none)))
 (filter (lambda (x) (> x 1000000))
         (list 1 2 3 4 (* 100000 100000)) )
+(filter (lambda (x) #f) '(1 2 3 4))
 #+end_src
 
 
@@ -2411,6 +2412,123 @@ emptyEnv
 - Generally, don't want to always use point-free programming
   + Sometimes the lambda is just clearer
 - But can be easier to read in many cases
+* Implementing Lambdas with Substitution and Dynamic Typing
+:PROPERTIES:
+:EXPORT_FILE_NAME: pdf/slides012-dyntype.pdf
+:header-args:racket: :results code :lang plait
+:END:
+#+beamer: \beamerdefaultoverlayspecification{<+->}
+** Broad Strategy
+*** Implementation Strategy
+- In some ways, it's /easier/ to implement first-class functions with substitution than normal substitutions
+  + We can get rid of the whole list-of-definitions
+  + Functions as a value: function carries a parameter name and a variable body
+- Non-trivial parts:
+  + Now we have /two/ possible kinds of values
+  + Functions are not numbers
+  + Need to implement *dynamic typing*
+*** The Value Type
+#+begin_src racket
+(define-type Value
+  (NumV [num : Number])
+  (FunV [arg : Symbol]
+        [body : Expr]))
+#+end_src
+
+- The result of interpretation is called a /value/
+  + Number, or a function
+  + Function stores the info we need to call it
+*** Lambdas in our ASTs
+#+begin_src racket
+(define-type Expr
+  ....
+  ;; Capital L, so we don't clash with the plait keyword
+  (Lambda [arg : Symbol]
+          [body : Expr]))
+#+end_src
+- Similar for ~SurfExpr~
+- Notice that ~Lambda~ and ~FunV~ have the /exact/ same fields
+  + Functions /are/ values
+  + A function is saying "here's a computation to do later", so once we've got a Lambda, there's no more evaluation to do
+  + We'll see more of this for ~interp~
+*** Substitution for Lambda
+- Lambda binds its variable
+  + Similar to LetVar
+- Don't substitute in a Lambda body if the variable we're replacing matches the function variable
+  + Ensures that the function variable shadows any previous declarations
+#+begin_src racket
+(define (subst [toReplace : Symbol]
+               [replacedBy : Expr]
+               [replaceIn : Expr]) : Expr
+  (type-case Expr replaceIn
+  ....
+  [(Lambda x body)
+     (if (symbol=? x toReplace)
+         (Lambda x body) ;; Don't substitute if the variable is shadowed
+         (Lambda x (subst toReplace replacedBy body)))]
+  ))
+#+end_src
+*** The Problem: Interpretation
+- We want ~interp~ to produce a ~Value~
+  + So that we can produce functions as the result of expressions
+- Our previous interpreter assumed that ~interp~ always returned a number
+- We need to introduce *dynamic type checking* in Curly-Fun
+*** Aside: Type-Based Refactoring
+- We can use the plait type inference to help us write our implementation
+- Change ~interp~ to produce ~Value~ instead of ~Number~
+- The type-checker sees an error
+- Repeat until there are no type errors:
+  + Go to the first type error
+  + Change the code to have the right type
+    - Wrap numeric results in ~NumV~
+    - Perform dynamic type checks to extract fields
+*** Dynamic Typing
+- Curly now has two different types of things, ~FunV~ and ~NumV~
+- It's possible
+- /Dynamic type checking/ checks that the inputs to an operation are valid before running that operation
+  + Make sure that Plus and Times are only given numbers
+  + Make sure that the condition of ~if0~ is a number
+  + Make sure the thing in a Call is actually a function
+- /Dynamic/ because we check /while the program is running/
+  + If we checked before it ran, it would be /static type checking/
+*** Type Safety
+- Racket is pretty safe
+  + Can't write to arbitrary memory
+- In other languages like C++, type errors (e.g. improper casts) can lead to safety issues, security bugs, etc.
+- Curly is safe because Racket is, but we'll define our own notion of "type safety":
+  + Want to raise an error with an informative message when a Curly program performs a type-unsafe operation, instead of a generic Racket error message
+  + e.g. Dynamic type checks make sure that our interpreter, rather than Racket's built in functions, discover the error
+  + Good practice for programming in less safe languages
+*** Defining some helper functions
+#+begin_src racket
+(define (checkAndGetNum [v : Value]) : Number
+  (type-case Value V
+             [(NumV n) n]
+             [else
+              (error 'curlyTypeError
+                     (string-append "Expected Number, got function:"
+                                    (to-string v)))]))
+
+(define (checkAndGetFun [v : Value]) : (Symbol * Expr)
+  (type-case Value V
+             [(FunV x body)
+              (pair x body)]
+             [else
+              (error 'curlyTypeError
+                     (string-append "Expected Function, got number:"
+                                    (to-string v)))]))
+#+end_src
+- Lets us turn a Value into Number/Function
+  + Better error-message than e.g. ~NumV-num~ gives
+*** A Helpful Higher Order Function
+#+begin_src racket
+(define (liftVal2 [f : (Number Number -> Number)]
+                  [x : Value]
+                  [y : Value]) : Value
+  (let ([nx (checkAndGetNum x)]
+        [ny (checkAndGetNum y)])
+    (NumV (f nx ny))))
+#+end_src
 * Local Variables :noexport:
 Local Variables:
 org-latex-packages-alist: nil
