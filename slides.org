@@ -2485,6 +2485,8 @@ emptyEnv
 - Not actually doing any computation, just changing the constructors
   so the type checker is happy
 - In a more sophisticated implementation language, we could make values a /subtype/ of expressions, but that's beyond this course
+*** Substitution for Calls
+- Needs to substitute in function and body
 *** Substitution for Lambda
 - Fun binds its variable
   + Similar to LetVar
@@ -2537,14 +2539,14 @@ emptyEnv
 *** Defining some helper functions
 #+begin_src racket
 (define (checkAndGetNum [v : Value]) : Number
-  (type-case Value V
+  (type-case Value v
      [(NumV n) n]
      [else
      (error 'curlyTypeError
              (string-append "Expected Number, got function:"
                              (to-string v)))]))
 (define (checkAndGetFun [v : Value]) : (Symbol * Expr)
-  (type-case Value V
+  (type-case Value v
      [(FunV x body)
       (pair x body)]
      [else

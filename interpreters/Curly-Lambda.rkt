@@ -1,10 +1,10 @@
 #lang plait
 
 
-;; Curly-Let: A programming language with functions and local definitions
+;; Curly-Lambda: A language with first-class functions
 
-;; BNF for Curly-Let
-;; New forms: {let x e1 e2}
+;; BNF for Curly-Lambda
+;; New forms: {fun {x} body}
 ;; 
 ;;  <expr> ::=
 ;;     "{" "+" <expr> <expr> "}"
@@ -42,9 +42,13 @@
   ;; Variables (will show up in function definitions)
   (SurfVar [x : Symbol])
   ;;  Function calls
-  (SurfCall [funName : Symbol]
+  ;; NEW: Function can be any expression, not just a symbol
+  (SurfCall [fun : SurfaceExpr]
             [arg : SurfaceExpr])
-  ;; NEW: variable definitions
+  ;;NEW: Anonymous functions
+  (SurfFun [arg : Symbol]
+           [body : SurfaceExpr])
+  ;; variable definitions
   (SurfLetVar [x : Symbol]
               [xexp : SurfaceExpr]
               [body : SurfaceExpr]))
@@ -79,12 +83,19 @@
     ;; Same idea as above, but first arg needs to be symbol
     [(s-exp-match? `{letvar SYMBOL ANY ANY} s)
      (SurfLetVar (s-exp->symbol (second (s-exp->list s)))
-              (parse (third (s-exp->list s)))
-              (parse (fourth (s-exp->list s))))]
+                 (parse (third (s-exp->list s)))
+                 (parse (fourth (s-exp->list s))))]
+    ;; NEW: Anonymous functions
+    [(s-exp-match? `{fun {SYMBOL} ANY} s)
+     (SurfFun (s-exp->symbol
+               (first (s-exp->list
+                       (second (s-exp->list s)))))
+              (parse (third (s-exp->list s))))]
     ;; Function calls {f e1}
     ;; Has to come last, only treat as a function call if it's not a binary operator
     [(s-exp-match? `{SYMBOL ANY} s)
-     (SurfCall (s-exp->symbol (first (s-exp->list s)))
+     ;; NEW: called function can be any expression
+     (SurfCall (parse (first (s-exp->list s)))
                (parse (second (s-exp->list s))))]
     [else (error 'parse "invalid input")]))
 
@@ -107,36 +118,25 @@
   ;; Variables (will show up in function definitions)
   (Var [x : Symbol])
   ;; Function calls
-  (Call [funName : Symbol]
+  ;; NEW: function can be any name, not just a symbol
+  (Call [fun : Expr]
         [arg : Expr])
-  ;; NEW: Local Varible definitions
+  ;; Local Varible definitions
   (LetVar [x : Symbol]
           [xexp : Expr]
           [body : Expr])
+  ;; NEW: anonymous functions
+  (Fun [arg : Symbol]
+       [body : Expr])
   )
 
-;;NEW
-;; Datatype for storing function definitions
-(define-type FunDef
-  (mkFunDef [name : Symbol] ;; name of the function we're calling
-            [arg : Symbol] ;; name of the function's parameter
-            [body : Expr] ;; expression to run when calling the function
-            ))
-
-;;NEW
-;; Parser for function definitions.
-;; Parses {define {f x} e} into (mkFunDef f x (elab (parse e))
-(define (parse-fundef [s : S-Exp]) : FunDef
-  (cond
-    [(s-exp-match? `{define {SYMBOL SYMBOL} ANY} s)
-     (mkFunDef
-      (s-exp->symbol
-       (first (s-exp->list (second (s-exp->list s)))))
-      (s-exp->symbol
-       (second (s-exp->list (second (s-exp->list s)))))
-      (elab (parse (third (s-exp->list s)))))]
-    [else (error 'parse-fundef "invalid fundef input")]))
-
+;; NEW: Values
+;; Interpreter produces more than just numbers now
+;; So we have a datatype of the different kinds of values it can make
+(define-type Value
+  (FunV [arg : Symbol]
+        [body : Expr])
+  (NumV [num : Number]))
 
 ;; Elaborate (desugar) surface expressions into
 ;; core expressions
@@ -159,27 +159,15 @@
     ;; variables are core expressions, so there's nothing to do for desugaring
     [(SurfVar x) (Var x)]
     [(SurfCall f arg)
-     (Call f (elab arg))]
+     (Call (elab f) (elab arg))]
     ;; NEW: Letvar is desugared in the usual way
     [(SurfLetVar x xexp body)
      (LetVar x (elab xexp) (elab body))]
+    [(SurfFun x body)
+     (Fun x (elab body))]
     ))
 
 
-;; NEW:
-;; Helper function to iterate through a list of function definitions
-;; and find if there is one with the given name
-(define (get-fundef [s : Symbol] [defs : (Listof FunDef)]) : FunDef
-  (type-case (Listof FunDef) defs
-    ;; If we hit empty list, then we didn't find the function
-    [empty (error 'get-fundef (string-append "No function with name " (to-string s)))]
-    ;; Check if the first one in the list is what we're looking for
-    ;; If it is, return it.
-    ;; Otherwise, look in the rest of the list.
-    [(cons def otherDefs)
-     (if (equal? (mkFunDef-name def) s)
-         def
-         (get-fundef s otherDefs))]))
 
 ;; NEW:
 ;; Apply a substitution replacing x with expression e1 inside expression e2
@@ -215,58 +203,104 @@
           (subst toReplace replacedBy els))]
     ;; We can't replace a function name, since the Expr AST requires that the function name be
     ;; a symbol, not an expression. So we just recursively replace in the argument.
-    [(Call funName arg)
-     (Call funName (subst toReplace replacedBy arg))]
+    [(Call funExpr arg)
+     (Call (subst toReplace replacedBy funExpr)
+           (subst toReplace replacedBy arg))]
     ;;
     [(LetVar x xexp body)
      (LetVar x
              (subst toReplace replacedBy xexp)
              (if (symbol=? x toReplace)
                  body
-                 (subst toReplace replacedBy body)))]))
+                 (subst toReplace replacedBy body)))]
+    [(Fun x body)
+     ;; Don't substitute if variable is shadowed
+     (if (symbol=? x toReplace)
+         (Fun x body)
+         (Fun x (subst toReplace replacedBy body)))]
+    ))
 
+
+;;;;;;;;;;;;;;;;;;;
+;; NEW: helper functions for dynamic type checking.
+;; Check if a value is a number, and get the number if it is
+(define (checkAndGetNum [v : Value]) : Number
+  (type-case Value v
+    [(NumV n) n]
+    [else
+     (error 'curlyTypeError
+            (string-append "Expected Number, got function:"
+                           (to-string v)))]))
+
+;; Check if a value is a function, and get its parameter and body if it is
+(define (checkAndGetFun [v : Value]) : (Symbol * Expr)
+  (type-case Value v
+    [(FunV x body)
+     (pair x body)]
+    [else
+     (error 'curlyTypeError
+            (string-append "Expected Function, got number:"
+                           (to-string v)))]))
+
+;; Lift a binary operation on Numbers to Values
+(define (liftVal2 [f : (Number Number -> Number)]
+                  [x : Value]
+                  [y : Value]) : Value
+  (let ([nx (checkAndGetNum x)]
+        [ny (checkAndGetNum y)])
+    (NumV (f nx ny))))
+
+;; Convert a Value back into an equivalent expression
+(define (value->expr [v : Value]) : Expr
+  (type-case Value v
+    [(NumV v) (NumLit v)]
+    [(FunV x body) (Fun x body)]))
 
 
 ;; Evaluate Expressions
 ;; NEW: relative to a given context
-(define (interp [defs : (Listof FunDef)] ;;NEW
-                [e : Expr] ) : Number
-  (type-case Expr e
+(define (interp [e : Expr] ) : Value
+  (begin
+;;     (display (to-string e))
+;;     (display "\n------------------------------\n")
+   (type-case Expr e
     ;; A number evaluates to itself
-    [(NumLit n) n]
+    [(NumLit n) (NumV n)]
     ;; {+ e1 e2} evaluates e1 and e2, then adds the results together
     [(Plus l r)
-     (+ (interp defs l) (interp defs r))]
+     (liftVal2 + (interp l) (interp r))]
     ;; Works the same but for times
     [(Times l r)
-     (* (interp defs l) (interp defs r))]
+     (liftVal2 * (interp l) (interp r))]
     ;; {if0 test thn els} evaluates test and checks if it's zero
     ;; if it is, then we evaluate thn
     ;; otherwise we evaluate els
     [(If0 test thn els)
-     (if (= 0 (interp defs test))
-         (interp defs thn)
-         (interp defs els))]
+     (if (= 0 (checkAndGetNum (interp test)))
+         (interp thn)
+         (interp els))]
     ;; NEW: If we hit a variable in interp, it's an error
-    [(Var x) (error 'interp "undefined variable")]
+    [(Var x) (error 'interp (string-append "undefined variable " (to-string x)))]
     ;; New: Function calls
-    [(Call funName argExpr)
-     (let* ([argVal (interp defs argExpr)] ;;Evaluate the argument
-            [def (get-fundef funName defs)] ;; Look up the function definition
-            [argVar (mkFunDef-arg def)] ;; name of the function param
-            [funBody (mkFunDef-body def)]) ;; body of the function
+    [(Call funExpr argExpr)
+     (let* ([argVal (interp argExpr)] ;;Evaluate the argument
+            [funVal (checkAndGetFun (interp funExpr))] ;; Function might be an expression, so have to evaluate
+            [argVar (fst funVal)]  ;; name of the function param
+            [funBody (snd funVal)]) ;; body of the function
        ;; Replace the parameter with the argument value in the body,
        ;; then interpret the resulting body.
        ;; Need to substitute a NumLit because substition works on expressions,
        ;; not values.
-       (interp defs (subst argVar (NumLit argVal) funBody)))]
+       (interp (subst argVar (value->expr argVal) funBody)))]
     ;; NEW: interpret a let by replacing the bound variable
     ;; by its defined value in the body
     [(LetVar x xexp body)
-     (interp defs
-             (subst x
-                    (NumLit (interp defs xexp))
-                    body))]))
+     (interp
+      (subst x
+             (value->expr (interp xexp))
+             body))]
+    [(Fun x body)
+     (FunV x body)])))
 
 ;; The Language Pipeline
 ;; We run  program by parsing an s-expression into a surface expression,
@@ -275,54 +309,67 @@
 ;;NEW: Running is always relative to a set of function definitions
 ;; so we take an extra argument that's a list of function definitions.
 ;;
-(define (runWithDefs defs s-exp) (interp defs (elab (parse s-exp))))
+(define (runWithDefs defs s-exp) (interp (elab (parse s-exp))))
 
-;;NEW: A list of helpful function definitions
+;; NEW:
+;; A list of helpful function definitions
 ;; we can use while testing
-(define testDefs
-  (list
-   (parse-fundef `{define {add5 x} {+ x 5}})
-   (parse-fundef `{define {double y} {* 2 y}})
-   (parse-fundef `{define {quadruple x} {double {double x}}})
-   (parse-fundef `{define {checkIf0 x} {if0 x 1 0}})
-   (parse-fundef `{define {const0 x} {* 0 {+ 2 {+ 3 {if0 0 {- 3 999999} 40000}}}}})
-  ;; NEW
-   (parse-fundef `{define {shadowTriple x} {+ x {letvar x {+ x x} x}}})
-  ))
+;; This is a function that takes an s-expression and produces another s-expression
+;; using slicing, but you don't need to worry how it works.
+
+(define (withFunctions s-expr)
+  `{letvar add5 {fun {x} {+ x 5}}
+           {letvar double {fun {y} {* 2 y}}
+                   {letvar quadruple {fun {x} {double {double x}}}
+                           {letvar checkIf0 {fun {x} {if0 x 1 0}}
+                                   {letvar const0 {fun {x} {* 0 {+ 2 {+ 3 {if0 0 {- 3 999999} 40000}}}}}
+                                           {letvar shadowTriple {fun {x} {+ x {letvar x {+ x x} x}}} ,s-expr}
+                                           }}}}})
+
+;; (define testDefs
+;;   (list
+;;    (parse-fundef `{define {add5 x} {+ x 5}})
+;;    (parse-fundef `{define {double y} {* 2 y}})
+;;    (parse-fundef `{define {quadruple x} {double {double x}}})
+;;    (parse-fundef `{define {checkIf0 x} {if0 x 1 0}})
+;;    (parse-fundef `{define {const0 x} {* 0 {+ 2 {+ 3 {if0 0 {- 3 999999} 40000}}}}})
+;;   ;; NEW
+;;    (parse-fundef `{define {shadowTriple x} {+ x {letvar x {+ x x} x}}})
+;;   ))
 
 ;;NEW:
 ;; For testing, we have run work by interpreting
 ;; in the context of the above definitions
 
-(define (run s-exp) (interp testDefs (elab (parse s-exp))))
+(define (run s-exp) (interp (elab (parse (withFunctions s-exp)))))
 
 (test (run `3)
-      3)
+      (NumV 3))
 (test (run `{+ 1 2})
-      3)
+      (NumV 3))
 (test (run `{* 2 {+ 3 5}})
-      16)
+      (NumV 16))
 
 (test (run `{if0 0 1 2})
-      1)
+      (NumV 1))
 (test (run `{if0 99 1 2})
-      2)
+      (NumV 2))
 (test (run `{if0 {* 2 0} {+ 3 5} {* 3 5}})
-      8)
+      (NumV 8))
 
 (test (run `{+ 3 {if0 3 10 20}})
-      23)
+      (NumV 23))
 
 (test (run `{- 2 1})
-      1)
+      (NumV 1))
 (test (run `{* 2 {- 3 5}})
-      -4)
+      (NumV -4))
 
 (test (run `{if0 {- 2 2} {- 5 3} {- 3 5}})
-      2)
+      (NumV 2))
 
 (test (run `{if0 {- 2 4} {- 5 3} {- 3 5}})
-      -2)
+      (NumV -2))
 
 
 (test/exn (parse `{1 2}) "invalid input")
@@ -331,40 +378,40 @@
 (test/exn (run `{+ x 3}) "undefined variable")
 
 (test (run `{if0 0 3 {+ x 3}})
-      3)
+      (NumV 3))
 
 (test (run `{add5 10})
-      15)
+      (NumV 15))
 
 (test (run `{add5 {if0 0 3 4}})
-      8)
+      (NumV 8))
 
 (test (run `{if0 {add5 -5} 3 4})
-      3)
+      (NumV 3))
 
 (test (run `{quadruple 4})
-      16)
+      (NumV 16))
 
 (test (run `{checkIf0 {+ 3 -3}})
-      1)
+      (NumV 1))
 
 (test (run `{const0 3})
-      0)
+      (NumV 0))
 
 ;;NEW
 (test (run `{letvar x 3 {+ x 10}})
-      13)
+      (NumV 13))
 
 (test (run `{letvar x 3 {letvar x 4 {+ 10 x}}})
-      14)
+      (NumV 14))
 
 ;; Good example of shadowing, parameter is x
 ;; but then defines x to be x + x
 ;; so you get paramX + (paramX + paramX)
-(test (run `{shadowTriple 3}) 9)
+(test (run `{shadowTriple 3}) (NumV 9))
 
 ;; Static scoping: Variable x shouldn't enter function scope 
-(test (run `{letvar x 22 {shadowTriple 3}}) 9)
+(test (run `{letvar x 22 {shadowTriple 3}}) (NumV 9))
 
 
 
