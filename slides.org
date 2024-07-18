@@ -2427,6 +2427,27 @@ emptyEnv
   + Now we have /two/ possible kinds of values
   + Functions are not numbers
   + Need to implement *dynamic typing*
+*** Syntax and Parsing
+- ~{fun SYMBOL <expr>}~
+  + ~{fun {x} body}~ is anonymous function with argument ~x~ and body ~body~
+  + fun instead of lambda to distinguish Curly vs Plait
+#+begin_src racket
+(define (parse s-expr)
+  (cond
+    ....
+    [(s-exp-match? `{fun {SYMBOL} ANY} s)
+     (SurfFun (s-exp->symbol
+              (first (s-exp->list
+                        (second (s-exp->list s)))))
+           (parse (third (s-exp->list s))))]))
+#+end_src
+*** Parsing Calls
+- Same as before, but now we need to allow any expression in function position, not just symbols
+#+begin_src racket
+[(s-exp-match? `{ANY ANY} s)
+     (SurfCall (parse (first (s-exp->list s))
+               (parse (second (s-exp->list s))))]
+#+end_src
 *** The Value Type
 #+begin_src racket
 (define-type Value
@@ -2442,17 +2463,30 @@ emptyEnv
 #+begin_src racket
 (define-type Expr
   ....
-  ;; Capital L, so we don't clash with the plait keyword
-  (Lambda [arg : Symbol]
-          [body : Expr]))
+  (Fun [arg : Symbol]
+       [body : Expr]))
 #+end_src
 - Similar for ~SurfExpr~
-- Notice that ~Lambda~ and ~FunV~ have the /exact/ same fields
+- Notice that ~Fun~ and ~FunV~ have the /exact/ same fields
   + Functions /are/ values
   + A function is saying "here's a computation to do later", so once we've got a Lambda, there's no more evaluation to do
   + We'll see more of this for ~interp~
+*** Values to Expressions
+- We're going to need to substitute values into expressions
+  + But ~subst~ works on expressions, not values
+#+begin_src racket
+(define (value->expr [v : Value]) : Expr
+  (type-case Value v
+             [(NumV v) (NumLit v)]
+             [(FunV x body) (Fun x body)]))
+#+end_src
+- ~Value~ is /embedded/ in ~Expr~
+  + Want  ~(interp (value->expr v))~ to produce ~v~
+- Not actually doing any computation, just changing the constructors
+  so the type checker is happy
+- In a more sophisticated implementation language, we could make values a /subtype/ of expressions, but that's beyond this course
 *** Substitution for Lambda
-- Lambda binds its variable
+- Fun binds its variable
   + Similar to LetVar
 - Don't substitute in a Lambda body if the variable we're replacing matches the function variable
   + Ensures that the function variable shadows any previous declarations
@@ -2462,10 +2496,11 @@ emptyEnv
                [replaceIn : Expr]) : Expr
   (type-case Expr replaceIn
   ....
-  [(Lambda x body)
+  [(Fun x body)
+     ;; Don't substitute if variable is shadowed
      (if (symbol=? x toReplace)
-         (Lambda x body) ;; Don't substitute if the variable is shadowed
-         (Lambda x (subst toReplace replacedBy body)))]
+         (Fun x body)
+         (Fun x (subst toReplace replacedBy body)))]
   ))
 #+end_src
 *** The Problem: Interpretation
@@ -2503,23 +2538,86 @@ emptyEnv
 #+begin_src racket
 (define (checkAndGetNum [v : Value]) : Number
   (type-case Value V
-             [(NumV n) n]
-             [else
-              (error 'curlyTypeError
-                     (string-append "Expected Number, got function:"
-                                    (to-string v)))]))
-
+     [(NumV n) n]
+     [else
+     (error 'curlyTypeError
+             (string-append "Expected Number, got function:"
+                             (to-string v)))]))
 (define (checkAndGetFun [v : Value]) : (Symbol * Expr)
   (type-case Value V
-             [(FunV x body)
-              (pair x body)]
-             [else
-              (error 'curlyTypeError
-                     (string-append "Expected Function, got number:"
-                                    (to-string v)))]))
+     [(FunV x body)
+      (pair x body)]
+     [else
+     (error 'curlyTypeError
+             (string-append "Expected Function, got number:"
+                             (to-string v)))]))
 #+end_src
 - Lets us turn a Value into Number/Function
   + Better error-message than e.g. ~NumV-num~ gives
+*** Evaluating Functions
+#+begin_src racket
+(define (interp env expr)
+  (type-case Expr interp
+     ....
+     [(Fun x body)
+       (FunV x body)] ))
+#+end_src
+- Interp no longer needs a list of function definitions
+  + Can use let + lambda for the same effect
+- Nothing to do to turn function into a value
+  + Just package up the data in the Value type
+*** Calls
+#+begin_src racket
+(define (interp expr)
+  (type-case Expr interp
+  ....
+    [(Call funExpr argExpr)
+      (let* ([argVal (interp argExpr)]
+             [funVal (checkAndGetFun (interp funExpr))]
+             [funParam (fst funVal)]
+             [funBody (snd funVal)]))
+        (interp (subst funParam
+                       (value->expr argVal )
+                       funBody))] ))
+#+end_src
+- Mostly the same as for Curly-Fundef
+  + Except don't have to look up the function body + param
+- The thing we're calling might not be a Lambda /yet/
+  + So we evaluate it recursively
+  + Do a dynamic type check to make sure the result is a function, not a number
+
+*** Capturing the environment
+- Functions might contain /free variables/
+  + Variables that are not bound/defined by the function itself
+- Subst /will/ replace those variables when concrete values are given
+  #+begin_src racket
+  {letvar
+     f {fun {x} {fun {y} {+ x y}}}
+     {f 3}}
+  #+end_src
+  - For any ~x~, ~f~ produces another function that adds its argument to ~x~
+  - ~x~ is /free/ in ~{fun {y} {+ x y}}~
+  - Interp replaces ~f~ with the fun
+  - Calling ~f~ with ~3~ replaces ~x~ with ~3~
+    + Result: ~{fun {y} {+ 3 y}~
+    + e.g. The function that adds 3 to its argument
+  - Substitution lets us build new functions at run time based on values to other functions
+
+*** Fixing the rest of the interpreter
+- Need to change operations to use Value instead of Number
+  + Mostly just adding calls to ~checkAndGetNum~
+  + See in-class file / Curly-Lambda for full details
+- Don't need to change If0 branches or Let, since they don't do numeric operations
+   + Can have an if that produces a function
+#+begin_src racket
+(define (interp expr)
+  (type-case Expr expr
+        [(If0 test thn els)
+           (let ([testNum (checkAndGetNum (interp test))])
+             (if (= 0 testNum)
+                 (interp thn)
+                 (interp els)))]))
+#+end_src
 *** A Helpful Higher Order Function
 #+begin_src racket
 (define (liftVal2 [f : (Number Number -> Number)]
@@ -2529,6 +2627,49 @@ emptyEnv
         [ny (checkAndGetNum y)])
     (NumV (f nx ny))))
 #+end_src
+- Then can write:
+  #+begin_src racket
+(define (interp expr)
+  (type-case Expr expr
+     [(Plus l r)
+       (liftVal2 + (interp l) (interp r))]
+     [(Times l r)
+       (liftVal2 * (interp l) (interp r))]))
+
+  #+end_src
+*** Our Language Is Now Turing Complete!
+- Curly-Lambda can simulate every computer program ever written
+  + Not counting syscalls, IO, networking, effects, etc.
+- Just because we /can/ write an equivalent Curly-Lambda program, doesn't mean it's easy/succinct
+- We can now write Curly-Lambda programs that run forever
+#+begin_src racket
+{letvar f {fun x {x x}}
+  {f f}}
+#+end_src
+- Replaces ~f~ with ~{{fun {x} {x x}} {fun x {x x}}}~ calling itself
+- Function call: takes body ~{x x}~, replaces ~x~ with argument ~{fun {x} {x x}}~
+- Result is ~{{fun {x} {x x}} {fun {x} {x x}}}~, exactly what we started with!
+- ~interp~ runs forever
+*** A First Taste of Laziness
+- How we implement ~if0~ really matters now
+  + Code might run forever
+  + Don't want to run code in the branch we don't take
+- What if we did this?
+  #+begin_src racket
+  ;; BAD! Don't do this
+  (define (interp expr
+    (type-case Expr expr
+        [(If0 test thn els)
+        (let ([thenVal (interp thn)]
+              [elseVal (interl els)])
+          (if (= 0 (checkAndGetNum (interp test)))
+                 thenVal
+                 elseVal))])))
+  (run `{if0 0
+             {+ 1 1}
+             {letvar f {fun x {x x}} {f f}}})
+  #+end_src
+- Loops because it evaluates the untaken branch
 * Local Variables :noexport:
 Local Variables:
 org-latex-packages-alist: nil
