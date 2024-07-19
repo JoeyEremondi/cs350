@@ -2420,7 +2420,7 @@ emptyEnv
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 ** Broad Strategy
 *** Implementation Strategy
-- In some ways, it's /easier/ to implement first-class functions with substitution than normal substitutions
+- In some ways, it's /easier/ to implement first-class functions with substitution than top-level functions
   + We can get rid of the whole list-of-definitions
   + Functions as a value: function carries a parameter name and a variable body
 - Non-trivial parts:
@@ -2428,7 +2428,7 @@ emptyEnv
   + Functions are not numbers
   + Need to implement *dynamic typing*
 *** Syntax and Parsing
-- ~{fun SYMBOL <expr>}~
+- ~{fun {SYMBOL} <expr>}~
   + ~{fun {x} body}~ is anonymous function with argument ~x~ and body ~body~
   + fun instead of lambda to distinguish Curly vs Plait
 #+begin_src racket
@@ -2558,7 +2558,7 @@ emptyEnv
   + Better error-message than e.g. ~NumV-num~ gives
 *** Evaluating Functions
 #+begin_src racket
-(define (interp env expr)
+(define (interp expr)
   (type-case Expr interp
      ....
      [(Fun x body)
@@ -2601,7 +2601,7 @@ emptyEnv
   - ~x~ is /free/ in ~{fun {y} {+ x y}}~
   - Interp replaces ~f~ with the fun
   - Calling ~f~ with ~3~ replaces ~x~ with ~3~
-    + Result: ~{fun {y} {+ 3 y}~
+    + Result: ~{fun {y} {+ 3 y}}~
     + e.g. The function that adds 3 to its argument
   - Substitution lets us build new functions at run time based on values to other functions
 
@@ -2672,6 +2672,274 @@ emptyEnv
              {letvar f {fun x {x x}} {f f}}})
   #+end_src
 - Loops because it evaluates the untaken branch
+
+* Implementing Lambdas with Environments: Closures
+:PROPERTIES:
+:EXPORT_FILE_NAME: pdf/slides013-closures.pdf
+:header-args:racket: :results code :lang plait
+:END:
+#+beamer: \beamerdefaultoverlayspecification{<+->}
+** Broad Goals
+*** Overview
+**** Goals
+- Implement an interpreter for a Curly variant with functions
+  + Add a Lambda feature
+  + Allow functions to be taken or returned by functions
+  + Allow function calls on arbitrary expressions, not just symbols
+- Use Environments to make the implementation efficient
+- Replicate the behaviour of the substitution-based interpreter
+**** Key Concepts
+- Definition of a closure
+- Static and Dynamic Scope for first-class functions
+** The Details
+*** Substitution to Environmenst, Review
+- Interpreter takes environment argument
+  #+begin_src racket
+  (define (interp [env : Env]
+                  [expr : Expr])
+          : Value ;; Was Number
+    ....)
+  #+end_src
+- Function-calls evaluate body in environment containing argument
+*** Core and Abstract Syntax
+- Exact same as Curly-Lambda substitution version
+#+begin_src racket
+(define-type Expr
+  ....
+  (Fun [arg : Symbol]
+       [body : Expr]))
+#+end_src
+- Goal is to interpret the same language, but with environments
+*** A (Wrong) First Attempt: Values
+- Define ~Value~ just like in substitution version
+  +  Functions consist of their argument and the body to execute
+#+begin_src racket
+(define-type Value
+  (NumV [num : Number])
+  (FunV [arg : Symbol]
+        [body : Expr]))
+#+end_src
+*** A Wrong First Attempt: Functions Interp
+- As a first attempt, try building functions just like in substitition version
+#+begin_src racket
+(define (interp env expr)
+  (type-case Expr interp
+     ....
+     [(Fun x body)
+       (FunV x body)] ))
+#+end_src
+*** A Wrong First Attempt: Calls Interp
+- Just like before
+  + Evaluate argument to value
+  + Evaluate function, make sure it's actually a function, and get its parameter and body
+- Interpret function body in the environment with the parameter bound to the argument's value
+#+begin_src racket
+(define (interp env expr)
+  (type-case Expr interp
+  ....
+    [(Call funExpr argExpr)
+      (let* ([argVal (interp argExpr)]
+             [funVal (checkAndGetFun (interp funExpr))]
+             [funParam (fst funVal)]
+             [funBody (snd funVal)]))
+        (interp (extendEnv (bind funParam argVal)
+                           env) ;;<------
+                funBody))] ))
+#+end_src
+*** The problem
+- With a lambda, there could have been many substitutions that were applied to its free variables
+  + With substitutions, the variables get replaced in the lambda
+  + With environments, the variables aren't replaced /until we interpret the body/
+- When we actually go to interpret the body, we don't have the environment that the function was created in
+  + Just the environment from the time of the call
+- We've implemented *dynamic scoping* by accident!
+*** The Solution: Closures
+- A function should be /closed/ over its environment at the point it's created (interpreted)
+- So we add an extra piece of data to the ~Value~ variant for functions: the environment at the time of creation
+  + The combination of a function variable+body and an environment is called a *closure*
+- Closures give environment interpreters the same behavior as substitution interpreters
+*** The New Value Type
+- Value version of functions contains an environment in addition to its variable and body
+#+begin_src racket
+(define-type Value
+  (NumV [num : Number])
+  ;; Like FunV but with an environment
+  (ClosureV [arg : Symbol]
+            [body : Expr]
+            [env : Env]))
+#+end_src
+*** A New Dynamic Type Checker
+- Same idea as ~checkAndGetFun~, just has an extra piece of data to retrieve
+#+begin_src racket
+(define (checkAndGetClosure [v : Value]) : ((Symbol * Expr) * Env)
+  (type-case Value v
+     [(ClosureV x body env)
+      (pair (pair x body) env)]
+     [else
+     (error 'curlyTypeError
+             (string-append "Expected Function, got number:"
+                             (to-string v)))]))
+#+end_src
+*** Properly Interpreting Functions
+- When we interpret a lambda, /package the current environment up with it/
+  + This is what lets us dynamically create new functions
+  + For top-level functions, this is the empty environment
+#+begin_src racket
+(define (interp env expr)
+  (type-case Expr interp
+     ....
+     [(Fun x body)
+       (ClosureV x body env) ;;<------
+       ] ))
+#+end_src
+*** Properly Interpreting Calls
+- When we call a function, extend /the environment that was packaged up with it/
+  + Any free variables in the body get values from the place the closure was constructed
+
+#+begin_src racket
+(define (interp env expr)
+  (type-case Expr interp
+  ....
+    [(Call funExpr argExpr)
+      (let* ([argVal (interp argExpr)]
+             [funVal (checkAndGetFun (interp funExpr))]
+             [funParam (fst (fst funVal))]
+             [funBody (snd (fst funVal))]
+             [funEnv (snd funVal)]))
+        (interp (extendEnv (bind funParam argVal)
+                           funEnv);;<------
+                funBody))] )
+#+end_src
+*** Summary: Dynamic vs. Static Scope
+- Free variables in a function body are variables that are
+  not defined/bound in that function body
+- Static scope gives free variables values from the environment when the function was /constructed/
+- Dynamic scope gives variables values from the environment when the function was /called/
+*** Example: Static Scope
+#+begin_src racket
+{let double {fun {x} {* x 2}}
+  {let quadruple {fun {y} {double {double x}}}
+    {let double 2
+      {quadruple 3}}}}
+#+end_src
+- ~{fun {y} {double {double x}}}~ has one free variable, ~double~
+  + Functions and variables are in /the same namespace/ in Curly-Lambda
+- ~{fun {y} {double {double x}}}~ evaluates to closure
+  + Body is ~{double {double x}}~
+  + Env is ~double := {fun {x} {* x 2}}~
+- Env at call:
+  + ~double := 2~
+  + ~quadruple := {fun {y} {double {double x}}}~
+  + ~double := {fun {x} {* x 2}}~
+*** Example: Static Scope ctd
+#+begin_src racket
+{let double {fun {x} {* x 2}}
+  {let quadruple {fun {y} {double {double x}}}
+    {let double 2
+      {quadruple 3}}}}
+#+end_src
+- Call evaluates ~quadruple~ to closure
+- Finally evaluates ~{double {double x}}~
+  + In extended closure environment:
+    - ~x := 3~
+    - ~double := {fun {x} {* x 2}}~
+- Result is 12
+*** Example: Dynamic Scope
+#+begin_src racket
+{let double {fun {x} {* x 2}}
+  {let quadruple {fun {y} {double {double x}}}
+    {let double 2
+      {quadruple 3}}}}
+#+end_src
+- ~{fun {y} {double {double x}}}~ evaluates to closure
+  + Doesn't save environment
+- Call evaluates ~{double {double x}}~
+  + In extended /call site/ environment:
+    - ~x := 3~
+    - ~double := 2~
+    - ~quadruple := {fun {y} {double {double x}}}~
+    - ~double := {fun {x} {* x 2}}~
+- Dynamic type error
+  + Can't call 2 as a function
+** But Professor, When Will I Ever Use This?
+*** Static Scoping in the Wild
+**** Python:
+  #+begin_src python :exports both
+  timesTwo = lambda x : 2 * x
+  quadruple = lambda y : timesTwo(timesTwo(y))
+  def mainFun(x):
+      timesTwo = 2.0
+      return quadruple(x)
+  return mainFun(3)
+  #+end_src
+
+**** Result:
+  #+RESULTS:
+  : 12
+
+
+
+*** Static Scoping in the Wild
+**** JavaScript:
+  #+begin_src js :exports both
+  var timesTwo = function (x) { return x * 2 };
+  var quadruple =
+      function (x) {return timesTwo(timesTwo(x)) };
+  function mainFun(x){
+      var timesTwo = 2.0;
+      return quadruple(x)}
+  return mainFun(3)
+  #+end_src
+
+  #+RESULTS:
+  : 12
+
+
+**** Result:
+  #+RESULTS:
+  : 12
+
+
+
+*** Async in JavaScript
+- From the w3schools async tutorial
+#+begin_src js
+async function myFunction() {
+  return "Hello";
+}
+myFunction().then(
+  function(value) {myDisplayer(value);}
+);
+#+end_src
+- ~myFunction.then~ is a higher order function
+  + Takes in another function as an argument
+- They call the function argument the /callback/
+- ~function(value)~ is just the Javascript syntax for lambda
+  + Dynamically creates the function that is run when ~myFunction~ actually runs
+- Concurrency in JS is mostly just syntactic sugar for lambda/higher-order functions
+
+*** And More
+- Swift "Closures" are just lambdas
+  #+begin_src swift
+  names.sorted(by:
+    { (s1: String, s2: String) -> Bool
+        in return s1 > s2
+    } )
+  #+end_src
+- C++11 added anonymous functions
+  #+begin_src c++
+  sort(V.begin(), V.end(), [](auto& a, auto& b) -> bool
+  {
+     return a > b;
+  });
+  #+end_src
+- Java 8 added anonymous functions
+  #+begin_src java
+  Arrays.sort(arr,
+    (String a, String b) ->
+              a.length() - b.length());
+  #+end_src
+- This is all just lambda with different syntax
 * Local Variables :noexport:
 Local Variables:
 org-latex-packages-alist: nil
