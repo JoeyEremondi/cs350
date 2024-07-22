@@ -13,7 +13,7 @@
 ;;   | "{" "-" <expr> <expr> "}"
 ;;   | SYMBOL
 ;;   | "{" "let SYMBOL <expr> <expr> "}"
-;;   | "{" SYMBOL <expr> "}"
+;;   | "{" <expr> <expr> "}" ;;NEW: functions can be any expression now
 ;;   | NUMBER
 
 ;; BNF for Function definitions
@@ -79,7 +79,6 @@
     [(s-exp-match? `{- ANY ANY} s)
      (SurfSub (parse (second (s-exp->list s)))
               (parse (third (s-exp->list s))))]
-    ;; NEW
     ;; Same idea as above, but first arg needs to be symbol
     [(s-exp-match? `{letvar SYMBOL ANY ANY} s)
      (SurfLetVar (s-exp->symbol (second (s-exp->list s)))
@@ -118,7 +117,7 @@
   ;; Variables (will show up in function definitions)
   (Var [x : Symbol])
   ;; Function calls
-  ;; NEW: function can be any name, not just a symbol
+  ;; NEW: function can be any expression, not just a symbol
   (Call [fun : Expr]
         [arg : Expr])
   ;; Local Varible definitions
@@ -169,7 +168,6 @@
 
 
 
-;; NEW:
 ;; Apply a substitution replacing x with expression e1 inside expression e2
 (define (subst [toReplace : Symbol]
                [replacedBy : Expr]
@@ -201,18 +199,21 @@
      (If0 (subst toReplace replacedBy test)
           (subst toReplace replacedBy thn)
           (subst toReplace replacedBy els))]
+    ;; NEW
     ;; We can't replace a function name, since the Expr AST requires that the function name be
     ;; a symbol, not an expression. So we just recursively replace in the argument.
     [(Call funExpr arg)
      (Call (subst toReplace replacedBy funExpr)
            (subst toReplace replacedBy arg))]
-    ;;
+    ;; Don't substitute if the variable is shadowed
     [(LetVar x xexp body)
      (LetVar x
              (subst toReplace replacedBy xexp)
              (if (symbol=? x toReplace)
                  body
                  (subst toReplace replacedBy body)))]
+    ;;NEW
+    ;; Substitution in a function body
     [(Fun x body)
      ;; Don't substitute if variable is shadowed
      (if (symbol=? x toReplace)
@@ -258,7 +259,6 @@
 
 
 ;; Evaluate Expressions
-;; NEW: relative to a given context
 (define (interp [e : Expr] ) : Value
   (begin
 ;;     (display (to-string e))
@@ -279,12 +279,13 @@
      (if (= 0 (checkAndGetNum (interp test)))
          (interp thn)
          (interp els))]
-    ;; NEW: If we hit a variable in interp, it's an error
+    ;; If we hit a variable in interp, it's an error
     [(Var x) (error 'interp (string-append "undefined variable " (to-string x)))]
-    ;; New: Function calls
+    ;; NEW: Function calls
+    ;; Have to evaluate the function now too
     [(Call funExpr argExpr)
      (let* ([argVal (interp argExpr)] ;;Evaluate the argument
-            [funVal (checkAndGetFun (interp funExpr))] ;; Function might be an expression, so have to evaluate
+            [funVal (checkAndGetFun (interp funExpr))] ;; Function might be an expression, so have to evaluate ;;NEW
             [argVar (fst funVal)]  ;; name of the function param
             [funBody (snd funVal)]) ;; body of the function
        ;; Replace the parameter with the argument value in the body,
@@ -292,7 +293,7 @@
        ;; Need to substitute a NumLit because substition works on expressions,
        ;; not values.
        (interp (subst argVar (value->expr argVal) funBody)))]
-    ;; NEW: interpret a let by replacing the bound variable
+    ;; interpret a let by replacing the bound variable
     ;; by its defined value in the body
     [(LetVar x xexp body)
      (interp
