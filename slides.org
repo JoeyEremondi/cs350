@@ -2758,6 +2758,10 @@ emptyEnv
 - So we add an extra piece of data to the ~Value~ variant for functions: the environment at the time of creation
   + The combination of a function variable+body and an environment is called a *closure*
 - Closures give environment interpreters the same behavior as substitution interpreters
+*** Terminology
+- /Static scope/ means a function never changes once it has been *defined*
+  + We can still create functions dynamically
+  + But once created they're static
 *** The New Value Type
 - Value version of functions contains an environment in addition to its variable and body
 #+begin_src racket
@@ -2802,7 +2806,7 @@ emptyEnv
   ....
     [(Call funExpr argExpr)
       (let* ([argVal (interp argExpr)]
-             [funVal (checkAndGetFun (interp funExpr))]
+             [funVal (checkAndGetClosure (interp funExpr))]
              [funParam (fst (fst funVal))]
              [funBody (snd (fst funVal))]
              [funEnv (snd funVal)]))
@@ -2817,9 +2821,9 @@ emptyEnv
 - Dynamic scope gives variables values from the environment when the function was /called/
 *** Example: Static Scope
 #+begin_src racket
-{let double {fun {x} {* x 2}}
-  {let quadruple {fun {y} {double {double x}}}
-    {let double 2
+{letvar double {fun {x} {* x 2}}
+  {letvar quadruple {fun {y} {double {double y}}}
+    {letvar double 2
       {quadruple 3}}}}
 #+end_src
 - ~{fun {y} {double {double x}}}~ has one free variable, ~double~
@@ -2833,9 +2837,9 @@ emptyEnv
   + ~double := {fun {x} {* x 2}}~
 *** Example: Static Scope ctd
 #+begin_src racket
-{let double {fun {x} {* x 2}}
-  {let quadruple {fun {y} {double {double x}}}
-    {let double 2
+{letvar double {fun {x} {* x 2}}
+  {letvar quadruple {fun {y} {double {double x}}}
+    {letvar double 2
       {quadruple 3}}}}
 #+end_src
 - Call evaluates ~quadruple~ to closure
@@ -2846,9 +2850,9 @@ emptyEnv
 - Result is 12
 *** Example: Dynamic Scope
 #+begin_src racket
-{let double {fun {x} {* x 2}}
-  {let quadruple {fun {y} {double {double x}}}
-    {let double 2
+{letvar double {fun {x} {* x 2}}
+  {letvar quadruple {fun {y} {double {double x}}}
+    {letvar double 2
       {quadruple 3}}}}
 #+end_src
 - ~{fun {y} {double {double x}}}~ evaluates to closure
@@ -2940,6 +2944,102 @@ myFunction().then(
               a.length() - b.length());
   #+end_src
 - This is all just lambda with different syntax
+
+* Currying and the Lambda Calculus
+:PROPERTIES:
+:EXPORT_FILE_NAME: pdf/slides014-currying.pdf
+:header-args:racket: :results code :lang plait
+:END:
+#+beamer: \beamerdefaultoverlayspecification{<+->}
+** Overview
+*** Objectives
+- To learn how multi-argument functions can be
+  desugared into single-argument functions
+  + Curly-Curry
+- To see that /everything/ can be desugared into single-argument functions
+  + by learning about the Lambda Calculus
+** Currying
+*** Executing a multiple-argument function
+- Say we allow ~{lambda {x y z} {+ x {* y z}}}~ in Curly
+- How can we interpret a call to this function?
+  + Evaluate the body with either
+    - ~x,y,z~ replaced by concrete argument values (substitution)
+    - ~x,y,z~ bound to concrete values in an environment
+*** Achieving this: Currying
+- We can achieve this with nested lambda expressions
+#+begin_src racket
+{let f {fun {x} {fun {y} {fun {z} {+ x {* y z}}}}}
+  ....}
+#+end_src
+- To call, we do nested calls
+#+begin_src racket
+{{{f 1} 2} 3}
+#+end_src
+- Step by step:
+  + ~f 1~ produces ~{fun {y} {fun {z} {+ 1 {* y z}}}}~
+  + Calling that on 2 produces ~{fun {z} {+ 1 {* 2 z}}}~
+  + Calling that on 3 produces ~{+ 1 {* 2 3}}}~
+    - Exactly what we want for ~{f 1 2 3}~
+** Definition
+- The approach of simulating multiple-argument functions with nested single-argument functions is called *Currying*
+  + Named after Haskell Curry, and American logician
+    - Also the namesake of the Haskell programming language
+- A function written in this style is /curried/
+** Desugaring with Currying
+- We can add multiple-argument functions to our Surface Language /without/ changing
+  the core language
+  + Handle in ~elab~
+  + Doesn't matter if do substitution or environment-based version, translation is the exact same
+** AST for Multi-Argument Functions
+#+begin_src racket
+(define-type SurfExpr
+....
+ (SurfFun [xs : (Listof Symbol)]
+          [body : SurfExpr]))
+ (SurfCall [fun : SurfExpr]
+           [args : (Listof SurfExpr)])
+#+end_src
+- Functions now take a list of variables
+- Calls now take a list of arguments
+** Elaborating Multi-Argument Functions
+- Use recursion to iterate through the list
+  #+begin_src racket
+  (define (elab [surfExpr : SurfExpr])
+    (type-case SurfExpr surfExpr
+               ....
+     [(SurfFun xs body)
+       (type-case (Listof Symbol) xs
+         [empty
+           (elab body)]
+         [(cons x rest)
+           ;; Could also do with a helper fn
+           (Fun x (elab (SurfFun rest body)))])]))
+
+  #+end_src
+- No arguments: just produce the body
+- At least one argument: curry the rest of the arguments, and wrap the result in a lambda
+** Elaborating Multi-Argument Calls  
+#+begin_src racket
+  (define (elab [surfExpr : SurfExpr])
+    (type-case SurfExpr surfExpr
+               ....
+     [(SurfCall funExpr args)
+       (type-case (Listof SurfExpr) xs
+         [empty
+           (elab funExpr)]
+         [(cons x rest)
+           ;; Could also do with a helper fn
+           ])]))
+
+  #+end_src
+#+end_src
+** A Word of Warning
+- Plait does /not/ use currying by default
+  + Multiple argument functions are /not/ desugared into single-argument ones
+- We can convert between curried and uncurried functions with combinators
+  + See lecture on Higher Order Functions
+- A 0-argument ~(lambda () e)~ is /NOT/ the same as ~e~ in Plait
+  + But it is in Curly, if we use this desugaring
 * Local Variables :noexport:
 Local Variables:
 org-latex-packages-alist: nil
