@@ -28,3 +28,12 @@
        (append (sortBy compare smallers)
                (cons first
                      (sortBy compare biggers))))]))
+
+(lambda (x) (> x 1000))
+
+(map some (list "hello" "goodbye"))
+
+
+
+;(map (curry 2 (flip modulo))
+;     '(1 2 3 4 5 6 7 8))
