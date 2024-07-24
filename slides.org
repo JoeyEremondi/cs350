@@ -3013,12 +3013,16 @@ myFunction().then(
     - E.g. "If my list is empty, how do I apply a function to each element in it?"
 *** Programming With Recursion: Recursive Calls
 - Figure out what recursive calls you can make in the recursive cases
+- You can ALWAYS assume that the recursive call will produce the correct result
+  + Treat like a magic box that gives the right answer, but only for smaller values
+- Process:
   + If a sub-value has the same type, can definitely use it as argument to recursive call
   + Figure out values for other arguments
     - Problem dependent
     - E.g. What ~env~ do we pass in ~interp~?
   + Might be helpful to use ~let*~ to store results of recursive calls in variables
     - Can always delete if you don't end up using them in the solution
+-
 *** Programming With Recursion: Putting It Together
 - Look at what you have in scope
   + Fields/sub-values of the input
@@ -3033,7 +3037,6 @@ myFunction().then(
   + Problem-specific
 *** Constructing a value of a given type
 - Look at the type of the thing you're trying to produce
-  + Some take arguments, some don't
 - You must build it using one of:
   + A variable that is in scope
   + A literal/constant
@@ -3054,6 +3057,7 @@ myFunction().then(
 - Same advice applies:
   + Look at the types of what's in scope
   + Look at what you can build using what's in scope
+- The way to build a function is with ~lambda~
 
 * Currying and the Lambda Calculus
 :PROPERTIES:
