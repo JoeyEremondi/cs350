@@ -3059,6 +3059,96 @@ myFunction().then(
   + Look at what you can build using what's in scope
 - The way to build a function is with ~lambda~
 
+* Generative Recursion and Tail Recursion
+:PROPERTIES:
+:EXPORT_FILE_NAME: pdf/slides015-tailrec.pdf
+:header-args:racket: :results code :lang plait
+:END:
+#+beamer: \beamerdefaultoverlayspecification{<+->}
+** Broad Goals
+*** Overview
+- Objectives
+  + Iteratively building solutions to problems in functional languages
+  + Implementing recursive procedures efficiently
+  + Capturing this pattern of recursion as a higher-order function
+- Key Concepts
+  + Generative recursion
+  + Tail-calls
+  + Tail-call elimination
+  + Folds
+** Generative Recursion
+*** The Problem
+- Some problems don't obviously map to the style of recursion we've seen so far
+  + Or do, but not efficiently
+- Especially problems that are about incrementally updating a value
+  + No good way to talk about "the result so far"
+- e.g. What's the recursive version of:
+  #+begin_src c++
+  int x = startVal;
+  for (int i = 0; i < n; i++)
+  {
+    x = f(x);
+  }
+  #+end_src
+*** Example: Reversing a List The Naive Way
+#+name: reverse-slow
+#+begin_src racket :exports both
+(define (reverse [xs : (Listof 'a)]) : (Listof 'a)
+  (type-case (Listof 'a) xs
+    [empty empty]
+    [(cons h t)
+       (append (reverse t) (list h))]))
+(reverse '(1 2 3))
+(reverse '("hello" "goodbye"))
+#+end_src
+
+#+RESULTS: reverse-slow
+#+begin_src racket
+'(3 2 1)
+'("goodbye" "hello")
+#+end_src
+
+- Reversing the empty list produces the empty list
+- Reversing a list with one element means
+  + Reversing the tail of the list
+  + Putting the first element at the end of the new list
+- $\mathcal{O}(n^2)$: Each ~append~ has to walk through the whole list
+*** Reverse: What we want (conceptually)
+- Start with an empty list
+- Pop an element off the first list, then add it to our result list so far
+- When reach the end, have a reversed list
+*** An efficient reverse
+#+begin_src racket
+(define (reverseHelper [xs : (Listof 'a)]
+                       [listSoFar : (Listof 'a)]) : (Listof 'a)
+  (type-case (Listof 'a) xs
+    [empty
+       listSoFar]
+    [(cons h t)
+       (reverseHelper t (cons h listSoFar))]))
+(define (reverse xs) (reverseHelper xs '()))
+#+end_src
+
+- Helper function
+  + Base case: finished, produce the list we've built so far
+  + Recursive case: keep building, but on the tail of the list
+    - Call with head appended to ~listSoFar~
+- Main function calls the helper with the start value
+  + Empty list ~'()~
+*** General Template
+**** To write ~f : (Ty1 Ty2 ... TyN -> ReturnTy)~
++ Write a helper function with one extra argument
+  - Called the /accumulator/
+    + Often named ~accum~
+  - Has same type as return type
+    + ~fHelper : (Ty1 Ty2 ... TyN ReturnTy -> ReturnTy)~
++ Helper function is recursive
+  - Base case: return the accumulator
+  - Recursive case: call the helper recursively on the sub-value
+    + Compute an updated value for the result so far
+    + Pass it as the accumulator for the recursive call
+*** Example
+*** Live Example: Slow and Fast Factorial
 * Currying and the Lambda Calculus
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides017-currying.pdf
