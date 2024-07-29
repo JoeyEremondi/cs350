@@ -3138,7 +3138,7 @@ myFunction().then(
 *** General Template
 **** To write ~f : (Ty1 Ty2 ... TyN -> ReturnTy)~
 + Write a helper function with one extra argument
-  - Called the /accumulator/
+  - Extra argument called the /accumulator/
     + Often named ~accum~
   - Has same type as return type
     + ~fHelper : (Ty1 Ty2 ... TyN ReturnTy -> ReturnTy)~
@@ -3147,8 +3147,125 @@ myFunction().then(
   - Recursive case: call the helper recursively on the sub-value
     + Compute an updated value for the result so far
     + Pass it as the accumulator for the recursive call
+*** The Call Stack
+- In Racket (or any language), when we make a function call, we need to know what to do with the result
+  + In C/C++: where to execute after return is computed
+  + Keep track of the expression we'll plug the result into
+    - Note: We don't have a stack in Curly (yet) because our interpreter is written such that the Racket stack keeps track of where to return.
+- Each function call pushes onto the call stack, pops when it returns
+  + You've probably seen this when you get an error message in e.g. Python
+- Stack contents
+  + Body of function being currently computed
+  + Environment for that body
+  + Position in expression that's waiting for the result of this function
+    -  Called the /continuation/
+
 *** Example
+#+begin_src racket
+(define (g y z) (+ y z))
+(define (f x)
+  (cons (g x 1) '()))
+(f 3)
+#+end_src
+- Start:  stack top empty
+- Call ~f~:
+  + Push body ~(cons (g x x) nil)~, env ~x := 3~, continuation is ~END_OF_PROGRAM~
+- Call ~g~
+  + Push body ~(+ y z)~, env ~y := 3, z := 1~, continuation is ~(cons [] '())~
+    - ~[]~ shows where the result of the body is used
+- Return (pop) : plug ~4~ in place of ~[]~ to get ~cons 4 '()~
+- Return (pop), see ~END_OF_PROGRAM~ marker, produce ~4~ as result
+*** Returning a Function Call
+- Slightly different example
+#+begin_src racket
+(define (g y z) (+ y z))
+(define (f x)
+  (g x 1))
+(f 3)
+#+end_src
+- Start:  stack top empty
+- Call ~f~:
+  + Push body ~(cons (g x x) nil)~, env ~x := 3~, continuation is ~END_OF_PROGRAM~
+- Call ~g~
+  + Push body ~(+ y z)~, env ~y := 3, z := 1~, continuation is ~[]~
+    - Result of ~g~ is value of ~f~'s body
+- Return (pop) : plug ~4~ in place of ~[]~ to get 4
+- Return (pop), see ~END_OF_PROGRAM~ marker, produce ~'(4)~ as result
+*** What's The Difference?
+- In the first example, we had to take the result of the call to ~g~ and incorporate it into the result of ~f~
+  + By adding it as the first field of ~cons~
+- In the second example, the result of ~g~ /was/ the result of ~f~
+  + We never needed ~x~ in the environment after making the call to ~g~
+  + We never need the body of ~f~ after making the call to ~g~
+    - All the body of ~f~ tells us is to compute the body of ~g~
+- The Racket/Plait interpreter can just change the body and env on the stack, /without pushing to it/
+  + Mutation $\to$ fast
+*** Tail Calls
+- A function call is called a *tail call* if it is either:
+  + The body of a function
+  + The branch of a conditional (if, type-case, etc.)
+- A function is NOT a tail call if it is
+  + An argument to another function or constructor
+- Tail calls can be implemented as /jumps/ and /mutation/
+  + Don't need to add to the stack
+*** Tail Recursion
+- Tail recursion: when *all recursive calls in a function definition are tail calls*
+- Generative recursion (as described above) /is/ tail recursion
+- Tail recursive functions can be optimized into a loop
+  + No need to change the stack
+  + Recursive call $\to$ update parameters then jump
+  + Constant memory usage
+  + Less overhead
+*** Example: List Length in Constant Space
+#+begin_src racket
+(define (fast-length-helper [xs : (Listof 'a)]
+                            [accum : Number])
+  (type-case (Listof 'a) xs
+    [empty accum]
+    [(cons h t)
+       (fast-length-helper t (+ 1 accum))]))
+(define (fast-length xs) (fast-length-helper xs 0))
+#+end_src
+- Instead of computing the result directly, we incorporate the "result so far" into the new information from the non-recursive arguments
+- We keep computing by calling ~fast-length-helper~ recursively
+  + Parameter gets smaller
+  + Accumulator gets more information
+- Recursive call is tail call
+- Won't stack overflow, even on large arguments
 *** Live Example: Slow and Fast Factorial
+- See Racket in lecture
+*** A Note On Terminology
+- *Generative recursion* is when recursion works by building up (generating) a solution as an extra parameter, and returning that parameter in the base case
+- *Tail recursion* is when all recursive calls in a function are tail calls
+- Pretty much all the examples we'll see in this course of tail recursion are also generative recursion, and vice versa
+- You can come up with examples that are one but not the other, but they're pretty contrived, so we won't worry about them
+*** Tail Recursion and While Loops
+- We can relate tail recursion to while loops in imperative languages
+#+begin_src c++
+x = initialValue;
+while (test(x)){
+ x = f(x);
+}
+return g(x);
+#+end_src
+- Is equivalent to
+#+begin_src  racket
+(define (helper x)
+  (if (test x)
+      (helper (f x))
+      (g x)))
+#+end_src
+- Updating multiple variables $\to$ multiple arguments to ~helper~
+*** Implicit vs. Explicit State
+- Once again, we see that functional languages can express the same patterns as imperative language
+- We can still express stateful computations in functional languages, but it's /explicit state/
+  + You can tell what state there is by looking at the type of a function
+  + Nothing is hidden from the
+- Bugs in code are often due to subtle interactions between mutable states
+  + Especially with parallelism/concurrency
+- The functional style means that no state is hidden
+  + Easier to debug state problems
+    - By hand, or with tools/linters
 * Currying and the Lambda Calculus
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides017-currying.pdf

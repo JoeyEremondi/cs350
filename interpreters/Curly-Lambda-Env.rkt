@@ -13,7 +13,7 @@
 ;;   | "{" "-" <expr> <expr> "}"
 ;;   | SYMBOL
 ;;   | "{" "let SYMBOL <expr> <expr> "}"
-;;   | "{" SYMBOL <expr> "}"
+;;   | "{" <expr> <expr> "}" ;; Can call any expression
 ;;   | NUMBER
 
 ;; BNF for Function definitions
@@ -92,7 +92,7 @@
               (parse (third (s-exp->list s))))]
     ;; Function calls {f e1}
     ;; Has to come last, only treat as a function call if it's not a binary operator
-    [(s-exp-match? `{SYMBOL ANY} s)
+    [(s-exp-match? `{ANY ANY} s)
      ;;: called function can be any expression
      (SurfCall (parse (first (s-exp->list s)))
                (parse (second (s-exp->list s))))]
