@@ -3147,6 +3147,7 @@ myFunction().then(
   - Recursive case: call the helper recursively on the sub-value
     + Compute an updated value for the result so far
     + Pass it as the accumulator for the recursive call
++ Last step: ~f~ calls helper with initial accumulator value
 *** The Call Stack
 - In Racket (or any language), when we make a function call, we need to know what to do with the result
   + In C/C++: where to execute after return is computed
@@ -3159,7 +3160,11 @@ myFunction().then(
   + Environment for that body
   + Position in expression that's waiting for the result of this function
     -  Called the /continuation/
-
+*** Stack Overflow
+- If the call stack gets too large, a /stack overflow/ can be triggered
+  + When the memory allocated for the stack is exceeded
+- Typically the stack has much less space than the heap (dynamically allocated memory)
+  + Specifics depend on the implementation of your language
 *** Example
 #+begin_src racket
 (define (g y z) (+ y z))
@@ -3169,12 +3174,12 @@ myFunction().then(
 #+end_src
 - Start:  stack top empty
 - Call ~f~:
-  + Push body ~(cons (g x x) nil)~, env ~x := 3~, continuation is ~END_OF_PROGRAM~
+  + Push body ~(cons (g x 1) empty)~, env ~x := 3~, continuation is ~END_OF_PROGRAM~
 - Call ~g~
   + Push body ~(+ y z)~, env ~y := 3, z := 1~, continuation is ~(cons [] '())~
     - ~[]~ shows where the result of the body is used
 - Return (pop) : plug ~4~ in place of ~[]~ to get ~cons 4 '()~
-- Return (pop), see ~END_OF_PROGRAM~ marker, produce ~4~ as result
+- Return (pop), see ~END_OF_PROGRAM~ marker, produce ~'(4)~ as result
 *** Returning a Function Call
 - Slightly different example
 #+begin_src racket
@@ -3185,12 +3190,12 @@ myFunction().then(
 #+end_src
 - Start:  stack top empty
 - Call ~f~:
-  + Push body ~(cons (g x x) nil)~, env ~x := 3~, continuation is ~END_OF_PROGRAM~
+  + Push body ~(g x 1)~, env ~x := 3~, continuation is ~END_OF_PROGRAM~
 - Call ~g~
   + Push body ~(+ y z)~, env ~y := 3, z := 1~, continuation is ~[]~
     - Result of ~g~ is value of ~f~'s body
 - Return (pop) : plug ~4~ in place of ~[]~ to get 4
-- Return (pop), see ~END_OF_PROGRAM~ marker, produce ~'(4)~ as result
+- Return (pop), see ~END_OF_PROGRAM~ marker, produce ~4~ as result
 *** What's The Difference?
 - In the first example, we had to take the result of the call to ~g~ and incorporate it into the result of ~f~
   + By adding it as the first field of ~cons~
@@ -3201,9 +3206,10 @@ myFunction().then(
 - The Racket/Plait interpreter can just change the body and env on the stack, /without pushing to it/
   + Mutation $\to$ fast
 *** Tail Calls
-- A function call is called a *tail call* if it is either:
+- An expression is in *tail position* if it is
   + The body of a function
-  + The branch of a conditional (if, type-case, etc.)
+  + The branch of a conditional (if, type-case, etc.) that was in tail position
+- A function call in tail position is a *tail call*
 - A function is NOT a tail call if it is
   + An argument to another function or constructor
 - Tail calls can be implemented as /jumps/ and /mutation/
@@ -3237,8 +3243,8 @@ myFunction().then(
 *** A Note On Terminology
 - *Generative recursion* is when recursion works by building up (generating) a solution as an extra parameter, and returning that parameter in the base case
 - *Tail recursion* is when all recursive calls in a function are tail calls
-- Pretty much all the examples we'll see in this course of tail recursion are also generative recursion, and vice versa
-- You can come up with examples that are one but not the other, but they're pretty contrived, so we won't worry about them
+- Many examples we'll see in this course of tail recursion are also generative recursion, and vice versa
+  + Some counter-examples, e.g. ~foldr~ that we'll see soon
 *** Tail Recursion and While Loops
 - We can relate tail recursion to while loops in imperative languages
 #+begin_src c++
@@ -3266,19 +3272,104 @@ return g(x);
 - The functional style means that no state is hidden
   + Easier to debug state problems
     - By hand, or with tools/linters
+** Abstracting Generative Recursion
+*** Objective
+- Goals
+  + To see how the pattern of generative recursion on lists can be represented concretely as a higher order function
+- Key Concepts
+  + ~foldl~ and ~foldr~
+*** Higher-Order Genrative Recursion: Folds
+- Recall: higher-order polymorphic functions let us turn design patterns into functions
+  + e.g. ~map~ for "do this to each element of a list"
+- Generative recursion is no exception
+*** Foldl
+#+name: foldl
+#+begin_src racket
+(define (foldl [f : ('a 'b -> 'b)]
+               [accum : 'b]
+               [xs : (Listof 'a)]) : 'b
+  (type-case (Listof 'a) xs
+    [empty
+      accum ]
+    [(cons h t)
+       (foldl f (f h accum) t)]))
+#+end_src
+- Generative recursion on a list as a function
+- Name ~foldl~ means "fold left"
+  + Processes elements in order
+- If list empty, gives whatever the initial ~accum~ was
+- If not empty, uses ~f~ to update the ~accum~ based on the first element of the list
+  + Then processes the rest of the list with a recursive call
+- Tail recursive, so fast and takes constant space
+*** Example: Reverse using folds
+#+begin_src racket :noweb strip-export :exports both
+<<foldl>>
+(define (fold-reverse [xs : (Listof 'elType)]) : (Listof 'elType)
+  (foldl (lambda (elem accum) (cons elem accum))
+         '()
+         xs))
+(fold-reverse '(1 2 3))
+#+end_src
+
+#+RESULTS:
+#+begin_src racket
+'(3 2 1)
+#+end_src
+- ~'a~ is ~'elType~, ~'b~ is ~(Listof 'elType)~
+- Update function type is ~('elType (Listof 'elType) -> (Listof 'elType))~
+- Initial accumulator is empty list, since we start with nothing
+- Update function adds the current element to the front of the list we've built so far
+*** Reasoning with foldl
+ - ~(foldl f init '(a b c d))~ gives ~(f d (f c (f b (f a init))))~
+ - Similar to normal recursion:
+   + Assume that ~accum~ has the correct result so far
+   + Find the ~f~ that incorporates the next element of the list into the new ~accum~
+ - For ~fold-reverse~
+   + Assume that ~accum~ has the correct reversal of the list we've seen so far. How do we incorporate the next element?
+     - We add it to the front, since it's the last of all elements we've seen so far, so the first in the reversed list
+     - Recursive call says "keep processing for the rest of the list"
+*** Non-tail Folds
+#+begin_src racket
+(define (foldr [f : ('a 'b -> 'b)]
+               [init : 'b]
+               [xs : (Listof 'a)]) : 'b
+  (type-case (Listof 'a) xs
+    [empty
+      accum ]
+    [(cons h t)
+       (f h (foldr f init t))]))
+#+end_src
+- Like foldr, but processes the list right-to-left
+- ~(foldr f init '(a b c d))~ gives ~(f a (f b (f c (f d init))))~
+- Reasoning the exact same, except we assume the argument to ~f~
+  has the accumulator for all elements /after/ the current element
+- Generally ~foldl~ is faster
+*** List Recursion, Once And For All
+- ~foldr~ is the higher-order function version of pattern matching on lists
+  + Give an empty case (initial value)
+  + Give a function that incorporates head of the list with the recursive result on the rest of the list
+- ~foldl~ is the higher-order function version of generative recursion on lists
+  + Give an initial accumulator
+  + Give a way to update the accumulator for each element of the list
+- These two functions can replace (nearly) all pattern matching/recursion on lists
+- Examples (see lecture Racket file)
 * Currying and the Lambda Calculus
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides017-currying.pdf
+:EXPORT_FILE_NAME: pdf/slides016-currying.pdf
 :header-args:racket: :results code :lang plait
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 ** Overview
 *** Objectives
-- To learn how multi-argument functions can be
-  desugared into single-argument functions
-  + Curly-Curry
-- To see that /everything/ can be desugared into single-argument functions
-  + by learning about the Lambda Calculus
+- Learning Goals
+ - To learn how multi-argument functions can be
+   desugared into single-argument functions
+   + Curly-Curry
+ - To see that /everything/ can be desugared into single-argument functions
+   + by learning about the Lambda Calculus
+- Core Concepts
+  + Currying
+  + Lambda Calculus
 ** Currying
 *** Executing a multiple-argument function
 - Say we allow ~{lambda {x y z} {+ x {* y z}}}~ in Curly
@@ -3301,17 +3392,17 @@ return g(x);
   + Calling that on 2 produces ~{fun {z} {+ 1 {* 2 z}}}~
   + Calling that on 3 produces ~{+ 1 {* 2 3}}}~
     - Exactly what we want for ~{f 1 2 3}~
-** Definition
+*** Definition
 - The approach of simulating multiple-argument functions with nested single-argument functions is called *Currying*
   + Named after Haskell Curry, and American logician
     - Also the namesake of the Haskell programming language
 - A function written in this style is /curried/
-** Desugaring with Currying
+*** Desugaring with Currying
 - We can add multiple-argument functions to our Surface Language /without/ changing
   the core language
   + Handle in ~elab~
   + Doesn't matter if do substitution or environment-based version, translation is the exact same
-** AST for Multi-Argument Functions
+*** AST for Multi-Argument Functions
 #+begin_src racket
 (define-type SurfExpr
 ....
@@ -3322,7 +3413,7 @@ return g(x);
 #+end_src
 - Functions now take a list of variables
 - Calls now take a list of arguments
-** Elaborating Multi-Argument Functions
+*** Elaborating Multi-Argument Functions
 - Use recursion to iterate through the list
   #+begin_src racket
   (define (elab [surfExpr : SurfExpr])
@@ -3339,28 +3430,142 @@ return g(x);
   #+end_src
 - No arguments: just produce the body
 - At least one argument: curry the rest of the arguments, and wrap the result in a lambda
-** Elaborating Multi-Argument Calls  
+*** Multi-Argument Calls with Tail Recursion
+#+begin_src racket
+  (define (callHelper [args : (Listof SurfExpr)]
+                      [accum : Expr]) : Expr
+    (type-case (Listof SurfExpr) args
+        [empty accum]
+        [(cons arg rest)
+           ;; tail recursion
+           (callHelper rest (Call accum (elab arg)) )]))
+  #+end_src
+- Given a list of argument to apply, build up one giant expression with nested calls
+***  Building The Entire Call
 #+begin_src racket
   (define (elab [surfExpr : SurfExpr])
     (type-case SurfExpr surfExpr
                ....
      [(SurfCall funExpr args)
-       (type-case (Listof SurfExpr) xs
-         [empty
-           (elab funExpr)]
-         [(cons x rest)
-           ;; Could also do with a helper fn
-           ])]))
+        (callHelper args (elab funExpr))]))
 
-  #+end_src
 #+end_src
-** A Word of Warning
+*** A Word of Warning
 - Plait does /not/ use currying by default
   + Multiple argument functions are /not/ desugared into single-argument ones
 - We can convert between curried and uncurried functions with combinators
   + See lecture on Higher Order Functions
 - A 0-argument ~(lambda () e)~ is /NOT/ the same as ~e~ in Plait
   + But it is in Curly, if we use this desugaring
+*** Another Desugaring: Let
+- Recall that ~letvar~ let us define a local variable to have the value of some expression, that we could then use to build another expression
+- We can make ~letvar~ syntactic sugar using lambda
+#+begin_src  racket
+  (define (elab [surfExpr : SurfExpr])
+    (type-case SurfExpr surfExpr
+               ....
+     [(SurfLetVar x xExpr body)
+        (Call (Fun 'x (elab body))
+              (elab xExpr))]))
+#+end_src
+- Define a function whose body is the body of the ~letvar~
+- Immediately call it with the value we're giving to the defined variable
+- Letvar: executes the body in the environment extended with the variable's value
+  + This does the exact same thing
+** Lambda The Ultimate
+
+*** Functions As Sugar
+- So far we've seen that single argument functions can simulate
+  + Multi-argument functions
+  + Local variable definitions
+- What else can se simulate?
+- *NOTE* I won't ask about the following desugarings on an exam
+  + But they're an important introduction to the "science" of computer science
+    and the "mathematics" of informatics
+*** The Smallest Language We Can Imagine
+#+begin_src racket
+(define-type UTLC
+  ;; A variable
+  (Var [x : Symbol])
+  ;; Functiona application (call)
+  (App [fun : UTLC]
+       [arg : UTLC])
+  ;; Anonymous function (lambda)
+  (Lam [param : Symbol]
+       [body : UTCL]))
+#+end_src
+- Stands for "Un-Typed Lambda Calculus"
+- All you can do is define an anonymous function (lambda) or call a function (application)
+- *The Untyped Lambda Calculus is Turing Complete*
+  + Any program you can write, you can write an equivalent UTLC Program
+*** Interpreting the UTLC
+- Works just like we've seen so far
+  + ~Lam~ is like ~Fun~
+  + ~App~ is like ~Call~
+- Substitution version
+#+begin_src racket
+(define (interpUTLC [e : UTLC] : UTLC)
+  (type-case UTLC e
+    [(App fun arg)
+       (type-case (interpUTLC fun)
+          [(Lam x body)
+             (interpUTLC (subst x arg body))]
+          [else (error 'x "Undefined variable")])]
+    ;; Function and variables don't do any computation,
+    ;; they just return themselves
+    ;; Could have variables return an error,
+    [else e]))
+#+end_src
+- Can also do with environments, like Curly-Lambda-Env
+*** Booleans
+- Note: I'll write the desugarings as functions, rather than with ~elab~, just to keep things self contained
+- You can imagine these functions as constructors we'd use for the surface syntax, that produce ~UTLC~ directly
+#+begin_src racket
+(define True
+  (Lam 'x (Lam 'y (Var 'x))))
+(define False
+  (Lam 'x (Lam 'y (Var 'y))))
+;; curried (test thenCase elseCase)
+(define (If test thenCase elseCase)
+  (App (App test thenCase) elseCase))
+#+end_src
+- If we give ~If~ the boolean ~True~ it produces the then-case
+- If we give ~If~ the boolean ~False~ it produces the else-case
+*** Numbers
+- Define $n$ to be the function that takes in another function and an argument, and applies it $n$ times
+  +  $\lambda f \lambda x \ldotp f (f (f ... (f x)))$
+#+begin_src racket
+(define Zero
+  (Lam 'f (Lam 'x (Var 'x)))) ;; Function that returns its argument
+;; Add one to a number
+(define (Add1 n)
+  (Lam 'f (Lam 'x) (App (Var 'f) (App (App n f) x))))
+(define (Plus m n)
+  (Lam 'f (Lam 'x) (App m (App (App n f) x))))
+#+end_src
+*** Pairs
+- You can view a pair as a function that takes in a boolean and returns either the first or second value depending on that boolean
+#+begin_src racket
+(define (Pair x y)
+  (Lam 'z (If (Var 'z) x y)))
+(define (Fst pr)
+  (App pr True))
+(define (Snd pr)
+  (App pr False))
+#+end_src
+*** Recursion: The Y Combinator
+- Not the startup funder
+- $\lambda f \ldotp (\lambda x \ldotp f\ (x\ x)) (f\ (x\ x)))$
+#+begin_src racket
+(define Y
+  (Fun 'f (App (Fun 'x (App f (App x x)))
+               (Fun 'x (App f (App x x))))))
+#+end_src
+- Takes a function ~f~ with an extra parameter ~self~
+- Makes a new function where each call to ~self~ is replaced by a call to ~f~
+- You don't need to know the details of how this work, just that it's possible to
+  do recursion in the UTLC
+- Once we have recursion, we have loops
 * Local Variables :noexport:
 Local Variables:
 org-latex-packages-alist: nil
