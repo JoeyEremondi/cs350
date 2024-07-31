@@ -3838,7 +3838,16 @@ return g(x);
   + In the store we previously computed, getting a new store
 - Check that the box value is actually a box
 - Return the other value, /in the new store with the box location overwritten/
-  
+*** Interpreting Begin
+#+begin_src racket
+[(Begin l r)
+     (with [(v-l sto-l) (interp l env sto)]
+       (interp r env sto-l))]
+#+end_src
+- Evaluate the first expression /but do nothing with the value/
+  + Just get the store that's the result of evaluating it
+- Evaluate the second expression /in the store the first returned/
+
 *** Stores vs Environment
 - Environments enable /static scope/
   + Follow the stack like structure of function calls
