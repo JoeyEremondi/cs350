@@ -3857,6 +3857,29 @@ return g(x);
   + Linearly threaded through the program
   + Once we've updated a store (by generating a new one), /we never use the old store again/
     - ... until we implement more advanced features e.g. undo, backtracking
+* Mutable Variables
+:PROPERTIES:
+:EXPORT_FILE_NAME: pdf/slides018-mutvar.pdf
+:header-args:racket: :results code :lang plait
+:END:
+#+beamer: \beamerdefaultoverlayspecification{<+->}
+** Outline
+*** Overview
+- Learning goals
+  + To interpret a language where variables can change values (mutate)
+  + To understand the design choices around functions in such a language
+- Key concepts
+  + Pass-by-reference vs. Pass-by-value
+*** Identifiers vs Variables
+- Until now, a variable denoted a /value/
+  + In a given environment
+- They didn't really ever vary
+  + Except between different function calls
+- To allow variables values to change, we can make one simple change:
+  + *Keep locations instead of values in the environment*
+  + Then each variable refers to a single store location, whose value can change
+*** Pass-by-value
+*** Pass-by-reference
 * Local Variables :noexport:
 Local Variables:
 org-latex-packages-alist: nil
