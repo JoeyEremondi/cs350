@@ -3904,7 +3904,7 @@ return g(x);
 - Now we lookup a /location/
   + Have to use ~fetch~ to get its value from the store
 - Produce that value, along with the unchanged store
-*** Adding mutation
+*** Adding mutation: Curly-Mutvar
 - Curly syntax: ~{setvar! SYMBOL <expr>}~
   + ~{setvar! x e}~ changes the value of in-scope variable ~x~ to be the value of ~e~
 - Interpreting
@@ -3945,7 +3945,7 @@ return g(x);
             [funBody (snd (fst funPair))]
             [funEnv (snd funPair)]
             ;; Allocate a new location for the argument value
-            [argLoc (new-location sto)]
+            [argLoc (new-location arg-sto)]
             ;; new store with the arg value at the new location
             ;; Use most recent store from arg
             [body-sto (override-store (cell argLoc arg-v) arg-sto)])
@@ -4030,6 +4030,36 @@ return g(x);
 - The ~getloc~ makes a new box whose location is the same as ~y~
 - When ~doublebox!~ runs it alters the value at the location of its box, which was the location of ~y~
 - The final result is 6, since the value of ~y~ was changed
+* Implementing Recursion via State
+:PROPERTIES:
+:EXPORT_FILE_NAME: pdf/slides019-recursion.pdf
+:header-args:racket: :results code :lang plait
+:END:
+#+beamer: \beamerdefaultoverlayspecification{<+->}
+** Recursion via State
+*** Overview
+- Goals
+  + To see how to implement an interpreter for a language with recursion
+  + To see how recursion interacts with environments and stores
+- Key Concepts
+  + Landin's Knot
+*** Recursion in Curly-Rec
+- When we are allowed to refer to ~x~ while defining the value that is assigned to ~x~
+- We'll do this with a special ~let~ form
+  + ~{letrec x <expr> <expr>}~
+    - Gives ~{letrec x e1 e2}~ gives ~x~ the value ~e1~ then evaluates ~e2~ with ~x~ in scope
+    - Exactly like ~letvar~, except *~x~ is also in scope in e1*
+    -
+*** Ill-founded Recursion
+- We can't give ~x~ a value if we need to evaluate ~x~ to get that value
+- E.g.
+  + ~{letrec x {+ x 1} ....}~
+  + Should raise an error or loop forever
+  + In a later lecture we'll see a way to give this semantics
+*** Well-founded Recursion
+- What can we define with recursion?
+  + Definitions that refer to ~x~ but don't try to evaluate it
+  + *Recursive occurrences of the variable must be in the body of a lambda*
 * Local Variables :noexport:
 Local Variables:
 org-latex-packages-alist: nil
