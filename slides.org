@@ -4160,8 +4160,10 @@ return g(x);
   + Known as /Landin's Knot/
   + British Computer Scientist Peter Landin
   + Pioneer of functional programming
+    - Inventor of /offside rule/ for whitespace-sensitive languages
     - Invented the term /syntactic sugar/
     - Saw the connection between lambda calculus and programming
+    - Early version of algebraic datatypes
 - You can simulate recursion in any language with
   + First-class functions/closures
   + Mutable references/variables
