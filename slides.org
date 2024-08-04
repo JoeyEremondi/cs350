@@ -3945,7 +3945,7 @@ return g(x);
             [funBody (snd (fst funPair))]
             [funEnv (snd funPair)]
             ;; Allocate a new location for the argument value
-            [argLoc (new-location arg-sto)]
+            [argLoc (new-loc arg-sto)]
             ;; new store with the arg value at the new location
             ;; Use most recent store from arg
             [body-sto (override-store (cell argLoc arg-v) arg-sto)])
@@ -3985,9 +3985,9 @@ return g(x);
 #+begin_src racket
 {letvar y 2
   {letvar f {fun {x} {begin
-                     {setvar! x {* x 3}}
-                     x}}
-        {+ {f y} y}}}
+                       {set-var! x {* x 3}}
+                       x}}
+            {+ {f y} y}}}
 #+end_src
 - In both pass-by-value and pass-by-reference, the call to ~{f y}~ produces 6
 - In pass-by-value, ~x~ has a different location than ~y~, that started off with ~2~ (the value of ~y~)
@@ -4022,9 +4022,9 @@ return g(x);
 *** Example
 #+begin_src racket
 {letvar doublebox! {fun {x} {set-box! x {* 2 {unbox x}}}}
-        letvar y 3
-        {begin {doublebox {getloc y}}
-               y}}
+  {letvar y 3
+            {begin {doublebox! {get-loc y}}
+                   y}}}
 #+end_src
 - Function takes in a box, gets its value, doubles it, and writes it to the same location
 - The ~getloc~ makes a new box whose location is the same as ~y~
@@ -4075,8 +4075,25 @@ return g(x);
     - Shouldn't ever fetch if self-references are in the bodies of functions
   + Then, *update the store to contain the value of ~e1~ at the location of ~x~*
   + Then, interpret the body ~e2~ with this updated store
+*** Interpreting Recursion: Value
+#+begin_src racket
+(define-type Value
+  (ClosureV [arg : Symbol]
+            [body : Expr]
+            [env : Env])
+  (NumV [num : Number])
+  (BoxV [loc : Location])
+  ;; NEW
+  ;; Placeholder for implementing recursion
+  ;; If we ever produce this, we should get an error
+  (DummyV))
+#+end_src
 *** Interpreting Recursion: Code
 #+begin_src racket
+(define (interp [env : Env]
+                [e : Expr]
+                [sto : Store]) : Result
+  (type-case Expr e
 (define (interp [env : Env]
                 [e : Expr]
                 [sto : Store]) : Result
@@ -4085,7 +4102,7 @@ return g(x);
      (let* ([x-loc (new-loc sto)] ;; Location for x
             [dummy-sto ;; Put a dummy value at x's location
                (override-store (cell x-loc
-                                     (Var 'recursionError)))])
+                                     (DummyV)))])
         (with ([x-val x-sto]
                ;; Interpret xexpr in env with x's location
                  (interp (extendEnv (bind x x-loc) env)
@@ -4109,7 +4126,7 @@ return g(x);
   + Make a new location ~0~ for ~fact~
   + Evaluate the value for ~fact~
     - Env: ~fact := 0~
-    - Store: ~0 => (Var 'recursionError)~
+    - Store: ~0 => (DummyV)~
       ~~
 *** Example (ctd)
 - Evaluating function produces closure:
@@ -4156,7 +4173,7 @@ return g(x);
   + Evaluation repeats, but with ~x~ bound to location with ~NumV 2~
   + Etc. until we reach 0 and don't have a recursive call
 *** Landin's Knot
-- This trick is general
+- This trick is generally applicable
   + Known as /Landin's Knot/
   + British Computer Scientist Peter Landin
   + Pioneer of functional programming

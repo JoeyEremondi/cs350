@@ -1,14 +1,14 @@
 #lang plait
 
 
-;; Curly-Box: A language with curried first-class functions and mutable boxes
+;; Curly-A5: A language with curried first-class functions and mutable boxes
 ;; Four Questions
 ;; Q1: elaborate surface multi-argument calls into core single-argument calls using a fold
 ;; Q2: elaborate surface multi-argument functions into core multi-argument functions using a fold
 ;; Q3: Implement a version of while-loops for Curly-A5
 ;; Q4: Write a Curly-A5 function that takes in two boxes and swaps the values stored in them.
 
-;; BNF for Curly-Box
+;; BNF for Curly-Lambda
 ;; New forms: {fun {x} body}
 ;; 
 ;;  <expr> ::=
@@ -65,6 +65,11 @@
   (SurfLetVar [x : Symbol]
               [xexp : SurfaceExpr]
               [body : SurfaceExpr])
+  ;; recursive variable definitions
+  (SurfLetRec [x : Symbol]
+              [xexp : SurfaceExpr]
+              [body : SurfaceExpr])
+  
   ;; Box creation
   (SurfBox [init : SurfaceExpr])
   ;; Getting a Box's value
@@ -75,7 +80,12 @@
   ;; Do the first expression purely for its side-effects
   ;; then evaluate the second one
   (SurfBegin [e1 : SurfaceExpr]
-             [e2 : SurfaceExpr]))
+             [e2 : SurfaceExpr])
+  ;; Variable mutation
+  (SurfSetvar! [x : Symbol]
+               [newval : SurfaceExpr])
+  ;; Turn a variable into a Box pointing to the same location
+  (SurfGetLoc [x : Symbol]))
 
 ;; Parse
 ;; Takes an S-expression and turns it into an SurfExpr
@@ -113,6 +123,13 @@
     [(s-exp-match? `{set-box! ANY ANY} s)
      (SurfSetbox! (parse (second (s-exp->list s)))
                   (parse (third (s-exp->list s))))]
+    ;; {set-var! e1 e2}
+    [(s-exp-match? `{set-var! SYMBOL ANY} s)
+     (SurfSetvar! (s-exp->symbol (second (s-exp->list s)))
+                  (parse (third (s-exp->list s))))]
+    ;; {get-loc x}
+    [(s-exp-match? `{get-loc SYMBOL} s)
+     (SurfGetLoc (s-exp->symbol (second (s-exp->list s))))]                  
     ;; {begin e1 e2}
     [(s-exp-match? `{begin ANY ANY} s)
      (SurfBegin (parse (second (s-exp->list s)))
@@ -120,6 +137,11 @@
     ;; Same idea as above, but first arg needs to be symbol
     [(s-exp-match? `{letvar SYMBOL ANY ANY} s)
      (SurfLetVar (s-exp->symbol (second (s-exp->list s)))
+                 (parse (third (s-exp->list s)))
+                 (parse (fourth (s-exp->list s))))]
+    ;; Same idea as above, but first arg needs to be symbol
+    [(s-exp-match? `{letrec SYMBOL ANY ANY} s)
+     (SurfLetRec (s-exp->symbol (second (s-exp->list s)))
                  (parse (third (s-exp->list s)))
                  (parse (fourth (s-exp->list s))))]
     ;; Anonymous functions
@@ -166,6 +188,10 @@
   (LetVar [x : Symbol]
           [xexpr : Expr]
           [body : Expr])
+  ;; recursive variable definition
+  (LetRec [x : Symbol]
+          [xexpr : Expr]
+          [body : Expr])
   ;; Box creation
   (Box [init : Expr])
   ;; Getting a Box's value
@@ -176,6 +202,12 @@
   ;; Begin
   (Begin [l : Expr]
          [r : Expr])
+  ;; Variable mutation
+  (Setvar! [x : Symbol]
+           [val : Expr])
+  ;; Turn a variable into a Box
+  ;; pointing to the same location
+  (GetLoc [x : Symbol])
   )
 
 ;; NEW: Values
@@ -186,9 +218,12 @@
             [body : Expr]
             [env : Env])
   (NumV [num : Number])
-  ;; NEW:
   ;; A box is represented as a location in the store
-  (BoxV [loc : Location]))
+  (BoxV [loc : Location])
+  ;; NEW
+  ;; Placeholder for implementing recursion
+  ;; If we ever produce this, we should get an error
+  (DummyV))
 
 (define (helper-SurfCall [args : (Listof SurfaceExpr)]
                          [accum : Expr]) : Expr
@@ -228,6 +263,8 @@
     
     [(SurfLetVar x xexp body)
      (LetVar x (elab xexp) (elab body))]
+    [(SurfLetRec x xexp body)
+     (LetRec x (elab xexp) (elab body))]
     ;; NEW:
     ;; SurfFun now takes a list of argument variables.
     ;; Use recursion to desugar mutli-parameter functions
@@ -246,6 +283,10 @@
      (Setbox! (elab e1) (elab e2))]
     [(SurfBegin e1 e2)
      (Begin (elab e1) (elab e2))]
+    [(SurfSetvar! x e)
+     (Setvar! x (elab e))]
+    [(SurfGetLoc x)
+     (GetLoc x)]
     ))
 
 
@@ -286,7 +327,7 @@
 ;; NEW: Value datatype, not just number, in a binding
 (define-type Binding
   (bind [name : Symbol]
-        [val : Value]))
+        [loc : Location]))
 
 
 
@@ -369,7 +410,7 @@
 ;; Returns error if var not found
 ;; NEW: returns a Value, not just a Number
 ;; so we can have functions in the environment
-(define (lookup [n : Symbol] [env : Env]) : Value
+(define (lookup [n : Symbol] [env : Env]) : Location
   (type-case (Listof Binding) env
     ;; Can't find a variable in an empty env
     [empty (error 'lookup (string-append "undefined variable " (to-string n)))]
@@ -379,7 +420,7 @@
     ;; keep looking in the rest of the list
     [(cons b rst-env) (cond
                         [(symbol=? n (bind-name b))
-                         (bind-val b)]
+                         (bind-loc b)]
                         [else (lookup n rst-env)])]))
 
 
@@ -423,7 +464,7 @@
     ;; Variables don't change or the state at all
     ;; since all mutation is done behind boxes.
     [(Var x)
-     (v*s (lookup x env) sto)]
+     (v*s (fetch (lookup x env) sto) sto)]
     ;; Interpreting functions
     ;; This is where we package the function with its environment to build a closure.
     ;; No changes to the store, since we're not actually running the function body
@@ -433,19 +474,28 @@
     [(Call funExpr argExpr)
      (with ([fun-v fun-sto] (interp env funExpr sto))
            (with ([arg-v arg-sto] (interp env argExpr fun-sto))
-                 (let* ([funPair (checkAndGetClosure fun-v)] ;; Function might be an expression, so have to evaluate
-                        ;; Get the name, body, and environment from the closure
-                        [argVar (fst (fst funPair))]  ;; name of the function param
+                 (let* (
+                        [funPair (checkAndGetClosure fun-v)] ;; Function might be an expression, so have to evaluate
+                        [argVar (fst (fst funPair))]
                         [funBody (snd (fst funPair))]
-                        [funEnv (snd funPair)]) ;; body of the function
-                   ;; Evaluate the body in the extended *closure* environment
-                   ;; so that we get static scoping 
-                   (interp (extendEnv (bind argVar arg-v) funEnv) ;; <------------
+                        [funEnv (snd funPair)]
+                        ;; Allocate a new location for the argument value
+                        [argLoc (new-loc arg-sto)]
+                        ;; new store with the arg value at the new location
+                        ;; Use most recent store from arg
+                        [body-sto (override-store (cell argLoc arg-v) arg-sto)])
+                   ;; Evaluate the body in the extended *closure* env
+                   ;; with the new location bound to the parameter name,
+                   ;; using the new store with the argument value
+                   (interp (extendEnv (bind argVar argLoc) funEnv)
                            funBody
-                           arg-sto))))]
+                           body-sto))))]
+
     [(LetVar x xexpr body)
      (with ([x-val x-sto] (interp env xexpr sto))
-           (interp (extendEnv (bind x x-val) env) body x-sto))]
+           (let* ([xloc (new-loc x-sto)]
+                  [body-sto (override-store (cell xloc x-val) x-sto)])
+             (interp (extendEnv (bind x xloc) env) body body-sto)))]
     [(Box a)
      ;; Get the value we're putting in the box, and the new memory state 
      (with [(v sto-v) (interp env a sto)]
@@ -485,9 +535,39 @@
     [(Begin l r)
      (with ([v-l sto-l] (interp env l sto))
            (interp env r sto-l))]
+    ;; Like set-box! but we get the location from the environment
+    ;; instead of evaluating a box-expression
+    [(Setvar! x e)
+     (with ([e-val e-sto] (interp env e sto))
+           (v*s e-val
+                ;; Get the location from the environment
+                (override-store (cell (lookup x env) e-val)
+                                e-sto)))]
+    [(GetLoc x)
+     ;; Make a new box with the same location
+     ;; that the current environment has for the variable
+     (v*s (BoxV (lookup x env))
+          ;; No changes to the store
+          sto)]
+    [(LetRec x xexpr body)
+     (let* ([x-loc (new-loc sto)] ;; Location for x
+            [dummy-sto ;; Put a dummy value at x's location
+             (override-store (cell x-loc
+                                   (DummyV)) sto)])
+       (with ([x-val x-sto]
+              ;; Interpret xexpr in env with x's location
+              (interp (extendEnv (bind x x-loc) env)
+                      xexpr
+                      dummy-sto))
+             ;; Interpret body in env with x's location
+             ;; and store with x's newly computed value
+             ;; plus any side-effects from xexpr
+             (interp (extendEnv (bind x x-loc) env) body
+                     (override-store (cell x-loc x-val) x-sto))))]
+
+
+
     )) 
-
-
 
 
 
@@ -548,3 +628,26 @@
                                    {unbox x}}}})
       (NumV 10)
       )
+
+;; Test to make sure we have pass-by-value
+(test (run `{letvar y 2
+                    {letvar f {fun {x} {begin
+                                         {set-var! x {* x 3}}
+                                         x}}
+                            {+ {f y} y}}})
+      (NumV 8))
+
+;; Variable reference capturing
+;; to simulate call-by-reference
+(test (run `{letvar doublebox! {fun {x} {set-box! x {* 2 {unbox x}}}}
+                    {letvar y 3
+                            {begin {doublebox! {get-loc y}}
+                                   y}}}
+           ) (NumV 6))
+
+(test (run `{letrec fact {fun {x}
+                  {if0 x
+                       1
+                       {* x {fact {- x 1}}}}}
+        {fact 5}})
+      (NumV 120))
