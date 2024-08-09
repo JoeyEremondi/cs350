@@ -8,8 +8,7 @@
 ;; Q3: Implement a version of while-loops for Curly-A5
 ;; Q4: Write a Curly-A5 function that takes in two boxes and swaps the values stored in them.
 
-;; BNF for Curly-Lambda
-;; New forms: {fun {x} body}
+;; BNF for Curly-Mutvar
 ;; 
 ;;  <expr> ::=
 ;;   | SYMBOL
@@ -22,11 +21,14 @@
 ;;   | "{" "fun" "{" SYMBOL * "}" <expr> "}" ;; Can define a function with any number of arguments
 ;;                                            ;; * indicates "0 or more copies of the preceding thing"
 ;;   | "{" <expr> <expr>* "}" ;; Can call any expression with any number of argument
-;;     NEW:
 ;;   | "{" "begin" <expr> <expr> "}"
 ;;   | "{" "box" <expr> "}"
 ;;   | "{" "unbox" <expr> "}"
 ;;   | "{" "set-box!" <expr> <expr> "}"
+;; NEW
+;;   | "{" "set-var!" SYMBOL <expr> "}"
+;;   | "{" "get-loc" SYMBOL "}"
+;;   | "{" "letrec" SYMBOL <expr> <expr> "}"
 
 
 ;; BNF for Function definitions
@@ -65,6 +67,7 @@
   (SurfLetVar [x : Symbol]
               [xexp : SurfaceExpr]
               [body : SurfaceExpr])
+  ;; NEW
   ;; recursive variable definitions
   (SurfLetRec [x : Symbol]
               [xexp : SurfaceExpr]
@@ -81,9 +84,11 @@
   ;; then evaluate the second one
   (SurfBegin [e1 : SurfaceExpr]
              [e2 : SurfaceExpr])
+  ;; NEW
   ;; Variable mutation
   (SurfSetvar! [x : Symbol]
                [newval : SurfaceExpr])
+  ;;NEW
   ;; Turn a variable into a Box pointing to the same location
   (SurfGetLoc [x : Symbol]))
 
@@ -123,10 +128,12 @@
     [(s-exp-match? `{set-box! ANY ANY} s)
      (SurfSetbox! (parse (second (s-exp->list s)))
                   (parse (third (s-exp->list s))))]
+    ;; NEW
     ;; {set-var! e1 e2}
     [(s-exp-match? `{set-var! SYMBOL ANY} s)
      (SurfSetvar! (s-exp->symbol (second (s-exp->list s)))
                   (parse (third (s-exp->list s))))]
+    ;; NEW
     ;; {get-loc x}
     [(s-exp-match? `{get-loc SYMBOL} s)
      (SurfGetLoc (s-exp->symbol (second (s-exp->list s))))]                  
@@ -140,6 +147,7 @@
                  (parse (third (s-exp->list s)))
                  (parse (fourth (s-exp->list s))))]
     ;; Same idea as above, but first arg needs to be symbol
+    ;; NEW
     [(s-exp-match? `{letrec SYMBOL ANY ANY} s)
      (SurfLetRec (s-exp->symbol (second (s-exp->list s)))
                  (parse (third (s-exp->list s)))
@@ -202,9 +210,11 @@
   ;; Begin
   (Begin [l : Expr]
          [r : Expr])
+  ;; NEW
   ;; Variable mutation
   (Setvar! [x : Symbol]
            [val : Expr])
+  ;; NEW
   ;; Turn a variable into a Box
   ;; pointing to the same location
   (GetLoc [x : Symbol])
@@ -645,9 +655,13 @@
                                    y}}}
            ) (NumV 6))
 
+;; Testing recursion via mutation
 (test (run `{letrec fact {fun {x}
                   {if0 x
                        1
                        {* x {fact {- x 1}}}}}
         {fact 5}})
       (NumV 120))
+
+;; Recursion not guarded behind a lambda should produce an error when we try to operate on the result
+(test/exn (run `{letrec x {+ x 1} {* x 2}}) "DummyV")

@@ -4127,13 +4127,13 @@ return g(x);
 *** Example (ctd)
 - Evaluating function produces closure:
 #+begin_src racket
-(ClosureV
-   (Fun 'x (If0 (Var 'x)
+(ClosureV 'x
+   (If0 (Var 'x)
                 (NumLit 1)
                 (Times (Var 'x)
                        (Call (Var 'fact)
                              (Plus (Var 'x)
-                                   (Times (NumLit 1) (NumLit -1)))))))
+                                   (Times (NumLit 1) (NumLit -1))))))
    (fact := 0))
 #+end_src
 - Never fetch from location 0
@@ -4196,7 +4196,7 @@ return g(x);
     - Environments
     - Locations and Stores
 - Key Concepts
-  + Members
+  + Members/Fields
   + Methods
   + Encapsulation
 *** The Object/Datatype Duality
@@ -4233,15 +4233,23 @@ return g(x);
   + Copying the object makes a new copy
 - Like Tuples in Python
 *** Object Operations
-- Object creation ~{object {SYMBOL <expr>}* {SYMBOL {SYMBOL} <expr>} }~
+- Object creation
+  #+begin_src racket
+   {object {{SYMBOL <expr>}*} {SYMBOL {SYMBOL} <expr>}* }
+  #+end_src
   + Create an object with 0 or more /fields/, whose names are given by the given symbols, and 0 or more /methods/, with the given name, parameter name, and body
   + Simplest version of an (OOP-style) constructor, just takes values for all the fiels and methods
     - Not to be confused with constructor for a datatype
 - Field getting ~{get <expr> SYMBOL}~
   + Gets the value of the field with the given name from the given object
+  + ~{get o field}~ is like ~o.field~
 - Method calling ~{send <expr> SYMBOL <expr> }~
   + Call the given object's method (with the given name), with the given argument
+  + ~{send e method arg}~ is like ~e.method(arg)~
+
+
   + Name comes from Smalltalk, history of OOP
+*** Object operations ctd
 - Self-reference: ~this~
   + Inside an object's methods, there is a special variable called ~this~
   + Refers to the object that the method is being called on, so we can get e.g. field values from methods
@@ -4249,14 +4257,29 @@ return g(x);
 #+begin_src racket
 {letvar mkCircle
         {fun {r}
-             {object {radius r}
-                     ;; All methods take one parameter, so we just ignore the parameter
+             {object {{radius r}}
+                     ;; All methods take one parameter,
+                     ;; so we just ignore the parameter
                      {getArea {x} {* {get this radius}
                                      {* {get this radius} 3.14}}}}}
         {letvar unitCircle {mkCircle 1}
                 {send unitCircle getArea 0}}}
 #+end_src
 - Produces ~3.14~
+*** Example
+#+begin_src racket
+{letvar mkSquare
+        {fun {w}
+             {object {{width w}}
+                     ;; All methods take one parameter,
+                     ;; so we just ignore the parameter
+                     {getArea {x} {* {get this width}
+                                     {get this width} }}}}
+        {letvar unitSquare {mkSquare 2}
+                {send unitSquare getArea 0}}}
+#+end_src
+- Produces ~4~
+- Same interface as circle, can use interchangably if only call methods
 ** Implementing Objects
 *** General Strategy
 - For the most part, nothing complicated
@@ -4303,12 +4326,15 @@ return g(x);
   (type-case Expr e
     [(Object fields methods)
        ;; Each named field expression gets turned into a name-value pair
-       (ObjV (map (lambda ([pr : (Symbol * Expr)]) (pair (fst pr) (interp env (snd pr))))
+       (ObjV (map (lambda ([pr : (Symbol * Expr)])
+                    (pair (fst pr) (interp env (snd pr))))
+                fields)
                 ;; Each method gets turned into a closure
-                (lambda ([pr : (Symbol * (Symbol * Expr))])
-                  (pair (fst pr) (ClosureV (fst (snd pr))
-                                           (interp (snd (snd pr)))
-                                           env)))))])
+              (map (lambda ([pr : (Symbol * (Symbol * Expr))])
+                    (pair (fst pr) (ClosureV (fst (snd pr))
+                                           (snd (snd pr))
+                                           env)))
+                   methods))])
 #+end_src
 *** A Helper Function for List of Pairs
 #+begin_src racket
@@ -4327,7 +4353,8 @@ return g(x);
     - Works for fields and methods
 *** Interpreting Field Lookup
 #+begin_src racket
-[(getE obj-expr field-name)
+[(Get obj-expr field-name)
+ ;; Dynamic type check
   (type-case Value (interp env obj-expr)
       [(ObjV fields methods)
         (find fields field-name)]
@@ -4338,13 +4365,15 @@ return g(x);
 (Send obj-expr method-name arg-expr)
        (let [(obj-val (interp env obj-expr))
               (arg-val (interp env arg-expr))]
+         ;; dynamic type check
          (type-case Value obj-val
            [(ObjV fields methods)
-            (let ([param-body (find methods method-name)])
+            (let ([param-closure (find methods method-name)])
               (interp (extendEnv (bind 'this obj-val)
-                         (extendEnv (bind (fst param-body) arg-val)
-                                    env))
-                      (snd (param-body))))]
+                         (extendEnv (bind (ClosureV-arg param-closure)
+                                          arg-val)
+                                    ClosureV-env))
+                      (ClosureV-body param-closure)))]
 #+end_src
 - Interpret the object and argument to values
 - Lookup the method by name in the object
@@ -4387,13 +4416,134 @@ return g(x);
 - Can even do recursion
 #+begin_src racket
 ;; factorial with objects
-{define fact
+{letvar fact
   {object {}
         {call {x}
           {if0 x
                1
                {* x {send this call {- x 1}}}}}}}
 #+end_src
+* Lazy Evaluation
+:PROPERTIES:
+:EXPORT_FILE_NAME: pdf/slides021-lazy.pdf
+:header-args:racket: :results code :lang plait
+:END:
+#+beamer: \beamerdefaultoverlayspecification{<+->}
+** Lazy Evaluation
+*** Overview
+- Objectives
+  + To understand the design space of evaluation order
+- Key Concepts
+  + Lazy evaluation
+  + Strict evaluation
+  + Strictness points
+  + Thunks
+*** The Type of Substitution
+- We could replace a variable with /any expression/ in subsituttion
+  + Doesn't have to be a value
+#+begin_src racket
+(define (subst [toReplace : Symbol]
+               [replacedBy : Expr]
+               [replaceIn : Expr]) : Expr ....)
+#+end_src
+*** Substituting Expressions vs. Values
+- Think /waaaaayyyy/ back to our substitution-based Curly-Lambda interpreter
+#+begin_src racket
+(define (interp expr)
+  (type-case Expr interp
+  ....
+    [(Call funExpr argExpr)
+     ;; Interpret the argument to a value
+      (let* ([argVal (interp argExpr)]
+             ;; Interpret the function to a value
+             [funVal (checkAndGetFun (interp funExpr))]
+             [funParam (fst funVal)]
+             [funBody (snd funVal)]))
+        ;; Substitute the parameter value into the function body
+        (interp (subst funParam
+                       (value->expr argVal )
+                       funBody))] ))
+#+end_src
+- We evaluate the argument before substituting it into the function body
+  + Why do we have to do this?
+  + We don't
+*** Substitution-Based Lazy Evaluation
+#+begin_src racket
+(define (interp expr)
+  (type-case Expr interp
+  ....
+    [(Call funExpr argExpr)
+     ;; Interpret the argument to a value
+      (let* (;; Interpret the function to a value
+             [funVal (checkAndGetFun (interp funExpr))]
+             [funParam (fst funVal)]
+             [funBody (snd funVal)]))
+        ;; Substitute the parameter value into the function body
+        (interp (subst funParam
+                       argExpr ;; !! <-----------------------
+                       funBody))] ))
+#+end_src
+- Don't interpret argument to a value before substituting it
+- Works just as well, /but we get different behaviour/
+*** Strict vs. Lazy Semantics
+- *Strict evaluation order* is when we evaluate function arguments to a value before substituting them into the function body
+  + Also called *eager* semantics
+- *Lazy evaluation order* is when we don't evaluate function parameters before substituting them into function bodies
+- As long as a language has no mutable state, a program that runs successfully will produce /the exact same results/ with strict and lazy semantics
+  + However, some programs might fail with strict but succeed with lazy
+  + Some programs might run forever with strict, but terminate with lazy
+*** Example: Error
+#+begin_src racket
+{letvar f {fun {x y} {if0 x y {* x 2}}}
+        {f 3 undefinedVariable}}
+#+end_src
+- Strict evaluation:
+  + Evaluates ~undefinedVariable~ before substituting it in the function body
+  + Raises an error because it's undefined
+- Doesn't raise an error with lazy evaluation
+  + We never evaluate ~undefinedVariable~
+  + When we substitute, it only ends up in the branch of the ~if0~ that we don't take
+*** Example: Loop
+#+begin_src racket
+{letvar f {fun {x y} {if0 x y {* x 2}}}
+        {f 3
+           {{fun {x} {x x}} {fun {x} {x x}}}
+           }}
+#+end_src
+- ~{{fun {x} {x x}} {fun {x} {x x}}}~ runs forever
+  + Midterm bonus
+- Strict evaluation:
+  + Evaluates the application that runs forever, never gets to substituting
+- Terminates with lazy evaluation
+  + We never evaluate the function calling itself
+  + When we substitute, it only ends up in the branch of the ~if0~ that we don't take
+*** The General Rule
+- For function calls
+  + Lazy: substitute the argument /expression/ into the body, then evaluate the body
+  + Strict: evaluate the argument to a value, then substitute into the body, then evaluate the body
+*** Non-Function Recursion
+- Recall: with recursion, we needed to have all recursive references in the body of a lambda
+- With lazy evaluation, we don't need this, because we won't try to evaluate the variable
+- Lets us define *infinite data structures* using recursion
+  + As long as we only ever access a finite part of the structure, program will terminate
+  + e.g. "the list of all natural numbers"
+- See Racket examples in ~lazy.rkt~
+*** Strictness Points
+- Some features /had/ to evaluate their arguments before using them
+  + e.g. the number we're testing in ~if0~
+    - Can't progress until it's a value
+  + These are /strictness points/
+    - Places an un-evaluated argument will be evaluated
+- Include
+  + Number tested in ~if0-
+  + Arguments to plus or times
+  + The /function/ in a function call
+    - not the argument
+*** Laziness in real languages
+- Python and JavaScript have /generators/
+  + A structure we can iterate from, that doesn't generate the entire list we're going through
+  + This is basically just a lazy list, implemented similar way
+- Can probably do something similar with iterators in C++
 * Local Variables :noexport:
 Local Variables:
 org-latex-packages-alist: nil
