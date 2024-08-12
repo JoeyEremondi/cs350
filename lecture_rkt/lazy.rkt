@@ -5,14 +5,21 @@
 ;; For example, if we have an error in an expression that's never used,
 ;; it is never evaluated
 
-(define fail
+(define fail : 'a
+  (error 'fail "FAIL was evaluated"))
+
+(define failB : Boolean
   (error 'fail "FAIL was evaluated"))
 
 ;; The argument x is never used, so the error is never evaluated
 (define (ignore x) 3)
+
 (test
    (ignore fail)
    3)
+
+(define (if0Fst x y)
+  (if (= x 0) y (* x 2)))
 
 ;; There are "strictness points" where we need to inspect
 ;; the value of an expression to proceed,
@@ -21,6 +28,7 @@
 
 ;;e.g. 
 (test/exn (zero? fail) "")
+
 
 ;; We can build infinite lists with lazy evaluation.
 ;; Map works just fine over an infinite list, since it doesn't
@@ -63,5 +71,19 @@
             (take (- n 1) (rest l)))))
 
 
+;; We can search by making an infinite (or very long) lists and filtering to
+;; only include the ones that have the properties we want.
+;; e.g. (very slow) way to find a solution to an equation
+
+(define (isSolution x)
+  (= (- (* x x) 625) 0))
 
 
+(define (range start end step)
+  (if (<= end start)
+      '()
+      (cons start
+            (range (+ start step) end step))))
+
+
+(filter isSolution (range 0 1000000 1))

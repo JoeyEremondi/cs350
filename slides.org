@@ -4453,13 +4453,10 @@ return g(x);
   (type-case Expr interp
   ....
     [(Call funExpr argExpr)
-     ;; Interpret the argument to a value
       (let* ([argVal (interp argExpr)]
-             ;; Interpret the function to a value
              [funVal (checkAndGetFun (interp funExpr))]
              [funParam (fst funVal)]
              [funBody (snd funVal)]))
-        ;; Substitute the parameter value into the function body
         (interp (subst funParam
                        (value->expr argVal )
                        funBody))] ))
@@ -4473,7 +4470,6 @@ return g(x);
   (type-case Expr interp
   ....
     [(Call funExpr argExpr)
-     ;; Interpret the argument to a value
       (let* (;; Interpret the function to a value
              [funVal (checkAndGetFun (interp funExpr))]
              [funParam (fst funVal)]
@@ -4492,6 +4488,7 @@ return g(x);
 - As long as a language has no mutable state, a program that runs successfully will produce /the exact same results/ with strict and lazy semantics
   + However, some programs might fail with strict but succeed with lazy
   + Some programs might run forever with strict, but terminate with lazy
+  + Opposite never true: if strict succeeds, then lazy does too
 *** Example: Error
 #+begin_src racket
 {letvar f {fun {x y} {if0 x y {* x 2}}}
@@ -4544,6 +4541,18 @@ return g(x);
   + A structure we can iterate from, that doesn't generate the entire list we're going through
   + This is basically just a lazy list, implemented similar way
 - Can probably do something similar with iterators in C++
+*** Laziness via lambda
+- We can simulate laziness in an eager language using just functions
+- A function that ignores its argument acts like a lazy value
+  + To force it back to a value, you call it with any value
+*** Laziness via lambda example
+#+begin_src racket
+{letvar f {fun {x y} {if0 x {y 0} {* x 2}}}
+        {f 3 {fun {x} undefinedVariable}}}
+#+end_src
+- Undefined variable behind a lambda, so no error
+  + Closures store /expressions/, not values
+- In a strict language, this has the same behavior as the lazy version
 * Local Variables :noexport:
 Local Variables:
 org-latex-packages-alist: nil
