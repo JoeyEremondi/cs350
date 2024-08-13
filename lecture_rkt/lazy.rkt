@@ -86,4 +86,4 @@
             (range (+ start step) end step))))
 
 
-(filter isSolution (range 0 1000000 1))
+
