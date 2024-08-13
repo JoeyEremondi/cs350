@@ -4563,6 +4563,7 @@ return g(x);
 *** Main Topics
 - Purely functional programming
   + No mutable variables
+    -  Mathematical functions: same input means same output
   + Recursion instead of loops
 - Algebraic data types
   + "OR" for datatypes
@@ -4596,6 +4597,7 @@ return g(x);
 #+begin_src racket
 (define (f x1 x2 x3) body)
 #+end_src
+- ~x1, x2, x3~ are /identifiers/, names we choose for variables when writing the function
 - Then for any expressions ~a b c~, the function call ~(f a b c)~ is equal to ~body~ with:
   + ~x1~ replaced by the value of ~a~
   + ~x2~ replaced by the value of ~b~
@@ -4693,7 +4695,7 @@ return g(x);
 - e.g. Every interpreter we've written for the last 6 weeks
 ** Higher Order Functions
 *** Lambdas
-- The main way to create a function at the top level
+- The main way to create a function NOT at the top level
 - If you're trying to make something of type ~('a -> 'b)~, then you can always do so by writing:
   + ~(lambda ([x : 'a]) body)~
   + ~body~ has type ~'b~, can use the variable ~x~ of type ~'a~
@@ -4703,7 +4705,7 @@ return g(x);
   + Captures the values from whenever the function was created
 *** Functions Taking Functions
 - For the most part, nothing has changed
-- If you have a variable of type ~('a -> 'b)~ for any types ~'a~ and ~'b~, and you do a call ~(f x)~ on ~x : 'a~, then the result of the call will have type ~'b~
+- If you have a variable ~f~ of type ~('a -> 'b)~ for any types ~'a~ and ~'b~, and you do a call ~(f x)~ on ~x : 'a~, then the result of the call will have type ~'b~
   + Extends to multi-argument functions
 - All the same equational rules hold
   + You evaluate a function by replacing its parameter variables with the values of its arguments
@@ -4737,7 +4739,7 @@ return x; // or just do something with the final value of x
   (someLoop-helper 0 xInit)
   #+end_src
 *** Tail Calls
-- If we're in the body of function ~f~, and we call function ~g~, then ~g~ is a tail call if the return value of ~g~ is used as the return value of ~f~
+- If we're in the body of function ~f~, and we call function ~g~, then the call to ~g~ is a tail call if the return value of ~g~ is used as the return value of ~f~
 - E.g.
   + ~(define (f x) (g x 10))~: tail call
   + ~(define (f x) (if x (g x 10) 0))~: tail call
