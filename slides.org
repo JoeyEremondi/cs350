@@ -4913,13 +4913,71 @@ if (true){ // make the scope explicit
   + For purely functional language
 - Operations:
   + Make empty environment
+  + Look up the most recent value for a given symbol
+  + Add a new binding (e.g. add a new value for a given symbol)
+    - Like a low-tech hashtable/dictionary/key-value store
 *** Letvar with environments
 #+begin_src racket
 {letvar x xExpr body}
 #+end_src
 - Interpret ~xExpr~ to a value
-- Make a new environment with ~x~ bound
+- Make a new environment with ~x~ bound to the value of ~xExpr~
 *** Closures
+- Lambdas let us create functions at any point in the program
+  + Can refer to any in-scope variables
+- When those variables get values, the lambda should use those values
+  + Happens automatically with substitution
+- In an environment-based interpreter, we must *include the environment from when a function was created*
+- Functions evaluate to closures
+- Data structure with:
+  + Parameter variable
+  + Body (where parameter is in scope)
+  + Environment from when the function was *created*
+*** Static vs. Dynamic Scope
+- Closures implement static scope
+  + In a lambda, free variables get their values from where the function was /created/
+- Dynamic scope:
+  + In a lambda, free variables get their values from where the function is /called/
+** Mutable State
+*** Generative Recursion
+- Recall how we used generative/tail recursion to implement loops
+  + Updated a variables value by passing the new value as a parameter to the recursive call
+- Implementing mutable state in a purely functional language works the same way
+  + Take an extra argument for the /current state of memory/
+    - Called the *store*
+  + Each recursive call is explicitly passed a store
+  + ~interp~ now produces a value /and a store/
+    - State of memory after interpreting some expression
+    - Gets passed to the next interpreter call
+  + Sequence of states we pass along determines the execution order
+- We can now view programs as functions from the current environment /and the current state of memory/ to values /and states of memory/
+*** Boxes
+- Value representing a location in memory
+  + Kind of like pointer
+- Create a box
+  + Add a *new* location to the store
+- Unbox a value
+  + Look up the value for the box's location in the store
+- Set a box's value
+  + Update the store to have a new value /for the box's existing location/
+*** Mutable Variables
+- One big change:
+  + Environments store /locations/, not values
+- Each variable lookup now gets a location from the env, and a value from that location in the store
+- Can mutate a variable's value by producing a store with a different value at the variable's location
+*** Recursion
+- Can define values self-referentially with mutable state
+- Interpret the value for a variable in an environment extended with that variable
+  + Dummy value at the variable's location in the store
+- After interpreting the value, put that value at the variable's location in the store
+- Works as long as all recursive uses of the variable are in the body of a lambda
+  + Closures don't evaluate their bodies until called
+** Alternate Models of Execution
+*** OOP
+- Pair data (members) with operations on that data (fields)
+- Self reference
+- Adding new variants of an interface is an easy (local) change
+- Adding new operations is a hard (global) change
 * Local Variables :noexport:
 Local Variables:
 org-latex-packages-alist: nil
