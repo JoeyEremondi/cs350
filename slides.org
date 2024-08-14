@@ -49,7 +49,9 @@
 #+BEAMER_HEADER: \usepackage[outputdir=pdf]{minted}
 #+BEAMER_HEADER: \usepackage{etoolbox}
 #+BEAMER_HEADER: \usepackage{hyphenat}
-#+BEAMER_HEADER: \AtBeginEnvironment{minted}{\pause} \setminted[racket]{escapeinside=||,bgcolor=LightGray,beameroverlays=true,baselinestretch=1.2,fontsize=\scriptsize}
+#+BEAMER_HEADER: \AtBeginEnvironment{minted}{\pause}
+#+BEAMER_HEADER: \setminted[racket]{escapeinside=||,bgcolor=LightGray,beameroverlays=true,baselinestretch=1.2,fontsize=\scriptsize}
+#+BEAMER_HEADER: \setminted[c++]{escapeinside=||,bgcolor=LightGray,beameroverlays=true,baselinestretch=1.2,fontsize=\scriptsize}
 
 * Introduction
 :PROPERTIES:
@@ -4789,6 +4791,135 @@ return x; // or just do something with the final value of x
 :header-args:racket: :results code :lang plait
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
+** Interpreters
+*** What We've Learned
+- Syntax trees to represent programs
+- Evaluation (~interp~)
+  + Compute the value for an expression recursively
+- Desugaring
+  + E.g. Substitution, Currying
+- Language features
+  + Conditionals
+  + Top-level function definitions
+  + Local variable definitions (~letvar~)
+  + First-class functions via substitution
+- Environment-based interpreters
+  + Variables via environments
+  + Lambdas via environments: closures
+- Store-passing interpreters
+  + Boxes
+  + Mutable Variables
+  + Recursion via mutation
+- OOP
+- Lazy evaluation
+** Syntax and the Language Pipeline
+*** Life of a program
+
+- The Language Pipeline:
+
+#+latex: {\tiny
+#+ATTR_LATEX: :align p{0.11\textwidth}p{0.11\textwidth}p{0.11\textwidth}p{0.11\textwidth}p{0.11\textwidth}p{0.11\textwidth}p{0.11\textwidth}
+| Source code | $\xrightarrow{\text{parsing}}$ | Abstract syntax tree | $\xrightarrow{translation}$ | Core Syntax                | $\xrightarrow{evaluation}$  | Result              |
+|             |                                |                      |                             |                            |                             |                     |
+| \nohyphens{text file} | \nohyphens{lexing / tokenizing first} | \nohyphens{data structure } | \nohyphens{desugaring / compilation} | simpler AST / machine code | interpreter, execute on CPU | value, side effects |
+|             |                                |                      |                             |                            |                             |                     |
+#+latex: }
+*** The Pipeline
+- Start with source code
+- Parser translates it into a /syntax tree/
+  + I won't ask about parsers on the exam
+- Surface Syntax Tree (~SurfaceExpr~)
+  + Direct representation of the syntax of the program
+- Desugaring/Elaboration
+  + Translate the surface syntax tree into core syntax
+- Core syntax (~Expr~)
+  + The type that the interpreter takes as input
+- Interpreter/Evaluation
+  + Actually run the code
+  + Get a value and/or side-effects
+- Value type
+  + Whatever the result of the computation is
+*** Interpreter Basics
+- Every expression has a /value/
+- Interpreter computes this value
+  + Can view it as /defining/ the semantics of the language
+- Recursively compute sub-expression values
+  + Use to compute value for the whole expression
+  + Once have a value, then we can use the features of the implementation language
+    - e.g. We can't use Plait ~+~ on an ~Expr~, but once we apply ~interp~ and get a ~Number~ we can
+*** Variables and Substitution
+- To implement functions, we need a way to specify a program that's parameterized
+- We use ~Symbol~ as a Plait type to represent variable names
+- Add variant ~(Var [x : Symbol])~ to ~Expr~
+- New operation: substitution
+  + Replace all /free/ occurrences of the variable ~x~ with some expression in another expression
+    - Ignoring bound occurrences gives us /shadowing/
+*** Function Calls
+- To implement a function call with substitution:
+  + Evaluate the function to a value
+    - Gives us a parameter symbol and a body
+  + Evaluate the argument to a value
+    - (If doing strict semantics)
+  + Replace the parameter symbol with the argument value in the body
+  + Interpret the replaced body
+    - This is how we say "run the body"
+*** Local Definitions: Intuition
+- Consider this C++ program
+#+begin_src c++
+if (someCondition){
+  cout >> "hello";
+  int x = 10;
+  while (x > 0){
+    cout >> x;
+    x = x - 1;
+  }
+ }
+cout >> "goodbye";
+#+end_src
+- Declaring ~int x = 10~ creates a new variable *whose scope is not obvious from the code*
+  + We can use ~x~ anywhere from where it's declared until the end of the ~if~ block
+- The assignment in the ~while~ does *not* affect the scope
+  + No equivalent in a purely functional language
+*** Local Definitions
+- In an expression based language, the scope of a variable is /explicit/
+#+begin_src racket
+{letvar x xExpr body}
+#+end_src
+- The scope of ~x~ is body
+- The value of ~x~ in body is the value of ~xExpr~
+- To interpret with substitution, we:
+  + Evaluate ~xExpr~ to ~xVal~
+  + Replace ~x~ with ~xVal~ in body
+  + Interpret the replaced version of ~body~
+- Similar to:
+#+begin_src c++
+if (true){ // make the scope explicit
+  int x = xExpr;
+  body;
+}
+#+end_src
+*** Dynamic Type Checking
+- When we have functions as values, we need a way to
+** Environments
+*** Why Environments
+- What is the /meaning/ of the program ~{+ x 1}~
+  + With substitution, the program has no meaning until we replace ~x~ with a value
+- Environments /give meaning to programs with free variables/
+  + The program has a value /paramterized over/ values for the free variables
+- Performance:
+  + Instead of traversing the entire body of the function, just push a binding onto the front of a list
+*** Environments Operations
+- Environment is a list of symbol-value pairs
+  + For purely functional language
+- Operations:
+  + Make empty environment
+*** Letvar with environments
+#+begin_src racket
+{letvar x xExpr body}
+#+end_src
+- Interpret ~xExpr~ to a value
+- Make a new environment with ~x~ bound
+*** Closures
 * Local Variables :noexport:
 Local Variables:
 org-latex-packages-alist: nil
