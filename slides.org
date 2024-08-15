@@ -4858,6 +4858,7 @@ return x; // or just do something with the final value of x
 - To implement a function call with substitution:
   + Evaluate the function to a value
     - Gives us a parameter symbol and a body
+    - The /data/ of a function is the expression of its body
   + Evaluate the argument to a value
     - (If doing strict semantics)
   + Replace the parameter symbol with the argument value in the body
@@ -4886,6 +4887,7 @@ cout >> "goodbye";
 {letvar x xExpr body}
 #+end_src
 - The scope of ~x~ is body
+- The value of the whole ~letvar~ is the value of the body, with the variable bound to its value
 - The value of ~x~ in body is the value of ~xExpr~
 - To interpret with substitution, we:
   + Evaluate ~xExpr~ to ~xVal~
@@ -4899,7 +4901,10 @@ if (true){ // make the scope explicit
 }
 #+end_src
 *** Dynamic Type Checking
-- When we have functions as values, we need a way to
+- When we have functions as values, an expression can produce a number or a function
+- Some operations only expect functions, some only expect numbers
+  + e.g. Can't do ~{+ {fun {x} x} 5}~
+- Whenever we check to see if a value is a particular kind of value, this is a /dynamic type check/
 ** Environments
 *** Why Environments
 - What is the /meaning/ of the program ~{+ x 1}~
@@ -4978,6 +4983,11 @@ if (true){ // make the scope explicit
 - Self reference
 - Adding new variants of an interface is an easy (local) change
 - Adding new operations is a hard (global) change
+*** Lazy
+- Don't evaluate function arguments before substituting
+  + That's it
+- Means can define non-functions recursively
+  + Infinite data structures
 * Local Variables :noexport:
 Local Variables:
 org-latex-packages-alist: nil
