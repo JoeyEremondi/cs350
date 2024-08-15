@@ -1,1 +1,171 @@
 Practice Final Solutions
+
+***MC***
+
+(1) Syntax tree in, value out
+
+(2) Look up value for a given symbol
+
+(3) Only foldl is tail recursion
+
+(4) False, because tail recursion doesn't grow the call stack
+
+(5) False. The environment grows with each fn call, shrinks with each return. The store never shrinks, just grows every time we define a new location.
+
+
+***Evaluation***
+
+Start:
+env (z, loc1) (x, loc2) (f, loc3)
+store: (loc1, 7) (loc2, 9) (loc3 (ClosureV...))
+
+Then to evaluate the -, we evaluate f x
+and then evaluate z
+To evaluate f x
+  look up x, get loc2, fetch loc2, get 9
+  interpret body of f with new location in the env,
+   parameter in that location
+  closure-env: (y, loc4), (z, loc1) (x, loc2)
+  store: (loc1, 7) (loc2, 9) (loc3 (ClosureV...)) (loc4, 9)
+  setvar z sets (loc1, 9) in the store
+  (setvar y) sets (loc4, 10) in the store
+  produces value of y, which is 10
+    end store (loc1, 9) (loc2, 9) (loc3 (ClosureV...)) (loc4, 10)
+Now have the value for {f x}= 10
+Then get value for z, it has location 1,
+which has value 9.
+Finally, we do 10 - 9 = 1
+
+Same as above, but with pass-by-reference
+Difference is that when we call f,
+so instead of making new location loc4,
+we put y pointing to the same location
+as x (the argument) had, loc 2.
+Then, loc2 gets updated to 10
+
+Everything else is the same, end up getting the same result, but with a different store at the end,
+because now x has the value of 10.
+
+If instead, we did {+ {- {f x} z} x}, then
+we'd get different results, because
+the right-most x would 9 with pass-by-value,
+and 10 with pass-by-reference.
+
+Q3:
+   {letvar f {fun {x y} {if0 x y 3}}
+      {f {+ f 2} 9}}
+With strict semantics, should be ERROR
+Because to call the function, we evaluate
+its arguments, doing {+ f 2} is a type error.
+
+With lazy semantics. we don't evaluate the arguments before substituting.
+We STILL get a type ERROR, because if0
+is a strictness point.
+We can't do the if until we have x
+down to a value.
+
+Q4: strict throws ERROR, for same reason as above
+
+Lazy does not, because we never evaluate y
+when x is not 0
+
+Last example: Result is 3.
+Y gets the *value* of x, not the location.
+So setting y doesn't change the value of x.
+
+
+*** Coding ***
+
+(define (elab [s : SurfaceExpr]) : Expr
+  (type-case SurfaceExpr s
+    [(Begins es)
+       ;; es has type (Listof SurfaceExpr)
+    ;; write your impl here
+  (type-case (reverse es)
+    [empty (error "empty begin")]
+    [(cons last rest)
+      (foldl Begin (elab last)
+        (map elab rest))])
+  ]
+
+Could instead do recursion
+(define (elab [s : SurfaceExpr]) : Expr
+  (type-case SurfaceExpr s
+    [(Begins es)
+    (if (= (length es) 0 error)
+      (if (= (length es) 1)
+        (elab (first es))
+        ;; else case, length is 2 or more
+      (Begin (first es)
+              (elab (SurfaceBegin (rest es))))
+
+        ))
+  ]
+
+** Interpreters
+
+(define (interp [env : Env]
+                        [e : Expr]
+                        [sto : Store]) : Result
+  (type-case Expr e
+    [(LetAlias x y body)
+          ;;your implementation here
+          ;; because x and y have the same location,
+          ;; we don't need to change the store,
+          ;; just the environment
+        (interp (extendEnv (bind x (lookup y env) env))
+                 body
+                 sto)
+  ]
+    ))
+
+
+HOF zip:
+
+;; not tail recursion
+(define (zip [as : (Listof 'a)]
+                    [bs : (Listof 'b)])
+                    : (Listof ('a * 'b))
+  (if (or (empty? as) (empty? bs))
+       '()
+       (let ([ha (first as)]
+              [ta (rest as)]
+              [hb (first bs)]
+              [tb (rest bs)]
+              [recResult (zip ta tb)]))
+          (Cons (pair ha hb) recResult)    )
+)
+
+** Tail recursion
+
+(define countOddEvents nums
+  (helper nums (pair 0 0))
+
+(define (helper nums countsSoFar)
+  (type-case nums
+    [empty countSoFar]
+    [(cons h t)
+      (if (= (modulo h 2) 0)
+        (helper t
+               (pair (fst countsSoFar)
+                      (+ 1 (snd countsSoFar))))
+        (helper t
+               (pair (+ 1 (fst countsSoFar))
+                      (snd countsSoFar))))]))
+
+with foldl
+
+(foldl (lambda (h countSoFar)
+          (if (= (modulo h 2) 0)
+                (pair (fst countsSoFar)
+                        (+ 1 (snd countsSoFar)))
+                (pair (+ 1 (fst countsSoFar))
+                        (snd countsSoFar))))
+    (pair 0 0 )
+    nums )
+
+** version with filter
+(pair (length
+         (filter (fun (x) (= (modulo x 2) 0))))
+       (length
+         (filter (fun (x) (= (modulo x 2) 1)))))
