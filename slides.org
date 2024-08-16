@@ -56,7 +56,7 @@
 
 * CS 350 Summer 2024, University of Regina
 :PROPERTIES:
-:TOC:      :include all :depth 2 :force ((nothing)) :ignore ((nothing)) :local ((nothing))
+:TOC:      :include all :depth 2 :force (((nothing))) :ignore (((nothing))) :local (((nothing)))
 :END:
 
 :PROPERTIES:
