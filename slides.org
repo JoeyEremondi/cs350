@@ -5,7 +5,7 @@
 
 
 
-#+OPTIONS: toc:nil H:2 num:t TODO:nil eval:yes
+#+OPTIONS: toc:nil H:2 TODO:nil eval:yes
 
 #+BEAMER_HEADER: \usepackage[sfdefault]{atkinson} %% Option 'sfdefault' if the base
 #+BEAMER_HEADER: \usepackage{FiraMono}
