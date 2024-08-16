@@ -1,3 +1,4 @@
+#+title: University of Regina, CS 350, Summer 2024
 #+subtitle: CS 350
 #+AUTHOR: Dr. Joseph Eremondi
 #+DATE: Last updated: \today{}
@@ -54,7 +55,7 @@
 #+BEAMER_HEADER: \setminted[c++]{escapeinside=||,bgcolor=LightGray,beameroverlays=true,baselinestretch=1.2,fontsize=\scriptsize}
 
 
-* CS 350 Summer 2024, University of Regina
+* Contents
 :PROPERTIES:
 :TOC:      :include all :depth 2 :force (((nothing))) :ignore (((nothing))) :local (((nothing)))
 :END:
@@ -66,7 +67,7 @@
 This document contains the compiled course notes for the summer 2024 iteration of  CS 350 at the University of Regina, taught by Dr. Joseph Eremondi.
 
 :CONTENTS:
-- [[#cs-350-summer-2024-university-of-regina][CS 350 Summer 2024, University of Regina]]
+- [[#contents][Contents]]
 - [[#introduction][Introduction]]
   - [[#course-overview][Course Overview]]
   - [[#motivation-functional-programming][Motivation: Functional Programming]]
@@ -5081,7 +5082,7 @@ if (true){ // make the scope explicit
   + That's it
 - Means can define non-functions recursively
   + Infinite data structures
-* Local Variables :noexport:
+* Emacs Variables (please ignore) :noexport:
 Local Variables:
 org-latex-packages-alist: nil
 End:
