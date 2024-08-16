@@ -54,18 +54,19 @@
 #+BEAMER_HEADER: \setminted[racket]{escapeinside=||,bgcolor=LightGray,beameroverlays=true,baselinestretch=1.2,fontsize=\scriptsize}
 #+BEAMER_HEADER: \setminted[c++]{escapeinside=||,bgcolor=LightGray,beameroverlays=true,baselinestretch=1.2,fontsize=\scriptsize}
 
-
-* Contents :TOC_2_gh:
+* Contents
+:PROPERTIES:
+:TOC:      :include all :depth 2
+:CUSTOM_ID: contents
+:END:
+:CONTENTS:
+- [[#contents][Contents]]
 - [[#introduction][Introduction]]
   - [[#course-overview][Course Overview]]
   - [[#motivation-functional-programming][Motivation: Functional Programming]]
   - [[#motivation-interpreters][Motivation: Interpreters]]
 - [[#functional-programming-1-recursion-and-immutable-data][Functional Programming 1: Recursion and Immutable Data]]
-  - [[#programming-in-cs-350][Programming in CS 350]]
-  - [[#racket][Racket]]
-  - [[#plait][Plait]]
-  - [[#functional-thinking-and-recursion][Functional Thinking and Recursion]]
-  - [[#unbounded-data-lists][Unbounded Data: Lists]]
+  - [[#overview][Overview]]
 - [[#functional-programming-2-defining-data-types][Functional Programming 2: Defining Data Types]]
   - [[#warmup-pairs][Warmup: Pairs]]
   - [[#algebraic-data-types][Algebraic Data Types]]
@@ -81,7 +82,7 @@
 - [[#functions-variables-and-substitution][Functions, Variables and Substitution]]
   - [[#overview-functions][Overview: Functions]]
 - [[#review][Review]]
-  - [[#overview][Overview]]
+  - [[#overview-0][Overview]]
   - [[#functional-programming][Functional Programming]]
   - [[#the-languages-weve-built][The Languages We've Built]]
 - [[#environments-binding-and-scope][Environments, Binding, and Scope]]
@@ -100,10 +101,10 @@
   - [[#but-professor-when-will-i-ever-use-this][But Professor, When Will I Ever Use This?]]
 - [[#midterm-review][Midterm Review]]
   - [[#overview-2][Overview]]
-  -  [[#functional-programming-concepts][Functional Programming Concepts]]
-  - [[#higher-order-functions-1][Higher Order Functions]]
+  - [[#functional-programming-concepts][Functional Programming Concepts]]
+  - [[#higher-order-functions-0][Higher Order Functions]]
 - [[#generative-recursion-and-tail-recursion][Generative Recursion and Tail Recursion]]
-  - [[#broad-goals-1][Broad Goals]]
+  - [[#broad-goals-0][Broad Goals]]
   - [[#generative-recursion][Generative Recursion]]
   - [[#abstracting-generative-recursion][Abstracting Generative Recursion]]
 - [[#currying-and-the-lambda-calculus][Currying and the Lambda Calculus]]
@@ -123,28 +124,33 @@
   - [[#curly-obj-immut][Curly-Obj-Immut]]
   - [[#implementing-objects][Implementing Objects]]
 - [[#lazy-evaluation][Lazy Evaluation]]
-  - [[#lazy-evaluation-1][Lazy Evaluation]]
+  - [[#lazy-evaluation-0][Lazy Evaluation]]
 - [[#final-exam-review-functional-programming][Final Exam Review: Functional Programming]]
   - [[#functional-programming-what-we-learned][Functional Programming: What We Learned]]
   - [[#purely-functional-programming][Purely Functional Programming]]
-  - [[#algebraic-data-types-1][(Algebraic) Data Types]]
-  - [[#higher-order-functions-2][Higher Order Functions]]
+  - [[#algebraic-data-types-0][(Algebraic) Data Types]]
+  - [[#higher-order-functions-1][Higher Order Functions]]
   - [[#tail-recursion][Tail Recursion]]
 - [[#final-exam-review-interpreters][Final Exam Review: Interpreters]]
   - [[#interpreters][Interpreters]]
   - [[#syntax-and-the-language-pipeline][Syntax and the Language Pipeline]]
-  - [[#environments-1][Environments]]
+  - [[#environments-0][Environments]]
   - [[#mutable-state][Mutable State]]
   - [[#alternate-models-of-execution][Alternate Models of Execution]]
+:END:
 
 * Introduction
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides001-intro.pdf
+:CUSTOM_ID: introduction
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 #+OPTIONS: todo:nil
 
 ** Course Overview
+:PROPERTIES:
+:CUSTOM_ID: course-overview
+:END:
 *** Course Objectives
 To learn:
 - Functional programming
@@ -228,6 +234,9 @@ To learn:
 **** Don't set yourself up for failure on the exams
 - Doing the assignments is the best way to study
 ** Motivation: Functional Programming
+:PROPERTIES:
+:CUSTOM_ID: motivation-functional-programming
+:END:
 *** Programming in This Class
 - In plait
   + i.e., "PLAI-typed"
@@ -329,6 +338,9 @@ To learn:
 
 
 ** Motivation: Interpreters
+:PROPERTIES:
+:CUSTOM_ID: motivation-interpreters
+:END:
     
 *** Importance of Programming Languages
 - Interpreter: (Code , input) $\hookrightarrow$ (Output , effects)
@@ -365,10 +377,14 @@ To learn:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides002-plait.pdf
 :header-args:racket: :results code :lang plait
+:CUSTOM_ID: functional-programming-1-recursion-and-immutable-data
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 
 *** Overview
+:PROPERTIES:
+:CUSTOM_ID: overview
+:END:
 - Topic: Functional Programming in Racket and plait
 - Required Reading:
   + Plait tutorial (URCourses)
@@ -888,10 +904,14 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides003-datatypes.pdf
 :header-args:racket: :results code :lang plait
+:CUSTOM_ID: functional-programming-2-defining-data-types
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 
 ** Warmup: Pairs
+:PROPERTIES:
+:CUSTOM_ID: warmup-pairs
+:END:
 
 *** Pairs: "AND" for types
 -  ~(Number * Boolean)~
@@ -923,6 +943,9 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
   + ~snd : (('a * 'b) -> 'b)~
 
 ** Algebraic Data Types
+:PROPERTIES:
+:CUSTOM_ID: algebraic-data-types
+:END:
 
 *** "OR" for types
 - Pairs gave us "AND"
@@ -1034,6 +1057,9 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
 - e.g. Shape is ~(Either (Number * Number) Number)~
 
 ** Recursive Data
+:PROPERTIES:
+:CUSTOM_ID: recursive-data
+:END:
 
 *** Self-reference in types
 - The real power of datatypes is the ability to have fields of the type being defined
@@ -1153,10 +1179,14 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides004-syntax.pdf
 :header-args:racket: :results code :lang plait
+:CUSTOM_ID: abstract-syntax-and-parsing
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 
 ** The Big Picture
+:PROPERTIES:
+:CUSTOM_ID: the-big-picture
+:END:
 
 
 *** Life of a program
@@ -1182,6 +1212,9 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
 
 
 ** Describing Syntax
+:PROPERTIES:
+:CUSTOM_ID: describing-syntax
+:END:
 
 *** EBNF
 - Extended Backus-Naur form
@@ -1230,6 +1263,9 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
     - ~-> { * {+ 5 100000} -3}~
 
 ** Parsing and Abstract Syntax
+:PROPERTIES:
+:CUSTOM_ID: parsing-and-abstract-syntax
+:END:
 
 *** Parse Trees
 - Notice that the different replacements didn't affect each other
@@ -1334,10 +1370,14 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides005-arith.pdf
 :header-args:racket: :results code :lang plait
+:CUSTOM_ID: arithmetic-our-first-interpreter
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 
 ** Interpreters: Overview
+:PROPERTIES:
+:CUSTOM_ID: interpreters-overview
+:END:
 
 *** The Church Turing Thesis
 
@@ -1486,9 +1526,13 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides006-desugar.pdf
 :header-args:racket: :results code :lang plait
+:CUSTOM_ID: desugaring-our-first-elaborator
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 ** Syntactic Sugar
+:PROPERTIES:
+:CUSTOM_ID: syntactic-sugar
+:END:
 *** What is syntactic sugar
 - Some language features strictly increase the power of a language
   + Let you do things that can't be done any other way
@@ -1560,9 +1604,13 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides007-subst.pdf
 :header-args:racket: :results code :lang plait
+:CUSTOM_ID: functions-variables-and-substitution
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 ** Overview: Functions
+:PROPERTIES:
+:CUSTOM_ID: overview-functions
+:END:
 *** Adding functions to the language
 - Want to be able to re-use code, compute in terms of variables
 - Two new Curly features
@@ -1723,10 +1771,14 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides008-review.pdf
 :header-args:racket: :results code :lang plait
+:CUSTOM_ID: review
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 
 ** Overview
+:PROPERTIES:
+:CUSTOM_ID: overview-0
+:END:
 
 *** The Story So Far
 - Functional Programming
@@ -1743,6 +1795,9 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
   + Substitution
 
 ** Functional Programming
+:PROPERTIES:
+:CUSTOM_ID: functional-programming
+:END:
 *** How to evaluate functional programs
 - Repeat until we have a value:
   + Take all the functions defined with ~define~
@@ -1750,6 +1805,9 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
   + Simplify any ~if~, ~cond~, ~type-case~ etc.
 
 ** The Languages We've Built
+:PROPERTIES:
+:CUSTOM_ID: the-languages-weve-built
+:END:
 
 *** Curly
 - Many different languages
@@ -1797,9 +1855,13 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides009-environments.pdf
 :header-args:racket: :results code :lang plait
+:CUSTOM_ID: environments-binding-and-scope
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 ** Overview
+:PROPERTIES:
+:CUSTOM_ID: overview-1
+:END:
 *** The Road So Far
 - Functional Programming (Plait Tutorial)
 - Parsing (PLAI ch2)
@@ -1818,6 +1880,9 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
 **** Everything up to and including Closures may appear on the midterm
 
 ** Environments
+:PROPERTIES:
+:CUSTOM_ID: environments
+:END:
 
 *** Functions Review
   + Evaluate their argument
@@ -1970,6 +2035,9 @@ emptyEnv
   + You should understand it, but know that static scoping is what we want
 
 ** Implementing Let
+:PROPERTIES:
+:CUSTOM_ID: implementing-let
+:END:
 *** Curly-Let
 - New language: Curly-Let
 - Curly-Fundef, but with one new feature
@@ -2083,9 +2151,13 @@ emptyEnv
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides010-lambda.pdf
 :header-args:racket: :results code :lang plait
+:CUSTOM_ID: functional-programming-2-first-class-functions
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 ** Higher Order Functions
+:PROPERTIES:
+:CUSTOM_ID: higher-order-functions
+:END:
 *** Functions on Functions
 - Functions let us be abstract over the data they work on
 - But why can't we be abstract over what they do to that data?
@@ -2274,9 +2346,13 @@ emptyEnv
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides011-map.pdf
 :header-args:racket: :results code :lang plait
+:CUSTOM_ID: polymorphic-higher-order-functions
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 ** Highly Generic Programming
+:PROPERTIES:
+:CUSTOM_ID: highly-generic-programming
+:END:
 *** Polymorphic Functions
 - Higher-order functions are even more powerful when combined with type variables
 - Allows us to say "This works on any type, as long as that type supports this kind of operation"
@@ -2502,9 +2578,13 @@ emptyEnv
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides012-dyntype.pdf
 :header-args:racket: :results code :lang plait
+:CUSTOM_ID: implementing-lambdas-with-substitution-and-dynamic-typing
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 ** Broad Strategy
+:PROPERTIES:
+:CUSTOM_ID: broad-strategy
+:END:
 *** Implementation Strategy
 - In some ways, it's /easier/ to implement first-class functions with substitution than top-level functions
   + We can get rid of the whole list-of-definitions
@@ -2763,9 +2843,13 @@ emptyEnv
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides013-closures.pdf
 :header-args:racket: :results code :lang plait
+:CUSTOM_ID: implementing-lambdas-with-environments-closures
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 ** Broad Goals
+:PROPERTIES:
+:CUSTOM_ID: broad-goals
+:END:
 *** Overview
 **** Goals
 - Implement an interpreter for a Curly variant with functions
@@ -2778,6 +2862,9 @@ emptyEnv
 - Definition of a closure
 - Static and Dynamic Scope for first-class functions
 ** The Details
+:PROPERTIES:
+:CUSTOM_ID: the-details
+:END:
 *** Substitution to Environmenst, Review
 - Interpreter takes environment argument
   #+begin_src racket
@@ -2952,6 +3039,9 @@ emptyEnv
 - Dynamic type error
   + Can't call 2 as a function
 ** But Professor, When Will I Ever Use This?
+:PROPERTIES:
+:CUSTOM_ID: but-professor-when-will-i-ever-use-this
+:END:
 *** Static Scoping in the Wild
 **** Python:
   #+begin_src python :exports both
@@ -3035,9 +3125,13 @@ myFunction().then(
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides014-midterm-review.pdf
 :header-args:racket: :results code :lang plait
+:CUSTOM_ID: midterm-review
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 ** Overview
+:PROPERTIES:
+:CUSTOM_ID: overview-2
+:END:
 *** The Road So Far
 - Functional programming
   + Recursion and datatypes
@@ -3060,6 +3154,9 @@ myFunction().then(
     - Dynamic typing
     - Closures and environments
 **  Functional Programming Concepts
+:PROPERTIES:
+:CUSTOM_ID: functional-programming-concepts
+:END:
 *** Functional Programming
 - Functions /in the mathematical sense/
   + Same input always produces same output
@@ -3132,6 +3229,9 @@ myFunction().then(
     - Look at their types and repeat this process
 - Which you choose depends on what you're trying to do
 ** Higher Order Functions
+:PROPERTIES:
+:CUSTOM_ID: higher-order-functions-0
+:END:
 *** Designing Higher Order Functions
 - The process is the exact same
   + Except sometimes you have inputs or outputs that are functions
@@ -3149,9 +3249,13 @@ myFunction().then(
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides015-tailrec.pdf
 :header-args:racket: :results code :lang plait
+:CUSTOM_ID: generative-recursion-and-tail-recursion
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 ** Broad Goals
+:PROPERTIES:
+:CUSTOM_ID: broad-goals-0
+:END:
 *** Overview
 - Objectives
   + Iteratively building solutions to problems in functional languages
@@ -3163,6 +3267,9 @@ myFunction().then(
   + Tail-call elimination
   + Folds
 ** Generative Recursion
+:PROPERTIES:
+:CUSTOM_ID: generative-recursion
+:END:
 *** The Problem
 - Some problems don't obviously map to the style of recursion we've seen so far
   + Or do, but not efficiently
@@ -3359,6 +3466,9 @@ return g(x);
   + Easier to debug state problems
     - By hand, or with tools/linters
 ** Abstracting Generative Recursion
+:PROPERTIES:
+:CUSTOM_ID: abstracting-generative-recursion
+:END:
 *** Objective
 - Goals
   + To see how the pattern of generative recursion on lists can be represented concretely as a higher order function
@@ -3444,9 +3554,13 @@ return g(x);
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides016-currying.pdf
 :header-args:racket: :results code :lang plait
+:CUSTOM_ID: currying-and-the-lambda-calculus
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 ** Overview
+:PROPERTIES:
+:CUSTOM_ID: overview-3
+:END:
 *** Objectives
 - Learning Goals
  - To learn how multi-argument functions can be
@@ -3458,6 +3572,9 @@ return g(x);
   + Currying
   + Lambda Calculus
 ** Currying
+:PROPERTIES:
+:CUSTOM_ID: currying
+:END:
 *** Executing a multiple-argument function
 - Say we allow ~{lambda {x y z} {+ x {* y z}}}~ in Curly
 - How can we interpret a call to this function?
@@ -3560,6 +3677,9 @@ return g(x);
 - Letvar: executes the body in the environment extended with the variable's value
   + This does the exact same thing
 ** Lambda The Ultimate
+:PROPERTIES:
+:CUSTOM_ID: lambda-the-ultimate
+:END:
 
 *** Functions As Sugar
 - So far we've seen that single argument functions can simulate
@@ -3657,9 +3777,13 @@ return g(x);
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides017-box.pdf
 :header-args:racket: :results code :lang plait
+:CUSTOM_ID: store-passing-and-boxes
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 ** Overview
+:PROPERTIES:
+:CUSTOM_ID: overview-4
+:END:
 *** Store Passing Interpreters
 - Objectives
   + Understand boxes as an abstraction for mutable state
@@ -3673,6 +3797,9 @@ return g(x);
   + Boxes
   + Macros
 ** Curly-Box: A Language with Mutation
+:PROPERTIES:
+:CUSTOM_ID: curly-box-a-language-with-mutation
+:END:
 *** Boxes
 *** Expressions vs. Statements
 - *Expression:* a program or program fragment that is meant to be evaluated
@@ -3735,6 +3862,9 @@ return g(x);
 - We produce the value from wherever ~x~ points
   + 10, since we updated its value
 ** Interpreting Boxes
+:PROPERTIES:
+:CUSTOM_ID: interpreting-boxes
+:END:
 *** Semantics
 - We /could/ just use Racket mutation to implement boxes
   + But we're not going to
@@ -3947,9 +4077,13 @@ return g(x);
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides018-mutvar.pdf
 :header-args:racket: :results code :lang plait
+:CUSTOM_ID: mutable-variables
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 ** Curly-Mutvar
+:PROPERTIES:
+:CUSTOM_ID: curly-mutvar
+:END:
 *** Overview
 - Learning goals
   + To interpret a language where variables can change values (mutate)
@@ -4120,9 +4254,13 @@ return g(x);
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides019-recursion.pdf
 :header-args:racket: :results code :lang plait
+:CUSTOM_ID: implementing-recursion-via-state
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 ** Recursion via State
+:PROPERTIES:
+:CUSTOM_ID: recursion-via-state
+:END:
 *** Overview
 - Goals
   + To see how to implement an interpreter for a language with recursion
@@ -4271,9 +4409,13 @@ return g(x);
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides020-oop.pdf
 :header-args:racket: :results code :lang plait
+:CUSTOM_ID: objects-and-oop
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 ** Concepts of Objects
+:PROPERTIES:
+:CUSTOM_ID: concepts-of-objects
+:END:
 *** Overview
 - Objectives
   + To see how OOP and datatype-oriented programming are dual/inverses
@@ -4313,6 +4455,9 @@ return g(x);
 |-------------+--------------------------+--------------------------|
 
 ** Curly-Obj-Immut
+:PROPERTIES:
+:CUSTOM_ID: curly-obj-immut
+:END:
 *** Immutable Objects
 - We'll add *immutable objects* to Curly
   + No way to mutate field values
@@ -4367,6 +4512,9 @@ return g(x);
 - Produces ~4~
 - Same interface as circle, can use interchangably if only call methods
 ** Implementing Objects
+:PROPERTIES:
+:CUSTOM_ID: implementing-objects
+:END:
 *** General Strategy
 - For the most part, nothing complicated
   + Just make new ~Expr~ and ~Value~ variants with data for object-fields and methods
@@ -4513,9 +4661,13 @@ return g(x);
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides021-lazy.pdf
 :header-args:racket: :results code :lang plait
+:CUSTOM_ID: lazy-evaluation
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 ** Lazy Evaluation
+:PROPERTIES:
+:CUSTOM_ID: lazy-evaluation-0
+:END:
 *** Overview
 - Objectives
   + To understand the design space of evaluation order
@@ -4643,9 +4795,13 @@ return g(x);
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides022-fp-review.pdf
 :header-args:racket: :results code :lang plait
+:CUSTOM_ID: final-exam-review-functional-programming
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 ** Functional Programming: What We Learned
+:PROPERTIES:
+:CUSTOM_ID: functional-programming-what-we-learned
+:END:
 *** Main Topics
 - Purely functional programming
   + No mutable variables
@@ -4665,6 +4821,9 @@ return g(x);
   + Functional version of a loop
   + foldl
 ** Purely Functional Programming
+:PROPERTIES:
+:CUSTOM_ID: purely-functional-programming
+:END:
 *** Expressions
 - Our program is made of /expressions/
 - An expression that has no free undefined variables evaluates to a /value/
@@ -4743,6 +4902,9 @@ return g(x);
     - Look at what a call to a helper function produces
     - Look at what a call to a library function produces
 ** (Algebraic) Data Types
+:PROPERTIES:
+:CUSTOM_ID: algebraic-data-types-0
+:END:
 *** OR for types
 - Pairs gave us AND for types
   + Value of type ~('a * 'b)~ contains a value of type ~'a~ AND a value of type ~'b~
@@ -4780,6 +4942,9 @@ return g(x);
   + Recursive calls on fields of the same type
 - e.g. Every interpreter we've written for the last 6 weeks
 ** Higher Order Functions
+:PROPERTIES:
+:CUSTOM_ID: higher-order-functions-1
+:END:
 *** Lambdas
 - The main way to create a function NOT at the top level
 - If you're trying to make something of type ~('a -> 'b)~, then you can always do so by writing:
@@ -4807,6 +4972,9 @@ return g(x);
   + Again, all the same rules apply as before
 - When we call a function with variables in its type, the compiler figures out what concrete types fill in for the type variables
 ** Tail Recursion
+:PROPERTIES:
+:CUSTOM_ID: tail-recursion
+:END:
 *** Consider the loop
 #+begin_src c++
 x = xInit;
@@ -4873,9 +5041,13 @@ return x; // or just do something with the final value of x
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides023-interp-review.pdf
 :header-args:racket: :results code :lang plait
+:CUSTOM_ID: final-exam-review-interpreters
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 ** Interpreters
+:PROPERTIES:
+:CUSTOM_ID: interpreters
+:END:
 *** What We've Learned
 - Syntax trees to represent programs
 - Evaluation (~interp~)
@@ -4897,6 +5069,9 @@ return x; // or just do something with the final value of x
 - OOP
 - Lazy evaluation
 ** Syntax and the Language Pipeline
+:PROPERTIES:
+:CUSTOM_ID: syntax-and-the-language-pipeline
+:END:
 *** Life of a program
 
 - The Language Pipeline:
@@ -4990,6 +5165,9 @@ if (true){ // make the scope explicit
   + e.g. Can't do ~{+ {fun {x} x} 5}~
 - Whenever we check to see if a value is a particular kind of value, this is a /dynamic type check/
 ** Environments
+:PROPERTIES:
+:CUSTOM_ID: environments-0
+:END:
 *** Why Environments
 - What is the /meaning/ of the program ~{+ x 1}~
   + With substitution, the program has no meaning until we replace ~x~ with a value
@@ -5028,6 +5206,9 @@ if (true){ // make the scope explicit
 - Dynamic scope:
   + In a lambda, free variables get their values from where the function is /called/
 ** Mutable State
+:PROPERTIES:
+:CUSTOM_ID: mutable-state
+:END:
 *** Generative Recursion
 - Recall how we used generative/tail recursion to implement loops
   + Updated a variables value by passing the new value as a parameter to the recursive call
@@ -5062,6 +5243,9 @@ if (true){ // make the scope explicit
 - Works as long as all recursive uses of the variable are in the body of a lambda
   + Closures don't evaluate their bodies until called
 ** Alternate Models of Execution
+:PROPERTIES:
+:CUSTOM_ID: alternate-models-of-execution
+:END:
 *** OOP
 - Pair data (members) with operations on that data (fields)
 - Self reference
