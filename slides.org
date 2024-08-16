@@ -55,25 +55,17 @@
 #+BEAMER_HEADER: \setminted[c++]{escapeinside=||,bgcolor=LightGray,beameroverlays=true,baselinestretch=1.2,fontsize=\scriptsize}
 
 
-* Contents
-:PROPERTIES:
-:TOC:      :include all :depth 2 :force (((nothing))) :ignore (((nothing))) :local (((nothing)))
-:END:
-
-:PROPERTIES:
-:TOC:      :include all :depth 1
-:END:
-
-This document contains the compiled course notes for the summer 2024 iteration of  CS 350 at the University of Regina, taught by Dr. Joseph Eremondi.
-
-:CONTENTS:
-- [[#contents][Contents]]
+* Contents :TOC_2_gh:
 - [[#introduction][Introduction]]
   - [[#course-overview][Course Overview]]
   - [[#motivation-functional-programming][Motivation: Functional Programming]]
   - [[#motivation-interpreters][Motivation: Interpreters]]
 - [[#functional-programming-1-recursion-and-immutable-data][Functional Programming 1: Recursion and Immutable Data]]
-  - [[#overview][Overview]]
+  - [[#programming-in-cs-350][Programming in CS 350]]
+  - [[#racket][Racket]]
+  - [[#plait][Plait]]
+  - [[#functional-thinking-and-recursion][Functional Thinking and Recursion]]
+  - [[#unbounded-data-lists][Unbounded Data: Lists]]
 - [[#functional-programming-2-defining-data-types][Functional Programming 2: Defining Data Types]]
   - [[#warmup-pairs][Warmup: Pairs]]
   - [[#algebraic-data-types][Algebraic Data Types]]
@@ -93,7 +85,7 @@ This document contains the compiled course notes for the summer 2024 iteration o
   - [[#functional-programming][Functional Programming]]
   - [[#the-languages-weve-built][The Languages We've Built]]
 - [[#environments-binding-and-scope][Environments, Binding, and Scope]]
-  - [[#overview][Overview]]
+  - [[#overview-1][Overview]]
   - [[#environments][Environments]]
   - [[#implementing-let][Implementing Let]]
 - [[#functional-programming-2-first-class-functions][Functional Programming 2: First-Class Functions]]
@@ -107,19 +99,19 @@ This document contains the compiled course notes for the summer 2024 iteration o
   - [[#the-details][The Details]]
   - [[#but-professor-when-will-i-ever-use-this][But Professor, When Will I Ever Use This?]]
 - [[#midterm-review][Midterm Review]]
-  - [[#overview][Overview]]
-  - [[#functional-programming-concepts][Functional Programming Concepts]]
-  - [[#higher-order-functions][Higher Order Functions]]
+  - [[#overview-2][Overview]]
+  -  [[#functional-programming-concepts][Functional Programming Concepts]]
+  - [[#higher-order-functions-1][Higher Order Functions]]
 - [[#generative-recursion-and-tail-recursion][Generative Recursion and Tail Recursion]]
-  - [[#broad-goals][Broad Goals]]
+  - [[#broad-goals-1][Broad Goals]]
   - [[#generative-recursion][Generative Recursion]]
   - [[#abstracting-generative-recursion][Abstracting Generative Recursion]]
 - [[#currying-and-the-lambda-calculus][Currying and the Lambda Calculus]]
-  - [[#overview][Overview]]
+  - [[#overview-3][Overview]]
   - [[#currying][Currying]]
   - [[#lambda-the-ultimate][Lambda The Ultimate]]
 - [[#store-passing-and-boxes][Store Passing and Boxes]]
-  - [[#overview][Overview]]
+  - [[#overview-4][Overview]]
   - [[#curly-box-a-language-with-mutation][Curly-Box: A Language with Mutation]]
   - [[#interpreting-boxes][Interpreting Boxes]]
 - [[#mutable-variables][Mutable Variables]]
@@ -131,21 +123,19 @@ This document contains the compiled course notes for the summer 2024 iteration o
   - [[#curly-obj-immut][Curly-Obj-Immut]]
   - [[#implementing-objects][Implementing Objects]]
 - [[#lazy-evaluation][Lazy Evaluation]]
-  - [[#lazy-evaluation][Lazy Evaluation]]
+  - [[#lazy-evaluation-1][Lazy Evaluation]]
 - [[#final-exam-review-functional-programming][Final Exam Review: Functional Programming]]
   - [[#functional-programming-what-we-learned][Functional Programming: What We Learned]]
   - [[#purely-functional-programming][Purely Functional Programming]]
-  - [[#algebraic-data-types][(Algebraic) Data Types]]
-  - [[#higher-order-functions][Higher Order Functions]]
+  - [[#algebraic-data-types-1][(Algebraic) Data Types]]
+  - [[#higher-order-functions-2][Higher Order Functions]]
   - [[#tail-recursion][Tail Recursion]]
 - [[#final-exam-review-interpreters][Final Exam Review: Interpreters]]
   - [[#interpreters][Interpreters]]
   - [[#syntax-and-the-language-pipeline][Syntax and the Language Pipeline]]
-  - [[#environments][Environments]]
+  - [[#environments-1][Environments]]
   - [[#mutable-state][Mutable State]]
   - [[#alternate-models-of-execution][Alternate Models of Execution]]
-:END:
-
 
 * Introduction
 :PROPERTIES:
