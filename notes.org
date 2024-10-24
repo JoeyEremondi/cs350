@@ -1,0 +1,110 @@
+#+title: Functional Languages, Interpreters and Types: CS 350 Course Notes
+
+* Introduction
+
+** For Students
+
+
+*** What This Course Is About
+
+If you take into a linguistics class, you will not take French one week, German the next, Mandarin after that, etc.
+Instead, you learn about the things that all languages are made of: sounds, words, syntax, semantics, etc.
+You might learn about the history of certain languages, and how some languages influenced each other,
+or how some languages have certain features while others don't.
+
+In the same way, this course is not about teaching you multiple different languages.
+It's about teaching you /what languages are made of/.
+The idea is that you will then have the tools to understand the features of any language you encounter
+in your career.
+In particular, you will learn about /semantics/: what does a program mean, separate from a particular computer
+and input and environment that it's run on.
+Some languages which are syntactically very different are semantically very similar, and some languages that look the same
+have very different features.
+
+*** Why Functional Programming?
+
+In this course, we will learn about /functional programming,/ where a variable's value never changes once it is set.
+Programming is focused around what a program /is/, not what a program /does/.
+There is no denying that functional programming is less popular in industry than imperative or object-oriented programming,
+so why are we going to learn it? We have a few reasons:
+
+1. Functional languages have simple reasoning principles.
+   In this course, code is not just a means to an end, but an object worthy of study.
+   Just as one might study a bacterium or a mouse before studying human biology, we will
+   examine simple languages before complex ones.
+   While it is certainly possible to formally reason about code in languages like C++, Python, or Java,
+   doing so is much more complicated, and is beyond the scope of an introductory class.
+2. Functional languages are close to the "atoms" of programming languages.
+   As we will see in the course, many concepts like mutable variables, loops, and objects
+   are expressible using functions, datatypes, and recursion.
+   Many of the concepts we language features we will learn about are obvious in functional languages,
+   but implicit or hidden in other languages.
+   So we can learn about those features more directly.
+3. The functional paradigm is growing in popularity.
+   Languages like F#, Clojure, Elixir, and Scala have introduced functional languages
+   into existing ecosystems, yielding a bump in usage.
+   More significantly, functional /ideas/ are being added to more and more languages.
+   Nearly every language has some kind of closure, with C being the main exception.
+   JavaScript async is based around passing functions as arguments, and
+   Rust's design draws heavily from research on algebraic datatypes, pattern matching, and polymorphism.
+
+You will not likely ever use Racket in industry
+(although the Naughty Dog video game company does use Racket to develop games like The Last of Us).
+But more importantly, I do not know what languages you will use in your career, and neither do you.
+So I hope this course can change the way you think about programming and understand what languages are made of,
+so that you are able to adapt and learn whatever language you need in your job ten or twenty years from now.
+
+*** Why Interpreters?
+
+In addition to learning how to use language features, this course will teach you
+how to implement several of them.
+Interpreters are the simplest way to implement a programming language.
+To write a full-fledged compiler, one needs to understand machine code, memory layout,
+jumps, basic blocks, register allocation, etc.
+To write an interpreter, all we need is a few tree traversals.
+
+More importantly, when we write an interpreter for a language in a purely functional source language,
+we get equations about programs.
+So we get a two-for-one: writing an interpreter for a language also serves to /define/ the semantics of the language,
+and give us some rules and principles we can use to reason about programs in that language.
+So our interpreters will give us a way to think logically about programs in an abstract way,
+independent of machine-specific details, memory architectures, or execution contexts.
+
+An interpreter is a program that is powerful enough to simulate every other program that has ever or will ever
+be written. Nevertheless, it is essentially just a recursive tree traversal, and can serve to show the simplicity
+and beauty that lies at the heart of computation.
+
+** For Educators: Why FLIT?
+
+During my PhD at UBC, I was a TA for a programming course based on the first edition of Shriram Krishnamurthy's /Programming Languages, Applications and Interpretation/ text.
+This worked quite well, but the student there had mainly studied /How To Design Programs/ in their first year, so they were familiar with functional programming
+and the Racket ecosystem.
+
+This course is for professors who do not have that luxury. It assumes that this is the first and only programming languages course
+in your students' studies. So the entire first half of the course is devoted
+
+While I appreciate the HtDP approach greatly, my background is in Haskell, so algebraic datatypes and pattern matching
+are central to how I think about problem solving.
+There is nothing wrong with the "union of structs" approach that HtDP and Typed Racket take to datatypes,
+but it is not how I prefer to teach.
+
+I also come from the Agda school of thought, where programming is an /interactive/ experience: you write the type of the thing
+you're building, then put a hole as its definition. You can look at a hole to find out what's in scope, and what the types of variables are.
+The HtDP approach uses this same process, but without the support of the editor or type system.
+Given the rapid pace of a course teaching both functional programming and interpreters, having this tool support
+is necessary, even if it means students get less practice reasoning about scope mentally.
+
+This book is accompanied by ~#lang flit~, a Racket dialect for typed functional programming and interpreter writing.
+It is a modified version of the ~plait~ language used in PLAI 3rd edition to support typed holes and listing in-scope variables,
+as well as some other niceties for programming, such as inferring types for pattern matches.
+Syntactically it is essentially like Racket, but with plait-style datatype and pattern-matching definitions.
+While students tend to get tripped up on the parentheses, using them has made it massively easier to write tooling for the language,
+as well as to explain exactly what an expression is and when it's in scope.
+I have expanded the standard library to include more classic higher-order functions, and
+indulged my personal preference by changing some names
+to be more Haskelly, such as ~Maybe~ instead of ~Option~ and ~List~ instead of ~Listof~.
+
+
+* Part I: Functional Programming
+
+* Part II: Interpreters
