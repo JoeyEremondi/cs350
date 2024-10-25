@@ -106,6 +106,9 @@ to be more Haskelly, such as ~Maybe~ instead of ~Option~ and ~List~ instead of ~
 
 
 * Part I: Functional Programming
+:PROPERTIES:
+:header-args:racket: :results code :lang plait
+:END:
 
 ** Setup: Dr. Racket and ~#lang flit~
 
@@ -186,6 +189,104 @@ If your code contains no type or syntax errors, then anything that you ~define~ 
 can be used in the REPL.
 
 ** Functions and Expressions
+*** S-expressions
+The syntax of Dr. Racket based around /S-Expressions/. Every S-Expression is either:
+- A literal (such as a number ~3~, a boolean ~#t~ or ~#f~, a string ~"hello"~, a symbol ~'a~, etc.)
+- A name (such as ~x~, ~y~, ~foo~, ~map~, ~if~, ~type-case~ )
+- Parentheses ~(...)~ containing one or more S-Expressions, separated by a space
+
+Since an S-Expression can contain more s-expressions inside of it, they are effectively a notation
+for writing trees in text:
+- Names or literals are leaves
+- A node with children is a bracketed expression ~(e1 e2 ... en)~ with children ~e1~, ~e2~, ..., ~en~.
+
+After the ~#lang~ line, the contents of a Racket (or Flit) file are all S-Expressions.
+Some are commands to Racket, like ~(require ...)~ for importing other files or ~(test expected actual)~
+for declaring a test.
+Some are definitions ~(define someThing ...), which define functions.
+The rest that we see will be Flit expressions, i.e., programs that compute some value.
+**** TODO S-Exp diagram
+*** Special Characters
+There are a few characters that you can't use in variable/function names in Racket:
+- Whitespace is used to separate S-expressions
+- ~;~ begins a one-line comment
+- Parentheses ~()[]{}~ aren't allowed in variable names
+- Single, ~'~ and double ~"~ and backtick ~`~ quotes are used for strings and special symbols
+- ~# | \ , @~ are reserved for other purposes
+
+  Names cannot begin with numbers.
+  Otherwise, any character can occur at any point in a Racket name.
+  For example, ~odd?~, ~hello!~, ~x+y~, ~$$bills~ and  ~....~ are all valid Racket names.
+  Boolean-returning functions usually have names ending in ~?~.
+*** Expressions in Flit
+*NOTE: All Flit expressions are S-Expressions, but not all S-Expressions are Flit Expressions, since some are declarations, etc. It's an unfortunate naming conflict.*
+
+Flit is an /expression-based/ language. That means we're more focused on the results of
+calling a function or other computations than we are with writing instructions
+and telling the program to "do" something.
+
+****  Literals
+Literals are expressions that evaluate to themselves. For example:
+#+begin_src racket
+3 ;; The number 3
+#f ;; False
+#t ;; True
+"hello" ;; A String
+#+end_src
+
+#+RESULTS:
+#+begin_src racket
+3
+#f
+#t
+"hello"
+#+end_src
+
+
+**** Function Calls
+Any time
+
+**** Keywords
+
+If you write ~(foo bar baz)~ where ~foo~ is a keyword in Flit, then
+the expression will compute however the keyword is defined.
+
+The main keywords we'll use are ~if~ and ~type-case~. We'll explain ~type-case~ in a later chapter.
+
+***** Conditionals
+If-expressions are built into Flit:
+#+begin_src racket
+(if #f 3 4)
+(if #t 3 4)
+(if (odd? 7) (+ 7 1) (+ 7 2) )
+(if (odd? 6) (error 'crash "CRASH") (+ 6 9000) ) ;; Doesn't run the error
+#+end_src
+
+#+RESULTS:
+#+begin_src racket
+4
+3
+8
+9006
+#+end_src
+
+To evaluate ~(if A B C)~, Flit evaluates ~A~. If it is produces ~#t~, then it evaluates ~B~ and produces its result.
+If evaluating ~A~ produces ~#f~, then Flit evaluates ~C~ and produces its value as the result for the ~(if A B C)~.
+The true branch is not evaluated if the condition is false, and vice versa.
+
+We can describe ~if~ with the following equations:
+#+BEGIN_QUOTE
+For any expressions ~EXPR1~ and ~EXPR2~
+- ~(if #t EXPR1 EXPR2) = EXPR1~
+- ~(if #f EXPR1 EXPR2) = EXPR2~
+#+END_QUOTE
+
+This is slightly different from ~if~ that you might have seen in C++ or Python.
+There, ~if~ is a /statement/: it evaluates its boolean, and then /does something/ if it is true.
+In Flit, ~if~ doesn't do anything, like printing or updating values. It is an expression,
+and what value it has depends on whether the boolean it is given produces true or false.
+
+If you are familiar with the ~cond ? foo : bar~ syntax in C/C++, this is similar.
 
 ** Types
 
@@ -196,5 +297,9 @@ can be used in the REPL.
 ** Datatypes and Pattern Matching
 
 ** Lambda and First-Class Functions
+
+** Higher-Order Polymorphic Functions
+
+** Tail-Calls and Generative Recursion
 
 * Part II: Interpreters
