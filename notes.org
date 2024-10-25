@@ -281,6 +281,13 @@ For any expressions ~EXPR1~ and ~EXPR2~
 - ~(if #f EXPR1 EXPR2) = EXPR2~
 #+END_QUOTE
 
+
+#+BEGIN_VERSE
+For any expressions ~EXPR1~ and ~EXPR2~
+- ~(if #t EXPR1 EXPR2) = EXPR1~
+- ~(if #f EXPR1 EXPR2) = EXPR2~
+#+END_VERSE
+
 This is slightly different from ~if~ that you might have seen in C++ or Python.
 There, ~if~ is a /statement/: it evaluates its boolean, and then /does something/ if it is true.
 In Flit, ~if~ doesn't do anything, like printing or updating values. It is an expression,
