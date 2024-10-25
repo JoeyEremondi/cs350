@@ -107,4 +107,94 @@ to be more Haskelly, such as ~Maybe~ instead of ~Option~ and ~List~ instead of ~
 
 * Part I: Functional Programming
 
+** Setup: Dr. Racket and ~#lang flit~
+
+All of the programming in this course takes place in Racket.
+Racket is a programming languages, but it is also a toolkit for making languages.
+At the beginning of every Racket file, there is a line ~#lang nameOfLanguage~ which says
+which language the following file is written in.
+The default is ~#lang racket~, but for this course, we're going to be using the Flit language,
+i.e., ~#lang flit~.
+
+
+*** TODO Installing Dr. Racket
+Dr. Racket is the IDE for Racket, and language made using Racket, including Flit.
+
+
+*** TODO Installing the Handin Tool
+
+*** TODO Using Dr. Racket
+
+There are three main parts of the Dr. Racket interface: the toolbar at the top,
+the code editor window, and the REPL at the bottom.
+
+**** TODO pictures
+
+**** The Definitions Window (Code Editor)
+The editor window is where you will type your Racket program.
+The top of every file should begin with ~#lang flit~, though if you've set up
+Racket as described above this will happen by default.
+
+***** Type and Syntax Errors
+If there are type or syntax errors in your code, there will be
+pink text at the bottom of the Dr. Racket window with an error message,
+along with a *Jump to Error* button.
+_It is very important that you look for these messages_, since code that
+has a type or syntax error will get a grade of 0.
+
+***** Useful Tools
+If you right click on a variable, function name, type name, etc. in Dr. Racket,
+there will be an option *Jump to Binding Occurrence* or *Jump to Definition*.
+This will show you where/how that thing is defined, which can be very useful when understanding
+the code you are given on an assignment.
+
+Typing "Ctrl-I" (or "Cmd-I" on Mac) will re-indent your code based on the parentheses.
+This can be very useful to make your code more readable, or to find errors based on misplaced brackets.
+
+**** The Toolbar
+There are two main buttons you need on the toolbar.
+
+First is the [[./img/run.png]] button, which will type-check and compile your code,
+as well as executing any tests or expressions that are in the file.
+
+If there are syntax or type errors in your file, you will get an error message
+after clicking Run.
+*You MUST read these error messages*: code that produces a type or syntax error will be graded 0
+by the handin tool, and the messages give you important information on how to fix the problem.
+
+To jump to the location of the problem, click on the [[./img/error.png]] icon and
+
+The other important button is the Handin Button.
+At the University of Regina, this looks like this: [[./img/handin.png]].
+When completing an assignment, clicking this button will submit your code to the handin server.
+This will run a few tests and, after a short time, return your grade, along with any tests that fail.
+*Read the results of the test carefully*, as they will tell you what your code is doing wrong, along with
+what result it should produce.
+You may hand in your code as many times as you like up until the deadline of an assignment,
+and each submission overwrites the last.
+There may be private tests on an assignment, where you are told that a test is failing but not provided information
+on which test that is. In these cases, *read the problem specification carefully* to determine if you have missed any edge-cases.
+
+**** The Interactions Window (REPL)
+The interactions window features a Read-Evaluate-Print-Loop (REPL),
+where you can type in expressions to be read and evaluated, and have their results printed.
+This is very useful for quickly testing a piece of code you wrote, or
+running pre-existing code to better understand what it does.
+This is similar to the prompts that Python or JavaScript give you if you type ~python~ or ~node~ in a terminal window.
+
+If your code contains no type or syntax errors, then anything that you ~define~ in the editor window
+can be used in the REPL.
+
+** Functions and Expressions
+
+** Types
+
+** Recursion and Lists
+
+** Polymorphism
+
+** Datatypes and Pattern Matching
+
+** Lambda and First-Class Functions
+
 * Part II: Interpreters
