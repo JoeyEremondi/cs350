@@ -122,9 +122,53 @@ i.e., ~#lang flit~.
 
 *** TODO Installing Dr. Racket
 Dr. Racket is the IDE for Racket, and language made using Racket, including Flit.
+To install it:
+
+- Go to [[https://download.racket-lang.org/]], select the appropriate installer for your system,
+  download it and run it.
+
+  On MacOS with Homebrew, you may also run ~brew install --cask racket~.
+
+  On Linux, you can install from Snap using ~sudo snap install racket~.
+  Many distributions also have their own packages, which you are welcome to use.
 
 
-*** TODO Installing the Handin Tool
+
+*** Dr. Racket on Laboratory Computers
+Dr. Racket is installed on computers in the following labs:
+- CL 135.4
+- CL 136
+
+You can write, run, and submit your code from these computers if you do not have
+access to your own computer.
+
+** Installing the Handin Tool
+Whether you use your own computer or a lab computer, you will need to
+install the Package for this class. You can do this as follows:
+
+- Click "File > Install .plt File..."
+- In the URL box, paste ~TODO~
+- Click "OK"
+
+This accomplishes two things:
+1. You can now begin
+2. There is now button in the toolbar which you can use to submit your assignments.
+
+
+**** Changing Your Password
+You will be emailed a password for your account. If you wish to change your password,
+you may do so from Dr. Racket:
+- Go to "File > Manage CS350 Handin Account"
+- Enter your old and new passwords and submit
+
+Unfortunately, this is only currently available on-campus
+or using the URegina VPN.
+
+*Do not use a password that is shared with another login*. They are stored as MD5 hashes,
+which is secure enough
+for the handin tool, but not secure enough for sensitive personal information.
+
+**** TODO Make PLT file and upload link
 
 *** TODO Using Dr. Racket
 
@@ -188,22 +232,79 @@ This is similar to the prompts that Python or JavaScript give you if you type ~p
 If your code contains no type or syntax errors, then anything that you ~define~ in the editor window
 can be used in the REPL.
 
+*** Submitting Assignments
+All assignments are to be submitted using the Handin tool. There are two ways to do this:
+- By clicking the "CS350 Handin" button in the Dr. Racket toolbar
+  + This option is currently only available on-campus or when connected to the campus VPN, which you can set up using the instructions
+   [[https://www.uregina.ca/is/tech-notes/technote569.html][here]]
+  + After you submit your code, you
+- By uploading your file at [[https://racket.cs.uregina.ca/cs350-handin]]
+
+ At any point, you can view the test results of your most recent assignment run, including your current grade,
+ by logging in at [[https://racket.cs.uregina.ca/cs350-handin]].
+ The test results are also visible on URCourses.
+
+
+
+**** Submitting Multiple Times
+You may submit as many times as you like until the deadline. Your grade will be the grade
+from the last submission before the deadline.
+
+*No late assignments will be accepted.* There will be no exceptions to this rule.
+
+**** Syntax and Type Errors
+If your file contains syntax or type errors, the feedback in Dr. Racket or on the handin website will
+list the error message. This is generally the same error
+
+Note that *if your grade is listed as 0 on the test feedback, your assignment will receive zero.*
+You *must* read the error messages and correct the errors to receive a non-zero grade.
+
+*It is better to submit code containing TODOs or that is failing many tests than to submit mostly-correct code that does not compile.*
+In particular, there will be no leniency for code that is copied from ChatGPT or other websites that does not compile.
+*Flit is one of many Racket-based languages*, so Racket code you find on the Internet may have type or syntax errors when used in Flit.
+
+These course notes and the Flit documentation are to be your main source of information for the course.
+If there is an error message you do not understand, then *ask a question on the URCourses Discussion Forum*.
+
+**** Public and Private Tests
+When you submit an assignment, most tests are /public/, meaning that you
+are shown the expected input and output, but some tests are /private/, meaning that
+you are told that your code did not pass the test, but not told exactly what input
+caused the problem or what the expected result was.
+
+If you are passing all public tests, but failing some private tests, read the assignment
+specification carefully, and think about if there are any edge-cases that you might have
+missed when writing your code.
+
+**** Submitting on URCourses (not preferred)
+
+
+Submitting assignments via URCourses is available as a backup.
+However, it may take 15 minutes or more for the Handin Server to receive your code and
+upload the test results.
+
+
+In the event of technical difficulties with the handin server, you may upload your assignment to URCourses,
+but you are then responsible for ensuring that it has no syntax or type errors.
+
+**** TODO Check VPN/off-campus status
+
 ** Functions and Expressions
 *** S-expressions
-The syntax of Dr. Racket based around /S-Expressions/. Every S-Expression is either:
+The syntax of Dr. Racket based around /S-Expressions/. Every S-Expression (or s-exp, pronounced "ess-exp") is either:
 - A literal (such as a number ~3~, a boolean ~#t~ or ~#f~, a string ~"hello"~, a symbol ~'a~, etc.)
 - A name (such as ~x~, ~y~, ~foo~, ~map~, ~if~, ~type-case~ )
 - Parentheses ~(...)~ containing one or more S-Expressions, separated by a space
 
-Since an S-Expression can contain more s-expressions inside of it, they are effectively a notation
+Since an s-exp can contain more s-expressions inside of it, they are effectively a notation
 for writing trees in text:
 - Names or literals are leaves
 - A node with children is a bracketed expression ~(e1 e2 ... en)~ with children ~e1~, ~e2~, ..., ~en~.
 
-After the ~#lang~ line, the contents of a Racket (or Flit) file are all S-Expressions.
+After the ~#lang~ line, the contents of a Racket (or Flit) file are all s-exps.
 Some are commands to Racket, like ~(require ...)~ for importing other files or ~(test expected actual)~
 for declaring a test.
-Some are definitions ~(define someThing ...), which define functions.
+Some are definitions ~(define someThing ...)~, which define functions, or ~(define-type Foo ...)~ which defines a type.
 The rest that we see will be Flit expressions, i.e., programs that compute some value.
 **** TODO S-Exp diagram
 *** Special Characters
@@ -224,6 +325,8 @@ There are a few characters that you can't use in variable/function names in Rack
 Flit is an /expression-based/ language. That means we're more focused on the results of
 calling a function or other computations than we are with writing instructions
 and telling the program to "do" something.
+
+
 
 ****  Literals
 Literals are expressions that evaluate to themselves. For example:
