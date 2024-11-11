@@ -1,3 +1,11 @@
+# CS 350 Notes, Code and Slides
+## University of Regina, Winter 2025, Dr. Joseph Eremondi
+
+
+* [Course Notes](notes.html)
+* [Lecture Slides](https://github.com/JoeyEremondi/cs350/tree/winter2025/pdf)
+* [URCourses](https://urcourses.uregina.ca/course/view.php?id=33282)
+
 [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
 
 The text of this work is licensed under a
