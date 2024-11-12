@@ -1,4 +1,7 @@
 #+title: Functional Languages, Interpreters and Types: CS 350 Course Notes
+#+author: Dr. Joseph Eremondi
+
+#+SETUPFILE: readtheorg_inline.theme
 
 * Introduction
 
@@ -318,7 +321,7 @@ There are a few characters that you can't use in variable/function names in Rack
   Names cannot begin with numbers.
   Otherwise, any character can occur at any point in a Racket name.
   For example, ~odd?~, ~hello!~, ~x+y~, ~$$bills~ and  ~....~ are all valid Racket names.
-  Boolean-returning functions usually have names ending in ~?~.
+  Boolean-returning functions usually have names ending in ~?~, such as ~even? : (Number -> Boolean) ~ or ~empty? : ((Listof 'a) -> Boolean)~.
 *** Expressions in Flit
 *NOTE: All Flit expressions are S-Expressions, but not all S-Expressions are Flit Expressions, since some are declarations, etc. It's an unfortunate naming conflict.*
 
@@ -326,7 +329,9 @@ Flit is an /expression-based/ language. That means we're more focused on the res
 calling a function or other computations than we are with writing instructions
 and telling the program to "do" something.
 
-
+#+begin_definition Expression
+An /expression/ is a part of a program that produces a result: it either has a /value/, unless it raises an error or runs forever.
+#+end_definition
 
 ****  Literals
 Literals are expressions that evaluate to themselves. For example:
