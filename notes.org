@@ -1,8 +1,11 @@
 #+title: Functional Languages, Interpreters and Types: CS 350 Course Notes
-#+author: Dr. Joseph Eremondi
+#+author: Dr. Joseph Eremondi, with material adapted from Dr. Shriram Krishnamurthi
 
 #+SETUPFILE: readtheorg_inline.theme
 
+:PROPERTIES:
+:header-args:racket: :results code :lang plait
+:END:
 * Introduction
 
 ** For Students
@@ -109,11 +112,9 @@ to be more Haskelly, such as ~Maybe~ instead of ~Option~ and ~List~ instead of ~
 
 
 * Part I: Functional Programming
-:PROPERTIES:
-:header-args:racket: :results code :lang plait
-:END:
 
-** Setup: Dr. Racket and ~#lang flit~
+** Setup: Editor and Tooling
+*** Dr. Racket and ~#lang flit~
 
 All of the programming in this course takes place in Racket.
 Racket is a programming languages, but it is also a toolkit for making languages.
@@ -123,7 +124,7 @@ The default is ~#lang racket~, but for this course, we're going to be using the 
 i.e., ~#lang flit~.
 
 
-*** TODO Installing Dr. Racket
+**** TODO Installing Dr. Racket
 Dr. Racket is the IDE for Racket, and language made using Racket, including Flit.
 To install it:
 
@@ -137,7 +138,7 @@ To install it:
 
 
 
-*** Dr. Racket on Laboratory Computers
+**** Dr. Racket on Laboratory Computers
 Dr. Racket is installed on computers in the following labs:
 - CL 135.4
 - CL 136
@@ -145,7 +146,7 @@ Dr. Racket is installed on computers in the following labs:
 You can write, run, and submit your code from these computers if you do not have
 access to your own computer.
 
-** Installing the Handin Tool
+*** Installing the Handin Tool
 Whether you use your own computer or a lab computer, you will need to
 install the Package for this class. You can do this as follows:
 
@@ -154,11 +155,11 @@ install the Package for this class. You can do this as follows:
 - Click "OK"
 
 This accomplishes two things:
-1. You can now begin
+1. The ~flit~ language is now installed, so you can write programs beginning with ~#lang flit~.
 2. There is now button in the toolbar which you can use to submit your assignments.
 
 
-**** Changing Your Password
+***** Changing Your Password
 You will be emailed a password for your account. If you wish to change your password,
 you may do so from Dr. Racket:
 - Go to "File > Manage CS350 Handin Account"
@@ -171,7 +172,7 @@ or using the URegina VPN.
 which is secure enough
 for the handin tool, but not secure enough for sensitive personal information.
 
-**** TODO Make PLT file and upload link
+***** TODO Make PLT file and upload link
 
 *** TODO Using Dr. Racket
 
@@ -235,7 +236,7 @@ This is similar to the prompts that Python or JavaScript give you if you type ~p
 If your code contains no type or syntax errors, then anything that you ~define~ in the editor window
 can be used in the REPL.
 
-*** Submitting Assignments
+**** Submitting Assignments
 All assignments are to be submitted using the Handin tool. There are two ways to do this:
 - By clicking the "CS350 Handin" button in the Dr. Racket toolbar
   + This option is currently only available on-campus or when connected to the campus VPN, which you can set up using the instructions
@@ -249,13 +250,13 @@ All assignments are to be submitted using the Handin tool. There are two ways to
 
 
 
-**** Submitting Multiple Times
+***** Submitting Multiple Times
 You may submit as many times as you like until the deadline. Your grade will be the grade
 from the last submission before the deadline.
 
 *No late assignments will be accepted.* There will be no exceptions to this rule.
 
-**** Syntax and Type Errors
+***** Syntax and Type Errors
 If your file contains syntax or type errors, the feedback in Dr. Racket or on the handin website will
 list the error message. This is generally the same error
 
@@ -269,7 +270,7 @@ In particular, there will be no leniency for code that is copied from ChatGPT or
 These course notes and the Flit documentation are to be your main source of information for the course.
 If there is an error message you do not understand, then *ask a question on the URCourses Discussion Forum*.
 
-**** Public and Private Tests
+***** Public and Private Tests
 When you submit an assignment, most tests are /public/, meaning that you
 are shown the expected input and output, but some tests are /private/, meaning that
 you are told that your code did not pass the test, but not told exactly what input
@@ -279,7 +280,7 @@ If you are passing all public tests, but failing some private tests, read the as
 specification carefully, and think about if there are any edge-cases that you might have
 missed when writing your code.
 
-**** Submitting on URCourses (not preferred)
+***** Submitting on URCourses (not preferred)
 
 
 Submitting assignments via URCourses is available as a backup.
@@ -290,14 +291,19 @@ upload the test results.
 In the event of technical difficulties with the handin server, you may upload your assignment to URCourses,
 but you are then responsible for ensuring that it has no syntax or type errors.
 
-**** TODO Check VPN/off-campus status
+***** TODO Check VPN/off-campus status
 
-** Functions and Expressions
+** The Syntax of Flit
 *** S-expressions
-The syntax of Dr. Racket based around /S-Expressions/. Every S-Expression (or s-exp, pronounced "ess-exp") is either:
-- A literal (such as a number ~3~, a boolean ~#t~ or ~#f~, a string ~"hello"~, a symbol ~'a~, etc.)
-- A name (such as ~x~, ~y~, ~foo~, ~map~, ~if~, ~type-case~ )
-- Parentheses ~(...)~ containing one or more S-Expressions, separated by a space
+The syntax of Dr. Racket based around /S-Expressions/.
+
+#+begin_definition S-Expression
+Every S-Expression (or s-exp, pronounced "ess-exp") is either:
+        1. A literal (such as a number ~3~, a boolean ~#t~ or ~#f~, a string ~"hello"~, a symbol ~'a~, etc.)
+        2.  A name (such as ~x~, ~y~, ~foo~, ~map~, ~if~, ~type-case~ )
+        3. Parentheses ~(...)~ containing one or more  S-Expressions, separated by a space
+#+end_definition
+
 
 Since an s-exp can contain more s-expressions inside of it, they are effectively a notation
 for writing trees in text:
@@ -322,6 +328,7 @@ There are a few characters that you can't use in variable/function names in Rack
   Otherwise, any character can occur at any point in a Racket name.
   For example, ~odd?~, ~hello!~, ~x+y~, ~$$bills~ and  ~....~ are all valid Racket names.
   Boolean-returning functions usually have names ending in ~?~, such as ~even? : (Number -> Boolean) ~ or ~empty? : ((Listof 'a) -> Boolean)~.
+** Functions and Expressions
 *** Expressions in Flit
 *NOTE: All Flit expressions are S-Expressions, but not all S-Expressions are Flit Expressions, since some are declarations, etc. It's an unfortunate naming conflict.*
 
@@ -329,8 +336,8 @@ Flit is an /expression-based/ language. That means we're more focused on the res
 calling a function or other computations than we are with writing instructions
 and telling the program to "do" something.
 
-#+begin_definition Expression
-An /expression/ is a part of a program that produces a result: it either has a /value/, unless it raises an error or runs forever.
+#+begin_definition  Expression
+An expression is part of a program that produces a result: it either has a /value/, unless it raises an error or runs forever.
 #+end_definition
 
 ****  Literals
@@ -357,7 +364,7 @@ Any time
 **** Keywords
 
 If you write ~(foo bar baz)~ where ~foo~ is a keyword in Flit, then
-the expression will compute however the keyword is defined.
+the result of the expression is computed however the keyword is defined.
 
 The main keywords we'll use are ~if~ and ~type-case~. We'll explain ~type-case~ in a later chapter.
 
@@ -418,3 +425,28 @@ If you are familiar with the ~cond ? foo : bar~ syntax in C/C++, this is similar
 ** Tail-Calls and Generative Recursion
 
 * Part II: Interpreters
+
+* Glossary
+- Expression :: An expression is part of a program that produces a result: it either has a /value/, unless it raises an error or runs forever.
+
+- S-Expression :: Every S-Expression (or s-exp, pronounced "ess-exp") is either:
+1. A literal (such as a number ~3~, a boolean ~#t~ or ~#f~, a string ~"hello"~, a symbol ~'a~, etc.)
+2. A name (such as ~x~, ~y~, ~foo~, ~map~, ~if~, ~type-case~ )
+3. Parentheses ~(...)~ containing one or more  S-Expressions, separated by a space
+
+
+* Aliases
+
+** Glossary :noexport:
+- s-exp :: S-Expression
+- sexp :: S-Expression
+- sexpr :: S-Expression
+- s-expr :: S-Expression
+
+
+
+* Emacs Variables (please ignore) :noexport:
+Local Variables:
+eval: (add-hook 'after-save-hook 'org-generate-moodle-glossary t t)
+org-latex-packages-alist: nil
+End:
