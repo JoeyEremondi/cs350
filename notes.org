@@ -80,7 +80,7 @@ An interpreter is a program that is powerful enough to simulate every other prog
 be written. Nevertheless, it is essentially just a recursive tree traversal, and can serve to show the simplicity
 and beauty that lies at the heart of computation.
 
-** For Educators: Why FLIT?
+** For Educators: Why FLIT? :noexport:
 
 During my PhD at UBC, I was a TA for a programming course based on the first edition of Shriram Krishnamurthy's /Programming Languages, Applications and Interpretation/ text.
 This worked quite well, but the student there had mainly studied /How To Design Programs/ in their first year, so they were familiar with functional programming
@@ -100,7 +100,7 @@ The HtDP approach uses this same process, but without the support of the editor 
 Given the rapid pace of a course teaching both functional programming and interpreters, having this tool support
 is necessary, even if it means students get less practice reasoning about scope mentally.
 
-This book is accompanied by ~#lang flit~, a Racket dialect for typed functional programming and interpreter writing.
+These notes is accompanied by ~#lang flit~, a Racket dialect for typed functional programming and interpreter writing.
 It is a modified version of the ~plait~ language used in PLAI 3rd edition to support typed holes and listing in-scope variables,
 as well as some other niceties for programming, such as inferring types for pattern matches.
 Syntactically it is essentially like Racket, but with plait-style datatype and pattern-matching definitions.
@@ -114,6 +114,10 @@ to be more Haskelly, such as ~Maybe~ instead of ~Option~ and ~List~ instead of ~
 * Part I: Functional Programming
 
 ** Setup: Editor and Tooling
+:PROPERTIES:
+:custom_id: setup
+:header-args:racket: :results code :lang plait
+:END:
 *** Dr. Racket and ~#lang flit~
 
 All of the programming in this course takes place in Racket.
@@ -164,9 +168,6 @@ You will be emailed a password for your account. If you wish to change your pass
 you may do so from Dr. Racket:
 - Go to "File > Manage CS350 Handin Account"
 - Enter your old and new passwords and submit
-
-Unfortunately, this is only currently available on-campus
-or using the URegina VPN.
 
 *Do not use a password that is shared with another login*. They are stored as MD5 hashes,
 which is secure enough
@@ -282,7 +283,6 @@ missed when writing your code.
 
 ***** Submitting on URCourses (not preferred)
 
-
 Submitting assignments via URCourses is available as a backup.
 However, it may take 15 minutes or more for the Handin Server to receive your code and
 upload the test results.
@@ -291,9 +291,15 @@ upload the test results.
 In the event of technical difficulties with the handin server, you may upload your assignment to URCourses,
 but you are then responsible for ensuring that it has no syntax or type errors.
 
-***** TODO Check VPN/off-campus status
+
+
+
+
 
 ** The Syntax of Flit
+:PROPERTIES:
+:CUSTOM_ID: racket-synax
+:END:
 *** S-expressions
 The syntax of Dr. Racket based around /S-Expressions/.
 
@@ -328,7 +334,14 @@ There are a few characters that you can't use in variable/function names in Rack
   Otherwise, any character can occur at any point in a Racket name.
   For example, ~odd?~, ~hello!~, ~x+y~, ~$$bills~ and  ~....~ are all valid Racket names.
   Boolean-returning functions usually have names ending in ~?~, such as ~even? : (Number -> Boolean) ~ or ~empty? : ((Listof 'a) -> Boolean)~.
+  Likewise, functions converting between types often contain ~->~ in their names, such as ~number->string : (Number -> String)~
+
+
 ** Functions and Expressions
+:PROPERTIES:
+:custom_id: flit-expr
+:header-args:racket: :results code :lang plait
+:END:
 *** Expressions in Flit
 *NOTE: All Flit expressions are S-Expressions, but not all S-Expressions are Flit Expressions, since some are declarations, etc. It's an unfortunate naming conflict.*
 
@@ -341,11 +354,11 @@ An expression is part of a program that produces a result: it either has a /valu
 #+end_definition
 
 ****  Literals
-Literals are expressions that evaluate to themselves. For example:
+Literals are expressions that evaluate to themselves, denoting fixed values of some type. For example:
 #+begin_src racket
 3 ;; The number 3
-#f ;; False
-#t ;; True
+#f ;; False (boolean literal)
+#t ;; True (boolean literal)
 "hello" ;; A String
 #+end_src
 
@@ -358,17 +371,148 @@ Literals are expressions that evaluate to themselves. For example:
 #+end_src
 
 
-**** Function Calls
-Any time
-
 **** Keywords
 
 If you write ~(foo bar baz)~ where ~foo~ is a keyword in Flit, then
 the result of the expression is computed however the keyword is defined.
 
-The main keywords we'll use are ~if~ and ~type-case~. We'll explain ~type-case~ in a later chapter.
+Some keywords that we'll see are ~if~, ~type-case~, and ~list~.
 
-***** Conditionals
+
+**** Function Calls
+Any expression of the form ~(f a)~ is interpreted as calling the function ~f~ with the argument ~a~,
+for any expressions ~f~ and ~a~,
+as long as ~f~ isn't a keyword.
+This extends to functions with multiple arguments: ~(f a b c d ...)~ is a call to function ~f~
+with arguments ~a~, ~b~, ~c~, ~d~, etc.
+
+Function calls are the "default" for an expression with parentheses:
+any time there's an expression ~(f a b c...)~, it is interpreted as a call to ~f~
+unless ~f~ is a special Flit keyword.
+
+*There are no infix operators in Racket*. There are only function calls. ~+~, ~*~, ~modulo~, ~<~, ~>~, and ~=~ are all just normal functions.
+
+So in C++, we might write:
+#+begin_src C++
+!((3 + 4 * 5) == 23); // Type bool
+#+end_src
+
+The Flit equivalent of this is:
+#+begin_src racket
+(not (= (+ 3 (* 4 5)) 23))
+#+end_src
+
+#+RESULTS:
+#+begin_src racket
+#f
+#+end_src
+
+- ~*~ has two arguments, ~4~ and ~5~. It produces a number.
+- ~+~ has two arguments, ~3~ and the result of ~(* 4 5)~. It produces a number.
+- ~=~ has two arguments, the result of ~(+ 3 (* 4 5))~ and ~23~. It produces a boolean.
+- ~not~ has one argument, the result of ~(= (+ 3 (* 4 5)) 23)~.
+
+In the C++ version, the operator precedence told us that ~*~ was applied before ~+~. In Flit and other S-Expression based languages, there is no need for
+operator precedence rules. The brackets make it clear what order the operations are being applied.
+
+*You do not need to count parentheses in Dr. Racket.*
+If you put your cursor right before the opening bracket, it will highlight
+up to the closing bracket.
+*Use this if you are getting syntax errors with brackets*.
+Here, we have used color to indicate the matching brackets.
+
+
+*** Computing Using Equations
+**** Semantics
+One of the goals of this course is to answer the question: *what do programs mean*?
+
+It is tempting to say that the meaning of a program is what happens when you execute
+it on a CPU. But does this mean a program /means/ something different when you
+run it on an Intel CPU vs. on an ARM chip? If you run a program twice and the OS
+allocates different addresses in memory, have you actually run two different programs?
+These are undesirable, because it means that one piece of source code can have multiple
+different meanings depending on the context you use it in.
+
+You definitely have an informal notion of semantics in your head.
+When you look at a piece of code and imagine how it runs, you aren't actually
+allocating memory addresses
+
+In this course, we will take this informal idea of semantics,
+and make it into something formal that we can reason about logically.
+
+**** Mutable and Immutable Variables
+
+Most of the programming languages that you have likely seen so far have mutable variables:
+
+#+begin_definition mutable
+A variable is mutable if its value can change within its scope.
+#+end_definition
+
+C, C++, Java, Python, JavaScript, Swift, and Go all have mutable variables.
+When you call a function or method, the result might be different each time you call it, even if the arguments are the same, because the body
+of the function can might access variables whose value has changed.
+
+By contrast, Flit is a /purely functional language:/
+
+#+begin_definition purely functional
+A programming language is purely functional if every call to a function with the same inputs produces the same outputs.
+#+end_definition
+
+In Flit, the value of an expression only depends on the initial values of the variables in that expression.
+This is because all variables in Flit are immutable:
+
+#+begin_definition immutable
+A variable is immutable if its value value is constant in its scope
+#+end_definition
+
+Variables in Flit are more like the variables you have seen in mathematics.
+Consider the equation for a line,
+$f(x) = mx + b$. The line is described by the different $f(x)$ values that are possible for all the different values of $x$,
+but when we're computing a value for $f(x)$, the value of $x$ never changes during that computation.
+Each input value for $x$ produces a single value for $f(x)$, and the value of the output only depends on the values of the inputs.
+
+In languages with mutable variables, /the equals sign is a lie!/ Consider the following C++ code:
+
+#+begin_src c++
+int x;
+x = 3;
+cout << x;
+x = 4;
+#+end_src
+
+We have to "equations", ~x = 3~ and  ~x = 4~. But clearly we don't have ~3 = 4~.
+So we can't really say what the variable ~x~ means without talking about the state of memory
+at a particular point in time.
+
+In purely functional languages, we can reason about actual equality. This gives us a very convenient
+way to describe what a program means, separately from any particular hardware.
+It also allows us to design programs using recipes, which we will learn about in [[#flit-types][the chapter on types.]]
+
+It is possible to define semantics for programs with mutable variables, but that is (1) more complicated,
+and (2) ends up translating the programs to something that looks like a purely functional version anyways.
+We'll see a bit more of this [[#flit-tailrec][when we learn about tail recursion]].
+**** Equations
+We will describe the semantics of Flit using /Equations/. Here is our first
+semantic equation:
+
+#+begin_definition Semantics of +
+For any number literals ~m~ and ~n~, the expression ~(+ m n)~
+is equal to the sum of ~m~ and ~n~
+#+end_definition
+
+#+begin_example
+(+ 3 4) = 7
+(+ 0 2) = 2
+#+end_example
+
+There are a few tricky things to notice here.
+**** Types
+Another way that we can talk about what programs mean is their /type/.
+***** Static and Dynamic Typing
+***** Typing Rules
+***** Type Inference
+***** Polymorphism
+*** Conditionals
 If-expressions are built into Flit:
 #+begin_src racket
 (if #f 3 4)
@@ -390,18 +534,12 @@ If evaluating ~A~ produces ~#f~, then Flit evaluates ~C~ and produces its value 
 The true branch is not evaluated if the condition is false, and vice versa.
 
 We can describe ~if~ with the following equations:
-#+BEGIN_QUOTE
+#+begin_definition Semantics of If
 For any expressions ~EXPR1~ and ~EXPR2~
 - ~(if #t EXPR1 EXPR2) = EXPR1~
 - ~(if #f EXPR1 EXPR2) = EXPR2~
-#+END_QUOTE
+#+end_definition
 
-
-#+BEGIN_CENTER
-For any expressions ~EXPR1~ and ~EXPR2~
-- ~(if #t EXPR1 EXPR2) = EXPR1~
-- ~(if #f EXPR1 EXPR2) = EXPR2~
-#+END_CENTER
 
 This is slightly different from ~if~ that you might have seen in C++ or Python.
 There, ~if~ is a /statement/: it evaluates its boolean, and then /does something/ if it is true.
@@ -410,23 +548,64 @@ and what value it has depends on whether the boolean it is given produces true o
 
 If you are familiar with the ~cond ? foo : bar~ syntax in C/C++, this is similar.
 
+*** Function Definitions
+Flit is a functional language, so the main way that we will write programs is by
+defining one or more functions that compute the results we want.
+
+
+
 ** Types
+:PROPERTIES:
+:CUSTOM_ID: flit-types
+:END:
+
 
 ** Recursion and Lists
+:PROPERTIES:
+:CUSTOM_ID: flit-recursion
+:END:
 
 ** Polymorphism
+:PROPERTIES:
+:CUSTOM_ID: flit-poly
+:END:
 
 ** Datatypes and Pattern Matching
+:PROPERTIES:
+:CUSTOM_ID: flit-datatypes
+:END:
 
 ** Lambda and First-Class Functions
+:PROPERTIES:
+:CUSTOM_ID: flit-lambda
+:END:
 
 ** Higher-Order Polymorphic Functions
+:PROPERTIES:
+:CUSTOM_ID: flit-hof
+:END:
 
 ** Tail-Calls and Generative Recursion
+:PROPERTIES:
+:CUSTOM_ID: flit-tailrec
+:END:
 
 * Part II: Interpreters
 
-* Glossary
+* Glossary :noexport:
+- Semantics of If :: For any expressions ~EXPR1~ and ~EXPR2~
+- ~(if #t EXPR1 EXPR2) = EXPR1~
+- ~(if #f EXPR1 EXPR2) = EXPR2~
+
+- Semantics of + :: For any number literals ~m~ and ~n~, the expression ~(+ m n)~
+is equal to the sum of ~m~ and ~n~
+
+- immutable :: A variable is immutable if its value value is constant in its scope
+
+- purely functional :: A programming language is purely functional if every call to a function with the same inputs produces the same outputs.
+
+- mutable :: A variable is mutable if its value can change within its scope.
+
 - Expression :: An expression is part of a program that produces a result: it either has a /value/, unless it raises an error or runs forever.
 
 - S-Expression :: Every S-Expression (or s-exp, pronounced "ess-exp") is either:
@@ -436,13 +615,6 @@ If you are familiar with the ~cond ? foo : bar~ syntax in C/C++, this is similar
 
 
 * Aliases
-
-** Glossary :noexport:
-- s-exp :: S-Expression
-- sexp :: S-Expression
-- sexpr :: S-Expression
-- s-expr :: S-Expression
-
 
 
 * Emacs Variables (please ignore) :noexport:
