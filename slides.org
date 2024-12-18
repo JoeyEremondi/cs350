@@ -77,64 +77,6 @@
   - [[#broad-goals][Broad Goals]]
   - [[#generative-recursion][Generative Recursion]]
   - [[#abstracting-generative-recursion][Abstracting Generative Recursion]]
-- [[#abstract-syntax-and-parsing][Abstract Syntax and Parsing]]
-  - [[#the-big-picture][The Big Picture]]
-  - [[#describing-syntax][Describing Syntax]]
-  - [[#parsing-and-abstract-syntax][Parsing and Abstract Syntax]]
-- [[#arithmetic-our-first-interpreter][Arithmetic: Our First Interpreter]]
-  - [[#interpreters-overview][Interpreters: Overview]]
-- [[#desugaring-our-first-elaborator][Desugaring: Our First Elaborator]]
-  - [[#syntactic-sugar][Syntactic Sugar]]
-- [[#functions-variables-and-substitution][Functions, Variables and Substitution]]
-  - [[#overview-functions][Overview: Functions]]
-- [[#review][Review]]
-  - [[#overview][Overview]]
-  - [[#functional-programming][Functional Programming]]
-  - [[#the-languages-weve-built][The Languages We've Built]]
-- [[#environments-binding-and-scope][Environments, Binding, and Scope]]
-  - [[#overview-1][Overview]]
-  - [[#environments][Environments]]
-  - [[#implementing-let][Implementing Let]]
-- [[#implementing-lambdas-with-substitution-and-dynamic-typing][Implementing Lambdas with Substitution and Dynamic Typing]]
-  - [[#broad-strategy][Broad Strategy]]
-- [[#implementing-lambdas-with-environments-closures][Implementing Lambdas with Environments: Closures]]
-  - [[#broad-goals-1][Broad Goals]]
-  - [[#the-details][The Details]]
-  - [[#but-professor-when-will-i-ever-use-this][But Professor, When Will I Ever Use This?]]
-- [[#midterm-review][Midterm Review]]
-  - [[#overview-2][Overview]]
-  -  [[#functional-programming-concepts][Functional Programming Concepts]]
-  - [[#higher-order-functions-1][Higher Order Functions]]
-- [[#currying-and-the-lambda-calculus][Currying and the Lambda Calculus]]
-  - [[#overview-3][Overview]]
-  - [[#currying][Currying]]
-  - [[#lambda-the-ultimate][Lambda The Ultimate]]
-- [[#store-passing-and-boxes][Store Passing and Boxes]]
-  - [[#overview-4][Overview]]
-  - [[#curly-box-a-language-with-mutation][Curly-Box: A Language with Mutation]]
-  - [[#interpreting-boxes][Interpreting Boxes]]
-- [[#mutable-variables][Mutable Variables]]
-  - [[#curly-mutvar][Curly-Mutvar]]
-- [[#implementing-recursion-via-state][Implementing Recursion via State]]
-  - [[#recursion-via-state][Recursion via State]]
-- [[#objects-and-oop][Objects and OOP]]
-  - [[#concepts-of-objects][Concepts of Objects]]
-  - [[#curly-obj-immut][Curly-Obj-Immut]]
-  - [[#implementing-objects][Implementing Objects]]
-- [[#lazy-evaluation][Lazy Evaluation]]
-  - [[#lazy-evaluation-1][Lazy Evaluation]]
-- [[#final-exam-review-functional-programming][Final Exam Review: Functional Programming]]
-  - [[#functional-programming-what-we-learned][Functional Programming: What We Learned]]
-  - [[#purely-functional-programming][Purely Functional Programming]]
-  - [[#algebraic-data-types-1][(Algebraic) Data Types]]
-  - [[#higher-order-functions-2][Higher Order Functions]]
-  - [[#tail-recursion][Tail Recursion]]
-- [[#final-exam-review-interpreters][Final Exam Review: Interpreters]]
-  - [[#interpreters][Interpreters]]
-  - [[#syntax-and-the-language-pipeline][Syntax and the Language Pipeline]]
-  - [[#environments-1][Environments]]
-  - [[#mutable-state][Mutable State]]
-  - [[#alternate-models-of-execution][Alternate Models of Execution]]
 
 * Introduction
 :PROPERTIES:
@@ -1905,7 +1847,7 @@ return g(x);
 - These two functions can replace (nearly) all pattern matching/recursion on lists
 - Examples (see lecture Racket file)
 
-* Abstract Syntax and Parsing
+* Abstract Syntax and Parsing :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides004-syntax.pdf
 :header-args:racket: :results code :lang plait
@@ -2096,7 +2038,7 @@ return g(x);
             (parse (third (s-exp->list s))))]
     [else (error 'parse "invalid input")]))
 #+end_src
-* Arithmetic: Our First Interpreter
+* Arithmetic: Our First Interpreter :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides005-arith.pdf
 :header-args:racket: :results code :lang plait
@@ -2252,7 +2194,7 @@ return g(x);
                  (interp elseBranch)
                )])
 #+end_src
-* Desugaring: Our First Elaborator
+* Desugaring: Our First Elaborator :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides006-desugar.pdf
 :header-args:racket: :results code :lang plait
@@ -2330,7 +2272,7 @@ return g(x);
 
 
 
-* Functions, Variables and Substitution
+* Functions, Variables and Substitution :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides007-subst.pdf
 :header-args:racket: :results code :lang plait
@@ -2497,7 +2439,7 @@ return g(x);
             [funBody (mkFunDef-body def)])
        (interp defs (subst argVar (NumLit argVal) funBody)))]
 #+end_src
-* Review
+* Review :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides008-review.pdf
 :header-args:racket: :results code :lang plait
@@ -2581,7 +2523,7 @@ return g(x);
   + Replace variable with value of concrete argument
 
 
-* Environments, Binding, and Scope
+* Environments, Binding, and Scope :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides009-environments.pdf
 :header-args:racket: :results code :lang plait
@@ -2877,7 +2819,7 @@ emptyEnv
   + Behavior of ~subst~ on bound variables
   + What environment ~interp~ is passed for function bodies
 
-* Implementing Lambdas with Substitution and Dynamic Typing
+** Implementing Lambdas with Substitution and Dynamic Typing
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides012-dyntype.pdf
 :header-args:racket: :results code :lang plait
@@ -3142,7 +3084,7 @@ emptyEnv
   #+end_src
 - Loops because it evaluates the untaken branch
 
-* Implementing Lambdas with Environments: Closures
+* Implementing Lambdas with Environments: Closures :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides013-closures.pdf
 :header-args:racket: :results code :lang plait
@@ -3424,7 +3366,7 @@ myFunction().then(
   #+end_src
 - This is all just lambda with different syntax
 
-* Midterm Review
+* Midterm Review :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides014-midterm-review.pdf
 :header-args:racket: :results code :lang plait
@@ -3548,7 +3490,7 @@ myFunction().then(
   + Look at what you can build using what's in scope
 - The way to build a function is with ~lambda~
 
-* Currying and the Lambda Calculus
+* Currying and the Lambda Calculus :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides016-currying.pdf
 :header-args:racket: :results code :lang plait
@@ -3771,7 +3713,7 @@ myFunction().then(
 - You don't need to know the details of how this work, just that it's possible to
   do recursion in the UTLC
 - Once we have recursion, we have loops
-* Store Passing and Boxes
+* Store Passing and Boxes :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides017-box.pdf
 :header-args:racket: :results code :lang plait
@@ -4071,7 +4013,7 @@ myFunction().then(
   + Linearly threaded through the program
   + Once we've updated a store (by generating a new one), /we never use the old store again/
     - ... until we implement more advanced features e.g. undo, backtracking
-* Mutable Variables
+* Mutable Variables :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides018-mutvar.pdf
 :header-args:racket: :results code :lang plait
@@ -4248,7 +4190,7 @@ myFunction().then(
 - The ~getloc~ makes a new box whose location is the same as ~y~
 - When ~doublebox!~ runs it alters the value at the location of its box, which was the location of ~y~
 - The final result is 6, since the value of ~y~ was changed
-* Implementing Recursion via State
+* Implementing Recursion via State :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides019-recursion.pdf
 :header-args:racket: :results code :lang plait
@@ -4403,7 +4345,7 @@ myFunction().then(
   + First-class functions/closures
   + Mutable references/variables
 - Useful in typed languages that can't give the Y-combinator a type
-* Objects and OOP
+* Objects and OOP :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides020-oop.pdf
 :header-args:racket: :results code :lang plait
@@ -4655,7 +4597,7 @@ myFunction().then(
                1
                {* x {send this call {- x 1}}}}}}}
 #+end_src
-* Lazy Evaluation
+* Lazy Evaluation :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides021-lazy.pdf
 :header-args:racket: :results code :lang plait
@@ -4789,7 +4731,7 @@ myFunction().then(
 - Undefined variable behind a lambda, so no error
   + Closures store /expressions/, not values
 - In a strict language, this has the same behavior as the lazy version
-* Final Exam Review: Functional Programming
+* Final Exam Review: Functional Programming :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides022-fp-review.pdf
 :header-args:racket: :results code :lang plait
@@ -5035,7 +4977,7 @@ return x; // or just do something with the final value of x
 - Give a function that says what the accumulator should be updated to
   + Takes element in the list and previous accumulator
 - Traverses list from left to right, updating the accumulator
-* Final Exam Review: Interpreters
+* Final Exam Review: Interpreters :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides023-interp-review.pdf
 :header-args:racket: :results code :lang plait
