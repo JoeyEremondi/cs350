@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-12-14 Sat 11:41 -->
+<!-- 2024-12-15 Sun 00:15 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Functional Languages, Interpreters and Types: CS 350 Course Notes</title>
@@ -346,6 +346,475 @@ $(function() {    $('.definition').before("<p class='admonition-title note'>Defi
                         color:red;
                         text-decoration: none;}
           </style>
+          
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
+          
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
+          
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
+          
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
+          
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
+          
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
+          
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
 <script>
   window.MathJax = {
     tex: {
@@ -386,38 +855,39 @@ $(function() {    $('.definition').before("<p class='admonition-title note'>Defi
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgb896196">1. Introduction</a>
+<li><a href="#org432ba0d">1. Introduction</a>
 <ul>
-<li><a href="#org426467e">1.1. For Students</a>
+<li><a href="#orgeed685b">1.1. For Students</a>
 <ul>
-<li><a href="#org63ca1e1">1.1.1. What This Course Is About</a></li>
-<li><a href="#org1f53f43">1.1.2. Why Functional Programming?</a></li>
-<li><a href="#orgd1ad933">1.1.3. Why Interpreters?</a></li>
+<li><a href="#org6fb33ef">1.1.1. What This Course Is About</a></li>
+<li><a href="#org26e17b7">1.1.2. Why Functional Programming?</a></li>
+<li><a href="#orga422dd6">1.1.3. Why Interpreters?</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org3a7eb32">2. Part I: Functional Programming</a>
+<li><a href="#org8c715e8">2. Part I: Functional Programming</a>
 <ul>
 <li><a href="#setup">2.1. Setup: Editor and Tooling</a>
 <ul>
-<li><a href="#orgbeb157f">2.1.1. Dr. Racket and <code>#lang flit</code></a></li>
-<li><a href="#orge0e9fb0">2.1.2. Installing the Handin Tool</a></li>
-<li><a href="#org90b2bbe">2.1.3. <span class="todo TODO">TODO</span> Using Dr. Racket</a></li>
+<li><a href="#orgbb93cf0">2.1.1. Dr. Racket and <code>#lang flit</code></a></li>
+<li><a href="#org05b8d26">2.1.2. Installing the Handin Tool</a></li>
+<li><a href="#org77959a2">2.1.3. <span class="todo TODO">TODO</span> Using Dr. Racket</a></li>
 </ul>
 </li>
 <li><a href="#racket-synax">2.2. The Syntax of Flit</a>
 <ul>
-<li><a href="#org6e7455b">2.2.1. S-expressions</a></li>
-<li><a href="#orgac01702">2.2.2. Special Characters</a></li>
+<li><a href="#org93423ac">2.2.1. S-expressions</a></li>
+<li><a href="#orgb629e94">2.2.2. Special Characters</a></li>
 </ul>
 </li>
 <li><a href="#flit-expr">2.3. Functions and Expressions</a>
 <ul>
-<li><a href="#org4b379c6">2.3.1. Expressions in Flit</a></li>
-<li><a href="#org5bd297b">2.3.2. Computing Using Equations</a></li>
-<li><a href="#org3652387">2.3.3. Conditionals</a></li>
-<li><a href="#org8aa9072">2.3.4. Function Definitions</a></li>
+<li><a href="#org81ec03b">2.3.1. Expressions in Flit</a></li>
+<li><a href="#org540f107">2.3.2. Computing Using Equations</a></li>
+<li><a href="#org34ca740">2.3.3. Conditionals</a></li>
+<li><a href="#orgdfe8fc1">2.3.4. Function Definitions</a></li>
+<li><a href="#orgc01edc2">2.3.5. Local Variables</a></li>
 </ul>
 </li>
 <li><a href="#flit-types">2.4. Types</a></li>
@@ -429,25 +899,23 @@ $(function() {    $('.definition').before("<p class='admonition-title note'>Defi
 <li><a href="#flit-tailrec">2.10. Tail-Calls and Generative Recursion</a></li>
 </ul>
 </li>
-<li><a href="#orgff91bcc">3. Part II: Interpreters</a></li>
-<li><a href="#org20485a2">4. Aliases</a></li>
-<li><a href="#orgd10e087">5. Glossary</a></li>
+<li><a href="#org1054ba9">3. Glossary</a></li>
 </ul>
 </div>
 </div>
 <p>
 :header-args:racket: :results code :lang plait
 </p>
-<div id="outline-container-orgb896196" class="outline-2">
-<h2 id="orgb896196"><span class="section-number-2">1.</span> Introduction</h2>
+<div id="outline-container-org432ba0d" class="outline-2">
+<h2 id="org432ba0d"><span class="section-number-2">1.</span> Introduction</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org426467e" class="outline-3">
-<h3 id="org426467e"><span class="section-number-3">1.1.</span> For Students</h3>
+<div id="outline-container-orgeed685b" class="outline-3">
+<h3 id="orgeed685b"><span class="section-number-3">1.1.</span> For Students</h3>
 <div class="outline-text-3" id="text-1-1">
 </div>
-<div id="outline-container-org63ca1e1" class="outline-4">
-<h4 id="org63ca1e1"><span class="section-number-4">1.1.1.</span> What This Course Is About</h4>
+<div id="outline-container-org6fb33ef" class="outline-4">
+<h4 id="org6fb33ef"><span class="section-number-4">1.1.1.</span> What This Course Is About</h4>
 <div class="outline-text-4" id="text-1-1-1">
 <p>
 If you take into a linguistics class, you will not take French one week, German the next, Mandarin after that, etc.
@@ -468,8 +936,8 @@ have very different features.
 </p>
 </div>
 </div>
-<div id="outline-container-org1f53f43" class="outline-4">
-<h4 id="org1f53f43"><span class="section-number-4">1.1.2.</span> Why Functional Programming?</h4>
+<div id="outline-container-org26e17b7" class="outline-4">
+<h4 id="org26e17b7"><span class="section-number-4">1.1.2.</span> Why Functional Programming?</h4>
 <div class="outline-text-4" id="text-1-1-2">
 <p>
 In this course, we will learn about <i>functional programming,</i> where a variable&rsquo;s value never changes once it is set.
@@ -509,8 +977,8 @@ so that you are able to adapt and learn whatever language you need in your job t
 </p>
 </div>
 </div>
-<div id="outline-container-orgd1ad933" class="outline-4">
-<h4 id="orgd1ad933"><span class="section-number-4">1.1.3.</span> Why Interpreters?</h4>
+<div id="outline-container-orga422dd6" class="outline-4">
+<h4 id="orga422dd6"><span class="section-number-4">1.1.3.</span> Why Interpreters?</h4>
 <div class="outline-text-4" id="text-1-1-3">
 <p>
 In addition to learning how to use language features, this course will teach you
@@ -539,16 +1007,16 @@ and beauty that lies at the heart of computation.
 </div>
 </div>
 </div>
-<div id="outline-container-org3a7eb32" class="outline-2">
-<h2 id="org3a7eb32"><span class="section-number-2">2.</span> Part I: Functional Programming</h2>
+<div id="outline-container-org8c715e8" class="outline-2">
+<h2 id="org8c715e8"><span class="section-number-2">2.</span> Part I: Functional Programming</h2>
 <div class="outline-text-2" id="text-2">
 </div>
 <div id="outline-container-setup" class="outline-3">
 <h3 id="setup"><span class="section-number-3">2.1.</span> Setup: Editor and Tooling</h3>
 <div class="outline-text-3" id="text-setup">
 </div>
-<div id="outline-container-orgbeb157f" class="outline-4">
-<h4 id="orgbeb157f"><span class="section-number-4">2.1.1.</span> Dr. Racket and <code>#lang flit</code></h4>
+<div id="outline-container-orgbb93cf0" class="outline-4">
+<h4 id="orgbb93cf0"><span class="section-number-4">2.1.1.</span> Dr. Racket and <code>#lang flit</code></h4>
 <div class="outline-text-4" id="text-2-1-1">
 <p>
 All of the programming in this course takes place in Racket.
@@ -560,7 +1028,7 @@ i.e., <code>#lang flit</code>.
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="org9e639f3"></a><span class="todo TODO">TODO</span> Installing Dr. Racket<br />
+<li><a id="org0f50ed5"></a><span class="todo TODO">TODO</span> Installing Dr. Racket<br />
 <div class="outline-text-5" id="text-2-1-1-1">
 <p>
 Dr. Racket is the IDE for Racket, and language made using Racket, including Flit.
@@ -584,7 +1052,7 @@ Many distributions also have their own packages, which you are welcome to use.
 </ul>
 </div>
 </li>
-<li><a id="org1f02f09"></a>Dr. Racket on Laboratory Computers<br />
+<li><a id="org535c533"></a>Dr. Racket on Laboratory Computers<br />
 <div class="outline-text-5" id="text-2-1-1-2">
 <p>
 Dr. Racket is installed on computers in the following labs:
@@ -602,8 +1070,8 @@ access to your own computer.
 </li>
 </ol>
 </div>
-<div id="outline-container-orge0e9fb0" class="outline-4">
-<h4 id="orge0e9fb0"><span class="section-number-4">2.1.2.</span> Installing the Handin Tool</h4>
+<div id="outline-container-org05b8d26" class="outline-4">
+<h4 id="org05b8d26"><span class="section-number-4">2.1.2.</span> Installing the Handin Tool</h4>
 <div class="outline-text-4" id="text-2-1-2">
 <p>
 Whether you use your own computer or a lab computer, you will need to
@@ -625,7 +1093,7 @@ This accomplishes two things:
 </ol>
 </div>
 <ol class="org-ol">
-<li><a id="org9ddc323"></a>Changing Your Password<br />
+<li><a id="orgfbf561d"></a>Changing Your Password<br />
 <div class="outline-text-6" id="text-2-1-2-0-1">
 <p>
 You will be emailed a password for your account. If you wish to change your password,
@@ -643,11 +1111,11 @@ for the handin tool, but not secure enough for sensitive personal information.
 </p>
 </div>
 </li>
-<li><a id="org68d2227"></a><span class="todo TODO">TODO</span> Make PLT file and upload link<br /></li>
+<li><a id="orga91f250"></a><span class="todo TODO">TODO</span> Make PLT file and upload link<br /></li>
 </ol>
 </div>
-<div id="outline-container-org90b2bbe" class="outline-4">
-<h4 id="org90b2bbe"><span class="section-number-4">2.1.3.</span> <span class="todo TODO">TODO</span> Using Dr. Racket</h4>
+<div id="outline-container-org77959a2" class="outline-4">
+<h4 id="org77959a2"><span class="section-number-4">2.1.3.</span> <span class="todo TODO">TODO</span> Using Dr. Racket</h4>
 <div class="outline-text-4" id="text-2-1-3">
 <p>
 There are three main parts of the Dr. Racket interface: the toolbar at the top,
@@ -655,9 +1123,9 @@ the code editor window, and the REPL at the bottom.
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="orge893029"></a><span class="todo TODO">TODO</span> pictures<br /></li>
+<li><a id="org5fe6fa8"></a><span class="todo TODO">TODO</span> pictures<br /></li>
 
-<li><a id="org0ea41af"></a>The Definitions Window (Code Editor)<br />
+<li><a id="org143e305"></a>The Definitions Window (Code Editor)<br />
 <div class="outline-text-5" id="text-2-1-3-2">
 <p>
 The editor window is where you will type your Racket program.
@@ -666,7 +1134,7 @@ Racket as described above this will happen by default.
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="org97f8774"></a>Type and Syntax Errors<br />
+<li><a id="orgaaa019d"></a>Type and Syntax Errors<br />
 <div class="outline-text-6" id="text-2-1-3-2-1">
 <p>
 If there are type or syntax errors in your code, there will be
@@ -677,7 +1145,7 @@ has a type or syntax error will get a grade of 0.
 </p>
 </div>
 </li>
-<li><a id="org11bd3d9"></a>Useful Tools<br />
+<li><a id="orgdb4f541"></a>Useful Tools<br />
 <div class="outline-text-6" id="text-2-1-3-2-2">
 <p>
 If you right click on a variable, function name, type name, etc. in Dr. Racket,
@@ -694,7 +1162,7 @@ This can be very useful to make your code more readable, or to find errors based
 </li>
 </ol>
 </li>
-<li><a id="orga20f5e4"></a>The Toolbar<br />
+<li><a id="org99ddd4f"></a>The Toolbar<br />
 <div class="outline-text-5" id="text-2-1-3-3">
 <p>
 There are two main buttons you need on the toolbar.
@@ -730,7 +1198,7 @@ on which test that is. In these cases, <b>read the problem specification careful
 </p>
 </div>
 </li>
-<li><a id="orgcfac534"></a>The Interactions Window (REPL)<br />
+<li><a id="orgf0453e0"></a>The Interactions Window (REPL)<br />
 <div class="outline-text-5" id="text-2-1-3-4">
 <p>
 The interactions window features a Read-Evaluate-Print-Loop (REPL),
@@ -746,7 +1214,7 @@ can be used in the REPL.
 </p>
 </div>
 </li>
-<li><a id="org4a8a6df"></a>Submitting Assignments<br />
+<li><a id="orgc233af6"></a>Submitting Assignments<br />
 <div class="outline-text-5" id="text-2-1-3-5">
 <p>
 All assignments are to be submitted using the Handin tool. There are two ways to do this:
@@ -770,7 +1238,7 @@ The test results are also visible on URCourses.
 </ul>
 </div>
 <ol class="org-ol">
-<li><a id="org6f91d0e"></a>Submitting Multiple Times<br />
+<li><a id="org8935ea0"></a>Submitting Multiple Times<br />
 <div class="outline-text-6" id="text-2-1-3-5-1">
 <p>
 You may submit as many times as you like until the deadline. Your grade will be the grade
@@ -782,7 +1250,7 @@ from the last submission before the deadline.
 </p>
 </div>
 </li>
-<li><a id="org550281a"></a>Syntax and Type Errors<br />
+<li><a id="orge2b08d6"></a>Syntax and Type Errors<br />
 <div class="outline-text-6" id="text-2-1-3-5-2">
 <p>
 If your file contains syntax or type errors, the feedback in Dr. Racket or on the handin website will
@@ -806,7 +1274,7 @@ If there is an error message you do not understand, then <b>ask a question on th
 </p>
 </div>
 </li>
-<li><a id="org0f92343"></a>Public and Private Tests<br />
+<li><a id="orgee3f5b5"></a>Public and Private Tests<br />
 <div class="outline-text-6" id="text-2-1-3-5-3">
 <p>
 When you submit an assignment, most tests are <i>public</i>, meaning that you
@@ -822,7 +1290,7 @@ missed when writing your code.
 </p>
 </div>
 </li>
-<li><a id="orgc52b784"></a>Submitting on URCourses (not preferred)<br />
+<li><a id="org0df35cd"></a>Submitting on URCourses (not preferred)<br />
 <div class="outline-text-6" id="text-2-1-3-5-4">
 <p>
 Submitting assignments via URCourses is available as a backup.
@@ -846,8 +1314,8 @@ but you are then responsible for ensuring that it has no syntax or type errors.
 <h3 id="racket-synax"><span class="section-number-3">2.2.</span> The Syntax of Flit</h3>
 <div class="outline-text-3" id="text-racket-synax">
 </div>
-<div id="outline-container-org6e7455b" class="outline-4">
-<h4 id="org6e7455b"><span class="section-number-4">2.2.1.</span> S-expressions</h4>
+<div id="outline-container-org93423ac" class="outline-4">
+<h4 id="org93423ac"><span class="section-number-4">2.2.1.</span> S-expressions</h4>
 <div class="outline-text-4" id="text-2-2-1">
 <p>
 The syntax of Dr. Racket based around <i><a class="org-gls" href="#gls.4" id="glsr.4.1">S-Expressions</a></i>.
@@ -885,11 +1353,11 @@ The rest that we see will be Flit <a class="org-gls" href="#gls.3" id="glsr.3.5"
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="org157171d"></a><span class="todo TODO">TODO</span> S-Exp diagram<br /></li>
+<li><a id="orgcdd63c1"></a><span class="todo TODO">TODO</span> S-Exp diagram<br /></li>
 </ol>
 </div>
-<div id="outline-container-orgac01702" class="outline-4">
-<h4 id="orgac01702"><span class="section-number-4">2.2.2.</span> Special Characters</h4>
+<div id="outline-container-orgb629e94" class="outline-4">
+<h4 id="orgb629e94"><span class="section-number-4">2.2.2.</span> Special Characters</h4>
 <div class="outline-text-4" id="text-2-2-2">
 <p>
 There are a few characters that you can&rsquo;t use in variable/function names in Racket:
@@ -918,8 +1386,8 @@ Likewise, functions converting between types often contain <code>-&gt;</code> in
 <h3 id="flit-expr"><span class="section-number-3">2.3.</span> Functions and Expressions</h3>
 <div class="outline-text-3" id="text-flit-expr">
 </div>
-<div id="outline-container-org4b379c6" class="outline-4">
-<h4 id="org4b379c6"><span class="section-number-4">2.3.1.</span> Expressions in Flit</h4>
+<div id="outline-container-org81ec03b" class="outline-4">
+<h4 id="org81ec03b"><span class="section-number-4">2.3.1.</span> Expressions in Flit</h4>
 <div class="outline-text-4" id="text-2-3-1">
 <p>
 <b>NOTE: All Flit <a class="org-gls" href="#gls.3" id="glsr.3.7">expressions</a> are <a class="org-gls" href="#gls.4" id="glsr.4.3">S-Expressions</a>, but not all <a class="org-gls" href="#gls.4" id="glsr.4.4">S-Expressions</a> are Flit <a class="org-gls" href="#gls.3" id="glsr.3.8">Expressions</a>, since some are declarations, etc. It&rsquo;s an unfortunate naming conflict.</b>
@@ -940,7 +1408,7 @@ An <a class="org-gls" href="#gls.3" id="glsr.3.10">expression</a> is part of a p
 </div>
 </div>
 <ol class="org-ol">
-<li><a id="org24cb199"></a>Literals<br />
+<li><a id="orge240dcb"></a>Literals<br />
 <div class="outline-text-5" id="text-2-3-1-1">
 <p>
 Literals are <a class="org-gls" href="#gls.3" id="glsr.3.11">expressions</a> that evaluate to themselves, denoting fixed values of some type. For example:
@@ -954,7 +1422,7 @@ Literals are <a class="org-gls" href="#gls.3" id="glsr.3.11">expressions</a> tha
 </div>
 </div>
 </li>
-<li><a id="org7c69e85"></a>Keywords<br />
+<li><a id="org8458848"></a>Keywords<br />
 <div class="outline-text-5" id="text-2-3-1-2">
 <p>
 If you write <code>(foo bar baz)</code> where <code>foo</code> is a keyword in Flit, then
@@ -966,7 +1434,7 @@ Some keywords that we&rsquo;ll see are <code>if</code>, <code>type-case</code>, 
 </p>
 </div>
 </li>
-<li><a id="org0f5efe6"></a>Function Calls<br />
+<li><a id="org85bec81"></a>Function Calls<br />
 <div class="outline-text-5" id="text-2-3-1-3">
 <p>
 Any <a class="org-gls" href="#gls.3" id="glsr.3.13">expression</a> of the form <code>(f a)</code> is interpreted as calling the function <code>f</code> with the argument <code>a</code>,
@@ -1025,12 +1493,12 @@ Here, we have used color to indicate the matching brackets.
 </li>
 </ol>
 </div>
-<div id="outline-container-org5bd297b" class="outline-4">
-<h4 id="org5bd297b"><span class="section-number-4">2.3.2.</span> Computing Using Equations</h4>
+<div id="outline-container-org540f107" class="outline-4">
+<h4 id="org540f107"><span class="section-number-4">2.3.2.</span> Computing Using Equations</h4>
 <div class="outline-text-4" id="text-2-3-2">
 </div>
 <ol class="org-ol">
-<li><a id="orgde90451"></a>Semantics<br />
+<li><a id="org5191896"></a>Semantics<br />
 <div class="outline-text-5" id="text-2-3-2-1">
 <p>
 One of the goals of this course is to answer the question: <b>what do programs mean</b>?
@@ -1057,7 +1525,7 @@ and make it into something formal that we can reason about logically.
 </p>
 </div>
 </li>
-<li><a id="org280ed91"></a>Mutable and Immutable Variables<br />
+<li><a id="org6d56f59"></a>Mutable and Immutable Variables<br />
 <div class="outline-text-5" id="text-2-3-2-2">
 <p>
 Most of the programming languages that you have likely seen so far have <a class="org-gls" href="#gls.1" id="glsr.1.2">mutable</a> variables:
@@ -1141,7 +1609,7 @@ We&rsquo;ll see a bit more of this <a href="#flit-tailrec">when we learn about t
 </p>
 </div>
 </li>
-<li><a id="orgcd32ec7"></a>Equations<br />
+<li><a id="orgf17a105"></a>Equations<br />
 <div class="outline-text-5" id="text-2-3-2-3">
 <p>
 We will describe the semantics of Flit using <i>Equations</i>. Here is our first
@@ -1152,20 +1620,26 @@ semantic equation:
                         <p class="admonition-title note">Definition: Semantics of +</p>&nbsp;
 <p>
 For any number literals <code>m</code> and <code>n</code>, the <a class="org-gls" href="#gls.3" id="glsr.3.19">expression</a> <code>(+ m n)</code>
-is equal to the sum of <code>m</code> and <code>n</code>
+is equal to the sum of <code>m</code> and <code>n</code>. The other arithmetic operations have similar rules.
 </p>
 
 </div>
 
-<pre class="example" id="org456b3b4">
-~(+ 3 4) = 7~
+<pre class="example" id="org011510a">
+(+ 3 4) = 7
+(+ 0 2) = 2
 </pre>
+
+<p>
+There are a few tricky things to notice here.
+</p>
 </div>
 </li>
+<li><a id="orga8a5b86"></a>Types<br /></li>
 </ol>
 </div>
-<div id="outline-container-org3652387" class="outline-4">
-<h4 id="org3652387"><span class="section-number-4">2.3.3.</span> Conditionals</h4>
+<div id="outline-container-org34ca740" class="outline-4">
+<h4 id="org34ca740"><span class="section-number-4">2.3.3.</span> Conditionals</h4>
 <div class="outline-text-4" id="text-2-3-3">
 <p>
 If-<a class="org-gls" href="#gls.3" id="glsr.3.20">expressions</a> are built into Flit:
@@ -1211,9 +1685,79 @@ and what value it has depends on whether the boolean it is given produces true o
 If you are familiar with the <code>cond ? foo : bar</code> syntax in C/C++, this is similar.
 </p>
 </div>
+<ol class="org-ol">
+<li><a id="org6d05196"></a>Example<br />
+<div class="outline-text-5" id="text-2-3-3-1">
+<p>
+Let&rsquo;s use the equational rules we have so far to evaluate some example code to a result.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">if</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">&lt;</span> <span style="color: #da8548; font-weight: bold;">3</span> <span style="color: #da8548; font-weight: bold;">4</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">(</span><span style="color: #e45649;">if</span> <span style="color: #50a14f;">(</span><span style="color: #a626a4;">=</span> <span style="color: #b751b6;">(</span><span style="color: #a626a4;">+</span> <span style="color: #da8548; font-weight: bold;">2</span> <span style="color: #da8548; font-weight: bold;">6</span><span style="color: #b751b6;">)</span> <span style="color: #da8548; font-weight: bold;">4</span><span style="color: #50a14f;">)</span> <span style="color: #50a14f;">(</span><span style="color: #a626a4;">*</span> <span style="color: #da8548; font-weight: bold;">3</span> <span style="color: #da8548; font-weight: bold;">33</span><span style="color: #50a14f;">)</span> <span style="color: #50a14f;">(</span><span style="color: #a626a4;">+</span> <span style="color: #da8548; font-weight: bold;">50</span> <span style="color: #da8548; font-weight: bold;">50</span><span style="color: #50a14f;">)</span><span style="color: #a626a4;">)</span> <span style="color: #da8548; font-weight: bold;">9001</span><span style="color: #4078f2;">)</span>
+</pre>
 </div>
-<div id="outline-container-org8aa9072" class="outline-4">
-<h4 id="org8aa9072"><span class="section-number-4">2.3.4.</span> Function Definitions</h4>
+
+<p>
+We can deduce this result by applying our rules:
+</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left"><a class="org-gls" href="#gls.3" id="glsr.3.23">Expression</a></th>
+<th scope="col" class="org-left">Rule</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left"><code>(if _(&lt; 3 4)_ (if (= (+ 2 6) 4) (* 3 33) (+ 50 50)) 9001)</code></td>
+<td class="org-left"><i>start <a class="org-gls" href="#gls.3" id="glsr.3.24">expression</a></i></td>
+</tr>
+
+<tr>
+<td class="org-left"><code>(_if_ #t (if (= (+ 2 6) 4) (* 3 33) (+ 50 50)) 9001)</code></td>
+<td class="org-left">Computation rule for <code>&lt;</code></td>
+</tr>
+
+<tr>
+<td class="org-left"><code>(if (= _(+ 2 6)_ 4) (* 3 33) (+ 50 50))</code></td>
+<td class="org-left">True rule - <a class="org-gls" href="#gls.7" id="glsr.7.1">Semantics of If</a></td>
+</tr>
+
+<tr>
+<td class="org-left"><code>(if _(= 8 4)_ (* 3 33) (+ 50 50))</code></td>
+<td class="org-left">Computation rule for <code>+</code></td>
+</tr>
+
+<tr>
+<td class="org-left"><code>(_if_ #f (* 3 33) (+ 50 50))</code></td>
+<td class="org-left">False rule - <a class="org-gls" href="#gls.7" id="glsr.7.2">Semantics of If</a></td>
+</tr>
+
+<tr>
+<td class="org-left"><code>(+ 50 50)</code></td>
+<td class="org-left">Computation rule for <code>+</code></td>
+</tr>
+</tbody>
+</table>
+
+
+<p>
+Evaluating examples like this will get much more interesting once we have functions and variables,
+which we&rsquo;ll see below.
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-orgdfe8fc1" class="outline-4">
+<h4 id="orgdfe8fc1"><span class="section-number-4">2.3.4.</span> Function Definitions</h4>
 <div class="outline-text-4" id="text-2-3-4">
 <p>
 Flit is a functional language, so the main way that we will write programs is by
@@ -1221,11 +1765,23 @@ defining one or more functions that compute the results we want.
 </p>
 </div>
 </div>
+<div id="outline-container-orgc01edc2" class="outline-4">
+<h4 id="orgc01edc2"><span class="section-number-4">2.3.5.</span> Local Variables</h4>
+</div>
 </div>
 <div id="outline-container-flit-types" class="outline-3">
 <h3 id="flit-types"><span class="section-number-3">2.4.</span> Types</h3>
 <div class="outline-text-3" id="text-flit-types">
+<p>
+Another way that we can talk about what programs mean is their <i>type</i>.
+</p>
 </div>
+<ol class="org-ol">
+<li><a id="orgb095e0d"></a>Static and Dynamic Typing<br /></li>
+<li><a id="orga226ad5"></a>Typing Rules<br /></li>
+<li><a id="org6a3c53c"></a>Type Inference<br /></li>
+<li><a id="org85af08f"></a>Polymorphism<br /></li>
+</ol>
 </div>
 <div id="outline-container-flit-recursion" class="outline-3">
 <h3 id="flit-recursion"><span class="section-number-3">2.5.</span> Recursion and Lists</h3>
@@ -1258,24 +1814,19 @@ defining one or more functions that compute the results we want.
 </div>
 </div>
 </div>
-<div id="outline-container-orgff91bcc" class="outline-2">
-<h2 id="orgff91bcc"><span class="section-number-2">3.</span> Part II: Interpreters</h2>
-</div>
+<div id="outline-container-org1054ba9" class="outline-2">
+<h2 id="org1054ba9"><span class="section-number-2">3.</span> Glossary</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+<b><span class="org-glsdef" id="gls.1">Semantics of If</span></b>&emsp;For any expressions <code>EXPR1</code> and <code>EXPR2</code>&ensp;<a class="org-glsdef" href="#glsr.7.1">1</a>, <a class="org-glsdef" href="#glsr.7.2">2</a>
+</p>
 
-<div id="outline-container-org20485a2" class="outline-2">
-<h2 id="org20485a2"><span class="section-number-2">4.</span> Aliases</h2>
-</div>
-
-
-<div id="outline-container-orgd10e087" class="outline-2">
-<h2 id="orgd10e087"><span class="section-number-2">5.</span> Glossary</h2>
-<div class="outline-text-2" id="text-5">
 <p>
 <b><span class="org-glsdef" id="gls.8">S-Expression</span></b>&emsp;Every S-Expression (or s-exp, pronounced &ldquo;ess-exp&rdquo;) is either:&ensp;<a class="org-glsdef" href="#glsr.4.1">1</a>, <a class="org-glsdef" href="#glsr.4.2">2</a>, <a class="org-glsdef" href="#glsr.4.3">3</a>, <a class="org-glsdef" href="#glsr.4.4">4</a>, <a class="org-glsdef" href="#glsr.4.5">5</a>
 </p>
 
 <p>
-<b><span class="org-glsdef" id="gls.7">Expression</span></b>&emsp;An expression is part of a program that produces a result: it either has a <i>value</i>, unless it raises an error or runs forever.&ensp;<a class="org-glsdef" href="#glsr.3.1">1</a>, <a class="org-glsdef" href="#glsr.3.2">2</a>, <a class="org-glsdef" href="#glsr.3.3">3</a>, <a class="org-glsdef" href="#glsr.3.4">4</a>, <a class="org-glsdef" href="#glsr.3.5">5</a>, <a class="org-glsdef" href="#glsr.3.6">6</a>, <a class="org-glsdef" href="#glsr.3.7">7</a>, <a class="org-glsdef" href="#glsr.3.8">8</a>, <a class="org-glsdef" href="#glsr.3.9">9</a>, <a class="org-glsdef" href="#glsr.3.10">10</a>, <a class="org-glsdef" href="#glsr.3.11">11</a>, <a class="org-glsdef" href="#glsr.3.12">12</a>, <a class="org-glsdef" href="#glsr.3.13">13</a>, <a class="org-glsdef" href="#glsr.3.14">14</a>, <a class="org-glsdef" href="#glsr.3.15">15</a>, <a class="org-glsdef" href="#glsr.3.16">16</a>, <a class="org-glsdef" href="#glsr.3.17">17</a>, <a class="org-glsdef" href="#glsr.3.18">18</a>, <a class="org-glsdef" href="#glsr.3.19">19</a>, <a class="org-glsdef" href="#glsr.3.20">20</a>, <a class="org-glsdef" href="#glsr.3.21">21</a>, <a class="org-glsdef" href="#glsr.3.22">22</a>
+<b><span class="org-glsdef" id="gls.7">Expression</span></b>&emsp;An expression is part of a program that produces a result: it either has a <i>value</i>, unless it raises an error or runs forever.&ensp;<a class="org-glsdef" href="#glsr.3.1">1</a>, <a class="org-glsdef" href="#glsr.3.2">2</a>, <a class="org-glsdef" href="#glsr.3.3">3</a>, <a class="org-glsdef" href="#glsr.3.4">4</a>, <a class="org-glsdef" href="#glsr.3.5">5</a>, <a class="org-glsdef" href="#glsr.3.6">6</a>, <a class="org-glsdef" href="#glsr.3.7">7</a>, <a class="org-glsdef" href="#glsr.3.8">8</a>, <a class="org-glsdef" href="#glsr.3.9">9</a>, <a class="org-glsdef" href="#glsr.3.10">10</a>, <a class="org-glsdef" href="#glsr.3.11">11</a>, <a class="org-glsdef" href="#glsr.3.12">12</a>, <a class="org-glsdef" href="#glsr.3.13">13</a>, <a class="org-glsdef" href="#glsr.3.14">14</a>, <a class="org-glsdef" href="#glsr.3.15">15</a>, <a class="org-glsdef" href="#glsr.3.16">16</a>, <a class="org-glsdef" href="#glsr.3.17">17</a>, <a class="org-glsdef" href="#glsr.3.18">18</a>, <a class="org-glsdef" href="#glsr.3.19">19</a>, <a class="org-glsdef" href="#glsr.3.20">20</a>, <a class="org-glsdef" href="#glsr.3.21">21</a>, <a class="org-glsdef" href="#glsr.3.22">22</a>, <a class="org-glsdef" href="#glsr.3.23">23</a>, <a class="org-glsdef" href="#glsr.3.24">24</a>
 </p>
 
 <p>
@@ -1298,7 +1849,7 @@ defining one or more functions that compute the results we want.
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: Dr. Joseph Eremondi, with material adapted from Dr. Shriram Krishnamurthi</p>
-<p class="date">Created: 2024-12-14 Sat 11:41</p>
+<p class="date">Created: 2024-12-15 Sun 00:15</p>
 </div>
 </body>
 </html>

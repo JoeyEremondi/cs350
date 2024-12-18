@@ -497,7 +497,7 @@ semantic equation:
 
 #+begin_definition Semantics of +
 For any number literals ~m~ and ~n~, the expression ~(+ m n)~
-is equal to the sum of ~m~ and ~n~
+is equal to the sum of ~m~ and ~n~. The other arithmetic operations have similar rules.
 #+end_definition
 
 #+begin_example
@@ -507,11 +507,6 @@ is equal to the sum of ~m~ and ~n~
 
 There are a few tricky things to notice here.
 **** Types
-Another way that we can talk about what programs mean is their /type/.
-***** Static and Dynamic Typing
-***** Typing Rules
-***** Type Inference
-***** Polymorphism
 *** Conditionals
 If-expressions are built into Flit:
 #+begin_src racket
@@ -547,18 +542,47 @@ In Flit, ~if~ doesn't do anything, like printing or updating values. It is an ex
 and what value it has depends on whether the boolean it is given produces true or false.
 
 If you are familiar with the ~cond ? foo : bar~ syntax in C/C++, this is similar.
+**** Example
+Let's use the equational rules we have so far to evaluate some example code to a result.
+
+#+begin_src racket
+(if (< 3 4) (if (= (+ 2 6) 4) (* 3 33) (+ 50 50)) 9001)
+#+end_src
+
+#+RESULTS:
+#+begin_src racket
+99
+#+end_src
+
+We can deduce this result by applying our rules. We use the underscore ~_~ to show which part of the expression is being simplified by the rule.
+| Expression                                              | Rule                         |
+|---------------------------------------------------------+------------------------------|
+| ~(if _(< 3 4)_ (if (= (+ 2 6) 4) (* 3 33) (+ 50 50)) 9001)~ | /start expression/             |
+| ~(_if_ #t (if (= (+ 2 6) 4) (* 3 33) (+ 50 50)) 9001)~    | Computation rule for ~<~       |
+| ~(if (= _(+ 2 6)_ 4) (* 3 33) (+ 50 50))~                   | True rule - Semantics of If  |
+| ~(if _(= 8 4)_ (* 3 33) (+ 50 50))~                         | Computation rule for ~+~       |
+| ~(_if_ #f (* 3 33) (+ 50 50))~                              | False rule - Semantics of If |
+| ~(+ 50 50)~                                               | Computation rule for ~+~       |
+
+
+Evaluating examples like this will get much more interesting once we have functions and variables,
+which we'll see below.
+
 
 *** Function Definitions
 Flit is a functional language, so the main way that we will write programs is by
 defining one or more functions that compute the results we want.
-
-
-
+*** Local Variables
 ** Types
 :PROPERTIES:
 :CUSTOM_ID: flit-types
 :END:
 
+Another way that we can talk about what programs mean is their /type/.
+***** Static and Dynamic Typing
+***** Typing Rules
+***** Type Inference
+***** Polymorphism
 
 ** Recursion and Lists
 :PROPERTIES:
@@ -590,15 +614,15 @@ defining one or more functions that compute the results we want.
 :CUSTOM_ID: flit-tailrec
 :END:
 
-* Part II: Interpreters
+* Part II: Interpreters :noexport:
 
-* Glossary :noexport:
+* Glossary 
 - Semantics of If :: For any expressions ~EXPR1~ and ~EXPR2~
 - ~(if #t EXPR1 EXPR2) = EXPR1~
 - ~(if #f EXPR1 EXPR2) = EXPR2~
 
 - Semantics of + :: For any number literals ~m~ and ~n~, the expression ~(+ m n)~
-is equal to the sum of ~m~ and ~n~
+is equal to the sum of ~m~ and ~n~. The other arithmetic operations have similar rules.
 
 - immutable :: A variable is immutable if its value value is constant in its scope
 
@@ -614,7 +638,7 @@ is equal to the sum of ~m~ and ~n~
 3. Parentheses ~(...)~ containing one or more  S-Expressions, separated by a space
 
 
-* Aliases
+* Aliases :noexport:
 
 
 * Emacs Variables (please ignore) :noexport:

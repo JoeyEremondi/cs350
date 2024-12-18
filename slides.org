@@ -1,4 +1,4 @@
-#+title: University of Regina, CS 350, Summer 2024
+#+title: University of Regina, CS 350, Winter 2025
 #+subtitle: CS 350
 #+AUTHOR: Dr. Joseph Eremondi
 #+DATE: Last updated: \today{}
@@ -59,16 +59,24 @@
   - [[#course-overview][Course Overview]]
   - [[#motivation-functional-programming][Motivation: Functional Programming]]
   - [[#motivation-interpreters][Motivation: Interpreters]]
-- [[#functional-programming-1-recursion-and-immutable-data][Functional Programming 1: Recursion and Immutable Data]]
+-  [[#recursion-and-immutable-data][Recursion and Immutable Data]]
   - [[#programming-in-cs-350][Programming in CS 350]]
   - [[#racket][Racket]]
   - [[#plait][Plait]]
   - [[#functional-thinking-and-recursion][Functional Thinking and Recursion]]
   - [[#unbounded-data-lists][Unbounded Data: Lists]]
-- [[#functional-programming-2-defining-data-types][Functional Programming 2: Defining Data Types]]
+- [[#defining-data-types][Defining Data Types]]
   - [[#warmup-pairs][Warmup: Pairs]]
   - [[#algebraic-data-types][Algebraic Data Types]]
   - [[#recursive-data][Recursive Data]]
+- [[#first-class-functions][First-Class Functions]]
+  - [[#higher-order-functions][Higher Order Functions]]
+- [[#polymorphic-higher-order-functions][Polymorphic Higher-Order Functions]]
+  - [[#highly-generic-programming][Highly Generic Programming]]
+- [[#generative-recursion-and-tail-recursion][Generative Recursion and Tail Recursion]]
+  - [[#broad-goals][Broad Goals]]
+  - [[#generative-recursion][Generative Recursion]]
+  - [[#abstracting-generative-recursion][Abstracting Generative Recursion]]
 - [[#abstract-syntax-and-parsing][Abstract Syntax and Parsing]]
   - [[#the-big-picture][The Big Picture]]
   - [[#describing-syntax][Describing Syntax]]
@@ -87,24 +95,16 @@
   - [[#overview-1][Overview]]
   - [[#environments][Environments]]
   - [[#implementing-let][Implementing Let]]
-- [[#functional-programming-2-first-class-functions][Functional Programming 2: First-Class Functions]]
-  - [[#higher-order-functions][Higher Order Functions]]
-- [[#polymorphic-higher-order-functions][Polymorphic Higher-Order Functions]]
-  - [[#highly-generic-programming][Highly Generic Programming]]
 - [[#implementing-lambdas-with-substitution-and-dynamic-typing][Implementing Lambdas with Substitution and Dynamic Typing]]
   - [[#broad-strategy][Broad Strategy]]
 - [[#implementing-lambdas-with-environments-closures][Implementing Lambdas with Environments: Closures]]
-  - [[#broad-goals][Broad Goals]]
+  - [[#broad-goals-1][Broad Goals]]
   - [[#the-details][The Details]]
   - [[#but-professor-when-will-i-ever-use-this][But Professor, When Will I Ever Use This?]]
 - [[#midterm-review][Midterm Review]]
   - [[#overview-2][Overview]]
   -  [[#functional-programming-concepts][Functional Programming Concepts]]
   - [[#higher-order-functions-1][Higher Order Functions]]
-- [[#generative-recursion-and-tail-recursion][Generative Recursion and Tail Recursion]]
-  - [[#broad-goals-1][Broad Goals]]
-  - [[#generative-recursion][Generative Recursion]]
-  - [[#abstracting-generative-recursion][Abstracting Generative Recursion]]
 - [[#currying-and-the-lambda-calculus][Currying and the Lambda Calculus]]
   - [[#overview-3][Overview]]
   - [[#currying][Currying]]
@@ -370,7 +370,7 @@ To learn:
 *** Intro
 
 **** Questions?
-* Functional Programming 1: Recursion and Immutable Data
+*  Recursion and Immutable Data
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides002-plait.pdf
 :header-args:racket: :results code :lang plait
@@ -897,7 +897,7 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
   + Filtering out odd elements of a list
 
 
-* Functional Programming 2: Defining Data Types
+* Defining Data Types
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides003-datatypes.pdf
 :header-args:racket: :results code :lang plait
@@ -1171,6 +1171,739 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
 #+end_src
 
 
+* First-Class Functions
+:PROPERTIES:
+:EXPORT_FILE_NAME: pdf/slides010-lambda.pdf
+:header-args:racket: :results code :lang plait
+:CUSTOM_ID: functional-programming-2-first-class-functions
+:END:
+#+beamer: \beamerdefaultoverlayspecification{<+->}
+** Higher Order Functions
+:PROPERTIES:
+:CUSTOM_ID: higher-order-functions
+:END:
+*** Functions on Functions
+- Functions let us be abstract over the data they work on
+- But why can't we be abstract over what they do to that data?
+  + We can!
+- A *higher order function* is a function that takes functions as an argument,
+  or returns functions as a value.
+- Examples:
+  + Callbacks
+    - Give a GUI element the function to run when clicked
+  + Threads
+    - Give the function for each thread to compute
+*** Function types
+- Type ~(T1 T2 ... Tn -> S)~
+  + The type of functions that:
+    - take $n$ arguments
+    - each with type $T_i$ respectively
+    - produces a result of type $S$
+- Functions can be defined, where their arguments /are function types!/
+*** First Class Functions
+- We say a language has /first class functions/ if functions are treated like any
+  other expression/value in a language
+  + We can construct them at any point, not just at the top level
+  + We can give them as arguments to functions
+  + We can return them as results of functions
+*** Example: Repeatedly apply a function
+#+name: applyNTimes
+#+begin_src racket
+(define (applyNTimes [f : (Number -> Number)]
+                     [x : Number]
+                     [nTimes : Number]) : Number
+  (if (<= nTimes 0)
+      x
+      (applyNTimes f (f x) (- nTimes 1))))
+#+end_src
+
+
+- Takes 3 arguments
+  + A function from Number to Number
+  + A number
+  + A number
+- Returns a number
+- In the body:
+  + Calls the parameter ~f~ as a function on ~x~
+
+*** ctd
+#+begin_src racket :noweb strip-export :exports both
+<<applyNTimes>>
+(define (timesTen x) (* 10 x))
+
+(applyNTimes add1 3 5)
+(applyNTimes timesTen 3 5)
+#+end_src
+- Takes whatever function we pass in, applies it to 3, 5 times
+  + ~(f (f (f (f (f 3)))))~
+*** Example: apply an operation to each number in a list
+#+name: mapNum
+#+begin_src racket
+(define (mapNum [f : (Number -> Number)]
+                [xs : (Listof Number)]) : (Listof Number)
+  (type-case (Listof Number) xs
+             [empty empty]
+             [(cons x rest)
+                (cons (f x) (mapNum f rest))]))
+#+end_src
+- Takes a function from Numbers to Numbers, and a list of numbers
+- Applies ~f~ to each element of the list
+  + Apply ~f~ to everything in the empty list
+    - Produces empty list
+  + Apply ~f~ to each in  ~(cons x rest)~
+    - Apply ~f~ to ~x~, recursively apply ~f~ to everything in ~rest~
+    - Combine the results with ~cons~
+
+*** ctd
+#+begin_src racket :exports both :noweb strip-export
+<<mapNum>>
+(define (timesTen x) (* 10 x))
+(mapNum add1 '(1 2 3 4))
+(mapNum timesTen '(1 2 3 4))
+#+end_src
+*** Creating Anonymous Functions
+- So far, have only given functions that we defined with ~define~ as arguments to other functions
+- What if we want to make a small little function that we use only once?
+- What if we want to make a function dynamically?
+*** Lambda
+#+begin_src
+(lambda (x) body)
+#+end_src
+- Creates a function with argument ~x~ that returns ~body~
+- ~x~ may occur in body
+- Is an expression, not a declaration
+  + Can occur anywhere else
+*** Lambda variations
+#+begin_src racket
+;; Type annotation
+(lambda ([x : Number]) : Number
+  (+ x 1))
+
+;; Multiple arguments
+(lambda (x y) (+ x (+ x y)))
+
+;;Multiple type annotations
+(lambda ([x : Number]
+   [y : Number]) (+ x (+ x y)))
+
+;; Unicode Greek lambda
+;; In Dr. Racket: either cmd-\ or ctrl-\ depending on os
+(λ (x) (+ x x))
+#+end_src
+*** Example
+#+begin_src racket :exports both :noweb strip-export
+<<mapNum>>
+(define (timesTen x) (* 10 x))
+(mapNum timesTen '(1 2 3 4))
+(mapNum (lambda (x) (* x 10)) '(1 2 3 4))
+#+end_src
+
+
+*** Define as sugar
+- ~(define (f x) body)~
+- Same as ~(define f (lambda (x) body))~
+- Defining functions is /syntactic sugar/ for lambda in Plait
+
+*** Lambda in a context
+- Don't have to use lambda at the top level
+- Can refer to other variables in the body of the lambda
+#+begin_src racket :noweb strip-export :exports both
+<<mapNum>>
+(define (addNToEach [numToAdd : Number]
+                    [xs : (Listof Number)]) : (Listof Number)
+  (mapNum (lambda(x) (+ x numToAdd)) xs))
+(addNToEach 3 '(1 2 3 4))
+#+end_src
+
+#+RESULTS:
+#+begin_src racket
+'(4 5 6 7)
+#+end_src
+- The lambda *captures* the variable ~numToAdd~
+- Dynamically creates the function that adds its argument to whatever ~numToAdd~ is
+
+*** Functions as return values
+- We can also make functions that produce other functions as a result
+  + Just use ~lambda~ in the body of the function
+#+begin_src racket :noweb strip-export :exports both
+<<mapNum>>
+(define (makeAdderWith n) : (Number -> Number)
+  (lambda (x) (+ n x)))
+(makeAdderWith 3)
+(mapNum (makeAdderWith 3))
+#+end_src
+
+*** Combinators
+- Functions that take and return functions
+- Can "lift" operations to whole functions
+- Create a new function by specifying how it should behave on each input
+  + Lambda lets us refer to this variable
+#+begin_src racket :noweb strip-export :exports both
+<<mapNum>>
+(define (+fun [f : (Number -> Number)]
+              [g : (Number -> Number)]) : (Number -> Number)
+  (lambda (x) (+ (f x) (g x))))
+;; e.g. Make the function that computes
+#+end_src
+
+*** Example: Beyond Numbers
+#+begin_src racket :exports both
+(define (liftOption [f : (Number -> Number)])
+  : ((Optionof Number) -> (Optionof Number))
+  (lambda ([optionN : (Optionof Number)])
+    (type-case (Optionof Number) optionN
+      [(none) (none)]
+      [(some x) (some (f x))]
+      )))
+(define optionPlusOne (liftOption add1))
+(optionPlusOne (some 3))
+(optionPlusOne (none))
+#+end_src
+
+#+RESULTS:
+#+begin_src racket
+(some 4)
+(none)
+#+end_src
+
+* Polymorphic Higher-Order Functions
+:PROPERTIES:
+:EXPORT_FILE_NAME: pdf/slides011-map.pdf
+:header-args:racket: :results code :lang plait
+:CUSTOM_ID: polymorphic-higher-order-functions
+:END:
+#+beamer: \beamerdefaultoverlayspecification{<+->}
+** Highly Generic Programming
+:PROPERTIES:
+:CUSTOM_ID: highly-generic-programming
+:END:
+*** Polymorphic Functions
+- Higher-order functions are even more powerful when combined with type variables
+- Allows us to say "This works on any type, as long as that type supports this kind of operation"
+- Express ideas like "do this to every element in a list"
+*** Example: Sorting
+#+begin_src racket
+(define (sortNumbers [xs : (Listof Number)]) : (Listof Number)
+  ....)
+
+;; These implementations are probably doing 99% the same thing
+;; except they're using different comparison operators
+(define (sortById [xs : (Listof (Number * String))])
+        : (Listof (Number * String))
+  ....)
+
+;; What we really want is this:
+(define (sortBy [xs : (Listof 'a)]
+                [compare : ('a 'a -> Boolean)])
+  : (Listof 'a)
+  ....)
+#+end_src
+- Sort function that works on any type ~'a~
+  + So long as we have a comparison function ~compare~ that can find if one ~'a~ value is <= another
+*** Map
+- One of the most essential functions on list
+- For each element in the list, apply this function to each element
+  + Returns the resulting list, original list is unchanged
+- If your function takes in type ~'a~ and produces type ~'b~, then ~map~ can turn a ~(Listof 'a)~ into ~(Listof 'b)~
+#+begin_src racket
+(define (map [f : ('a -> 'b)]
+           [xs : (Listof 'a)]) : (Listof 'b)
+  (type-case (Listof 'a) xs
+             [empty
+               empty]
+             [(cons x rest)
+               (cons (f x)
+                     (map f rest))]))
+#+end_src
+*** Examples
+#+begin_src racket :exports both
+(map (lambda (x) (* x 1001)) '(1 2 3 4))
+(map not '(#t #f #f #t))
+(map some '("Hello" "Goodbye"))
+
+#+end_src
+
+#+RESULTS:
+#+begin_src racket
+'(1001 2002 3003 4004)
+'(#f #t #t #f)
+(list (some "Hello") (some "Goodbye"))
+#+end_src
+
+*** Map does recursion so you don't have to
+- Lots of times, we were writing code that looked exactly the same
+- Higher-order functions and polymorphism let you turn those patterns into an actual *function*
+
+
+*** Filter
+- Another common function on lists
+- Takes a *predicate* for some type:
+  + Look at two values and return either true or false
+  + Defines a property on that type
+- Returns a new list containing only the elements satisfying the predicate
+#+begin_src racket
+(define (filter [p : ('a  -> Boolean)]
+                [xs : (Listof 'a)]) : (Listof 'a)
+  (type-case (Listof 'a) xs
+             [empty
+               empty]
+             [(cons x rest)
+              ;; Check if the first element satisfies p
+              ;; If it does, include it in the results,
+              ;; otherwise omit
+               (if (p x)
+                   (cons x (filter p rest))
+                   (filter p rest))]))
+#+end_src
+
+*** Filter examples
+#+begin_src racket :exports both
+(filter (lambda (x) (zero? (modulo x 2)))
+        '(1 2 3 4 5 6))
+(filter some?
+        (list (none) (some "Hello") (none) (some "Goodbye")
+              (none) (none) (some "Cheers") (none)))
+(filter (lambda (x) (> x 1000000))
+        (list 1 2 3 4 (* 100000 100000)) )
+(filter (lambda (x) #f) '(1 2 3 4))
+#+end_src
+
+
+*** Using Filter: The Functional Quicksort
+#+name: quicksort
+#+begin_src racket
+(define (sortBy [compare : ('a 'a -> Boolean)]
+                [xs : (Listof 'a)]) : (Listof 'a)
+  (type-case (Listof 'a) xs
+             [empty
+               empty]
+             [(cons first rest)
+               (let*
+                 ([smallers
+                    (filter (lambda (x) (compare x first))
+                            rest)]
+                  [biggers
+                    (filter (lambda (x) (not (compare x first)))
+                            rest)])
+                 (append (sortBy compare smallers)
+                         (cons first
+                               (sortBy compare biggers))))]))
+
+#+end_src
+
+*** How Quicksort works
+- An empty list is already sorted
+- If a list has at least one element, we can partition that list into everything smaller than that element, and greater than that element
+- We recursively sort those lists
+- This gives us 3 lists:
+  + A sorted list of things smaller than (or equal to) the head
+  + The head
+  + A sorted list of things greater than (or equal to) the head
+- If we append these together in that order, the result will still be sorted
+  + And contains everything from the original list
+
+*** Quicksort Examples
+#+begin_src racket :noweb strip-export :exports both
+<<quicksort>>
+(sortBy <= '(5 4 1 5 3 9 7))
+
+(sortBy (lambda (x y) (<= (fst x) (fst y)))
+      (list (pair 5 "a") (pair 4 "b") (pair 1 "c") (pair 9 "d")))
+
+(sortBy (lambda (s1 s2) (<= (string-length s1) (string-length s2)))
+        (list "goodbye" "hey" "hello" "a" "arithmetic" ))
+#+end_src
+
+#+RESULTS:
+#+begin_src racket
+'(1 3 4 5 5 7 9)
+(list (values 1 "c") (values 4 "b") (values 5 "a") (values 9 "d"))
+'("a" "hey" "hello" "goodbye" "arithmetic")
+#+end_src
+
+*** Polymorphic Combinators
+- Combinators that are polymorphic are highly general
+  + Ways to build new functions out of old functions
+- Often used to build up arguments to map or filter
+
+*** Function Composition
+- For any two functions, we can chain them together
+  + If their types agree
+#+name: comp
+#+begin_src racket
+;; Written that way to match the symbol in math
+(define (o [g : ('b -> 'c)]
+           [f : ('a -> 'b)]) : ('a -> 'c)
+  (lambda (x)
+    (g (f x))))
+;; (g (f x)) = ((o g f) x) for all x
+;; Arguments in that order so that this equation looks nice
+#+end_src
+
+*** Example
+#+begin_src racket :noweb strip-export :exports both
+<<comp>>
+(map (o (lambda (x) (* x 10)) add1)
+   '(1 2 3 4))
+
+(filter (o not empty?)
+        (list '() '(1 2) '(3 2 1) '() '(1)))
+#+end_src
+
+#+RESULTS:
+#+begin_src racket
+'(20 30 40 50)
+'((1 2) (3 2 1) (1))
+#+end_src
+- See type example on the board
+
+*** Partial Application
+- For functions that take multiple arguments, we can get a new function by providing only one argument
+  #+name: curry
+  #+begin_src racket
+  (define (curry [f : ('a 'b -> 'c)]
+                 [x : 'a])
+          : ('b -> 'c)
+    (lambda (y) (f x y)))
+  #+end_src
+
+- Can reverse order of arguments
+
+  #+name: flip
+  #+begin_src racket
+  (define (flip [f : ('a 'b -> 'c)])
+    : ('b 'a -> 'c)
+    (lambda (bVal aVal) (f aVal bVal)))
+
+  #+end_src
+
+*** Example
+#+begin_src racket :noweb strip-export :exports both
+<<curry>>
+<<flip>>
+;; Gets (modulo x 2) for each x in the list
+(map (curry (flip modulo) 2)
+     '(1 2 3 4 5 6 7 8))
+#+end_src
+
+#+RESULTS:
+#+begin_src racket
+'(1 0 1 0 1 0 1 0)
+#+end_src
+
+*** Point Free Programming
+- When you build functions using combinators instead of lambda, it's called
+  /point free programming/
+- Building programs becomes kind of like putting Lego together
+- Generally, don't want to always use point-free programming
+  + Sometimes the lambda is just clearer
+- But can be easier to read in many cases
+
+* Generative Recursion and Tail Recursion
+:PROPERTIES:
+:EXPORT_FILE_NAME: pdf/slides015-tailrec.pdf
+:header-args:racket: :results code :lang plait
+:CUSTOM_ID: generative-recursion-and-tail-recursion
+:END:
+#+beamer: \beamerdefaultoverlayspecification{<+->}
+** Broad Goals
+:PROPERTIES:
+:CUSTOM_ID: broad-goals-0
+:END:
+*** Overview
+- Objectives
+  + Iteratively building solutions to problems in functional languages
+  + Implementing recursive procedures efficiently
+  + Capturing this pattern of recursion as a higher-order function
+- Key Concepts
+  + Generative recursion
+  + Tail-calls
+  + Tail-call elimination
+  + Folds
+** Generative Recursion
+:PROPERTIES:
+:CUSTOM_ID: generative-recursion
+:END:
+*** The Problem
+- Some problems don't obviously map to the style of recursion we've seen so far
+  + Or do, but not efficiently
+- Especially problems that are about incrementally updating a value
+  + No good way to talk about "the result so far"
+- e.g. What's the recursive version of:
+  #+begin_src c++
+  int x = startVal;
+  for (int i = 0; i < n; i++)
+  {
+    x = f(x);
+  }
+  #+end_src
+*** Example: Reversing a List The Naive Way
+#+name: reverse-slow
+#+begin_src racket :exports both
+(define (reverse [xs : (Listof 'a)]) : (Listof 'a)
+  (type-case (Listof 'a) xs
+    [empty empty]
+    [(cons h t)
+       (append (reverse t) (list h))]))
+(reverse '(1 2 3))
+(reverse '("hello" "goodbye"))
+#+end_src
+
+#+RESULTS: reverse-slow
+#+begin_src racket
+'(3 2 1)
+'("goodbye" "hello")
+#+end_src
+
+- Reversing the empty list produces the empty list
+- Reversing a list with one element means
+  + Reversing the tail of the list
+  + Putting the first element at the end of the new list
+- $\mathcal{O}(n^2)$: Each ~append~ has to walk through the whole list
+*** Reverse: What we want (conceptually)
+- Start with an empty list
+- Pop an element off the first list, then add it to our result list so far
+- When reach the end, have a reversed list
+*** An efficient reverse
+#+begin_src racket
+(define (reverseHelper [xs : (Listof 'a)]
+                       [listSoFar : (Listof 'a)]) : (Listof 'a)
+  (type-case (Listof 'a) xs
+    [empty
+       listSoFar]
+    [(cons h t)
+       (reverseHelper t (cons h listSoFar))]))
+(define (reverse xs) (reverseHelper xs '()))
+#+end_src
+
+- Helper function
+  + Base case: finished, produce the list we've built so far
+  + Recursive case: keep building, but on the tail of the list
+    - Call with head appended to ~listSoFar~
+- Main function calls the helper with the start value
+  + Empty list ~'()~
+*** General Template
+**** To write ~f : (Ty1 Ty2 ... TyN -> ReturnTy)~
++ Write a helper function with one extra argument
+  - Extra argument called the /accumulator/
+    + Often named ~accum~
+  - Has same type as return type
+    + ~fHelper : (Ty1 Ty2 ... TyN ReturnTy -> ReturnTy)~
++ Helper function is recursive
+  - Base case: return the accumulator
+  - Recursive case: call the helper recursively on the sub-value
+    + Compute an updated value for the result so far
+    + Pass it as the accumulator for the recursive call
++ Last step: ~f~ calls helper with initial accumulator value
+*** The Call Stack
+- In Racket (or any language), when we make a function call, we need to know what to do with the result
+  + In C/C++: where to execute after return is computed
+  + Keep track of the expression we'll plug the result into
+    - Note: We don't have a stack in Curly (yet) because our interpreter is written such that the Racket stack keeps track of where to return.
+- Each function call pushes onto the call stack, pops when it returns
+  + You've probably seen this when you get an error message in e.g. Python
+- Stack contents
+  + Body of function being currently computed
+  + Environment for that body
+  + Position in expression that's waiting for the result of this function
+    -  Called the /continuation/
+*** Stack Overflow
+- If the call stack gets too large, a /stack overflow/ can be triggered
+  + When the memory allocated for the stack is exceeded
+- Typically the stack has much less space than the heap (dynamically allocated memory)
+  + Specifics depend on the implementation of your language
+*** Example
+#+begin_src racket
+(define (g y z) (+ y z))
+(define (f x)
+  (cons (g x 1) '()))
+(f 3)
+#+end_src
+- Start:  stack top empty
+- Call ~f~:
+  + Push body ~(cons (g x 1) empty)~, env ~x := 3~, continuation is ~END_OF_PROGRAM~
+- Call ~g~
+  + Push body ~(+ y z)~, env ~y := 3, z := 1~, continuation is ~(cons [] '())~
+    - ~[]~ shows where the result of the body is used
+- Return (pop) : plug ~4~ in place of ~[]~ to get ~cons 4 '()~
+- Return (pop), see ~END_OF_PROGRAM~ marker, produce ~'(4)~ as result
+*** Returning a Function Call
+- Slightly different example
+#+begin_src racket
+(define (g y z) (+ y z))
+(define (f x)
+  (g x 1))
+(f 3)
+#+end_src
+- Start:  stack top empty
+- Call ~f~:
+  + Push body ~(g x 1)~, env ~x := 3~, continuation is ~END_OF_PROGRAM~
+- Call ~g~
+  + Push body ~(+ y z)~, env ~y := 3, z := 1~, continuation is ~[]~
+    - Result of ~g~ is value of ~f~'s body
+- Return (pop) : plug ~4~ in place of ~[]~ to get 4
+- Return (pop), see ~END_OF_PROGRAM~ marker, produce ~4~ as result
+*** What's The Difference?
+- In the first example, we had to take the result of the call to ~g~ and incorporate it into the result of ~f~
+  + By adding it as the first field of ~cons~
+- In the second example, the result of ~g~ /was/ the result of ~f~
+  + We never needed ~x~ in the environment after making the call to ~g~
+  + We never need the body of ~f~ after making the call to ~g~
+    - All the body of ~f~ tells us is to compute the body of ~g~
+- The Racket/Plait interpreter can just change the body and env on the stack, /without pushing to it/
+  + Mutation $\to$ fast
+*** Tail Calls
+- An expression is in *tail position* if it is
+  + The body of a function
+  + The branch of a conditional (if, type-case, etc.) that was in tail position
+- A function call in tail position is a *tail call*
+- A function is NOT a tail call if it is
+  + An argument to another function or constructor
+- Tail calls can be implemented as /jumps/ and /mutation/
+  + Don't need to add to the stack
+*** Tail Recursion
+- Tail recursion: when *all recursive calls in a function definition are tail calls*
+- Generative recursion (as described above) /is/ tail recursion
+- Tail recursive functions can be optimized into a loop
+  + No need to change the stack
+  + Recursive call $\to$ update parameters then jump
+  + Constant memory usage
+  + Less overhead
+*** Example: List Length in Constant Space
+#+begin_src racket
+(define (fast-length-helper [xs : (Listof 'a)]
+                            [accum : Number])
+  (type-case (Listof 'a) xs
+    [empty accum]
+    [(cons h t)
+       (fast-length-helper t (+ 1 accum))]))
+(define (fast-length xs) (fast-length-helper xs 0))
+#+end_src
+- Instead of computing the result directly, we incorporate the "result so far" into the new information from the non-recursive arguments
+- We keep computing by calling ~fast-length-helper~ recursively
+  + Parameter gets smaller
+  + Accumulator gets more information
+- Recursive call is tail call
+- Won't stack overflow, even on large arguments
+*** Live Example: Slow and Fast Factorial
+- See Racket in lecture
+*** A Note On Terminology
+- *Generative recursion* is when recursion works by building up (generating) a solution as an extra parameter, and returning that parameter in the base case
+- *Tail recursion* is when all recursive calls in a function are tail calls
+- Many examples we'll see in this course of tail recursion are also generative recursion, and vice versa
+  + Some counter-examples, e.g. ~foldr~ that we'll see soon
+*** Tail Recursion and While Loops
+- We can relate tail recursion to while loops in imperative languages
+#+begin_src c++
+x = initialValue;
+while (test(x)){
+ x = f(x);
+}
+return g(x);
+#+end_src
+- Is equivalent to
+#+begin_src  racket
+(define (helper x)
+  (if (test x)
+      (helper (f x))
+      (g x)))
+#+end_src
+- Updating multiple variables $\to$ multiple arguments to ~helper~
+*** Implicit vs. Explicit State
+- Once again, we see that functional languages can express the same patterns as imperative language
+- We can still express stateful computations in functional languages, but it's /explicit state/
+  + You can tell what state there is by looking at the type of a function
+  + Nothing is hidden from the
+- Bugs in code are often due to subtle interactions between mutable states
+  + Especially with parallelism/concurrency
+- The functional style means that no state is hidden
+  + Easier to debug state problems
+    - By hand, or with tools/linters
+** Abstracting Generative Recursion
+:PROPERTIES:
+:CUSTOM_ID: abstracting-generative-recursion
+:END:
+*** Objective
+- Goals
+  + To see how the pattern of generative recursion on lists can be represented concretely as a higher order function
+- Key Concepts
+  + ~foldl~ and ~foldr~
+*** Higher-Order Genrative Recursion: Folds
+- Recall: higher-order polymorphic functions let us turn design patterns into functions
+  + e.g. ~map~ for "do this to each element of a list"
+- Generative recursion is no exception
+*** Foldl
+#+name: foldl
+#+begin_src racket
+(define (foldl [f : ('a 'b -> 'b)]
+               [accum : 'b]
+               [xs : (Listof 'a)]) : 'b
+  (type-case (Listof 'a) xs
+    [empty
+      accum ]
+    [(cons h t)
+       (foldl f (f h accum) t)]))
+#+end_src
+- Generative recursion on a list as a function
+- Name ~foldl~ means "fold left"
+  + Processes elements in order
+- If list empty, gives whatever the initial ~accum~ was
+- If not empty, uses ~f~ to update the ~accum~ based on the first element of the list
+  + Then processes the rest of the list with a recursive call
+- Tail recursive, so fast and takes constant space
+*** Example: Reverse using folds
+#+begin_src racket :noweb strip-export :exports both
+<<foldl>>
+(define (fold-reverse [xs : (Listof 'elType)]) : (Listof 'elType)
+  (foldl (lambda (elem accum) (cons elem accum))
+         '()
+         xs))
+(fold-reverse '(1 2 3))
+#+end_src
+
+#+RESULTS:
+#+begin_src racket
+'(3 2 1)
+#+end_src
+- ~'a~ is ~'elType~, ~'b~ is ~(Listof 'elType)~
+- Update function type is ~('elType (Listof 'elType) -> (Listof 'elType))~
+- Initial accumulator is empty list, since we start with nothing
+- Update function adds the current element to the front of the list we've built so far
+*** Reasoning with foldl
+ - ~(foldl f init '(a b c d))~ gives:
+   +  ~(f d (f c (f b (f a init))))~
+ - Similar to normal recursion:
+   + Assume that ~accum~ has the correct result so far
+   + Find the ~f~ that incorporates the next element of the list into the new ~accum~
+ - For ~fold-reverse~
+   + Assume that ~accum~ has the correct reversal of the list we've seen so far. How do we incorporate the next element?
+     - We add it to the front, since it's the last of all elements we've seen so far, so the first in the reversed list
+     - Recursive call says "keep processing for the rest of the list"
+*** Non-tail Folds
+#+begin_src racket
+(define (foldr [f : ('a 'b -> 'b)]
+               [init : 'b]
+               [xs : (Listof 'a)]) : 'b
+  (type-case (Listof 'a) xs
+    [empty
+      init ]
+    [(cons h t)
+       (f h (foldr f init t))]))
+#+end_src
+- Like foldr, but processes the list right-to-left
+- ~(foldr f init '(a b c d))~ gives ~(f a (f b (f c (f d init))))~
+- Reasoning the exact same, except we assume the argument to ~f~
+  has the accumulator for all elements /after/ the current element
+- Generally ~foldl~ is faster
+*** List Recursion, Once And For All
+- ~foldr~ is the higher-order function version of pattern matching on lists
+  + Give an empty case (initial value)
+  + Give a function that incorporates head of the list with the recursive result on the rest of the list
+- ~foldl~ is the higher-order function version of generative recursion on lists
+  + Give an initial accumulator
+  + Give a way to update the accumulator for each element of the list
+- These two functions can replace (nearly) all pattern matching/recursion on lists
+- Examples (see lecture Racket file)
 
 * Abstract Syntax and Parsing
 :PROPERTIES:
@@ -2144,433 +2877,6 @@ emptyEnv
   + Behavior of ~subst~ on bound variables
   + What environment ~interp~ is passed for function bodies
 
-* Functional Programming 2: First-Class Functions
-:PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides010-lambda.pdf
-:header-args:racket: :results code :lang plait
-:CUSTOM_ID: functional-programming-2-first-class-functions
-:END:
-#+beamer: \beamerdefaultoverlayspecification{<+->}
-** Higher Order Functions
-:PROPERTIES:
-:CUSTOM_ID: higher-order-functions
-:END:
-*** Functions on Functions
-- Functions let us be abstract over the data they work on
-- But why can't we be abstract over what they do to that data?
-  + We can!
-- A *higher order function* is a function that takes functions as an argument,
-  or returns functions as a value.
-- Examples:
-  + Callbacks
-    - Give a GUI element the function to run when clicked
-  + Threads
-    - Give the function for each thread to compute
-*** Function types
-- Type ~(T1 T2 ... Tn -> S)~
-  + The type of functions that:
-    - take $n$ arguments
-    - each with type $T_i$ respectively
-    - produces a result of type $S$
-- Functions can be defined, where their arguments /are function types!/
-*** First Class Functions
-- We say a language has /first class functions/ if functions are treated like any
-  other expression/value in a language
-  + We can construct them at any point, not just at the top level
-  + We can give them as arguments to functions
-  + We can return them as results of functions
-*** Example: Repeatedly apply a function
-#+name: applyNTimes
-#+begin_src racket
-(define (applyNTimes [f : (Number -> Number)]
-                     [x : Number]
-                     [nTimes : Number]) : Number
-  (if (<= nTimes 0)
-      x
-      (applyNTimes f (f x) (- nTimes 1))))
-#+end_src
-
-
-- Takes 3 arguments
-  + A function from Number to Number
-  + A number
-  + A number
-- Returns a number
-- In the body:
-  + Calls the parameter ~f~ as a function on ~x~
-
-*** ctd
-#+begin_src racket :noweb strip-export :exports both
-<<applyNTimes>>
-(define (timesTen x) (* 10 x))
-
-(applyNTimes add1 3 5)
-(applyNTimes timesTen 3 5)
-#+end_src
-- Takes whatever function we pass in, applies it to 3, 5 times
-  + ~(f (f (f (f (f 3)))))~
-*** Example: apply an operation to each number in a list
-#+name: mapNum
-#+begin_src racket
-(define (mapNum [f : (Number -> Number)]
-                [xs : (Listof Number)]) : (Listof Number)
-  (type-case (Listof Number) xs
-             [empty empty]
-             [(cons x rest)
-                (cons (f x) (mapNum f rest))]))
-#+end_src
-- Takes a function from Numbers to Numbers, and a list of numbers
-- Applies ~f~ to each element of the list
-  + Apply ~f~ to everything in the empty list
-    - Produces empty list
-  + Apply ~f~ to each in  ~(cons x rest)~
-    - Apply ~f~ to ~x~, recursively apply ~f~ to everything in ~rest~
-    - Combine the results with ~cons~
-
-*** ctd
-#+begin_src racket :exports both :noweb strip-export
-<<mapNum>>
-(define (timesTen x) (* 10 x))
-(mapNum add1 '(1 2 3 4))
-(mapNum timesTen '(1 2 3 4))
-#+end_src
-*** Creating Anonymous Functions
-- So far, have only given functions that we defined with ~define~ as arguments to other functions
-- What if we want to make a small little function that we use only once?
-- What if we want to make a function dynamically?
-*** Lambda
-#+begin_src
-(lambda (x) body)
-#+end_src
-- Creates a function with argument ~x~ that returns ~body~
-- ~x~ may occur in body
-- Is an expression, not a declaration
-  + Can occur anywhere else
-*** Lambda variations
-#+begin_src racket
-;; Type annotation
-(lambda ([x : Number]) : Number
-  (+ x 1))
-
-;; Multiple arguments
-(lambda (x y) (+ x (+ x y)))
-
-;;Multiple type annotations
-(lambda ([x : Number]
-   [y : Number]) (+ x (+ x y)))
-
-;; Unicode Greek lambda
-;; In Dr. Racket: either cmd-\ or ctrl-\ depending on os
-(λ (x) (+ x x))
-#+end_src
-*** Example
-#+begin_src racket :exports both :noweb strip-export
-<<mapNum>>
-(define (timesTen x) (* 10 x))
-(mapNum timesTen '(1 2 3 4))
-(mapNum (lambda (x) (* x 10)) '(1 2 3 4))
-#+end_src
-
-
-*** Define as sugar
-- ~(define (f x) body)~
-- Same as ~(define f (lambda (x) body))~
-- Defining functions is /syntactic sugar/ for lambda in Plait
-
-*** Lambda in a context
-- Don't have to use lambda at the top level
-- Can refer to other variables in the body of the lambda
-#+begin_src racket :noweb strip-export :exports both
-<<mapNum>>
-(define (addNToEach [numToAdd : Number]
-                    [xs : (Listof Number)]) : (Listof Number)
-  (mapNum (lambda(x) (+ x numToAdd)) xs))
-(addNToEach 3 '(1 2 3 4))
-#+end_src
-
-#+RESULTS:
-#+begin_src racket
-'(4 5 6 7)
-#+end_src
-- The lambda *captures* the variable ~numToAdd~
-- Dynamically creates the function that adds its argument to whatever ~numToAdd~ is
-
-*** Functions as return values
-- We can also make functions that produce other functions as a result
-  + Just use ~lambda~ in the body of the function
-#+begin_src racket :noweb strip-export :exports both
-<<mapNum>>
-(define (makeAdderWith n) : (Number -> Number)
-  (lambda (x) (+ n x)))
-(makeAdderWith 3)
-(mapNum (makeAdderWith 3))
-#+end_src
-
-*** Combinators
-- Functions that take and return functions
-- Can "lift" operations to whole functions
-- Create a new function by specifying how it should behave on each input
-  + Lambda lets us refer to this variable
-#+begin_src racket :noweb strip-export :exports both
-<<mapNum>>
-(define (+fun [f : (Number -> Number)]
-              [g : (Number -> Number)]) : (Number -> Number)
-  (lambda (x) (+ (f x) (g x))))
-;; e.g. Make the function that computes
-#+end_src
-
-*** Example: Beyond Numbers
-#+begin_src racket :exports both
-(define (liftOption [f : (Number -> Number)])
-  : ((Optionof Number) -> (Optionof Number))
-  (lambda ([optionN : (Optionof Number)])
-    (type-case (Optionof Number) optionN
-      [(none) (none)]
-      [(some x) (some (f x))]
-      )))
-(define optionPlusOne (liftOption add1))
-(optionPlusOne (some 3))
-(optionPlusOne (none))
-#+end_src
-
-#+RESULTS:
-#+begin_src racket
-(some 4)
-(none)
-#+end_src
-
-* Polymorphic Higher-Order Functions
-:PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides011-map.pdf
-:header-args:racket: :results code :lang plait
-:CUSTOM_ID: polymorphic-higher-order-functions
-:END:
-#+beamer: \beamerdefaultoverlayspecification{<+->}
-** Highly Generic Programming
-:PROPERTIES:
-:CUSTOM_ID: highly-generic-programming
-:END:
-*** Polymorphic Functions
-- Higher-order functions are even more powerful when combined with type variables
-- Allows us to say "This works on any type, as long as that type supports this kind of operation"
-- Express ideas like "do this to every element in a list"
-*** Example: Sorting
-#+begin_src racket
-(define (sortNumbers [xs : (Listof Number)]) : (Listof Number)
-  ....)
-
-;; These implementations are probably doing 99% the same thing
-;; except they're using different comparison operators
-(define (sortById [xs : (Listof (Number * String))])
-        : (Listof (Number * String))
-  ....)
-
-;; What we really want is this:
-(define (sortBy [xs : (Listof 'a)]
-                [compare : ('a 'a -> Boolean)])
-  : (Listof 'a)
-  ....)
-#+end_src
-- Sort function that works on any type ~'a~
-  + So long as we have a comparison function ~compare~ that can find if one ~'a~ value is <= another
-*** Map
-- One of the most essential functions on list
-- For each element in the list, apply this function to each element
-  + Returns the resulting list, original list is unchanged
-- If your function takes in type ~'a~ and produces type ~'b~, then ~map~ can turn a ~(Listof 'a)~ into ~(Listof 'b)~
-#+begin_src racket
-(define (map [f : ('a -> 'b)]
-           [xs : (Listof 'a)]) : (Listof 'b)
-  (type-case (Listof 'a) xs
-             [empty
-               empty]
-             [(cons x rest)
-               (cons (f x)
-                     (map f rest))]))
-#+end_src
-*** Examples
-#+begin_src racket :exports both
-(map (lambda (x) (* x 1001)) '(1 2 3 4))
-(map not '(#t #f #f #t))
-(map some '("Hello" "Goodbye"))
-
-#+end_src
-
-#+RESULTS:
-#+begin_src racket
-'(1001 2002 3003 4004)
-'(#f #t #t #f)
-(list (some "Hello") (some "Goodbye"))
-#+end_src
-
-*** Map does recursion so you don't have to
-- Lots of times, we were writing code that looked exactly the same
-- Higher-order functions and polymorphism let you turn those patterns into an actual *function*
-
-
-*** Filter
-- Another common function on lists
-- Takes a *predicate* for some type:
-  + Look at two values and return either true or false
-  + Defines a property on that type
-- Returns a new list containing only the elements satisfying the predicate
-#+begin_src racket
-(define (filter [p : ('a  -> Boolean)]
-                [xs : (Listof 'a)]) : (Listof 'a)
-  (type-case (Listof 'a) xs
-             [empty
-               empty]
-             [(cons x rest)
-              ;; Check if the first element satisfies p
-              ;; If it does, include it in the results,
-              ;; otherwise omit
-               (if (p x)
-                   (cons x (filter p rest))
-                   (filter p rest))]))
-#+end_src
-
-*** Filter examples
-#+begin_src racket :exports both
-(filter (lambda (x) (zero? (modulo x 2)))
-        '(1 2 3 4 5 6))
-(filter some?
-        (list (none) (some "Hello") (none) (some "Goodbye")
-              (none) (none) (some "Cheers") (none)))
-(filter (lambda (x) (> x 1000000))
-        (list 1 2 3 4 (* 100000 100000)) )
-(filter (lambda (x) #f) '(1 2 3 4))
-#+end_src
-
-
-*** Using Filter: The Functional Quicksort
-#+name: quicksort
-#+begin_src racket
-(define (sortBy [compare : ('a 'a -> Boolean)]
-                [xs : (Listof 'a)]) : (Listof 'a)
-  (type-case (Listof 'a) xs
-             [empty
-               empty]
-             [(cons first rest)
-               (let*
-                 ([smallers
-                    (filter (lambda (x) (compare x first))
-                            rest)]
-                  [biggers
-                    (filter (lambda (x) (not (compare x first)))
-                            rest)])
-                 (append (sortBy compare smallers)
-                         (cons first
-                               (sortBy compare biggers))))]))
-
-#+end_src
-
-*** How Quicksort works
-- An empty list is already sorted
-- If a list has at least one element, we can partition that list into everything smaller than that element, and greater than that element
-- We recursively sort those lists
-- This gives us 3 lists:
-  + A sorted list of things smaller than (or equal to) the head
-  + The head
-  + A sorted list of things greater than (or equal to) the head
-- If we append these together in that order, the result will still be sorted
-  + And contains everything from the original list
-
-*** Quicksort Examples
-#+begin_src racket :noweb strip-export :exports both
-<<quicksort>>
-(sortBy <= '(5 4 1 5 3 9 7))
-
-(sortBy (lambda (x y) (<= (fst x) (fst y)))
-      (list (pair 5 "a") (pair 4 "b") (pair 1 "c") (pair 9 "d")))
-
-(sortBy (lambda (s1 s2) (<= (string-length s1) (string-length s2)))
-        (list "goodbye" "hey" "hello" "a" "arithmetic" ))
-#+end_src
-
-#+RESULTS:
-#+begin_src racket
-'(1 3 4 5 5 7 9)
-(list (values 1 "c") (values 4 "b") (values 5 "a") (values 9 "d"))
-'("a" "hey" "hello" "goodbye" "arithmetic")
-#+end_src
-
-*** Polymorphic Combinators
-- Combinators that are polymorphic are highly general
-  + Ways to build new functions out of old functions
-- Often used to build up arguments to map or filter
-
-*** Function Composition
-- For any two functions, we can chain them together
-  + If their types agree
-#+name: comp
-#+begin_src racket
-;; Written that way to match the symbol in math
-(define (o [g : ('b -> 'c)]
-           [f : ('a -> 'b)]) : ('a -> 'c)
-  (lambda (x)
-    (g (f x))))
-;; (g (f x)) = ((o g f) x) for all x
-;; Arguments in that order so that this equation looks nice
-#+end_src
-
-*** Example
-#+begin_src racket :noweb strip-export :exports both
-<<comp>>
-(map (o (lambda (x) (* x 10)) add1)
-   '(1 2 3 4))
-
-(filter (o not empty?)
-        (list '() '(1 2) '(3 2 1) '() '(1)))
-#+end_src
-
-#+RESULTS:
-#+begin_src racket
-'(20 30 40 50)
-'((1 2) (3 2 1) (1))
-#+end_src
-- See type example on the board
-
-*** Partial Application
-- For functions that take multiple arguments, we can get a new function by providing only one argument
-  #+name: curry
-  #+begin_src racket
-  (define (curry [f : ('a 'b -> 'c)]
-                 [x : 'a])
-          : ('b -> 'c)
-    (lambda (y) (f x y)))
-  #+end_src
-
-- Can reverse order of arguments
-
-  #+name: flip
-  #+begin_src racket
-  (define (flip [f : ('a 'b -> 'c)])
-    : ('b 'a -> 'c)
-    (lambda (bVal aVal) (f aVal bVal)))
-
-  #+end_src
-
-*** Example
-#+begin_src racket :noweb strip-export :exports both
-<<curry>>
-<<flip>>
-;; Gets (modulo x 2) for each x in the list
-(map (curry (flip modulo) 2)
-     '(1 2 3 4 5 6 7 8))
-#+end_src
-
-#+RESULTS:
-#+begin_src racket
-'(1 0 1 0 1 0 1 0)
-#+end_src
-
-*** Point Free Programming
-- When you build functions using combinators instead of lambda, it's called
-  /point free programming/
-- Building programs becomes kind of like putting Lego together
-- Generally, don't want to always use point-free programming
-  + Sometimes the lambda is just clearer
-- But can be easier to read in many cases
 * Implementing Lambdas with Substitution and Dynamic Typing
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides012-dyntype.pdf
@@ -3242,311 +3548,6 @@ myFunction().then(
   + Look at what you can build using what's in scope
 - The way to build a function is with ~lambda~
 
-* Generative Recursion and Tail Recursion
-:PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides015-tailrec.pdf
-:header-args:racket: :results code :lang plait
-:CUSTOM_ID: generative-recursion-and-tail-recursion
-:END:
-#+beamer: \beamerdefaultoverlayspecification{<+->}
-** Broad Goals
-:PROPERTIES:
-:CUSTOM_ID: broad-goals-0
-:END:
-*** Overview
-- Objectives
-  + Iteratively building solutions to problems in functional languages
-  + Implementing recursive procedures efficiently
-  + Capturing this pattern of recursion as a higher-order function
-- Key Concepts
-  + Generative recursion
-  + Tail-calls
-  + Tail-call elimination
-  + Folds
-** Generative Recursion
-:PROPERTIES:
-:CUSTOM_ID: generative-recursion
-:END:
-*** The Problem
-- Some problems don't obviously map to the style of recursion we've seen so far
-  + Or do, but not efficiently
-- Especially problems that are about incrementally updating a value
-  + No good way to talk about "the result so far"
-- e.g. What's the recursive version of:
-  #+begin_src c++
-  int x = startVal;
-  for (int i = 0; i < n; i++)
-  {
-    x = f(x);
-  }
-  #+end_src
-*** Example: Reversing a List The Naive Way
-#+name: reverse-slow
-#+begin_src racket :exports both
-(define (reverse [xs : (Listof 'a)]) : (Listof 'a)
-  (type-case (Listof 'a) xs
-    [empty empty]
-    [(cons h t)
-       (append (reverse t) (list h))]))
-(reverse '(1 2 3))
-(reverse '("hello" "goodbye"))
-#+end_src
-
-#+RESULTS: reverse-slow
-#+begin_src racket
-'(3 2 1)
-'("goodbye" "hello")
-#+end_src
-
-- Reversing the empty list produces the empty list
-- Reversing a list with one element means
-  + Reversing the tail of the list
-  + Putting the first element at the end of the new list
-- $\mathcal{O}(n^2)$: Each ~append~ has to walk through the whole list
-*** Reverse: What we want (conceptually)
-- Start with an empty list
-- Pop an element off the first list, then add it to our result list so far
-- When reach the end, have a reversed list
-*** An efficient reverse
-#+begin_src racket
-(define (reverseHelper [xs : (Listof 'a)]
-                       [listSoFar : (Listof 'a)]) : (Listof 'a)
-  (type-case (Listof 'a) xs
-    [empty
-       listSoFar]
-    [(cons h t)
-       (reverseHelper t (cons h listSoFar))]))
-(define (reverse xs) (reverseHelper xs '()))
-#+end_src
-
-- Helper function
-  + Base case: finished, produce the list we've built so far
-  + Recursive case: keep building, but on the tail of the list
-    - Call with head appended to ~listSoFar~
-- Main function calls the helper with the start value
-  + Empty list ~'()~
-*** General Template
-**** To write ~f : (Ty1 Ty2 ... TyN -> ReturnTy)~
-+ Write a helper function with one extra argument
-  - Extra argument called the /accumulator/
-    + Often named ~accum~
-  - Has same type as return type
-    + ~fHelper : (Ty1 Ty2 ... TyN ReturnTy -> ReturnTy)~
-+ Helper function is recursive
-  - Base case: return the accumulator
-  - Recursive case: call the helper recursively on the sub-value
-    + Compute an updated value for the result so far
-    + Pass it as the accumulator for the recursive call
-+ Last step: ~f~ calls helper with initial accumulator value
-*** The Call Stack
-- In Racket (or any language), when we make a function call, we need to know what to do with the result
-  + In C/C++: where to execute after return is computed
-  + Keep track of the expression we'll plug the result into
-    - Note: We don't have a stack in Curly (yet) because our interpreter is written such that the Racket stack keeps track of where to return.
-- Each function call pushes onto the call stack, pops when it returns
-  + You've probably seen this when you get an error message in e.g. Python
-- Stack contents
-  + Body of function being currently computed
-  + Environment for that body
-  + Position in expression that's waiting for the result of this function
-    -  Called the /continuation/
-*** Stack Overflow
-- If the call stack gets too large, a /stack overflow/ can be triggered
-  + When the memory allocated for the stack is exceeded
-- Typically the stack has much less space than the heap (dynamically allocated memory)
-  + Specifics depend on the implementation of your language
-*** Example
-#+begin_src racket
-(define (g y z) (+ y z))
-(define (f x)
-  (cons (g x 1) '()))
-(f 3)
-#+end_src
-- Start:  stack top empty
-- Call ~f~:
-  + Push body ~(cons (g x 1) empty)~, env ~x := 3~, continuation is ~END_OF_PROGRAM~
-- Call ~g~
-  + Push body ~(+ y z)~, env ~y := 3, z := 1~, continuation is ~(cons [] '())~
-    - ~[]~ shows where the result of the body is used
-- Return (pop) : plug ~4~ in place of ~[]~ to get ~cons 4 '()~
-- Return (pop), see ~END_OF_PROGRAM~ marker, produce ~'(4)~ as result
-*** Returning a Function Call
-- Slightly different example
-#+begin_src racket
-(define (g y z) (+ y z))
-(define (f x)
-  (g x 1))
-(f 3)
-#+end_src
-- Start:  stack top empty
-- Call ~f~:
-  + Push body ~(g x 1)~, env ~x := 3~, continuation is ~END_OF_PROGRAM~
-- Call ~g~
-  + Push body ~(+ y z)~, env ~y := 3, z := 1~, continuation is ~[]~
-    - Result of ~g~ is value of ~f~'s body
-- Return (pop) : plug ~4~ in place of ~[]~ to get 4
-- Return (pop), see ~END_OF_PROGRAM~ marker, produce ~4~ as result
-*** What's The Difference?
-- In the first example, we had to take the result of the call to ~g~ and incorporate it into the result of ~f~
-  + By adding it as the first field of ~cons~
-- In the second example, the result of ~g~ /was/ the result of ~f~
-  + We never needed ~x~ in the environment after making the call to ~g~
-  + We never need the body of ~f~ after making the call to ~g~
-    - All the body of ~f~ tells us is to compute the body of ~g~
-- The Racket/Plait interpreter can just change the body and env on the stack, /without pushing to it/
-  + Mutation $\to$ fast
-*** Tail Calls
-- An expression is in *tail position* if it is
-  + The body of a function
-  + The branch of a conditional (if, type-case, etc.) that was in tail position
-- A function call in tail position is a *tail call*
-- A function is NOT a tail call if it is
-  + An argument to another function or constructor
-- Tail calls can be implemented as /jumps/ and /mutation/
-  + Don't need to add to the stack
-*** Tail Recursion
-- Tail recursion: when *all recursive calls in a function definition are tail calls*
-- Generative recursion (as described above) /is/ tail recursion
-- Tail recursive functions can be optimized into a loop
-  + No need to change the stack
-  + Recursive call $\to$ update parameters then jump
-  + Constant memory usage
-  + Less overhead
-*** Example: List Length in Constant Space
-#+begin_src racket
-(define (fast-length-helper [xs : (Listof 'a)]
-                            [accum : Number])
-  (type-case (Listof 'a) xs
-    [empty accum]
-    [(cons h t)
-       (fast-length-helper t (+ 1 accum))]))
-(define (fast-length xs) (fast-length-helper xs 0))
-#+end_src
-- Instead of computing the result directly, we incorporate the "result so far" into the new information from the non-recursive arguments
-- We keep computing by calling ~fast-length-helper~ recursively
-  + Parameter gets smaller
-  + Accumulator gets more information
-- Recursive call is tail call
-- Won't stack overflow, even on large arguments
-*** Live Example: Slow and Fast Factorial
-- See Racket in lecture
-*** A Note On Terminology
-- *Generative recursion* is when recursion works by building up (generating) a solution as an extra parameter, and returning that parameter in the base case
-- *Tail recursion* is when all recursive calls in a function are tail calls
-- Many examples we'll see in this course of tail recursion are also generative recursion, and vice versa
-  + Some counter-examples, e.g. ~foldr~ that we'll see soon
-*** Tail Recursion and While Loops
-- We can relate tail recursion to while loops in imperative languages
-#+begin_src c++
-x = initialValue;
-while (test(x)){
- x = f(x);
-}
-return g(x);
-#+end_src
-- Is equivalent to
-#+begin_src  racket
-(define (helper x)
-  (if (test x)
-      (helper (f x))
-      (g x)))
-#+end_src
-- Updating multiple variables $\to$ multiple arguments to ~helper~
-*** Implicit vs. Explicit State
-- Once again, we see that functional languages can express the same patterns as imperative language
-- We can still express stateful computations in functional languages, but it's /explicit state/
-  + You can tell what state there is by looking at the type of a function
-  + Nothing is hidden from the
-- Bugs in code are often due to subtle interactions between mutable states
-  + Especially with parallelism/concurrency
-- The functional style means that no state is hidden
-  + Easier to debug state problems
-    - By hand, or with tools/linters
-** Abstracting Generative Recursion
-:PROPERTIES:
-:CUSTOM_ID: abstracting-generative-recursion
-:END:
-*** Objective
-- Goals
-  + To see how the pattern of generative recursion on lists can be represented concretely as a higher order function
-- Key Concepts
-  + ~foldl~ and ~foldr~
-*** Higher-Order Genrative Recursion: Folds
-- Recall: higher-order polymorphic functions let us turn design patterns into functions
-  + e.g. ~map~ for "do this to each element of a list"
-- Generative recursion is no exception
-*** Foldl
-#+name: foldl
-#+begin_src racket
-(define (foldl [f : ('a 'b -> 'b)]
-               [accum : 'b]
-               [xs : (Listof 'a)]) : 'b
-  (type-case (Listof 'a) xs
-    [empty
-      accum ]
-    [(cons h t)
-       (foldl f (f h accum) t)]))
-#+end_src
-- Generative recursion on a list as a function
-- Name ~foldl~ means "fold left"
-  + Processes elements in order
-- If list empty, gives whatever the initial ~accum~ was
-- If not empty, uses ~f~ to update the ~accum~ based on the first element of the list
-  + Then processes the rest of the list with a recursive call
-- Tail recursive, so fast and takes constant space
-*** Example: Reverse using folds
-#+begin_src racket :noweb strip-export :exports both
-<<foldl>>
-(define (fold-reverse [xs : (Listof 'elType)]) : (Listof 'elType)
-  (foldl (lambda (elem accum) (cons elem accum))
-         '()
-         xs))
-(fold-reverse '(1 2 3))
-#+end_src
-
-#+RESULTS:
-#+begin_src racket
-'(3 2 1)
-#+end_src
-- ~'a~ is ~'elType~, ~'b~ is ~(Listof 'elType)~
-- Update function type is ~('elType (Listof 'elType) -> (Listof 'elType))~
-- Initial accumulator is empty list, since we start with nothing
-- Update function adds the current element to the front of the list we've built so far
-*** Reasoning with foldl
- - ~(foldl f init '(a b c d))~ gives:
-   +  ~(f d (f c (f b (f a init))))~
- - Similar to normal recursion:
-   + Assume that ~accum~ has the correct result so far
-   + Find the ~f~ that incorporates the next element of the list into the new ~accum~
- - For ~fold-reverse~
-   + Assume that ~accum~ has the correct reversal of the list we've seen so far. How do we incorporate the next element?
-     - We add it to the front, since it's the last of all elements we've seen so far, so the first in the reversed list
-     - Recursive call says "keep processing for the rest of the list"
-*** Non-tail Folds
-#+begin_src racket
-(define (foldr [f : ('a 'b -> 'b)]
-               [init : 'b]
-               [xs : (Listof 'a)]) : 'b
-  (type-case (Listof 'a) xs
-    [empty
-      init ]
-    [(cons h t)
-       (f h (foldr f init t))]))
-#+end_src
-- Like foldr, but processes the list right-to-left
-- ~(foldr f init '(a b c d))~ gives ~(f a (f b (f c (f d init))))~
-- Reasoning the exact same, except we assume the argument to ~f~
-  has the accumulator for all elements /after/ the current element
-- Generally ~foldl~ is faster
-*** List Recursion, Once And For All
-- ~foldr~ is the higher-order function version of pattern matching on lists
-  + Give an empty case (initial value)
-  + Give a function that incorporates head of the list with the recursive result on the rest of the list
-- ~foldl~ is the higher-order function version of generative recursion on lists
-  + Give an initial accumulator
-  + Give a way to update the accumulator for each element of the list
-- These two functions can replace (nearly) all pattern matching/recursion on lists
-- Examples (see lecture Racket file)
 * Currying and the Lambda Calculus
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides016-currying.pdf
