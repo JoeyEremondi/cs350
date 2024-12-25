@@ -56,13 +56,13 @@
 
 * Contents :TOC_2_gh:
 - [[#introduction][Introduction]]
-  - [[#course-overview][Course Overview]]
-  - [[#motivation-functional-programming][Motivation: Functional Programming]]
-  - [[#motivation-interpreters][Motivation: Interpreters]]
+  - [[#course-details][Course Details]]
+  - [[#course-content][Course Content]]
 -  [[#recursion-and-immutable-data][Recursion and Immutable Data]]
+  - [[#overview][Overview]]
   - [[#programming-in-cs-350][Programming in CS 350]]
   - [[#racket][Racket]]
-  - [[#plait][Plait]]
+  - [[#flit][Flit]]
   - [[#functional-thinking-and-recursion][Functional Thinking and Recursion]]
   - [[#unbounded-data-lists][Unbounded Data: Lists]]
 - [[#defining-data-types][Defining Data Types]]
@@ -86,7 +86,7 @@
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 #+OPTIONS: todo:nil
 
-** Course Overview
+** Course Details
 :PROPERTIES:
 :CUSTOM_ID: course-overview
 :END:
@@ -102,45 +102,72 @@ To learn:
   + Desugaring
   + Evaluation
 
-- _To change how you /think/ about programming_
-*** Textbook
-- /Programming Languages: Application and Interpretation/, 2nd edition, by Shriram Krishnamurthi
+**** _To change how you /think/ about programming_
+*** Course Notes / Textbook
+- Course Notes: /Functional Languages, Interpreters and Types/
+  + Work in progress, so let me know if you discover any errors/issues
+  + Covers the first half of the course (Functional Programming)
+
+- Textbook: /Programming Languages: Application and Interpretation/, 3rd edition, by Shriram Krishnamurthi
   + aka PLAI
-  + Freely avaliable online, pdf in UR Courses
-- 3rd edition also available
-  + Optional additional reference
-  + Similar content but very different approach
-  + When in doubt, we're following the 2nd edition
+  + Freely available online, pdf in UR Courses
+  + Covers the second half of the course (Implementing Programming Languages)
+    - We'll follow loosely
 
 *** Course Communication
 - Everything on URCourses
   + Announcements
   + Assignments and Handin
   + Textbook, Slides, Videos
-  + Email
   + Discussion Forum
+  + Messages to Instructor
 
-- Do NOT ask programming/conceptual questions by email
+- Do NOT ask programming/conceptual questions by email/private message
   + Use the discussion forum
   + If you're wondering, others are too
   + EXCEPTION: when you can't ask your question without revealing
     your solution to the assignment
 
+*** Office Hours
+- Location: RIC 317
+  + Take the elevator, go across the bridge and through the door
+  + Or take the stairs by the "Church Turing Thesis" wall and vending machines
+- Tues at 10:30
+- Thurs at 11:30
+- Check pinned announcement on URCourses
+
 *** Grading Scheme
-  + 25% assignments
-  + 25% midterm
+  + 35% assignments
+  + 15% midterm
     - In-class
-    - Thursday, July 25
-  + 50% final
-    - Aug 19
-    - 2pm-5pm
-    - This room
-*** Assignments
+    - Wednesday, Feb 12
+  + 40% final
+  + 10% Participation
+
+*** Participation
+- You get marks just for showing up
+- Each lecture is 0.5%, to a maximum of 10%
+- Each forum post is 0.5%, maximum of 5%
+  + e.g. You need to attend half the lectures for full marks
+- Assignment 0 is 1% (counts as 2 lectures)
+
+
+*** Assignment 0
+- Due Friday, On URCourses
+- Get your Dr. Racket Set up
+  + Download from https://download.racket-lang.org/
+  + Install the ~cs350-winter2050.plt~ file from URCourses
+  + Full instructions on URCourses
+- Get your handin account setup
+  + Username and password under "Feedback" for Assignment 0
+  + Submit the assignment using [[./img/handin.png]]
+
+*** Assignments 1-6
 - Six weekly assignments
-- Due Tuesday at noon (11:59am)
+- Due Fridays at 5pm (17:00)
   + No extensions
-  + Lowest grade dropped
-- Submitted over UR Courses
+  + Lowest two grades dropped
+    - Last two are "optional" if you're happy with your marks
 *** Assignments (ctd.)
 - Mostly programming
   + Some conceptual questions
@@ -150,168 +177,139 @@ To learn:
   + Code doesn't run $->$ no marks
 - Some points for style/documentation/etc.
   +  Sample based marking
-*** Attendance
-- Attendance is mandatory but unenforced
-  + Lecture contents is fair game for exams
-- Lectures will contain walk-throughs of code
-  and problem solving examples
-- This is NOT a memorization-focused class
-- I'll do my best to post slides and example code from lectures
-  + But ultimately it's your responsibility to catch up on missed material
-*** Office Hours :
-- Mon 2:30-3:45pm
-- Mon 4:30-5:15pm
-- Wed 11:00am-11:45am
-- Thurs 2:30-3:45pm
-- RIC 317
-  + Take the elevator to 3rd floor, then go straight across
-*** LLM Policy
-**** Use of ChatGPT, GitHub Copilot, or any other Large Language Model or Generative AI is forbidden when completing the assignments for this class
-- Considered a violation of Academic Integrity
-**** ChatGPT has trouble with Racket/plait
-- Don't expect sympathy if you copy/paste code from an LLM that doesn't work
+*** Submitting Assignments via Handin
+- Unlimited submissions before deadline
+- After a submission, you get:
+  + A score
+  + A list of which public tests failed, along with expected results
+- *READ THE TEST RESULTS* to know what you need to fix
+
+*** Syntax and Type Errors
+- *ALL CODE CONTAINING SYNTAX OR TYPE ERRORS WILL GET A GRADE OF ZERO*
+  + The handin tool will give an error message if your file doesn't compile
+- If your code has a type or syntax error, you can try submitting again
+- It's better to submit code that fails some tests than to submit code with type or syntax errors
+
+
+*** Resources for This Course
+- There are few resources available for you to learn about ~flit~
+  + THIS IS BY DESIGN
+- You will learn to think about code
+  + With your brain
+  + Not with copy/paste or AI
+- ~flit~ is a small language
+  + All the features/functions you need will be described in the course notes
+- There are many languages built using Racket
+  + Copying code will probably get you a 0
+
+*** Academic Integrity
+- You are to complete all assignments *individually*
+- Some (easy) questions on assignments are individualized to you, and must be completed for your assignment to be graded.
+- All of the following are considered cheating:
+  + Using code from a local or online AI tool
+  + Copying code from a website like StackOverflow
+  + Viewing another student's solution
+- ChatGPT DOES NOT UNDERSTAND FLIT
+  + Getting AI code to work is harder than just doing the assignment
 **** Don't set yourself up for failure on the exams
-- Doing the assignments is the best way to study
-** Motivation: Functional Programming
-:PROPERTIES:
-:CUSTOM_ID: motivation-functional-programming
-:END:
-*** Programming in This Class
-- In plait
-  + i.e., "PLAI-typed"
-- Plait is
-  + a programming language
-  + a library for the Racket programming language
-- We'll learn more why this distinction is fuzzy
-*** What is Racket
-- A programming language for writing programming languages
-- LISP-like
-  - parentheses ~(((((((((())))))))))~
-  - functions are values just like anything else
-- Immutable: once a variable has a value, it never changes
-  + Racket does let you mutate variables,
-    but those parts of the language are *forbidden* in this class
-    - Unless otherwise specified
 
-*** Will I Ever Use Racket in Industry?
-**** \qquad
-*****   \centering\huge _No_
-*****   \centering (probably)
-*** Future Proofing
-- Don't know what you'll use in industry in 10 years
-  + If you know how languages work, you can learn /any/ language quickly
-  + Racket is effective for learning how languages work
+** Course Content
 
-*** Language Trends (from Google Trends)
+*** Course Objectives
+  Programming language genealogy and design.
 
-**** \colored{RoyalBlue}{Objective C} vs \colored{BrickRed}{Swift}
-[[./img/objc_vs_swift.png]]
+  Imperative, functional, and object-oriented language paradigms.
 
-**** \colored{RoyalBlue}{C++} vs \colored{BrickRed}{Python}
-[[./img/cpp_vs_python.png]]
-*** Syntax Vs Semantics
-- Semantics
-  + What a program /means/
-  + How a program behaves
-- Different syntaxes can have identical semantics
-- _Course goal:_ Learning to see past syntax and understand a program
-  as its semantics
-- Racket looks very different from other languages
-  + Expressions, not statements
-  + Recursion, not loops
-  + Parentheses & functions, not operators
-- Changes how you think about programs
+  Context-free grammars and syntax trees.
 
-*** Seeing Past Syntax
- By the end of the course, you should be able to look at these programs and intuitively
- know that they're doing the same thing:
+  Data types, control structures, exception handling, data abstraction, information hiding, and non-determinism.
 
-**** CPP
-:PROPERTIES:
-:BEAMER_col: 0.45
-:END:
-#+latex: {\scriptsize
-  #+begin_src C :exports code
-  int pow (int x, int y){
-    int ret = 1;
-    for (int i = 0; i < y; i++){
-      ret *= x;
-    }
-    return ret;
-  }
-  #+end_src
-#+latex: }
+  Program representation, translation, and execution.
 
-**** Racket
-:PROPERTIES:
-:BEAMER_col: 0.45
-:END:
-#+latex: {\scriptsize
-#+begin_src racket :exports code
-(define (pow x y)
-  (if
-    (<= y 0)
-    0
-    (* x (pow x (- y 1)))))
-#+end_src
-#+latex: }
+  Functional programming: advantages, constructs, closures, and higher-order operations.
+
+  Parallel programming.
+
+  \phantom{First half of the class}
+
+
+*** Course Objectives
+  Programming language genealogy and design.
+
+  Imperative, *functional*, and object-oriented language paradigms.
+
+  Context-free grammars and syntax trees.
+
+  Data types, control structures, exception handling, data abstraction, information hiding, and non-determinism.
+
+  Program representation, translation, and execution.
+
+  *Functional programming: advantages, constructs, closures, and higher-order operations.*
+
+  Parallel programming.
+
+  - /First half of the class: Programming in Flit/
+
+*** Course Objectives
+  *Programming language genealogy and design.*
+
+  *Imperative,* functional, and *object-oriented language paradigms.*
+
+  *Context-free grammars and syntax trees.*
+
+  Data types, control structures, exception handling, data abstraction, information hiding, and non-determinism.
+
+  *Program representation, translation, and execution.*
+
+  Functional programming: advantages, constructs, closures, and higher-order operations.
+
+  Parallel programming.
+
+  - /Second half of class: implementing interpreters/
 
 
 
-*** Functional Programming Going Mainstream?
-- We're seeing more languages adopt functional features
-- Anonymous functions/closures (lambda)
-  + Python, Ruby, JS, PHP, Swift, Go, Rust, etc.
+*** Common Questions
+- Am I going to use Racket in Industry?
+  + No
 
-  + Added to C++11
+*** Common Questions
+- Then why are we learning it
+  + Don't know what you'll be using in industry
+  + Learn a small language that shows core concept
+  + Learn the pieces that languages are made of
+    - How to see past syntax
+    - Understand what programs /mean/
+  + Then you'll be able to learn whatever language you need in industry
 
-  + Added in Java 8
-  + Most language have some form of ~map~ to apply a function to each element of a list
+*** Common Questions
+- Do you really expect me to learn a new language in just one term?
+  + Yes. *This is a programming languages class*.
+  + The language we're learning is small (really just functions and pattern matching)
 
-- Sum types
-  + Also called variants, algebraic datatypes
-  + Perfect for syntax trees
-  + Now in Python, Typescript, C++ (~std::variant~), Java (sealed interfaces), Rust (enums)
+*** When might this course be useful?
+- You might get hired to
+  + Write a JavaScript Node server using callbacks to handle requests
+  + Maintain a python library full of lambdas and list comprehension
+  + Add to Discord's chat system built in Elixr
+  # + Add to Wal-Mart's data management system, drowning in Clojure Parentheses
+  + Write an Android GUI using Kotlin, Jetpack Compose and function composition
+  + Write Rust at Amazon, or write an iPhone app in Swift, and need to use ~Option~ instead of null pointers
+- I can't teach you all of Kotlin, JavaScript, Elixr, Rust, Swift, Clojure, Scala, etc. in one term
+  + But I can teach you what they're made of
 
-- Learning these features in Racket will help if/when they show up in other languages in the future
-
-
-** Motivation: Interpreters
-:PROPERTIES:
-:CUSTOM_ID: motivation-interpreters
-:END:
-    
-*** Importance of Programming Languages
-- Interpreter: (Code , input) $\hookrightarrow$ (Output , effects)
-  + Effects: write to disk, display pixels, etc
-- You interact with a compiler or interpreter every time you:
-  + Write a program
-  + Run a program
-    - Python, JavaScript, JVM all use some kind of interpreter
-    - The CPU is just an interpreter for machine code
-
-*** Programming Languages Aren't Magic
-- Understanding how languages are implemented can help you understand your code
-  + Why is it slow/fast
-  + How to prevent/properly handle errors
-  + How to know that it's doing what you think it does
-
-*** Domain Specific Languages :noexport:
-- Small language for a particular kind of task
-
-*** Is this a hard course?
-**** Why interpreters are hard
-- By the end if this course, you will be able to write a program that is
-  powerful enough to simulate every other computer program that ever has or
-  ever will be written
-
-**** Why interpreters are easy
-- It's just a bunch of tree traversals
+*** The Science of Computer Science
+- How to think about programs in a rigorous way
+  + Programs as mathematical objects
+  + Equations with programs
+- Problem solving with types
+  + How to make sure you handle all the cases
+    - Making invalid states unrepresentable
+  + How the shape of a problem can guide to its solution
+  + Using types to communicate properties of code
+- This is radically different from the kind of coding you have done so far
 
 
-*** Intro
-
-**** Questions?
 *  Recursion and Immutable Data
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides002-plait.pdf
@@ -320,80 +318,114 @@ To learn:
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 
-*** Overview
-:PROPERTIES:
-:CUSTOM_ID: overview
-:END:
-- Topic: Functional Programming in Racket and plait
-- Required Reading:
-  + Plait tutorial (URCourses)
-- Optional Reference
-  + Plait videos, HtDP videos
+[[./img/xkcd_parens.png]]
+** Overview
+*** Objectives
+- To learn how to use Dr. Racket
+- To learn how to install and use ~#lang flit~
 ** Programming in CS 350
 *** All coding for this class uses:
 - The Racket Programming Language
-- The ~plait~ library for Racket
+- The ~flit~ library for Racket
+  + Is it a library? Is it a language?
+    - Yes
 - The Dr. Racket editor
 ** Racket
 *** What is Racket?
 - Lisp-style language
   + ~((((((((Parentheses))))))))~
 - Language for making languages
+  + You will find documentation for many of these languages online
+  + They are different from what we are doing. Beware!
 
 *** What is Dr. Racket?
 - IDE for Racket
   - Syntax highlighting
+  - Parentheses matching
   - Other useful features
+    +  Some I've developed custom for this class
 - Read-Eval-Print-Loop (REPL)
   + Feedback when writing code
   + Can  evaluate expressions while you're writing your code
-- Other editors are possible
-  + ... but you're on your own if you have problems
-  + see https://docs.racket-lang.org/guide/other-editors.html
 
-** Plait
-*** What is Plait?
-****  "PLAI-typed"
-**** Language defined in Racket
-- Racket functions you can call
-- Adds syntax to Racket
-  + Declaring and pattern matching on data types
-  + Type annotations for functions
-- Minimal
-  + Has what you need to write programming languages
-  + Not much else
-  + You can do a lot with very little
+** Flit
+*** What is Flit?
+- "Functional Languages, Interpreters and Types"
+- Language defined in Racket
+  + Functions you can call
+  + Adds syntax to Racket
+    - Declaring and pattern matching on data types
+    - Type annotations for functions
+  + Minimal
+    - Has what you need to write programming languages
+    - Not much else
+    - You can do a lot with very little
 
-*** Plait features:
 
+
+*** Flit features:
+- Purely functional
+  + Variables never change values
+  + Can't do ~int x = 3; x = 4;~
+- Strongly typed
+  + Every expression has a type
+  + No implicit coercion between types
 - Type inference
-  + Every expression is typed
   + Don't have to write down the types
-- Algebraic Data Types
+  + Writing types down is still a good idea
+    - Compiler checks if the actual type matches what you wrote
+    - Serves as documentation
+- Data Types with Variants
 
 
 
-*** Parentheses
-- Racket programs are trees called "S-expressions"
-- Parentheses give this tree structure
-- Default: parentheses mean function call
-  + Racket writes ~(f x)~, not ~f(x)~
-- ~x~ is not the same as ~(x)~
-  + ~x~ gets the value of the variable ~x~
-  + ~(x)~ is calling a function named ~x~ with zero arguments
+
+
+
+*** Syntax in Flit
+- Expression: something that we run to compute a value
+- Every flit expression is either:
+  + A literal (e.g. ~3, "hello", #t, #f~)
+  + An identifier (variable/function name), e.g. ~x, y, +, and, or~
+  + Parentheses containing some expression ~(a b c d ...)~
+- Parentheses mark the start and end of complex expressions
+- If the first thing in the parentheses is a keyword, then that keyword determines
+  the meaning of the expression
+  + e.g. ~if, lambda, type-case~
+- Otherwise, interpreted as a function call
+  + First thing in the parentheses is the function to be called
+    - NOT always a named function!
+
+*** Infix vs. Prefix
+- All operations in Flit are written using "prefix notation"
+  + Operation, then arguments
+  + ~(+ 2 3)~, not ~(2 + 3)~
+- Languages like C++ and Python use "infix notation" for math
+
+*** Function calls
+- In C++ you write ~f(x,y,z)~
+- In Flit, you write ~(f x y z)~
+- 99% of what you do in Flit is calling functions
+
+*** Why Parentheses?
+- They're different from what you're used to
+  + I want to to learn to see /past/ syntax
+- You can tell /exactly/ where an expression starts and ends
+- You can tell exactly the order of operations
+  + No need for BEDMAS/PEMDAS or precedence rules
+- Most importantly: *Programs are Trees*
+  + Hierarchical structure: expressions contain expressions contain expressions...
+  + Parentheses make this very explicit
+
+*** Parentheses in the real world
+- e.g. Clojure, uses parentheses
+- WebAssembly has an S-Expression based syntax for programmers
+- JSON is basically just funny-looking parentheses
+
 
 *** Numbers
-
-****   
-:PROPERTIES:
-:BEAMER_COL: 0.48
-:BEAMER_ENV: block
-:END:
-
-#+name: plait-numbers
+**** Example
 #+begin_src racket :exports both
-;;!!appear!!
-;;!!results!!
 (+ 2 7)
 (- 10 0.5)
 (* 1/3 2/3)
@@ -402,29 +434,24 @@ To learn:
 (modulo 10 3)
 #+end_src
 
-****    
-:PROPERTIES:
-:BEAMER_COL: 0.48
-:BEAMER_ENV: block
-:END:
-#+BEGIN_EXPORT latex
-\onslide<1->
-#+END_EXPORT
-#+RESULTS: plait-numbers
+#+RESULTS:
+#+begin_src racket
+9
+9.5
+2/9
+1e-12
+20
+1
+#+end_src
+
+
+
+
 
 
 *** Booleans
-
-****   
-:PROPERTIES:
-:BEAMER_COL: 0.68
-:BEAMER_ENV: block
-:END:
-
-#+name: plait-booleans
+**** Example
 #+begin_src racket :exports both
-;;!!appear!!
-;;!!results!!
 (= (+ 2 3) 5)
 (> (/ 0 1) 1)
 (zero? (- (+ 1 2) (+ 3 0)))
@@ -432,21 +459,45 @@ To learn:
 (or (zero? 1) (even? 3))
 #+end_src
 
-****    
-:PROPERTIES:
-:BEAMER_COL: 0.28
-:BEAMER_ENV: block
-:END:
-#+BEGIN_EXPORT latex
-\onslide<1->
-#+END_EXPORT
-#+RESULTS: plait-booleans
+#+RESULTS:
+#+begin_src racket
+#t
+#f
+#t
+#t
+#f
+#+end_src
 
 
-        
-***  Conditionals
-- Conditionals are *expressions*, not statements
-- Boolean changes what the expression *is*, not what it does
+
+*** Imperative Languages
+- C, C++, and Python are /imperative languages/
+  + Each statement tells what to /do/
+- Mutable state and side-effects
+    + Program state: current variable values
+    + Statements can change the state
+      - /Mutate/ value of variable
+
+*** Functional Language
+- Flit is /purely functional/
+- Program is made up of /expressions/
+  + These evaluate to a /value/
+- Variables are /immutable/
+  + Like variables in math
+  + Can make new ones, but value never changes
+- Use functions and recursion to do all computation
+
+*** Example: Imperative Conditionals
+- Conditionals in C++/Python tell what to /do/
+#+begin_src C++
+if (someCondition)
+  doThis
+else
+ doThat
+#+end_src
+- The if-statement doesn't have a value, but it can mutate (change) the state
+
+***  Conditional Expressions
 #+begin_src racket :exports both
 (if (< 2 3) "hello" "goodbye")
 (+ 3
@@ -454,6 +505,36 @@ To learn:
       3
       40))
 #+end_src
+
+#+RESULTS:
+#+begin_src racket
+"hello"
+6
+#+end_src
+
+- Conditionals in Flit are *expressions*, not statements
+- Value is either the "then" branch or the "else" branch
+  + Always have 2 branches
+- Boolean changes what the expression *is*, not what it does
+  + e.g. Above, the 2nd ~if~ evaluates to ~3~ because the condition evaluates to true
+
+*** Equational Reasoning
+- When all variables are immutable, we can treat programs as mathematical objects
+- Write equations about programs as if they were numbers/booleans/etc.
+- /Referential transparency/
+  + If you give a functional program the same inputs, you will always get the same outputs
+
+*** Imperative Breaks Equational Reasoning
+- In C++, the equals sign is a LIE
+  #+begin_src C++
+  int x;
+  x = 3;
+  x = 4;
+  #+end_src
+  - Have ~x = 3~ and ~x = 4~, so surely ~3 = 4~, right?
+
+*** Equations for IF
+#+transclude: [[file:notes.org::if-equations][Test]]
 
 ***  Functions
 - Calling a function replaces variable with concrete argument
@@ -596,7 +677,6 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
 
 *** Factorial - Examples
   #+begin_src racket
-   ;;!!appear!!
 
   (test (factorial 0) 1 )
   (test (factorial 1) 1 )
@@ -815,8 +895,6 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
     #+name: plait-concat
     #+begin_src racket :exports both :noweb strip-export
   <<plait-concat-def>>
-  ;;!!appear!!
-  ;;!!results!!
 
   (concat '(1 2 3) '(4 5 6))
   (concat '("3" "5") '("0"))
@@ -1208,7 +1286,7 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
 - What if we want to make a small little function that we use only once?
 - What if we want to make a function dynamically?
 *** Lambda
-#+begin_src
+#+begin_src racket
 (lambda (x) body)
 #+end_src
 - Creates a function with argument ~x~ that returns ~body~
@@ -1867,10 +1945,10 @@ return g(x);
 
 #+latex: {\tiny
 #+ATTR_LATEX: :align p{0.11\textwidth}p{0.11\textwidth}p{0.11\textwidth}p{0.11\textwidth}p{0.11\textwidth}p{0.11\textwidth}p{0.11\textwidth}
-| Source code | $\xrightarrow{\text{parsing}}$ | Abstract syntax tree | $\xrightarrow{translation}$ | Core Syntax                | $\xrightarrow{evaluation}$  | Result              |
-|             |                                |                      |                             |                            |                             |                     |
+| Source code           | $\xrightarrow{\text{parsing}}$        | Abstract syntax tree        | $\xrightarrow{translation}$          | Core Syntax                | $\xrightarrow{evaluation}$  | Result              |
+|                       |                                       |                             |                                      |                            |                             |                     |
 | \nohyphens{text file} | \nohyphens{lexing / tokenizing first} | \nohyphens{data structure } | \nohyphens{desugaring / compilation} | simpler AST / machine code | interpreter, execute on CPU | value, side effects |
-|             |                                |                      |                             |                            |                             |                     |
+|                       |                                       |                             |                                      |                            |                             |                     |
 #+latex: }
 
 
@@ -2054,7 +2132,7 @@ return g(x);
 *** The Church Turing Thesis
 
 #+ATTR_LATEX: :align p{0.2\textwidth}p{0.2\textwidth}p{0.2\textwidth}p{0.2\textwidth}
-|   | [[./img/Alonzo_church.jpg]]     | [[./img/goedel.jpg]]                        | [[./img/turing.jpg]]            |
+|   | [[./img/Alonzo_church.jpg]]         | [[./img/goedel.jpg]]                            | [[./img/turing.jpg]]                |
 |   | Alonzo Church                   | Kurt Gödel                                  | Alan Turing                     |
 |   |                                 |                                             |                                 |
 |   | /\nohyphens{(lambda calculus)}/ | /\nohyphens{(general recursive functions)}/ | /\nohyphens{(Turing machines)}/ |
@@ -5018,10 +5096,10 @@ return x; // or just do something with the final value of x
 
 #+latex: {\tiny
 #+ATTR_LATEX: :align p{0.11\textwidth}p{0.11\textwidth}p{0.11\textwidth}p{0.11\textwidth}p{0.11\textwidth}p{0.11\textwidth}p{0.11\textwidth}
-| Source code | $\xrightarrow{\text{parsing}}$ | Abstract syntax tree | $\xrightarrow{translation}$ | Core Syntax                | $\xrightarrow{evaluation}$  | Result              |
-|             |                                |                      |                             |                            |                             |                     |
+| Source code           | $\xrightarrow{\text{parsing}}$        | Abstract syntax tree        | $\xrightarrow{translation}$          | Core Syntax                | $\xrightarrow{evaluation}$  | Result              |
+|                       |                                       |                             |                                      |                            |                             |                     |
 | \nohyphens{text file} | \nohyphens{lexing / tokenizing first} | \nohyphens{data structure } | \nohyphens{desugaring / compilation} | simpler AST / machine code | interpreter, execute on CPU | value, side effects |
-|             |                                |                      |                             |                            |                             |                     |
+|                       |                                       |                             |                                      |                            |                             |                     |
 #+latex: }
 *** The Pipeline
 - Start with source code

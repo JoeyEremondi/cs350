@@ -529,6 +529,8 @@ If evaluating ~A~ produces ~#f~, then Flit evaluates ~C~ and produces its value 
 The true branch is not evaluated if the condition is false, and vice versa.
 
 We can describe ~if~ with the following equations:
+
+#+name: if-equations
 #+begin_definition Semantics of If
 For any expressions ~EXPR1~ and ~EXPR2~
 - ~(if #t EXPR1 EXPR2) = EXPR1~
