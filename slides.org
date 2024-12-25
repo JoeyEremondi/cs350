@@ -22,6 +22,7 @@
 #+COLUMNS: %45ITEM %10BEAMER_ENV(Env) %10BEAMER_ACT(Act) %4BEAMER_COL(Col)
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 
+#+BEAMER_THEME: moloch [block=fill]
 
 # -*- org-latex-packages-alist: nil; -*-
 
@@ -29,7 +30,7 @@
 
 
 # #+BEAMER_HEADER: \usetheme[customfont,nofooter]{pureminimalistic}
-#+BEAMER_HEADER: \usetheme{moloch}
+# #+BEAMER_HEADER: \usetheme[fill=]{moloch}
 # #+BEAMER_HEADER:\definecolor{textcolor}{RGB}{0, 0, 0}
 #+BEAMER_HEADER:\definecolor{title}{RGB}{2, 71, 49}
 # #+BEAMER_HEADER:\renewcommand{\beamertextcolor}{textcolor}
@@ -523,6 +524,9 @@ else
 - Write equations about programs as if they were numbers/booleans/etc.
 - /Referential transparency/
   + If you give a functional program the same inputs, you will always get the same outputs
+- Example:
+
+  #+transclude: [[file:notes.org::flit-plus-semantics][Semantics of Plus]]
 
 *** Imperative Breaks Equational Reasoning
 - In C++, the equals sign is a LIE
@@ -534,6 +538,8 @@ else
   - Have ~x = 3~ and ~x = 4~, so surely ~3 = 4~, right?
 
 *** Equations for IF
+- We can describe the behaviour of if-expressions with the following two equations:
+
 #+transclude: [[file:notes.org::if-equations][Test]]
 
 ***  Functions

@@ -495,6 +495,7 @@ We'll see a bit more of this [[#flit-tailrec][when we learn about tail recursion
 We will describe the semantics of Flit using /Equations/. Here is our first
 semantic equation:
 
+#+name: flit-plus-semantics
 #+begin_definition Semantics of +
 For any number literals ~m~ and ~n~, the expression ~(+ m n)~
 is equal to the sum of ~m~ and ~n~. The other arithmetic operations have similar rules.
@@ -530,12 +531,12 @@ The true branch is not evaluated if the condition is false, and vice versa.
 
 We can describe ~if~ with the following equations:
 
-#+name: if-equations
-#+begin_definition Semantics of If
-For any expressions ~EXPR1~ and ~EXPR2~
-- ~(if #t EXPR1 EXPR2) = EXPR1~
-- ~(if #f EXPR1 EXPR2) = EXPR2~
-#+end_definition
+        #+name: flit-if-equations
+        #+begin_definition Semantics of If
+        For any expressions ~EXPR1~ and ~EXPR2~
+        - ~(if #t EXPR1 EXPR2) = EXPR1~
+        - ~(if #f EXPR1 EXPR2) = EXPR2~
+        #+end_definition
 
 
 This is slightly different from ~if~ that you might have seen in C++ or Python.
@@ -557,6 +558,8 @@ Let's use the equational rules we have so far to evaluate some example code to a
 #+end_src
 
 We can deduce this result by applying our rules. We use the underscore ~_~ to show which part of the expression is being simplified by the rule.
+
+#+name: flit-if-example
 | Expression                                              | Rule                         |
 |---------------------------------------------------------+------------------------------|
 | ~(if _(< 3 4)_ (if (= (+ 2 6) 4) (* 3 33) (+ 50 50)) 9001)~ | /start expression/             |
