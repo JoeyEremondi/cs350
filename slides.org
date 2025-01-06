@@ -606,7 +606,7 @@ is equal to the sum of ~m~ and ~n~. The other arithmetic operations have similar
       - Same, as long as there's no side effects
 
 *** Alternate Versions of Let
-- TODO implement multi version as default
+- TODO implement multi version as default exported
 - ~let*~ : multiple definitions, later ones can refer to earlier ones
 - 99% of the time this is what you want to use
   #+begin_src racket
