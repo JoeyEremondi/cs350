@@ -26,7 +26,6 @@
 
 # -*- org-latex-packages-alist: nil; -*-
 
-# #+BEAMER_HEADER: \renewcommand{\pageword}{}
 
 
 # #+BEAMER_HEADER: \usetheme[customfont,nofooter]{pureminimalistic}
