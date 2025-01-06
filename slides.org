@@ -33,7 +33,6 @@
 # #+BEAMER_HEADER: \usetheme[fill=]{moloch}
 # #+BEAMER_HEADER:\definecolor{textcolor}{RGB}{0, 0, 0}
 #+BEAMER_HEADER:\definecolor{title}{RGB}{2, 71, 49}
-# #+BEAMER_HEADER:\renewcommand{\beamertextcolor}{textcolor}
 # #+BEAMER_HEADER:\renewcommand{\beamerfootertextcolor}{footercolor}
 # #+BEAMER_HEADER:\renewcommand{\beamertitlecolor}{title}
 # #+BEAMER_HEADER:\setbeamertemplate{frametitle}{\\setbeamercolor{alerted text}{fg=black}
