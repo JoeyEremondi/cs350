@@ -133,7 +133,7 @@ To learn:
 - Location: RIC 317
   + Take the elevator, go across the bridge and through the door
   + Or take the stairs by the "Church Turing Thesis" wall and vending machines
-- Tues at 10:30
+- Tues at 10:00
 - Thurs at 11:30
 - Check pinned announcement on URCourses
 
@@ -154,17 +154,17 @@ To learn:
 
 
 *** Assignment 0
-- Due Friday, On URCourses
+- Due Monday, On URCourses
 - Get your Dr. Racket Set up
   + Download from https://download.racket-lang.org/
-  + Install the ~cs350-winter2050.plt~ file from URCourses
+  + Install the plt file
   + Full instructions on URCourses
 - Get your handin account setup
-  + Username and password under "Feedback" for Assignment 0
+  + Username and password under "Feedback" for "Login Details"
   + Submit the assignment using [[./img/handin.png]]
 
 *** Assignments 1-6
-- Six weekly assignments
+- Six bi-weekly assignments
 - Due Fridays at 5pm (17:00)
   + No extensions
   + Lowest two grades dropped
@@ -526,7 +526,11 @@ else
   + If you give a functional program the same inputs, you will always get the same outputs
 - Example:
 
-  #+transclude: [[file:notes.org::flit-plus-semantics][Semantics of Plus]]
+#+name: flit-plus-semantics
+#+begin_definition Semantics of +
+For any number literals ~m~ and ~n~, the expression ~(+ m n)~
+is equal to the sum of ~m~ and ~n~. The other arithmetic operations have similar rules.
+#+end_definition
 
 *** Imperative Breaks Equational Reasoning
 - In C++, the equals sign is a LIE
@@ -540,7 +544,12 @@ else
 *** Equations for IF
 - We can describe the behaviour of if-expressions with the following two equations:
 
-#+transclude: [[file:notes.org::if-equations][Test]]
+        #+name: flit-if-equations
+        #+begin_definition Semantics of If
+        For any expressions ~EXPR1~ and ~EXPR2~
+        - ~(if #t EXPR1 EXPR2) = EXPR1~
+        - ~(if #f EXPR1 EXPR2) = EXPR2~
+        #+end_definition
 
 ***  Functions
 - Calling a function replaces variable with concrete argument
@@ -585,6 +594,7 @@ else
 
 
 *** Intermediate definitions
+
 - Can still define variables
   + Once they're given a value, never changes
   + Allows re-use
@@ -602,6 +612,21 @@ else
 8
 300000
 #+end_src
+
+*** Intermediate Definitions
+- In C++, you might write
+  #+begin_src c++
+  while (someCond){
+        int x = f(3);
+        doSomethingWith(x);
+        doSomethingElseWith(x);
+  }
+  #+end_src
+  - ~let~ is like this
+    + Scope is clear from the brackets
+    + Functional, so the ~doSomething~ never changes the value of ~x~
+    + Could have just written ~f(3~) instead of ~x~ in both places
+      - Same, as long as there's no side effects
 
 *** Alternate Versions of Let
 - ~let*~ : multiple definitions, later ones can refer to earlier ones
@@ -5284,6 +5309,3 @@ if (true){ // make the scope explicit
 Local Variables:
 org-latex-packages-alist: nil
 End:
-
-
-
