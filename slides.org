@@ -604,7 +604,7 @@ is equal to the sum of ~m~ and ~n~. The other arithmetic operations have similar
     + Functional, so the ~doSomething~ never changes the value of ~x~
     + Could have just written ~f(3~) instead of ~x~ in both places
       - Same, as long as there's no side effects
-    + TODO later definitions can refer to previous ones
+    + TODO later definitions can refer to ones from before
 
 *** Alternate Versions of Let
 - TODO remove this
