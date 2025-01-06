@@ -155,13 +155,15 @@ Whether you use your own computer or a lab computer, you will need to
 install the Package for this class. You can do this as follows:
 
 - Click "File > Install .plt File..."
-- In the URL box, paste ~TODO~
+- In the URL box, paste [[https://eremondi.com/cs350/plt/cs350.plt]]
 - Click "OK"
 
 This accomplishes two things:
 1. The ~flit~ language is now installed, so you can write programs beginning with ~#lang flit~.
 2. There is now button in the toolbar which you can use to submit your assignments.
 
+You may be asked to update periodically. You should install these updates, as they might
+include files relevant to specific assignments.
 
 ***** Changing Your Password
 You will be emailed a password for your account. If you wish to change your password,
