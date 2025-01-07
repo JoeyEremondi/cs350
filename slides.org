@@ -55,6 +55,7 @@
 
 #+PROPERTY: header-args  :cache yes
 
+#+SETUPFILE: readtheorg_inline.theme
 
 * Introduction
 :PROPERTIES:
