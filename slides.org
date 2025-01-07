@@ -28,13 +28,7 @@
 
 
 
-# #+BEAMER_HEADER: \usetheme[customfont,nofooter]{pureminimalistic}
-# #+BEAMER_HEADER: \usetheme[fill=]{moloch}
-# #+BEAMER_HEADER:\definecolor{textcolor}{RGB}{0, 0, 0}
 #+BEAMER_HEADER:\definecolor{title}{RGB}{2, 71, 49}
-# #+BEAMER_HEADER:\renewcommand{\beamerfootertextcolor}{footercolor}
-# #+BEAMER_HEADER:\renewcommand{\beamertitlecolor}{title}
-# #+BEAMER_HEADER:\setbeamertemplate{frametitle}{\\setbeamercolor{alerted text}{fg=black}
 #+BEAMER_HEADER: \setbeamercolor{alerted text}{fg=black}
 #+BEAMER_HEADER: \setbeamerfont{alerted text}{series=\bfseries}
 #+BEAMER_HEADER: \newcommand{\colored}[2]{{\color{#1} #2}}
