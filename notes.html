@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2025-01-06 Mon 21:18 -->
+<!-- 2025-01-06 Mon 21:22 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Functional Languages, Interpreters and Types: CS 350 Course Notes</title>
@@ -252,12 +252,12 @@ $(function() {    $('.definition').before("<p class='admonition-title note'>Defi
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgbd5f38b">1. Introduction</a>
+<li><a href="#orgca499fb">1. Introduction</a>
 <ul>
-<li><a href="#org896927c">1.1. For Students</a></li>
+<li><a href="#orga1250db">1.1. For Students</a></li>
 </ul>
 </li>
-<li><a href="#org721f67d">2. Part I: Functional Programming</a>
+<li><a href="#org7995f94">2. Part I: Functional Programming</a>
 <ul>
 <li><a href="#setup">2.1. Setup: Editor and Tooling</a></li>
 <li><a href="#racket-synax">2.2. The Syntax of Flit</a></li>
@@ -271,20 +271,20 @@ $(function() {    $('.definition').before("<p class='admonition-title note'>Defi
 <li><a href="#flit-tailrec">2.10. Tail-Calls and Generative Recursion</a></li>
 </ul>
 </li>
-<li><a href="#org5d96087">3. Glossary</a></li>
+<li><a href="#org1ff7e9a">3. Glossary</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orgbd5f38b" class="outline-2">
-<h2 id="orgbd5f38b"><span class="section-number-2">1.</span> Introduction</h2>
+<div id="outline-container-orgca499fb" class="outline-2">
+<h2 id="orgca499fb"><span class="section-number-2">1.</span> Introduction</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org896927c" class="outline-3">
-<h3 id="org896927c"><span class="section-number-3">1.1.</span> For Students</h3>
+<div id="outline-container-orga1250db" class="outline-3">
+<h3 id="orga1250db"><span class="section-number-3">1.1.</span> For Students</h3>
 <div class="outline-text-3" id="text-1-1">
 </div>
 <ol class="org-ol">
-<li><a id="org9692845"></a>What This Course Is About<br />
+<li><a id="org8459f2c"></a>What This Course Is About<br />
 <div class="outline-text-4" id="text-1-1-1">
 <p>
 If you take into a linguistics class, you will not take French one week, German the next, Mandarin after that, etc.
@@ -305,7 +305,7 @@ have very different features.
 </p>
 </div>
 </li>
-<li><a id="org132aa27"></a>Why Functional Programming?<br />
+<li><a id="orgea3c7f5"></a>Why Functional Programming?<br />
 <div class="outline-text-4" id="text-1-1-2">
 <p>
 In this course, we will learn about <i>functional programming,</i> where a variable's value never changes once it is set.
@@ -345,7 +345,7 @@ so that you are able to adapt and learn whatever language you need in your job t
 </p>
 </div>
 </li>
-<li><a id="org6041db9"></a>Why Interpreters?<br />
+<li><a id="org5331399"></a>Why Interpreters?<br />
 <div class="outline-text-4" id="text-1-1-3">
 <p>
 In addition to learning how to use language features, this course will teach you
@@ -375,8 +375,8 @@ and beauty that lies at the heart of computation.
 </ol>
 </div>
 </div>
-<div id="outline-container-org721f67d" class="outline-2">
-<h2 id="org721f67d"><span class="section-number-2">2.</span> Part I: Functional Programming</h2>
+<div id="outline-container-org7995f94" class="outline-2">
+<h2 id="org7995f94"><span class="section-number-2">2.</span> Part I: Functional Programming</h2>
 <div class="outline-text-2" id="text-2">
 </div>
 <div id="outline-container-setup" class="outline-3">
@@ -384,7 +384,7 @@ and beauty that lies at the heart of computation.
 <div class="outline-text-3" id="text-setup">
 </div>
 <ol class="org-ol">
-<li><a id="orgd63757f"></a>Dr. Racket and <code>#lang flit</code><br />
+<li><a id="org3ae0c35"></a>Dr. Racket and <code>#lang flit</code><br />
 <div class="outline-text-4" id="text-2-1-1">
 <p>
 All of the programming in this course takes place in Racket.
@@ -396,7 +396,7 @@ i.e., <code>#lang flit</code>.
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="orga69e165"></a>Installing Dr. Racket<br />
+<li><a id="orgf346306"></a>Installing Dr. Racket<br />
 <div class="outline-text-5" id="text-2-1-1-1">
 <p>
 Dr. Racket is the IDE for Racket, and language made using Racket, including Flit.
@@ -420,7 +420,7 @@ Many distributions also have their own packages, which you are welcome to use.
 </ul>
 </div>
 </li>
-<li><a id="org542831c"></a>Dr. Racket on Laboratory Computers<br />
+<li><a id="org1eb8938"></a>Dr. Racket on Laboratory Computers<br />
 <div class="outline-text-5" id="text-2-1-1-2">
 <p>
 Dr. Racket is installed on computers in the following labs:
@@ -438,7 +438,7 @@ access to your own computer.
 </li>
 </ol>
 </li>
-<li><a id="org998eff9"></a>Installing the Handin Tool<br />
+<li><a id="org22fbcd9"></a>Installing the Handin Tool<br />
 <div class="outline-text-4" id="text-2-1-2">
 <p>
 Whether you use your own computer or a lab computer, you will need to
@@ -465,7 +465,7 @@ include files relevant to specific assignments.
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="org0601f32"></a>Changing Your Password<br />
+<li><a id="org13ede55"></a>Changing Your Password<br />
 <div class="outline-text-6" id="text-2-1-2-0-1">
 <p>
 You will be emailed a password for your account. If you wish to change your password,
@@ -483,10 +483,10 @@ for the handin tool, but not secure enough for sensitive personal information.
 </p>
 </div>
 </li>
-<li><a id="org63f4fa6"></a>Make PLT file and upload link<br /></li>
+<li><a id="orgbacb185"></a>Make PLT file and upload link<br /></li>
 </ol>
 </li>
-<li><a id="org0f4aa12"></a>Using Dr. Racket<br />
+<li><a id="org5048dbc"></a>Using Dr. Racket<br />
 <div class="outline-text-4" id="text-2-1-3">
 <p>
 There are three main parts of the Dr. Racket interface: the toolbar at the top,
@@ -494,9 +494,9 @@ the code editor window, and the REPL at the bottom.
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="org6943dd2"></a>pictures<br /></li>
+<li><a id="orgf384876"></a>pictures<br /></li>
 
-<li><a id="orgdec0270"></a>The Definitions Window (Code Editor)<br />
+<li><a id="orga690d63"></a>The Definitions Window (Code Editor)<br />
 <div class="outline-text-5" id="text-2-1-3-2">
 <p>
 The editor window is where you will type your Racket program.
@@ -505,7 +505,7 @@ Racket as described above this will happen by default.
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="org27a979b"></a>Type and Syntax Errors<br />
+<li><a id="org07ba178"></a>Type and Syntax Errors<br />
 <div class="outline-text-6" id="text-2-1-3-2-1">
 <p>
 If there are type or syntax errors in your code, there will be
@@ -516,7 +516,7 @@ has a type or syntax error will get a grade of 0.
 </p>
 </div>
 </li>
-<li><a id="orgaa702e1"></a>Useful Tools<br />
+<li><a id="org38a94f9"></a>Useful Tools<br />
 <div class="outline-text-6" id="text-2-1-3-2-2">
 <p>
 If you right click on a variable, function name, type name, etc. in Dr. Racket,
@@ -533,7 +533,7 @@ This can be very useful to make your code more readable, or to find errors based
 </li>
 </ol>
 </li>
-<li><a id="org6ed3430"></a>The Toolbar<br />
+<li><a id="org629d96a"></a>The Toolbar<br />
 <div class="outline-text-5" id="text-2-1-3-3">
 <p>
 There are two main buttons you need on the toolbar.
@@ -569,7 +569,7 @@ on which test that is. In these cases, <b>read the problem specification careful
 </p>
 </div>
 </li>
-<li><a id="org6c23d68"></a>The Interactions Window (REPL)<br />
+<li><a id="org3d384c8"></a>The Interactions Window (REPL)<br />
 <div class="outline-text-5" id="text-2-1-3-4">
 <p>
 The interactions window features a Read-Evaluate-Print-Loop (REPL),
@@ -585,7 +585,7 @@ can be used in the REPL.
 </p>
 </div>
 </li>
-<li><a id="org29f04c6"></a>Submitting Assignments<br />
+<li><a id="orga08a0d4"></a>Submitting Assignments<br />
 <div class="outline-text-5" id="text-2-1-3-5">
 <p>
 All assignments are to be submitted using the Handin tool. There are two ways to do this:
@@ -609,7 +609,7 @@ The test results are also visible on URCourses.
 </ul>
 </div>
 <ol class="org-ol">
-<li><a id="orgc371617"></a>Submitting Multiple Times<br />
+<li><a id="orga73ee22"></a>Submitting Multiple Times<br />
 <div class="outline-text-6" id="text-2-1-3-5-1">
 <p>
 You may submit as many times as you like until the deadline. Your grade will be the grade
@@ -621,7 +621,7 @@ from the last submission before the deadline.
 </p>
 </div>
 </li>
-<li><a id="org8bdf0a5"></a>Syntax and Type Errors<br />
+<li><a id="org93dcaf4"></a>Syntax and Type Errors<br />
 <div class="outline-text-6" id="text-2-1-3-5-2">
 <p>
 If your file contains syntax or type errors, the feedback in Dr. Racket or on the handin website will
@@ -645,7 +645,7 @@ If there is an error message you do not understand, then <b>ask a question on th
 </p>
 </div>
 </li>
-<li><a id="org411b87e"></a>Public and Private Tests<br />
+<li><a id="orge1bb4de"></a>Public and Private Tests<br />
 <div class="outline-text-6" id="text-2-1-3-5-3">
 <p>
 When you submit an assignment, most tests are <i>public</i>, meaning that you
@@ -661,7 +661,7 @@ missed when writing your code.
 </p>
 </div>
 </li>
-<li><a id="org8559276"></a>Submitting on URCourses (not preferred)<br />
+<li><a id="orgad46d0d"></a>Submitting on URCourses (not preferred)<br />
 <div class="outline-text-6" id="text-2-1-3-5-4">
 <p>
 Submitting assignments via URCourses is available as a backup.
@@ -687,13 +687,13 @@ but you are then responsible for ensuring that it has no syntax or type errors.
 <div class="outline-text-3" id="text-racket-synax">
 </div>
 <ol class="org-ol">
-<li><a id="orgca11342"></a>S-expressions<br />
+<li><a id="org9e0cb63"></a>S-expressions<br />
 <div class="outline-text-4" id="text-2-2-1">
 <p>
 The syntax of Dr. Racket based around <i>S-Expressions</i>.
 </p>
 
-<div class="definition" id="org080b082">
+<div class="definition" id="org0d4e145">
 <p>
 Every S-Expression (or s-exp, pronounced "ess-exp") is either:
 </p>
@@ -724,10 +724,10 @@ The rest that we see will be Flit expressions, i.e., programs that compute some 
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="org4e0ffae"></a>S-Exp diagram<br /></li>
+<li><a id="orgefc5111"></a>S-Exp diagram<br /></li>
 </ol>
 </li>
-<li><a id="orgbb95cbf"></a>Special Characters<br />
+<li><a id="org95be9e3"></a>Special Characters<br />
 <div class="outline-text-4" id="text-2-2-2">
 <p>
 There are a few characters that you can't use in variable/function names in Racket:
@@ -758,7 +758,7 @@ Likewise, functions converting between types often contain <code>-&gt;</code> in
 <div class="outline-text-3" id="text-flit-expr">
 </div>
 <ol class="org-ol">
-<li><a id="org38b1998"></a>Expressions in Flit<br />
+<li><a id="org66292e3"></a>Expressions in Flit<br />
 <div class="outline-text-4" id="text-2-3-1">
 <p>
 <b>NOTE: All Flit expressions are S-Expressions, but not all S-Expressions are Flit Expressions, since some are declarations, etc. It's an unfortunate naming conflict.</b>
@@ -770,7 +770,7 @@ calling a function or other computations than we are with writing instructions
 and telling the program to "do" something.
 </p>
 
-<div class="definition" id="orgee95227">
+<div class="definition" id="org190169d">
 <p>
 An expression is part of a program that produces a result: it either has a <i>value</i>, unless it raises an error or runs forever.
 </p>
@@ -778,7 +778,7 @@ An expression is part of a program that produces a result: it either has a <i>va
 </div>
 </div>
 <ol class="org-ol">
-<li><a id="org1e4ec97"></a>Literals<br />
+<li><a id="org6311811"></a>Literals<br />
 <div class="outline-text-5" id="text-2-3-1-1">
 <p>
 Literals are expressions that evaluate to themselves, denoting fixed values of some type. For example:
@@ -792,7 +792,7 @@ Literals are expressions that evaluate to themselves, denoting fixed values of s
 </div>
 </div>
 </li>
-<li><a id="org87c1492"></a>Keywords<br />
+<li><a id="org75e7dae"></a>Keywords<br />
 <div class="outline-text-5" id="text-2-3-1-2">
 <p>
 If you write <code>(foo bar baz)</code> where <code>foo</code> is a keyword in Flit, then
@@ -804,7 +804,7 @@ Some keywords that we'll see are <code>if</code>, <code>type-case</code>, and <c
 </p>
 </div>
 </li>
-<li><a id="orgc155c2d"></a>Function Calls<br />
+<li><a id="org59cc22b"></a>Function Calls<br />
 <div class="outline-text-5" id="text-2-3-1-3">
 <p>
 Any expression of the form <code>(f a)</code> is interpreted as calling the function <code>f</code> with the argument <code>a</code>,
@@ -863,9 +863,9 @@ Here, we have used color to indicate the matching brackets.
 </li>
 </ol>
 </li>
-<li><a id="org220ca75"></a>Computing Using Equations<br />
+<li><a id="orgdd3a1be"></a>Computing Using Equations<br />
 <ol class="org-ol">
-<li><a id="orgc13d390"></a>Semantics<br />
+<li><a id="org4eef6ce"></a>Semantics<br />
 <div class="outline-text-5" id="text-2-3-2-1">
 <p>
 One of the goals of this course is to answer the question: <b>what do programs mean</b>?
@@ -892,13 +892,13 @@ and make it into something formal that we can reason about logically.
 </p>
 </div>
 </li>
-<li><a id="org21cf12a"></a>Mutable and Immutable Variables<br />
+<li><a id="orga2da4d5"></a>Mutable and Immutable Variables<br />
 <div class="outline-text-5" id="text-2-3-2-2">
 <p>
 Most of the programming languages that you have likely seen so far have mutable variables:
 </p>
 
-<div class="definition" id="org19d606d">
+<div class="definition" id="orgb5ebbe2">
 <p>
 A variable is mutable if its value can change within its scope.
 </p>
@@ -915,7 +915,7 @@ of the function can might access variables whose value has changed.
 By contrast, Flit is a <i>purely functional language:</i>
 </p>
 
-<div class="definition" id="org2bce553">
+<div class="definition" id="org7feafe6">
 <p>
 A programming language is purely functional if every call to a function with the same inputs produces the same outputs.
 </p>
@@ -927,7 +927,7 @@ In Flit, the value of an expression only depends on the initial values of the va
 This is because all variables in Flit are immutable:
 </p>
 
-<div class="definition" id="org6bdc0d5">
+<div class="definition" id="org8cff09a">
 <p>
 A variable is immutable if its value value is constant in its scope
 </p>
@@ -973,14 +973,14 @@ We'll see a bit more of this <a href="#flit-tailrec">when we learn about tail re
 </p>
 </div>
 </li>
-<li><a id="orgf3ee451"></a>Equations<br />
+<li><a id="org519bea3"></a>Equations<br />
 <div class="outline-text-5" id="text-2-3-2-3">
 <p>
 We will describe the semantics of Flit using <i>Equations</i>. Here is our first
 semantic equation:
 </p>
 
-<div class="definition" id="orgdd65649">
+<div class="definition" id="org047fb6c">
 <p>
 For any number literals <code>m</code> and <code>n</code>, the expression <code>(+ m n)</code>
 is equal to the sum of <code>m</code> and <code>n</code>. The other arithmetic operations have similar rules.
@@ -988,7 +988,7 @@ is equal to the sum of <code>m</code> and <code>n</code>. The other arithmetic o
 
 </div>
 
-<pre class="example" id="org21b3a21">
+<pre class="example" id="orgdaca6cd">
 (+ 3 4) = 7
 (+ 0 2) = 2
 </pre>
@@ -998,10 +998,10 @@ There are a few tricky things to notice here.
 </p>
 </div>
 </li>
-<li><a id="orgfe87ed1"></a>Types<br /></li>
+<li><a id="orgf093f35"></a>Types<br /></li>
 </ol>
 </li>
-<li><a id="org00404ff"></a>Conditionals<br />
+<li><a id="orgf6924c4"></a>Conditionals<br />
 <div class="outline-text-4" id="text-2-3-3">
 <p>
 If-expressions are built into Flit:
@@ -1024,7 +1024,7 @@ The true branch is not evaluated if the condition is false, and vice versa.
 We can describe <code>if</code> with the following equations:
 </p>
 
-<div class="definition" id="orgad86caa">
+<div class="definition" id="orgdb1d0c7">
 <p>
 For any expressions <code>EXPR1</code> and <code>EXPR2</code>
 </p>
@@ -1048,7 +1048,7 @@ If you are familiar with the <code>cond ? foo : bar</code> syntax in C/C++, this
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="org40c2c29"></a>Example<br />
+<li><a id="org61b297e"></a>Example<br />
 <div class="outline-text-5" id="text-2-3-3-1">
 <p>
 Let's use the equational rules we have so far to evaluate some example code to a result.
@@ -1063,7 +1063,7 @@ Let's use the equational rules we have so far to evaluate some example code to a
 We can deduce this result by applying our rules. We use the underscore <code>_</code> to show which part of the expression is being simplified by the rule.
 </p>
 
-<table id="orgbe0a2a0" border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<table id="org935bb33" border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
 <colgroup>
@@ -1119,7 +1119,7 @@ which we'll see below.
 </li>
 </ol>
 </li>
-<li><a id="org1f5d532"></a>Function Definitions<br />
+<li><a id="orgb92dfbc"></a>Function Definitions<br />
 <div class="outline-text-4" id="text-2-3-4">
 <p>
 Flit is a functional language, so the main way that we will write programs is by
@@ -1127,7 +1127,7 @@ defining one or more functions that compute the results we want.
 </p>
 </div>
 </li>
-<li><a id="org9fdd0bf"></a>Local Variables<br /></li>
+<li><a id="org7f21920"></a>Local Variables<br /></li>
 </ol>
 </div>
 <div id="outline-container-flit-types" class="outline-3">
@@ -1138,10 +1138,10 @@ Another way that we can talk about what programs mean is their <i>type</i>.
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="org13d4797"></a>Static and Dynamic Typing<br /></li>
-<li><a id="org2806993"></a>Typing Rules<br /></li>
-<li><a id="org22d2863"></a>Type Inference<br /></li>
-<li><a id="org4680f04"></a>Polymorphism<br /></li>
+<li><a id="org6f7eff4"></a>Static and Dynamic Typing<br /></li>
+<li><a id="org904d8cd"></a>Typing Rules<br /></li>
+<li><a id="org0a274b8"></a>Type Inference<br /></li>
+<li><a id="orgdb39cd5"></a>Polymorphism<br /></li>
 </ol>
 </div>
 <div id="outline-container-flit-recursion" class="outline-3">
@@ -1175,8 +1175,8 @@ Another way that we can talk about what programs mean is their <i>type</i>.
 </div>
 </div>
 </div>
-<div id="outline-container-org5d96087" class="outline-2">
-<h2 id="org5d96087"><span class="section-number-2">3.</span> Glossary</h2>
+<div id="outline-container-org1ff7e9a" class="outline-2">
+<h2 id="org1ff7e9a"><span class="section-number-2">3.</span> Glossary</h2>
 <div class="outline-text-2" id="text-3">
 <dl class="org-dl">
 <dt>Semantics of If</dt><dd>For any expressions <code>EXPR1</code> and <code>EXPR2</code></dd>
@@ -1208,7 +1208,7 @@ is equal to the sum of <code>m</code> and <code>n</code>. The other arithmetic o
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: Dr. Joseph Eremondi, with material adapted from Dr. Shriram Krishnamurthi</p>
-<p class="date">Created: 2025-01-06 Mon 21:18</p>
+<p class="date">Created: 2025-01-06 Mon 21:22</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
