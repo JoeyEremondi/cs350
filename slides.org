@@ -388,6 +388,24 @@ To learn:
   + Hierarchical structure: expressions contain expressions contain expressions...
   + Parentheses make this very explicit
 
+*** Square vs. Round vs. Curly
+- Racket treats all parentheses as the same
+#+begin_src racket  :exports both
+(+ 1 2)
+[+ 1 2]
+{+ 1 2}
+#+end_src
+
+#+RESULTS:
+#+begin_src racket
+3
+3
+3
+#+end_src
+
+- We'll use square brackets in some places for clarity
+  + Save Curly brackets for the second half of the class
+
 *** Parentheses in the real world
 - e.g. Clojure, uses parentheses
 - WebAssembly has an S-Expression based syntax for programmers
@@ -395,6 +413,8 @@ To learn:
 
 
 *** Numbers
+- Most operations prefix version of what you've seen in C++/python
+
 **** Example
 #+begin_src racket :exports both
 (+ 2 7)
@@ -421,7 +441,9 @@ To learn:
 
 
 *** Booleans
-**** Example
+- Literals written #t and #f
+- Prefix versions of most boolean operations
+
 #+begin_src racket :exports both
 (= (+ 2 3) 5)
 (> (/ 0 1) 1)
@@ -471,6 +493,7 @@ else
 ***  Conditional Expressions
 #+begin_src racket :exports both
 (if (< 2 3) "hello" "goodbye")
+;; another example
 (+ 3
   (if (= 2 (+ 1 1))
       3
@@ -496,11 +519,8 @@ else
   + If you give a functional program the same inputs, you will always get the same outputs
 - Example:
 
-#+name: flit-plus-semantics
-#+begin_definition Semantics of +
-For any number literals ~m~ and ~n~, the expression ~(+ m n)~
-is equal to the sum of ~m~ and ~n~. The other arithmetic operations have similar rules.
-#+end_definition
+  #+transclude: [[file:notes.org::flit-plus-semantics][Semantics of Plus]]
+  - Math plus is different than Flit plus, needs numbers, not expressions
 
 *** Imperative Breaks Equational Reasoning
 - In C++, the equals sign is a LIE
@@ -520,7 +540,8 @@ is equal to the sum of ~m~ and ~n~. The other arithmetic operations have similar
         - ~(if #t EXPR1 EXPR2) = EXPR1~
         - ~(if #f EXPR1 EXPR2) = EXPR2~
         #+end_definition
-
+- The equals sign is not a lie here
+  + The two sides of the equation have the same run-time result
 ***  Functions
 - Calling a function replaces variable with concrete argument
 #+begin_src racket :exports both
@@ -529,7 +550,20 @@ is equal to the sum of ~m~ and ~n~. The other arithmetic operations have similar
 (addOne 10)
 #+end_src
 
-***  Functions
+
+*** Calling Functions
+- Syntax for calling a function is
+  + Open bracket
+  + Function name
+  + Arguments, each separated by whitespace
+  + Close bracket
+#+begin_src racket
+(f arg1 arg2 arg3 ... argN)
+#+end_src
+
+- Each argument might be a variable or a literl, or a complex expression in brackets
+
+***  Defining Multi-Argument Functions
 #+begin_src racket :exports both
 (define (isRemainder [x : Number]
                      [y : Number]
@@ -540,7 +574,7 @@ is equal to the sum of ~m~ and ~n~. The other arithmetic operations have similar
 (isRemainder 10 4 1)
 #+end_src
 
-***  Functions (ctd.)
+***  General Form Defining Functions
 - General form:
 
 #+begin_src racket :exports code
@@ -550,7 +584,23 @@ is equal to the sum of ~m~ and ~n~. The other arithmetic operations have similar
          [argNameN : argTypeN]) : returnType
   functionBody)
 #+end_src
+- Brackets around the function name, followed by arguments
+  + Each argument given as ~[name : Type]~
+  + We'll use ~:~ to mean "has type" a lot in this class
 - Later in the course we'll see another way of defining functions
+
+*** Type Inference
+- We can leave types off function arguments and return type
+- Compiler is /usually/ smart enough to figure out the types
+  #+begin_src racket
+  (define (addone x)
+    (+ x 1))
+  ;; in general
+  (define (functionName argName1 argName2 ... argNameN)
+    functionBody)
+  #+end_src
+
+***
 
 *** Symbols
 - Special type in Racket
