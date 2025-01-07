@@ -281,7 +281,7 @@ To learn:
 - This is radically different from the kind of coding you have done so far
 
 
-*  Recursion and Immutable Data
+*  Expression and Immutable Data
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides002-plait.pdf
 :header-args:racket: :results code :lang plait
@@ -534,12 +534,7 @@ else
 *** Equations for IF
 - We can describe the behaviour of if-expressions with the following two equations:
 
-        #+name: flit-if-equations
-        #+begin_definition Semantics of If
-        For any expressions ~EXPR1~ and ~EXPR2~
-        - ~(if #t EXPR1 EXPR2) = EXPR1~
-        - ~(if #f EXPR1 EXPR2) = EXPR2~
-        #+end_definition
+  #+transclude: [[file:notes.org::flit-if-semantics][Semantics of If]]
 - The equals sign is not a lie here
   + The two sides of the equation have the same run-time result
 ***  Functions
@@ -600,16 +595,18 @@ else
     functionBody)
   #+end_src
 
-***
 
-*** Symbols
+
+*** Semantics of Function Calls
+- Functions are about /substitution/:
+  #+transclude: [[file:notes.org::flit-funcall-semantics][Semantics of Function Calls]]
+*** Symbols :noexport:
 - Special type in Racket
 - Written with single quote ~'a~, ~'hello~, ~'foo~
 - Like strings, but you don't ever traverse/concatenate/look inside
 - Only relevant operation is comparison
   + ~(symbol=? 'a 'b)~
   + Compares pointers, so very fast
-
 
 
 
@@ -629,8 +626,7 @@ else
 
 #+RESULTS:
 #+begin_src racket
-8
-300000
+9
 #+end_src
 
 *** Intermediate Definitions
@@ -648,19 +644,50 @@ else
     + Could have just written ~f(3~) instead of ~x~ in both places
       - Same, as long as there's no side effects
 
-*** Alternate Versions of Let
-- TODO implement multi version as default exported
-- ~let*~ : multiple definitions, later ones can refer to earlier ones
-- 99% of the time this is what you want to use
-  #+begin_src racket
-    (let* ([x (+ 2 3)]
-           [y (* x x)])
-      (* y y))
-  #+end_src
+*** General Syntax
+- In general:
+#+begin_src racket
+(let* ([varName1 EXPR1]
+       [varName2 EXPR2]
+       ...
+       varNameN EXPRN)
+  bodyEXPR)
+#+end_src
+
+- Keyword ~let*~, a bracketed list of defined variables, then the body
+- Defined variables have form ~(variableName variableValue)~
+  + Defining just one variable has double brackets
+    - ~(let* ([x 3]]) (+ x 1))~
+    - Kind of awkward, but just how it works
+
+*** Semantics of Let
+  #+transclude: [[file:notes.org::flit-let-single-semantics][Semantics of Let]]
+
+  - Multiple variables work similarly, but also do the substitution in the expressions of later variables values
+    + We'll see this formally later
+
+*** Alternate versions of Let
+- There's also ~let~
+  + Like ~let*~, but when multiple variables, can't refer to each other
+  + Recursive version ~letrec~
+    - Can define multiple variables that all refer to each other and themselves
+- For now you only need ~let*~
+  + Very useful for gradually building up a complex solution from previous smaller bits
+
+* Types
+
+*** Why write down types?
+- With type inference, we don't /need/ to write down types
+- Still a good idea to write them down
+- Writing a type is like running an infinite number of tests
+  + Compiler makes sure that every possible run of your program produces the type written down
+- Sanity check
+  + Make sure types in your head match the types in the code
+- Documentation
+  + Types make it very clear what arguments a function expects
 
 
-- ~letrec~ : multiple definitions that can all refer to each other
-  + We'll see this later when we learn about lambdas
+* Recursion
 ** Functional Thinking and Recursion
 
 *** What Is Functional Programming?
