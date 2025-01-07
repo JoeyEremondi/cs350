@@ -281,9 +281,9 @@ To learn:
 - This is radically different from the kind of coding you have done so far
 
 
-*  Expression and Immutable Data
+*  Expressions and Immutable Data
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides002-plait.pdf
+:EXPORT_FILE_NAME: pdf/slides002-flit.pdf
 :header-args:racket: :results code :lang plait
 :CUSTOM_ID: functional-programming-1-recursion-and-immutable-data
 :END:
@@ -415,7 +415,6 @@ To learn:
 *** Numbers
 - Most operations prefix version of what you've seen in C++/python
 
-**** Example
 #+begin_src racket :exports both
 (+ 2 7)
 (- 10 0.5)
@@ -534,14 +533,24 @@ else
 *** Equations for IF
 - We can describe the behaviour of if-expressions with the following two equations:
 
-  #+transclude: [[file:notes.org::flit-if-semantics][Semantics of If]]
+#+name: flit-if-semantics
+#+begin_definition Semantics of If
+For any expressions ~EXPR1~ and ~EXPR2~
+- ~(if #t EXPR1 EXPR2) = EXPR1~
+- ~(if #f EXPR1 EXPR2) = EXPR2~
+#+end_definition
+
 - The equals sign is not a lie here
   + The two sides of the equation have the same run-time result
+  + No matter what we choose for ~EXPR1~ or ~EXPR2~
 ***  Functions
 - Calling a function replaces variable with concrete argument
 #+begin_src racket :exports both
+;; Define a function
 (define (addOne [x : Number]) : Number
   (+ x 1))
+
+;; Call the function we defined
 (addOne 10)
 #+end_src
 
@@ -582,14 +591,19 @@ else
 - Brackets around the function name, followed by arguments
   + Each argument given as ~[name : Type]~
   + We'll use ~:~ to mean "has type" a lot in this class
+- After name/arguments closing paren, have ~: returnType~
+- Then, the body of the function
+  + e.g. the code to run
 - Later in the course we'll see another way of defining functions
 
 *** Type Inference
 - We can leave types off function arguments and return type
 - Compiler is /usually/ smart enough to figure out the types
   #+begin_src racket
+  ;; example
   (define (addone x)
     (+ x 1))
+
   ;; in general
   (define (functionName argName1 argName2 ... argNameN)
     functionBody)
@@ -599,7 +613,14 @@ else
 
 *** Semantics of Function Calls
 - Functions are about /substitution/:
-  #+transclude: [[file:notes.org::flit-funcall-semantics][Semantics of Function Calls]]
+#+name: flit-funcall-semantics
+#+begin_definition Semantics of Function Calls
+If a function ~f~ is defined as:
+- ~(define (f x) body)~
+then for any expression ~EXPR~, we have:
+- ~(f EXPR) = [x => EXPR]body~
+where ~[x => EXPR]body~ is ~body~, with all non-shadowed occurrences of the variable ~x~ replaced by ~EXPR~
+#+end_definition
 *** Symbols :noexport:
 - Special type in Racket
 - Written with single quote ~'a~, ~'hello~, ~'foo~
@@ -650,18 +671,19 @@ else
 (let* ([varName1 EXPR1]
        [varName2 EXPR2]
        ...
-       varNameN EXPRN)
+       [varNameN EXPRN])
   bodyEXPR)
 #+end_src
 
 - Keyword ~let*~, a bracketed list of defined variables, then the body
-- Defined variables have form ~(variableName variableValue)~
+- Defined vars ~[variableName variableValue]~
+  + Round vs. Square not important
   + Defining just one variable has double brackets
     - ~(let* ([x 3]]) (+ x 1))~
     - Kind of awkward, but just how it works
 
 *** Semantics of Let
-  #+transclude: [[file:notes.org::flit-let-single-semantics][Semantics of Let]]
+  #+transclude: [[file:notes.org::flit-single-let-semantics][Semantics of Let]]
 
   - Multiple variables work similarly, but also do the substitution in the expressions of later variables values
     + We'll see this formally later

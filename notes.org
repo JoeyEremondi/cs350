@@ -534,7 +534,7 @@ The true branch is not evaluated if the condition is false, and vice versa.
 
 We can describe ~if~ with the following equations:
 
-        #+name: flit-if-equations
+        #+name: flit-if-semantics
         #+begin_definition Semantics of If
         For any expressions ~EXPR1~ and ~EXPR2~
         - ~(if #t EXPR1 EXPR2) = EXPR1~
@@ -595,9 +595,9 @@ defining one or more functions that compute the results we want.
 **** Semantics of Let
 #+name: flit-single-let-semantics
 #+begin_definition Semantics of Let for Single Variables
-For any expression ~EXPR~, we have
-~(let ([x EXPR]) body) = [x => EXPR]body~
- where ~[x => EXPR]body~ is ~body~ with all non-shadowed occurrences of ~x~ replaced by ~EXPR~
+  For any expression ~EXPR~, we have:
+    - ~(let ([x EXPR]) body) = [x => EXPR]body~
+   where ~[x => EXPR]body~ is ~body~ with all non-shadowed occurrences of ~x~ replaced by ~EXPR~
 #+end_definition
 ** Types
 :PROPERTIES:
@@ -643,8 +643,9 @@ Another way that we can talk about what programs mean is their /type/.
 * Part II: Interpreters :noexport:
 
 * Glossary 
-- Semantics of Let for Single Variables :: For any expression ~EXPR~, we have
-~(let ([x EXPR]) body)~
+- Semantics of Let for Single Variables :: For any expression ~EXPR~, we have:
+- ~(let ([x EXPR]) body) = [x => EXPR]body~
+where ~[x => EXPR]body~ is ~body~ with all non-shadowed occurrences of ~x~ replaced by ~EXPR~
 
 - Semantics of Function Calls :: If a function ~f~ is defined as:
 - ~(define (f x) body)~
