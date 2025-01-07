@@ -650,23 +650,24 @@ where ~[x => EXPR]body~ is ~body~, with all non-shadowed occurrences of the vari
 9
 #+end_src
 
-*** Intermediate Definitions
-- In C++, you might write
-  #+begin_src c++
-  while (someCond){
-        int x = f(3);
-        doSomethingWith(x);
-        doSomethingElseWith(x);
-  }
+*** Understanding Definitions
+**** In C++, you might write
+  #+begin_src C++
+        while (someCond){
+                int x = f(3);
+                doSomethingWith(x);
+                doSomethingElseWith(x);
+        }
   #+end_src
-  - ~let~ is like this
+
+  - ~let~ is similar
     + Scope is clear from the brackets
     + Functional, so the ~doSomething~ never changes the value of ~x~
-    + Could have just written ~f(3~) instead of ~x~ in both places
+    + Could have just written ~f(3)~ instead of ~x~ in both places
       - Same, as long as there's no side effects
-
 *** General Syntax
 - In general:
+
 #+begin_src racket
 (let* ([varName1 EXPR1]
        [varName2 EXPR2]
@@ -683,7 +684,12 @@ where ~[x => EXPR]body~ is ~body~, with all non-shadowed occurrences of the vari
     - Kind of awkward, but just how it works
 
 *** Semantics of Let
-  #+transclude: [[file:notes.org::flit-single-let-semantics][Semantics of Let]]
+#+name: flit-single-let-semantics
+#+begin_definition Semantics of Let for Single Variables
+For any expression ~EXPR~, we have:
+- ~(let ([x EXPR]) body) = [x => EXPR]body~
+where ~[x => EXPR]body~ is ~body~ with all non-shadowed occurrences of ~x~ replaced by ~EXPR~
+#+end_definition
 
   - Multiple variables work similarly, but also do the substitution in the expressions of later variables values
     + We'll see this formally later
@@ -696,7 +702,7 @@ where ~[x => EXPR]body~ is ~body~, with all non-shadowed occurrences of the vari
 - For now you only need ~let*~
   + Very useful for gradually building up a complex solution from previous smaller bits
 
-* Types
+** Types in Flit
 
 *** Why write down types?
 - With type inference, we don't /need/ to write down types
@@ -709,6 +715,62 @@ where ~[x => EXPR]body~ is ~body~, with all non-shadowed occurrences of the vari
   + Types make it very clear what arguments a function expects
 
 
+*** Checking Types
+- Can annotate any expression to confirm its type
+#+begin_src racket :exports both
+(has-type 3 : Number)
+(has-type #t : Boolean)
+(has-type "hello" : String)
+#+end_src
+
+#+RESULTS[a2fa135bb1c1aa22cf318423c40145565390d619]:
+#+begin_src racket
+3
+#t
+"hello"
+#+end_src
+
+*** Thinking About Types
+- With any type, there are two things we care about
+  + How to /directly/ create a value of that type
+  + How to /directly/ use a value of that type
+    - Can also create/use any value by giving it to a function expecting/returning  that type
+    - But eventually, you need some primitive operations
+
+*** Numbers
+- To create: literals ~3~, ~22~, ~0.00001~
+- To use: built in arithmetic ~+, -,  *, /~  etc. and comparisons like ~zero?~
+
+*** Strings
+- To use: mostly built-in operations
+  + I'll highlight relevant functions as we see them
+
+*** Booleans
+- To create: literals ~#t~, ~#f~
+- To use: ~if someBool e1 e2~
+- E.g. the purpose of booleans is to be things we give to ~if~ expressions
+
+
+*** Typing For If
+- ~if~ is not a function
+  + We'll learn exactly why later
+- Need a special rule to determine its type
+  + Can have ~any~ type, depending on the type you give it
+- Just like we have equations, we can make formal rules for typing
+
+*** The Rule
+  #+name: flit-if-typing
+  #+begin_definition Typing for If
+  For any expressions ~EXPR1~, ~EXPR2~ and ~EXPR3~,
+  - if ~EXPR1 : Boolean~, and
+  - there is some type ~T~ such that ~EXPR2 : T~ and ~EXPR3 : T~,
+  then:
+  - ~(if EXPR1 EXPR2 EXPR3) : T~
+  #+end_definition
+
+  - Condition must always be boolean
+  - Don't care what the type of the branches is, but the *need to be the same*
+  - Result of the ~if~ has the same type as the branches
 * Recursion
 ** Functional Thinking and Recursion
 
