@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2025-01-06 Mon 18:03 -->
+<!-- 2025-01-06 Mon 18:05 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>University of Regina, CS 350, Winter 2025</title>
@@ -255,46 +255,8 @@ $(function() {    $('.definition').before("<p class='admonition-title note'>Defi
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#introduction">1. Introduction</a>
-<ul>
-<li><a href="#course-overview">1.1. Course Details</a></li>
-<li><a href="#orgc5677b7">1.2. Course Content</a></li>
-</ul>
-</li>
-<li><a href="#functional-programming-1-recursion-and-immutable-data">2. Recursion and Immutable Data</a>
-<ul>
-<li><a href="#org7967d49">2.1. Overview</a></li>
-<li><a href="#orgbb76fa7">2.2. Programming in CS 350</a></li>
-<li><a href="#org4af1c20">2.3. Racket</a></li>
-<li><a href="#org2df67e3">2.4. Flit</a></li>
-<li><a href="#org899f7e6">2.5. Functional Thinking and Recursion</a></li>
-<li><a href="#org0cd7061">2.6. Unbounded Data: Lists</a></li>
-</ul>
-</li>
-<li><a href="#functional-programming-2-defining-data-types">3. Defining Data Types</a>
-<ul>
-<li><a href="#warmup-pairs">3.1. Warmup: Pairs</a></li>
-<li><a href="#algebraic-data-types">3.2. Algebraic Data Types</a></li>
-<li><a href="#recursive-data">3.3. Recursive Data</a></li>
-</ul>
-</li>
-<li><a href="#functional-programming-2-first-class-functions">4. First-Class Functions</a>
-<ul>
-<li><a href="#higher-order-functions">4.1. Higher Order Functions</a></li>
-</ul>
-</li>
-<li><a href="#polymorphic-higher-order-functions">5. Polymorphic Higher-Order Functions</a>
-<ul>
-<li><a href="#highly-generic-programming">5.1. Highly Generic Programming</a></li>
-</ul>
-</li>
-<li><a href="#generative-recursion-and-tail-recursion">6. Generative Recursion and Tail Recursion</a>
-<ul>
-<li><a href="#broad-goals-0">6.1. Broad Goals</a></li>
-<li><a href="#generative-recursion">6.2. Generative Recursion</a></li>
-<li><a href="#abstracting-generative-recursion">6.3. Abstracting Generative Recursion</a></li>
-</ul>
-</li>
+<li><a href="#introduction">1. Introduction</a></li>
+<li><a href="#functional-programming-1-recursion-and-immutable-data">2. Recursion and Immutable Data</a></li>
 </ul>
 </div>
 </div>
@@ -307,7 +269,7 @@ $(function() {    $('.definition').before("<p class='admonition-title note'>Defi
 <div class="outline-text-3" id="text-course-overview">
 </div>
 <ol class="org-ol">
-<li><a id="org4b80160"></a>Course Objectives<br />
+<li><a id="orgba2ce42"></a>Course Objectives<br />
 <div class="outline-text-4" id="text-1-1-1">
 <p>
 To learn:
@@ -329,10 +291,10 @@ To learn:
 </ul>
 </div>
 <ol class="org-ol">
-<li><a id="org0de1abc"></a><span class="underline">To change how you <i>think</i> about programming</span><br /></li>
+<li><a id="org496be4b"></a><span class="underline">To change how you <i>think</i> about programming</span><br /></li>
 </ol>
 </li>
-<li><a id="orgb764813"></a>Course Notes / Textbook<br />
+<li><a id="org7ad949a"></a>Course Notes / Textbook<br />
 <div class="outline-text-4" id="text-1-1-2">
 <ul class="org-ul">
 <li>Course Notes: <i>Functional Languages, Interpreters and Types</i>
@@ -353,7 +315,7 @@ To learn:
 </ul>
 </div>
 </li>
-<li><a id="org05eb782"></a>Course Communication<br />
+<li><a id="org0c2cac4"></a>Course Communication<br />
 <div class="outline-text-4" id="text-1-1-3">
 <ul class="org-ul">
 <li>Everything on URCourses
@@ -375,7 +337,7 @@ your solution to the assignment</li>
 </ul>
 </div>
 </li>
-<li><a id="org18ed4f0"></a>Office Hours<br />
+<li><a id="org0f4fd8c"></a>Office Hours<br />
 <div class="outline-text-4" id="text-1-1-4">
 <ul class="org-ul">
 <li>Location: RIC 317
@@ -389,7 +351,7 @@ your solution to the assignment</li>
 </ul>
 </div>
 </li>
-<li><a id="org9861cd3"></a>Grading Scheme<br />
+<li><a id="orgf117db0"></a>Grading Scheme<br />
 <div class="outline-text-4" id="text-1-1-5">
 <ul class="org-ul">
 <li>35% assignments</li>
@@ -403,7 +365,7 @@ your solution to the assignment</li>
 </ul>
 </div>
 </li>
-<li><a id="org637e7ba"></a>Participation<br />
+<li><a id="orgc459b01"></a>Participation<br />
 <div class="outline-text-4" id="text-1-1-6">
 <ul class="org-ul">
 <li>You get marks just for showing up</li>
@@ -416,7 +378,7 @@ your solution to the assignment</li>
 </ul>
 </div>
 </li>
-<li><a id="org80e862b"></a>Assignment 0<br />
+<li><a id="orgdfc4288"></a>Assignment 0<br />
 <div class="outline-text-4" id="text-1-1-7">
 <ul class="org-ul">
 <li>Due Monday, On URCourses</li>
@@ -434,7 +396,7 @@ your solution to the assignment</li>
 </ul>
 </div>
 </li>
-<li><a id="org9fabd5d"></a>Assignments 1-6<br />
+<li><a id="org3769807"></a>Assignments 1-6<br />
 <div class="outline-text-4" id="text-1-1-8">
 <ul class="org-ul">
 <li>Six bi-weekly assignments</li>
@@ -449,7 +411,7 @@ your solution to the assignment</li>
 </ul>
 </div>
 </li>
-<li><a id="orgf5b3075"></a>Assignments (ctd.)<br />
+<li><a id="org0674cc0"></a>Assignments (ctd.)<br />
 <div class="outline-text-4" id="text-1-1-9">
 <ul class="org-ul">
 <li>Mostly programming
@@ -469,7 +431,7 @@ your solution to the assignment</li>
 </ul>
 </div>
 </li>
-<li><a id="org0362e32"></a>Submitting Assignments via Handin<br />
+<li><a id="orgb6f34de"></a>Submitting Assignments via Handin<br />
 <div class="outline-text-4" id="text-1-1-10">
 <ul class="org-ul">
 <li>Unlimited submissions before deadline</li>
@@ -482,7 +444,7 @@ your solution to the assignment</li>
 </ul>
 </div>
 </li>
-<li><a id="orgcf388b1"></a>Syntax and Type Errors<br />
+<li><a id="org6941cd9"></a>Syntax and Type Errors<br />
 <div class="outline-text-4" id="text-1-1-11">
 <ul class="org-ul">
 <li><b>ALL CODE CONTAINING SYNTAX OR TYPE ERRORS WILL GET A GRADE OF ZERO</b>
@@ -494,7 +456,7 @@ your solution to the assignment</li>
 </ul>
 </div>
 </li>
-<li><a id="org350be0f"></a>Resources for This Course<br />
+<li><a id="org26ba16d"></a>Resources for This Course<br />
 <div class="outline-text-4" id="text-1-1-12">
 <ul class="org-ul">
 <li>There are few resources available for you to learn about <code>flit</code>
@@ -517,7 +479,7 @@ your solution to the assignment</li>
 </ul>
 </div>
 </li>
-<li><a id="orgb0c3b98"></a>Academic Integrity<br />
+<li><a id="org6f59c94"></a>Academic Integrity<br />
 <div class="outline-text-4" id="text-1-1-13">
 <ul class="org-ul">
 <li>You are to complete all assignments <b>individually</b></li>
@@ -535,17 +497,17 @@ your solution to the assignment</li>
 </ul>
 </div>
 <ol class="org-ol">
-<li><a id="org5b09c1e"></a>Don't set yourself up for failure on the exams<br /></li>
+<li><a id="orge9d79ee"></a>Don't set yourself up for failure on the exams<br /></li>
 </ol>
 </li>
 </ol>
 </div>
-<div id="outline-container-orgc5677b7" class="outline-3">
-<h3 id="orgc5677b7"><span class="section-number-3">1.2.</span> Course Content</h3>
+<div id="outline-container-org8f1801f" class="outline-3">
+<h3 id="org8f1801f"><span class="section-number-3">1.2.</span> Course Content</h3>
 <div class="outline-text-3" id="text-1-2">
 </div>
 <ol class="org-ol">
-<li><a id="org7f7c37c"></a>Course Objectives<br />
+<li><a id="org1ff5e6b"></a>Course Objectives<br />
 <div class="outline-text-4" id="text-1-2-1">
 <p>
 Programming language genealogy and design.
@@ -580,7 +542,7 @@ Parallel programming.
 </p>
 </div>
 </li>
-<li><a id="org18074a2"></a>Course Objectives<br />
+<li><a id="orgec9726e"></a>Course Objectives<br />
 <div class="outline-text-4" id="text-1-2-2">
 <p>
 Programming language genealogy and design.
@@ -615,7 +577,7 @@ Parallel programming.
 </ul>
 </div>
 </li>
-<li><a id="org13c86f8"></a>Course Objectives<br />
+<li><a id="org21bdfe5"></a>Course Objectives<br />
 <div class="outline-text-4" id="text-1-2-3">
 <p>
 <b>Programming language genealogy and design.</b>
@@ -650,7 +612,7 @@ Parallel programming.
 </ul>
 </div>
 </li>
-<li><a id="org8e5bf39"></a>Common Questions<br />
+<li><a id="org56d55c3"></a>Common Questions<br />
 <div class="outline-text-4" id="text-1-2-4">
 <ul class="org-ul">
 <li>Am I going to use Racket in Industry?
@@ -660,7 +622,7 @@ Parallel programming.
 </ul>
 </div>
 </li>
-<li><a id="org5ff5715"></a>Common Questions<br />
+<li><a id="orgc3eeab8"></a>Common Questions<br />
 <div class="outline-text-4" id="text-1-2-5">
 <ul class="org-ul">
 <li>Then why are we learning it
@@ -677,7 +639,7 @@ Parallel programming.
 </ul>
 </div>
 </li>
-<li><a id="org8e13ca5"></a>Common Questions<br />
+<li><a id="org2c3e39d"></a>Common Questions<br />
 <div class="outline-text-4" id="text-1-2-6">
 <ul class="org-ul">
 <li>Do you really expect me to learn a new language in just one term?
@@ -688,7 +650,7 @@ Parallel programming.
 </ul>
 </div>
 </li>
-<li><a id="orgc266974"></a>When might this course be useful?<br />
+<li><a id="org298446b"></a>When might this course be useful?<br />
 <div class="outline-text-4" id="text-1-2-7">
 <ul class="org-ul">
 <li><p>
@@ -711,7 +673,7 @@ You might get hired to
 </ul>
 </div>
 </li>
-<li><a id="orgd3644d4"></a>The Science of Computer Science<br />
+<li><a id="org00ad56e"></a>The Science of Computer Science<br />
 <div class="outline-text-4" id="text-1-2-8">
 <ul class="org-ul">
 <li>How to think about programs in a rigorous way
@@ -739,17 +701,17 @@ You might get hired to
 <h2 id="functional-programming-1-recursion-and-immutable-data"><span class="section-number-2">2.</span> Recursion and Immutable Data</h2>
 <div class="outline-text-2" id="text-functional-programming-1-recursion-and-immutable-data">
 
-<div id="orgc483d10" class="figure">
+<div id="org025970e" class="figure">
 <p><img src="./img/xkcd_parens.png" alt="xkcd_parens.png" />
 </p>
 </div>
 </div>
-<div id="outline-container-org7967d49" class="outline-3">
-<h3 id="org7967d49"><span class="section-number-3">2.1.</span> Overview</h3>
+<div id="outline-container-orgd6a80fd" class="outline-3">
+<h3 id="orgd6a80fd"><span class="section-number-3">2.1.</span> Overview</h3>
 <div class="outline-text-3" id="text-2-1">
 </div>
 <ol class="org-ol">
-<li><a id="org3d56a7e"></a>Objectives<br />
+<li><a id="orgcd8c628"></a>Objectives<br />
 <div class="outline-text-4" id="text-2-1-1">
 <ul class="org-ul">
 <li>To learn how to use Dr. Racket</li>
@@ -759,12 +721,12 @@ You might get hired to
 </li>
 </ol>
 </div>
-<div id="outline-container-orgbb76fa7" class="outline-3">
-<h3 id="orgbb76fa7"><span class="section-number-3">2.2.</span> Programming in CS 350</h3>
+<div id="outline-container-org0c3433d" class="outline-3">
+<h3 id="org0c3433d"><span class="section-number-3">2.2.</span> Programming in CS 350</h3>
 <div class="outline-text-3" id="text-2-2">
 </div>
 <ol class="org-ol">
-<li><a id="org3ab16a9"></a>All coding for this class uses:<br />
+<li><a id="org307b36b"></a>All coding for this class uses:<br />
 <div class="outline-text-4" id="text-2-2-1">
 <ul class="org-ul">
 <li>The Racket Programming Language</li>
@@ -781,12 +743,12 @@ You might get hired to
 </li>
 </ol>
 </div>
-<div id="outline-container-org4af1c20" class="outline-3">
-<h3 id="org4af1c20"><span class="section-number-3">2.3.</span> Racket</h3>
+<div id="outline-container-org21042c8" class="outline-3">
+<h3 id="org21042c8"><span class="section-number-3">2.3.</span> Racket</h3>
 <div class="outline-text-3" id="text-2-3">
 </div>
 <ol class="org-ol">
-<li><a id="org8a77ddf"></a>What is Racket?<br />
+<li><a id="org7965635"></a>What is Racket?<br />
 <div class="outline-text-4" id="text-2-3-1">
 <ul class="org-ul">
 <li>Lisp-style language
@@ -801,7 +763,7 @@ You might get hired to
 </ul>
 </div>
 </li>
-<li><a id="orgc8ba04e"></a>What is Dr. Racket?<br />
+<li><a id="org003ab40"></a>What is Dr. Racket?<br />
 <div class="outline-text-4" id="text-2-3-2">
 <ul class="org-ul">
 <li>IDE for Racket
@@ -823,12 +785,12 @@ You might get hired to
 </li>
 </ol>
 </div>
-<div id="outline-container-org2df67e3" class="outline-3">
-<h3 id="org2df67e3"><span class="section-number-3">2.4.</span> Flit</h3>
+<div id="outline-container-orgaa2f350" class="outline-3">
+<h3 id="orgaa2f350"><span class="section-number-3">2.4.</span> Flit</h3>
 <div class="outline-text-3" id="text-2-4">
 </div>
 <ol class="org-ol">
-<li><a id="orge9aa081"></a>What is Flit?<br />
+<li><a id="org8bbd1ef"></a>What is Flit?<br />
 <div class="outline-text-4" id="text-2-4-1">
 <ul class="org-ul">
 <li>"Functional Languages, Interpreters and Types"</li>
@@ -850,7 +812,7 @@ You might get hired to
 </ul>
 </div>
 </li>
-<li><a id="org2ef00be"></a>Flit features:<br />
+<li><a id="orgf3e4417"></a>Flit features:<br />
 <div class="outline-text-4" id="text-2-4-2">
 <ul class="org-ul">
 <li>Purely functional
@@ -876,7 +838,7 @@ You might get hired to
 </ul>
 </div>
 </li>
-<li><a id="org38ded51"></a>Syntax in Flit<br />
+<li><a id="org5e0f1c5"></a>Syntax in Flit<br />
 <div class="outline-text-4" id="text-2-4-3">
 <ul class="org-ul">
 <li>Expression: something that we run to compute a value</li>
@@ -902,7 +864,7 @@ the meaning of the expression
 </ul>
 </div>
 </li>
-<li><a id="org46acacc"></a>Infix vs. Prefix<br />
+<li><a id="org0d583a0"></a>Infix vs. Prefix<br />
 <div class="outline-text-4" id="text-2-4-4">
 <ul class="org-ul">
 <li>All operations in Flit are written using "prefix notation"
@@ -914,7 +876,7 @@ the meaning of the expression
 </ul>
 </div>
 </li>
-<li><a id="org3458e41"></a>Function calls<br />
+<li><a id="orge275c5d"></a>Function calls<br />
 <div class="outline-text-4" id="text-2-4-5">
 <ul class="org-ul">
 <li>In C++ you write <code>f(x,y,z)</code></li>
@@ -923,7 +885,7 @@ the meaning of the expression
 </ul>
 </div>
 </li>
-<li><a id="orgd387397"></a>Why Parentheses?<br />
+<li><a id="orgd63457f"></a>Why Parentheses?<br />
 <div class="outline-text-4" id="text-2-4-6">
 <ul class="org-ul">
 <li>They're different from what you're used to
@@ -943,7 +905,7 @@ the meaning of the expression
 </ul>
 </div>
 </li>
-<li><a id="org4e83e33"></a>Parentheses in the real world<br />
+<li><a id="org61bde97"></a>Parentheses in the real world<br />
 <div class="outline-text-4" id="text-2-4-7">
 <ul class="org-ul">
 <li>e.g. Clojure, uses parentheses</li>
@@ -952,9 +914,9 @@ the meaning of the expression
 </ul>
 </div>
 </li>
-<li><a id="orga8b81da"></a>Numbers<br />
+<li><a id="orgae083a9"></a>Numbers<br />
 <ol class="org-ol">
-<li><a id="org020e802"></a>Example<br />
+<li><a id="org90bcf59"></a>Example<br />
 <div class="outline-text-5" id="text-2-4-8-1">
 <div class="org-src-container">
 <pre class="src src-racket">(+ 2 7)
@@ -979,9 +941,9 @@ the meaning of the expression
 </li>
 </ol>
 </li>
-<li><a id="orgf7df44a"></a>Booleans<br />
+<li><a id="orga54dfb0"></a>Booleans<br />
 <ol class="org-ol">
-<li><a id="orgf22ca21"></a>Example<br />
+<li><a id="org467b562"></a>Example<br />
 <div class="outline-text-5" id="text-2-4-9-1">
 <div class="org-src-container">
 <pre class="src src-racket">(= (+ 2 3) 5)
@@ -1004,7 +966,7 @@ the meaning of the expression
 </li>
 </ol>
 </li>
-<li><a id="org1afed3e"></a>Imperative Languages<br />
+<li><a id="orgb5e673c"></a>Imperative Languages<br />
 <div class="outline-text-4" id="text-2-4-10">
 <ul class="org-ul">
 <li>C, C++, and Python are <i>imperative languages</i>
@@ -1022,7 +984,7 @@ the meaning of the expression
 </ul>
 </div>
 </li>
-<li><a id="orgd2065d9"></a>Functional Language<br />
+<li><a id="orgfc5c65a"></a>Functional Language<br />
 <div class="outline-text-4" id="text-2-4-11">
 <ul class="org-ul">
 <li>Flit is <i>purely functional</i></li>
@@ -1039,7 +1001,7 @@ the meaning of the expression
 </ul>
 </div>
 </li>
-<li><a id="org49e28ad"></a>Example: Imperative Conditionals<br />
+<li><a id="org6c4a69f"></a>Example: Imperative Conditionals<br />
 <div class="outline-text-4" id="text-2-4-12">
 <ul class="org-ul">
 <li>Conditionals in C++/Python tell what to <i>do</i></li>
@@ -1056,7 +1018,7 @@ else
 </ul>
 </div>
 </li>
-<li><a id="orgce62302"></a>Conditional Expressions<br />
+<li><a id="orgf6f9533"></a>Conditional Expressions<br />
 <div class="outline-text-4" id="text-2-4-13">
 <div class="org-src-container">
 <pre class="src src-racket">(if (&lt; 2 3) "hello" "goodbye")
@@ -1086,7 +1048,7 @@ else
 </ul>
 </div>
 </li>
-<li><a id="org7fc9b94"></a>Equational Reasoning<br />
+<li><a id="org92ce0a8"></a>Equational Reasoning<br />
 <div class="outline-text-4" id="text-2-4-14">
 <ul class="org-ul">
 <li>When all variables are immutable, we can treat programs as mathematical objects</li>
@@ -1098,7 +1060,7 @@ else
 <li>Example:</li>
 </ul>
 
-<div class="definition" id="orgc9bb36c">
+<div class="definition" id="orga1cc203">
 <p>
 For any number literals <code>m</code> and <code>n</code>, the expression <code>(+ m n)</code>
 is equal to the sum of <code>m</code> and <code>n</code>. The other arithmetic operations have similar rules.
@@ -1107,7 +1069,7 @@ is equal to the sum of <code>m</code> and <code>n</code>. The other arithmetic o
 </div>
 </div>
 </li>
-<li><a id="org86bf33f"></a>Imperative Breaks Equational Reasoning<br />
+<li><a id="org964c739"></a>Imperative Breaks Equational Reasoning<br />
 <div class="outline-text-4" id="text-2-4-15">
 <ul class="org-ul">
 <li><p>
@@ -1125,14 +1087,14 @@ x = 4;
 </ul>
 </div>
 </li>
-<li><a id="org8a5b9cd"></a>Equations for IF<br />
+<li><a id="orgf22e0bf"></a>Equations for IF<br />
 <div class="outline-text-4" id="text-2-4-16">
 <ul class="org-ul">
 <li><p>
 We can describe the behaviour of if-expressions with the following two equations:
 </p>
 
-<div class="definition" id="org37d651b">
+<div class="definition" id="org0c424b1">
 <p>
 For any expressions <code>EXPR1</code> and <code>EXPR2</code>
 </p>
@@ -1145,7 +1107,7 @@ For any expressions <code>EXPR1</code> and <code>EXPR2</code>
 </ul>
 </div>
 </li>
-<li><a id="orgf85afd9"></a>Functions<br />
+<li><a id="orgb0c86bd"></a>Functions<br />
 <div class="outline-text-4" id="text-2-4-17">
 <ul class="org-ul">
 <li>Calling a function replaces variable with concrete argument</li>
@@ -1158,7 +1120,7 @@ For any expressions <code>EXPR1</code> and <code>EXPR2</code>
 </div>
 </div>
 </li>
-<li><a id="orge06df62"></a>Functions<br />
+<li><a id="orgd955865"></a>Functions<br />
 <div class="outline-text-4" id="text-2-4-18">
 <div class="org-src-container">
 <pre class="src src-racket">(define (isRemainder [x : Number]
@@ -1172,7 +1134,7 @@ For any expressions <code>EXPR1</code> and <code>EXPR2</code>
 </div>
 </div>
 </li>
-<li><a id="orgac55c46"></a>Functions (ctd.)<br />
+<li><a id="orgbb5eb1e"></a>Functions (ctd.)<br />
 <div class="outline-text-4" id="text-2-4-19">
 <ul class="org-ul">
 <li>General form:</li>
@@ -1191,7 +1153,7 @@ For any expressions <code>EXPR1</code> and <code>EXPR2</code>
 </ul>
 </div>
 </li>
-<li><a id="org02c6ec3"></a>Symbols<br />
+<li><a id="orgbe98afe"></a>Symbols<br />
 <div class="outline-text-4" id="text-2-4-20">
 <ul class="org-ul">
 <li>Special type in Racket</li>
@@ -1205,7 +1167,7 @@ For any expressions <code>EXPR1</code> and <code>EXPR2</code>
 </ul>
 </div>
 </li>
-<li><a id="org793e507"></a>Intermediate definitions<br />
+<li><a id="org2c405d4"></a>Intermediate definitions<br />
 <div class="outline-text-4" id="text-2-4-21">
 <ul class="org-ul">
 <li>Can still define variables
@@ -1233,7 +1195,7 @@ For any expressions <code>EXPR1</code> and <code>EXPR2</code>
 </div>
 </div>
 </li>
-<li><a id="org2b260f6"></a>Intermediate Definitions<br />
+<li><a id="orgfeceb33"></a>Intermediate Definitions<br />
 <div class="outline-text-4" id="text-2-4-22">
 <ul class="org-ul">
 <li><p>
@@ -1261,7 +1223,7 @@ In C++, you might write
 </ul>
 </div>
 </li>
-<li><a id="org941e9f6"></a>Alternate Versions of Let<br />
+<li><a id="orgdb99551"></a>Alternate Versions of Let<br />
 <div class="outline-text-4" id="text-2-4-23">
 <ul class="org-ul">
 <li>TODO implement multi version as default exported</li>
@@ -1288,12 +1250,12 @@ In C++, you might write
 </li>
 </ol>
 </div>
-<div id="outline-container-org899f7e6" class="outline-3">
-<h3 id="org899f7e6"><span class="section-number-3">2.5.</span> Functional Thinking and Recursion</h3>
+<div id="outline-container-orgba8ff15" class="outline-3">
+<h3 id="orgba8ff15"><span class="section-number-3">2.5.</span> Functional Thinking and Recursion</h3>
 <div class="outline-text-3" id="text-2-5">
 </div>
 <ol class="org-ol">
-<li><a id="org6bb8da5"></a>What Is Functional Programming?<br />
+<li><a id="orge3373f6"></a>What Is Functional Programming?<br />
 <div class="outline-text-4" id="text-2-5-1">
 <ul class="org-ul">
 <li>Functions in our program correspond to functions in math
@@ -1317,7 +1279,7 @@ In C++, you might write
 </ul>
 </div>
 </li>
-<li><a id="org20a7223"></a>Advantages of Functional Programming<br />
+<li><a id="org604ec22"></a>Advantages of Functional Programming<br />
 <div class="outline-text-4" id="text-2-5-2">
 <ul class="org-ul">
 <li>All program state is <b>explicit</b>
@@ -1350,7 +1312,7 @@ In C++, you might write
 </ul>
 </div>
 </li>
-<li><a id="orgf70984c"></a>Disadvantages of Functional Programming<br />
+<li><a id="org33ea991"></a>Disadvantages of Functional Programming<br />
 <div class="outline-text-4" id="text-2-5-3">
 <ul class="org-ul">
 <li>None?</li>
@@ -1370,9 +1332,9 @@ In C++, you might write
 </ul>
 </div>
 </li>
-<li><a id="orga041674"></a>How to design functional programs<br />
+<li><a id="org2ffc8e2"></a>How to design functional programs<br />
 <ol class="org-ol">
-<li><a id="orgf4862e1"></a>5 Step method:<br />
+<li><a id="org4078d7e"></a>5 Step method:<br />
 <div class="outline-text-5" id="text-2-5-4-1">
 <ol class="org-ol">
 <li>Determine the <b>representation</b> of inputs and outputs</li>
@@ -1389,7 +1351,7 @@ In C++, you might write
 </ol>
 </div>
 </li>
-<li><a id="orgbd3f7ab"></a>Further reference:<br />
+<li><a id="orgd551c5b"></a>Further reference:<br />
 <div class="outline-text-5" id="text-2-5-4-2">
 <p>
 <a href="http://htdp.org">http://htdp.org</a>, Matthew Flatt's Notes (URCourses)
@@ -1398,7 +1360,7 @@ In C++, you might write
 </li>
 </ol>
 </li>
-<li><a id="org4b04e00"></a>Factorial - Representation<br />
+<li><a id="orga379140"></a>Factorial - Representation<br />
 <div class="outline-text-4" id="text-2-5-5">
 <ul class="org-ul">
 <li>\(n! = 1 \times 2 \times \ldots n\)</li>
@@ -1413,7 +1375,7 @@ Takes in a (natural) number, outputs a number
 </ul>
 </div>
 </li>
-<li><a id="orge14b10f"></a>Factorial - Examples<br />
+<li><a id="orga5be34d"></a>Factorial - Examples<br />
 <div class="outline-text-4" id="text-2-5-6">
 <div class="org-src-container">
 <pre class="src src-racket">
@@ -1430,7 +1392,7 @@ Takes in a (natural) number, outputs a number
 </ul>
 </div>
 </li>
-<li><a id="orgd91f72e"></a>Factorial - Template<br />
+<li><a id="org9d2cfed"></a>Factorial - Template<br />
 <div class="outline-text-4" id="text-2-5-7">
 <ul class="org-ul">
 <li>A natural number is either
@@ -1454,7 +1416,7 @@ Takes in a (natural) number, outputs a number
 </div>
 </div>
 </li>
-<li><a id="org893293d"></a>Factorial - Recursion<br />
+<li><a id="org60572aa"></a>Factorial - Recursion<br />
 <div class="outline-text-4" id="text-2-5-8">
 <ul class="org-ul">
 <li>Divide problem into base case and recursive cases</li>
@@ -1474,7 +1436,7 @@ Takes in a (natural) number, outputs a number
 </div>
 </div>
 </li>
-<li><a id="org29069de"></a>Factorial - Filling holes<br />
+<li><a id="org6793a57"></a>Factorial - Filling holes<br />
 <div class="outline-text-4" id="text-2-5-9">
 <ul class="org-ul">
 <li>Example gives the base case for 0</li>
@@ -1485,7 +1447,7 @@ Takes in a (natural) number, outputs a number
 </ul></li>
 </ul>
 <div class="org-src-container">
-<pre class="src src-racket" id="org667d741">(define (factorial [n : Number]) : Number
+<pre class="src src-racket" id="org87d34df">(define (factorial [n : Number]) : Number
   (if (zero? n)
       1
       (let*
@@ -1497,7 +1459,7 @@ Takes in a (natural) number, outputs a number
 </div>
 </div>
 </li>
-<li><a id="orgda7be87"></a>Run Tests<br />
+<li><a id="org40908f5"></a>Run Tests<br />
 <div class="outline-text-4" id="text-2-5-10">
 <div class="org-src-container">
 <pre class="src src-racket">
@@ -1507,7 +1469,7 @@ Takes in a (natural) number, outputs a number
 </div>
 </div>
 </li>
-<li><a id="org1bde48f"></a>Trust the Natural Recursion<br />
+<li><a id="org6e05307"></a>Trust the Natural Recursion<br />
 <div class="outline-text-4" id="text-2-5-11">
 <ul class="org-ul">
 <li>The magic key:
@@ -1527,7 +1489,7 @@ Takes in a (natural) number, outputs a number
 </ul>
 </div>
 </li>
-<li><a id="orge86452c"></a>Preconditions<br />
+<li><a id="org2c894f8"></a>Preconditions<br />
 <div class="outline-text-4" id="text-2-5-12">
 <ul class="org-ul">
 <li>Note: types not quite precise enough
@@ -1542,7 +1504,7 @@ Takes in a (natural) number, outputs a number
 </ul>
 </div>
 </li>
-<li><a id="org2c9eb75"></a>Another Example: Exponentiation<br />
+<li><a id="orgae92154"></a>Another Example: Exponentiation<br />
 <div class="outline-text-4" id="text-2-5-13">
 <ul class="org-ul">
 <li>Live coding in Dr. Racket</li>
@@ -1551,12 +1513,12 @@ Takes in a (natural) number, outputs a number
 </li>
 </ol>
 </div>
-<div id="outline-container-org0cd7061" class="outline-3">
-<h3 id="org0cd7061"><span class="section-number-3">2.6.</span> Unbounded Data: Lists</h3>
+<div id="outline-container-org9ecb239" class="outline-3">
+<h3 id="org9ecb239"><span class="section-number-3">2.6.</span> Unbounded Data: Lists</h3>
 <div class="outline-text-3" id="text-2-6">
 </div>
 <ol class="org-ol">
-<li><a id="org416e561"></a>Functional Linked Lists<br />
+<li><a id="org5cbe624"></a>Functional Linked Lists<br />
 <div class="outline-text-4" id="text-2-6-1">
 <ul class="org-ul">
 <li>Every linked list is one of:
@@ -1575,7 +1537,7 @@ Takes in a (natural) number, outputs a number
 </ul>
 </div>
 </li>
-<li><a id="org6461c32"></a>Lists in Racket<br />
+<li><a id="org023a909"></a>Lists in Racket<br />
 <div class="outline-text-4" id="text-2-6-2">
 <ul class="org-ul">
 <li>Multiple ways to write lists</li>
@@ -1593,7 +1555,7 @@ Takes in a (natural) number, outputs a number
 </ul>
 </div>
 </li>
-<li><a id="orgfff7078"></a>Template for Lists<br />
+<li><a id="org4c86c89"></a>Template for Lists<br />
 <div class="outline-text-4" id="text-2-6-3">
 <ul class="org-ul">
 <li>Two cases: list is empty or cons</li>
@@ -1615,7 +1577,7 @@ Make a recursive call on tail of cons case
 </ul>
 </div>
 </li>
-<li><a id="orgfc137f0"></a>Example: Sum<br />
+<li><a id="orgcbe3447"></a>Example: Sum<br />
 <div class="outline-text-4" id="text-2-6-4">
 <div class="org-src-container">
 <pre class="src src-racket">(define (sum [xs : (Listof Number)])
@@ -1639,7 +1601,7 @@ Make a recursive call on tail of cons case
 </div>
 </div>
 </li>
-<li><a id="org972f82d"></a>Pattern Matching: Motivation<br />
+<li><a id="orga95a4f2"></a>Pattern Matching: Motivation<br />
 <div class="outline-text-4" id="text-2-6-5">
 <ul class="org-ul">
 <li>Recursive case: used "getter" function to get the sub-data in the recursive case
@@ -1655,10 +1617,10 @@ Make a recursive call on tail of cons case
 </ul>
 </div>
 </li>
-<li><a id="org36e9cc6"></a>Pattern Matching:<br /></li>
+<li><a id="orgcc57e51"></a>Pattern Matching:<br /></li>
 
 
-<li><a id="org5af442b"></a>Example: Generating a Modified List<br />
+<li><a id="org6c39328"></a>Example: Generating a Modified List<br />
 <div class="outline-text-4" id="text-2-6-7">
 <ul class="org-ul">
 <li><p>
@@ -1682,7 +1644,7 @@ e.g. Increment each number in a list
 </ul>
 </div>
 </li>
-<li><a id="org501c501"></a>Parametric Polymorphism<br />
+<li><a id="org9b72fda"></a>Parametric Polymorphism<br />
 <div class="outline-text-4" id="text-2-6-8">
 <ul class="org-ul">
 <li>Lists are a <b>parameterized type</b>
@@ -1708,7 +1670,7 @@ e.g. Increment each number in a list
 </ul>
 </div>
 </li>
-<li><a id="org235a563"></a>Example: List Concatenation<br />
+<li><a id="orge34d07a"></a>Example: List Concatenation<br />
 <div class="outline-text-4" id="text-2-6-9">
 <ul class="org-ul">
 <li>We can combine two lists into a single list</li>
@@ -1720,7 +1682,7 @@ e.g. Increment each number in a list
 This function is built into Plait as <code>append</code>
 </p>
 <div class="org-src-container">
-<pre class="src src-racket" id="org18575dd">(define (concat [xs : (Listof 'elem)]
+<pre class="src src-racket" id="org4c98b5a">(define (concat [xs : (Listof 'elem)]
                 [ys : (Listof 'elem)])
         : (Listof 'elem)
   (type-case (Listof 'elem) xs
@@ -1734,12 +1696,12 @@ This function is built into Plait as <code>append</code>
 </ul>
 </div>
 </li>
-<li><a id="org3ae549b"></a>Example: List Concatenation (ctd.)<br />
+<li><a id="org91596ca"></a>Example: List Concatenation (ctd.)<br />
 <ol class="org-ol">
-<li><a id="org5b08551"></a>Example<br />
+<li><a id="org5f5c1fe"></a>Example<br />
 <div class="outline-text-5" id="text-2-6-10-1">
 <div class="org-src-container">
-<pre class="src src-racket" id="org255f89e">
+<pre class="src src-racket" id="org83143a8">
 
 (concat '(1 2 3) '(4 5 6))
 (concat '("3" "5") '("0"))
@@ -1749,13 +1711,13 @@ This function is built into Plait as <code>append</code>
 </div>
 </div>
 </li>
-<li><a id="org6db3078"></a>Results<br />
+<li><a id="orgf6dd4c7"></a>Results<br />
 <div class="outline-text-5" id="text-2-6-10-2">
 </div>
 </li>
 </ol>
 </li>
-<li><a id="org55a8d54"></a>More Examples<br />
+<li><a id="org9916809"></a>More Examples<br />
 <div class="outline-text-4" id="text-2-6-11">
 <ul class="org-ul">
 <li>Demo: Dr. Racket (as time permits)
@@ -1764,1555 +1726,6 @@ This function is built into Plait as <code>append</code>
 <li>"zipping" two lists together</li>
 <li>Filtering out odd elements of a list</li>
 </ul></li>
-</ul>
-</div>
-</li>
-</ol>
-</div>
-</div>
-<div id="outline-container-functional-programming-2-defining-data-types" class="outline-2">
-<h2 id="functional-programming-2-defining-data-types"><span class="section-number-2">3.</span> Defining Data Types</h2>
-<div class="outline-text-2" id="text-functional-programming-2-defining-data-types">
-</div>
-<div id="outline-container-warmup-pairs" class="outline-3">
-<h3 id="warmup-pairs"><span class="section-number-3">3.1.</span> Warmup: Pairs</h3>
-<div class="outline-text-3" id="text-warmup-pairs">
-</div>
-<ol class="org-ol">
-<li><a id="org5a15ab4"></a>Pairs: "AND" for types<br />
-<div class="outline-text-4" id="text-3-1-1">
-<ul class="org-ul">
-<li><code>(Number * Boolean)</code>
-<ul class="org-ul">
-<li>Cartesian product
-<ul class="org-ul">
-<li>"AND" for types</li>
-</ul></li>
-<li>A value of this type contains a <code>Number</code> AND <code>a Boolean</code></li>
-<li>Why is it infix? Who knows
-<ul class="org-ul">
-<li>Maybe to help distinguish it from multiplication</li>
-</ul></li>
-</ul></li>
-<li>Projections
-<ul class="org-ul">
-<li>Get the data from the pairs</li>
-</ul></li>
-</ul>
-<div class="org-src-container">
-<pre class="src src-racket">(define myPair : (Number * Boolean)
-   (pair 2 #t))
-(fst myPair) ;;Number
-(snd myPair) ;;Boolean
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-racket">2
-#t
-</pre>
-</div>
-</div>
-</li>
-<li><a id="org2eaa0ac"></a>Pairs in General<br />
-<div class="outline-text-4" id="text-3-1-2">
-<ul class="org-ul">
-<li>For any types <code>'a</code> and <code>'b</code> there is a type <code>('a * 'b)</code></li>
-<li>Build with <code>pair : ('a 'b -&gt; ('a * 'b))</code>
-<ul class="org-ul">
-<li>Takes one argument of each type, produces the pair</li>
-</ul></li>
-<li>Projections
-<ul class="org-ul">
-<li><code>fst : (('a * 'b) -&gt; 'a)</code></li>
-<li><code>snd : (('a * 'b) -&gt; 'b)</code></li>
-</ul></li>
-</ul>
-</div>
-</li>
-</ol>
-</div>
-<div id="outline-container-algebraic-data-types" class="outline-3">
-<h3 id="algebraic-data-types"><span class="section-number-3">3.2.</span> Algebraic Data Types</h3>
-<div class="outline-text-3" id="text-algebraic-data-types">
-</div>
-<ol class="org-ol">
-<li><a id="orgc8a8c62"></a>"OR" for types<br />
-<div class="outline-text-4" id="text-3-2-1">
-<ul class="org-ul">
-<li>Pairs gave us "AND"</li>
-<li>What does "OR" look like for types?
-<ul class="org-ul">
-<li><code>(OR Number Boolean)</code> should be the type of values that are either a number or a boolean</li>
-<li>Want a tag so we can check which one it is
-<ul class="org-ul">
-<li>Called a "constructor"</li>
-<li>not the same as Java/OOP constructor</li>
-</ul></li>
-</ul></li>
-<li>Saw some examples like this already
-<ul class="org-ul">
-<li>A number is zero OR one plus another number</li>
-<li>A list is empty OR an element cons-ed to another list</li>
-</ul></li>
-<li>Racket lets us define our own types mixing AND and OR</li>
-</ul>
-</div>
-</li>
-<li><a id="org9287ebc"></a>First example<br />
-<div class="outline-text-4" id="text-3-2-2">
-<div class="org-src-container">
-<pre class="src src-racket" id="orgcfb68d0">(define-type Shape
-  (Rectangle [length : Number]
-             [width : Number])
-  (Circle [radius : Number]))
-
-(define tv (Rectangle 16 9))
-(define loonie (Circle 1))
-</pre>
-</div>
-<ul class="org-ul">
-<li><code>Shape</code> is a <i>datatype</i></li>
-<li>It has two <i>constructors</i>, <code>Rectangle</code> and <code>Circle</code>
-<ul class="org-ul">
-<li>i.e. a Shape is a circle or a rectangle</li>
-</ul></li>
-<li><code>Rectangle</code> has two fields with type Number, <code>length</code> and <code>width</code></li>
-<li><code>Circle</code> has one field with type Number</li>
-</ul>
-</div>
-</li>
-<li><a id="orgde7ef7b"></a>Creating values of a datatype<br />
-<div class="outline-text-4" id="text-3-2-3">
-<div class="org-src-container">
-<pre class="src src-racket">(define-type Shape
-  (Rectangle [length : Number]
-             [width : Number])
-  (Circle [radius : Number]))
-
-(define tv (Rectangle 16 9))
-(define loonie (Circle 1))
-</pre>
-</div>
-<ul class="org-ul">
-<li>We construct a Shape by calling a constructor
-<ul class="org-ul">
-<li>Doesn't <b>do</b> anything except package the data together</li>
-</ul></li>
-<li>A Shape either has two numbers OR one number
-<ul class="org-ul">
-<li>Depending on the tag</li>
-</ul></li>
-</ul>
-</div>
-</li>
-<li><a id="org60f5322"></a>Auto-generated Functions<br />
-<div class="outline-text-4" id="text-3-2-4">
-<div class="org-src-container">
-<pre class="src src-racket">
-(Rectangle? tv)
-(Circle? tv)
-(Rectangle-length tv)
-;; (test/exn (Circle-radius tv) "")
-  ;;raises an error, no such field present
-</pre>
-</div>
-</div>
-</li>
-<li><a id="orgc25d257"></a>Pattern matching<br />
-<div class="outline-text-4" id="text-3-2-5">
-<ul class="org-ul">
-<li>Don't want to accidentally get a field that doesn't exist</li>
-<li>Almost always want to use the fields in the solution</li>
-<li>Solution: pattern-matching</li>
-</ul>
-<div class="org-src-container">
-<pre class="src src-racket">
-(define (area [shp : Shape]) : Number
-  (type-case Shape shp
-     [(Rectangle l w)
-       (* l w)]
-     [(Circle r)
-       (* 3.14 (* r r))])
-)
-(area tv)
-(area loonie)
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-racket">144
-3.14
-</pre>
-</div>
-</div>
-</li>
-<li><a id="orgcc43eec"></a>Total Matching<br />
-<div class="outline-text-4" id="text-3-2-6">
-<ul class="org-ul">
-<li>Missing a case in pattern matching is a <i>syntax error</i></li>
-<li>Lets us know we are safe</li>
-<li>Can add an else clause to handle multiple cases
-<ul class="org-ul">
-<li>See Racket window</li>
-</ul></li>
-</ul>
-</div>
-</li>
-<li><a id="orgbe18169"></a>E.g. Representing Failure<br />
-<div class="outline-text-4" id="text-3-2-7">
-<ul class="org-ul">
-<li>In plait standard library</li>
-</ul>
-<div class="org-src-container">
-<pre class="src src-racket">(define-type (Optionof 'a)
-  (none)
-  (some [v : 'a]))
-</pre>
-</div>
-<ul class="org-ul">
-<li>Pattern matching guarantees no null pointer errors
-<ul class="org-ul">
-<li>We'll see a more detailed example</li>
-</ul></li>
-</ul>
-</div>
-</li>
-<li><a id="orgce650fa"></a>Most Generic Form<br />
-<div class="outline-text-4" id="text-3-2-8">
-<div class="org-src-container">
-<pre class="src src-racket">(define-type (Either 'a 'b)
-  (Left [inLeft : 'a])
-  (Right [inRight : 'b])
-)
-</pre>
-</div>
-<ul class="org-ul">
-<li>You can define all (non-recursive) datatypes  with this and pairs</li>
-<li>e.g. Shape is <code>(Either (Number * Number) Number)</code></li>
-</ul>
-</div>
-</li>
-</ol>
-</div>
-<div id="outline-container-recursive-data" class="outline-3">
-<h3 id="recursive-data"><span class="section-number-3">3.3.</span> Recursive Data</h3>
-<div class="outline-text-3" id="text-recursive-data">
-</div>
-<ol class="org-ol">
-<li><a id="org02e51dd"></a>Self-reference in types<br />
-<div class="outline-text-4" id="text-3-3-1">
-<ul class="org-ul">
-<li>The real power of datatypes is the ability to have fields of the type being defined</li>
-<li>This allows us to define <b>trees</b>
-<ul class="org-ul">
-<li>of arbitrary depth</li>
-</ul></li>
-<li>Data can be traversed using recursion</li>
-</ul>
-</div>
-</li>
-<li><a id="org133ee6b"></a>Example: Lists as a dataype<br />
-<div class="outline-text-4" id="text-3-3-2">
-<div class="org-src-container">
-<pre class="src src-racket" id="orgf43cee6">(define-type NumList
-  (Nil)
-  (Cons [head : Number] [tail : NumList]))
-</pre>
-</div>
-<ul class="org-ul">
-<li>Note: this is not quite how lists are defined in Racket/plait
-<ul class="org-ul">
-<li>But they could be!</li>
-</ul></li>
-<li>Recursive fields in datatype \(\to\) recursive calls in template</li>
-</ul>
-<div class="org-src-container">
-<pre class="src src-racket">
-(define (sum [xs : NumList])
-  (type-case NumList xs
-             [(Nil)
-              0]
-             [(Cons h t)
-              (let ([sumRest (sum t)])
-                    (+ h (sum t)))
-              ]))
-(sum (Cons 100 (Cons 20 (Cons 3 (Nil)))))
-</pre>
-</div>
-</div>
-</li>
-<li><a id="org9e033af"></a>Example: Filesystem<br />
-<div class="outline-text-4" id="text-3-3-3">
-<ul class="org-ul">
-<li>Model of a file system
-<ul class="org-ul">
-<li>Not how is implemented on disk</li>
-</ul></li>
-</ul>
-<div class="org-src-container">
-<pre class="src src-racket" id="org9ae54ae">(define-type Filesystem
-  (File [name : String]
-        [data : Number])
-  (Folder [name : String]
-          [contents : (Listof Filesystem)]))
-</pre>
-</div>
-</div>
-</li>
-<li><a id="org2e2a956"></a>Linear Search using Recursion<br />
-<div class="outline-text-4" id="text-3-3-4">
-<ul class="org-ul">
-<li>Find the first matching file</li>
-</ul>
-<div class="org-src-container">
-<pre class="src src-racket" id="orga2fd1c9">
-(define (search [target : String]
-                [fs : Filesystem]) : (Optionof Number)
-  (type-case Filesystem fs
-             [(File name data)
-              (if (string=? name target)
-                  (some data)
-                  (none))]
-             [(Folder _ contents)
-               (searchList target contents)]))
-</pre>
-</div>
-</div>
-</li>
-<li><a id="orgc479713"></a>Helper Function: Searching the list<br />
-<div class="outline-text-4" id="text-3-3-5">
-<ul class="org-ul">
-<li>We have mutually recursive types
-<ul class="org-ul">
-<li><code>Filesystem</code> contains <code>(Listof Filesystem)</code></li>
-<li><code>(Listof Filesystem)</code> contains <code>Filesystem</code></li>
-</ul></li>
-<li>So we use mutually-recursive functions</li>
-</ul>
-
-<div class="org-src-container">
-<pre class="src src-racket" id="org7724504">
-(define (searchList [target : String]
-                    [files : (Listof Filesystem)])
-        : (Optionof Number)
-  (type-case (Listof Filesystem) files
-             [empty (none)]
-             [(cons h t)
-              (let ([result (search target h)])
-                (if (none? result)
-                    (searchList target t)
-                    result))
-              ]))
-</pre>
-</div>
-</div>
-</li>
-<li><a id="org8535491"></a>Testing the search<br />
-<div class="outline-text-4" id="text-3-3-6">
-<div class="org-src-container">
-<pre class="src src-racket">
-
-
-(define InnerSolarSystem
-  (Folder "Sun"
-          (list (File "Mercury" 1)
-                (File "Venus" 2)
-                (Folder "EarthSystem"
-                        (list (File "Earth" 3)
-                              (File "Moon" 3.5)))
-                (Folder "MarsSystem"
-                        (list (File "Mars" 4)
-                              (File "Phobos" 4.3)
-                              (File "Diemos" 4.6))))))
-
-(search "Moon" InnerSolarSystem)
-(search "Jupiter" InnerSolarSystem)
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-racket">(some 3.5)
-(none)
-</pre>
-</div>
-</div>
-</li>
-</ol>
-</div>
-</div>
-<div id="outline-container-functional-programming-2-first-class-functions" class="outline-2">
-<h2 id="functional-programming-2-first-class-functions"><span class="section-number-2">4.</span> First-Class Functions</h2>
-<div class="outline-text-2" id="text-functional-programming-2-first-class-functions">
-</div>
-<div id="outline-container-higher-order-functions" class="outline-3">
-<h3 id="higher-order-functions"><span class="section-number-3">4.1.</span> Higher Order Functions</h3>
-<div class="outline-text-3" id="text-higher-order-functions">
-</div>
-<ol class="org-ol">
-<li><a id="orgc4dfe0f"></a>Functions on Functions<br />
-<div class="outline-text-4" id="text-4-1-1">
-<ul class="org-ul">
-<li>Functions let us be abstract over the data they work on</li>
-<li>But why can't we be abstract over what they do to that data?
-<ul class="org-ul">
-<li>We can!</li>
-</ul></li>
-<li>A <b>higher order function</b> is a function that takes functions as an argument,
-or returns functions as a value.</li>
-<li>Examples:
-<ul class="org-ul">
-<li>Callbacks
-<ul class="org-ul">
-<li>Give a GUI element the function to run when clicked</li>
-</ul></li>
-<li>Threads
-<ul class="org-ul">
-<li>Give the function for each thread to compute</li>
-</ul></li>
-</ul></li>
-</ul>
-</div>
-</li>
-<li><a id="org88878ce"></a>Function types<br />
-<div class="outline-text-4" id="text-4-1-2">
-<ul class="org-ul">
-<li>Type <code>(T1 T2 ... Tn -&gt; S)</code>
-<ul class="org-ul">
-<li>The type of functions that:
-<ul class="org-ul">
-<li>take \(n\) arguments</li>
-<li>each with type \(T_i\) respectively</li>
-<li>produces a result of type \(S\)</li>
-</ul></li>
-</ul></li>
-<li>Functions can be defined, where their arguments <i>are function types!</i></li>
-</ul>
-</div>
-</li>
-<li><a id="org7478714"></a>First Class Functions<br />
-<div class="outline-text-4" id="text-4-1-3">
-<ul class="org-ul">
-<li>We say a language has <i>first class functions</i> if functions are treated like any
-other expression/value in a language
-<ul class="org-ul">
-<li>We can construct them at any point, not just at the top level</li>
-<li>We can give them as arguments to functions</li>
-<li>We can return them as results of functions</li>
-</ul></li>
-</ul>
-</div>
-</li>
-<li><a id="orge4ef7a3"></a>Example: Repeatedly apply a function<br />
-<div class="outline-text-4" id="text-4-1-4">
-<div class="org-src-container">
-<pre class="src src-racket" id="orgb6feafa">(define (applyNTimes [f : (Number -&gt; Number)]
-                     [x : Number]
-                     [nTimes : Number]) : Number
-  (if (&lt;= nTimes 0)
-      x
-      (applyNTimes f (f x) (- nTimes 1))))
-</pre>
-</div>
-
-
-<ul class="org-ul">
-<li>Takes 3 arguments
-<ul class="org-ul">
-<li>A function from Number to Number</li>
-<li>A number</li>
-<li>A number</li>
-</ul></li>
-<li>Returns a number</li>
-<li>In the body:
-<ul class="org-ul">
-<li>Calls the parameter <code>f</code> as a function on <code>x</code></li>
-</ul></li>
-</ul>
-</div>
-</li>
-<li><a id="org56c0f95"></a>ctd<br />
-<div class="outline-text-4" id="text-4-1-5">
-<div class="org-src-container">
-<pre class="src src-racket">
-(define (timesTen x) (* 10 x))
-
-(applyNTimes add1 3 5)
-(applyNTimes timesTen 3 5)
-</pre>
-</div>
-<ul class="org-ul">
-<li>Takes whatever function we pass in, applies it to 3, 5 times
-<ul class="org-ul">
-<li><code>(f (f (f (f (f 3)))))</code></li>
-</ul></li>
-</ul>
-</div>
-</li>
-<li><a id="org220aa80"></a>Example: apply an operation to each number in a list<br />
-<div class="outline-text-4" id="text-4-1-6">
-<div class="org-src-container">
-<pre class="src src-racket" id="org0777b87">(define (mapNum [f : (Number -&gt; Number)]
-                [xs : (Listof Number)]) : (Listof Number)
-  (type-case (Listof Number) xs
-             [empty empty]
-             [(cons x rest)
-                (cons (f x) (mapNum f rest))]))
-</pre>
-</div>
-<ul class="org-ul">
-<li>Takes a function from Numbers to Numbers, and a list of numbers</li>
-<li>Applies <code>f</code> to each element of the list
-<ul class="org-ul">
-<li>Apply <code>f</code> to everything in the empty list
-<ul class="org-ul">
-<li>Produces empty list</li>
-</ul></li>
-<li>Apply <code>f</code> to each in  <code>(cons x rest)</code>
-<ul class="org-ul">
-<li>Apply <code>f</code> to <code>x</code>, recursively apply <code>f</code> to everything in <code>rest</code></li>
-<li>Combine the results with <code>cons</code></li>
-</ul></li>
-</ul></li>
-</ul>
-</div>
-</li>
-<li><a id="orgea6e363"></a>ctd<br />
-<div class="outline-text-4" id="text-4-1-7">
-<div class="org-src-container">
-<pre class="src src-racket">
-(define (timesTen x) (* 10 x))
-(mapNum add1 '(1 2 3 4))
-(mapNum timesTen '(1 2 3 4))
-</pre>
-</div>
-</div>
-</li>
-<li><a id="org7828d91"></a>Creating Anonymous Functions<br />
-<div class="outline-text-4" id="text-4-1-8">
-<ul class="org-ul">
-<li>So far, have only given functions that we defined with <code>define</code> as arguments to other functions</li>
-<li>What if we want to make a small little function that we use only once?</li>
-<li>What if we want to make a function dynamically?</li>
-</ul>
-</div>
-</li>
-<li><a id="orgc1d3669"></a>Lambda<br />
-<div class="outline-text-4" id="text-4-1-9">
-<div class="org-src-container">
-<pre class="src src-racket">(lambda (x) body)
-</pre>
-</div>
-<ul class="org-ul">
-<li>Creates a function with argument <code>x</code> that returns <code>body</code></li>
-<li><code>x</code> may occur in body</li>
-<li>Is an expression, not a declaration
-<ul class="org-ul">
-<li>Can occur anywhere else</li>
-</ul></li>
-</ul>
-</div>
-</li>
-<li><a id="org789fc48"></a>Lambda variations<br />
-<div class="outline-text-4" id="text-4-1-10">
-<div class="org-src-container">
-<pre class="src src-racket">;; Type annotation
-(lambda ([x : Number]) : Number
-  (+ x 1))
-
-;; Multiple arguments
-(lambda (x y) (+ x (+ x y)))
-
-;;Multiple type annotations
-(lambda ([x : Number]
-   [y : Number]) (+ x (+ x y)))
-
-;; Unicode Greek lambda
-;; In Dr. Racket: either cmd-\ or ctrl-\ depending on os
-(λ (x) (+ x x))
-</pre>
-</div>
-</div>
-</li>
-<li><a id="org2c7a347"></a>Example<br />
-<div class="outline-text-4" id="text-4-1-11">
-<div class="org-src-container">
-<pre class="src src-racket">
-(define (timesTen x) (* 10 x))
-(mapNum timesTen '(1 2 3 4))
-(mapNum (lambda (x) (* x 10)) '(1 2 3 4))
-</pre>
-</div>
-</div>
-</li>
-<li><a id="org6e47371"></a>Define as sugar<br />
-<div class="outline-text-4" id="text-4-1-12">
-<ul class="org-ul">
-<li><code>(define (f x) body)</code></li>
-<li>Same as <code>(define f (lambda (x) body))</code></li>
-<li>Defining functions is <i>syntactic sugar</i> for lambda in Plait</li>
-</ul>
-</div>
-</li>
-<li><a id="org78cf83c"></a>Lambda in a context<br />
-<div class="outline-text-4" id="text-4-1-13">
-<ul class="org-ul">
-<li>Don't have to use lambda at the top level</li>
-<li>Can refer to other variables in the body of the lambda</li>
-</ul>
-<div class="org-src-container">
-<pre class="src src-racket">
-(define (addNToEach [numToAdd : Number]
-                    [xs : (Listof Number)]) : (Listof Number)
-  (mapNum (lambda(x) (+ x numToAdd)) xs))
-(addNToEach 3 '(1 2 3 4))
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-racket">'(4 5 6 7)
-</pre>
-</div>
-<ul class="org-ul">
-<li>The lambda <b>captures</b> the variable <code>numToAdd</code></li>
-<li>Dynamically creates the function that adds its argument to whatever <code>numToAdd</code> is</li>
-</ul>
-</div>
-</li>
-<li><a id="orge6f620b"></a>Functions as return values<br />
-<div class="outline-text-4" id="text-4-1-14">
-<ul class="org-ul">
-<li>We can also make functions that produce other functions as a result
-<ul class="org-ul">
-<li>Just use <code>lambda</code> in the body of the function</li>
-</ul></li>
-</ul>
-<div class="org-src-container">
-<pre class="src src-racket">
-(define (makeAdderWith n) : (Number -&gt; Number)
-  (lambda (x) (+ n x)))
-(makeAdderWith 3)
-(mapNum (makeAdderWith 3))
-</pre>
-</div>
-</div>
-</li>
-<li><a id="org04e8311"></a>Combinators<br />
-<div class="outline-text-4" id="text-4-1-15">
-<ul class="org-ul">
-<li>Functions that take and return functions</li>
-<li>Can "lift" operations to whole functions</li>
-<li>Create a new function by specifying how it should behave on each input
-<ul class="org-ul">
-<li>Lambda lets us refer to this variable</li>
-</ul></li>
-</ul>
-<div class="org-src-container">
-<pre class="src src-racket">
-(define (+fun [f : (Number -&gt; Number)]
-              [g : (Number -&gt; Number)]) : (Number -&gt; Number)
-  (lambda (x) (+ (f x) (g x))))
-;; e.g. Make the function that computes
-</pre>
-</div>
-</div>
-</li>
-<li><a id="orgfe92a7a"></a>Example: Beyond Numbers<br />
-<div class="outline-text-4" id="text-4-1-16">
-<div class="org-src-container">
-<pre class="src src-racket">(define (liftOption [f : (Number -&gt; Number)])
-  : ((Optionof Number) -&gt; (Optionof Number))
-  (lambda ([optionN : (Optionof Number)])
-    (type-case (Optionof Number) optionN
-      [(none) (none)]
-      [(some x) (some (f x))]
-      )))
-(define optionPlusOne (liftOption add1))
-(optionPlusOne (some 3))
-(optionPlusOne (none))
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-racket">(some 4)
-(none)
-</pre>
-</div>
-</div>
-</li>
-</ol>
-</div>
-</div>
-<div id="outline-container-polymorphic-higher-order-functions" class="outline-2">
-<h2 id="polymorphic-higher-order-functions"><span class="section-number-2">5.</span> Polymorphic Higher-Order Functions</h2>
-<div class="outline-text-2" id="text-polymorphic-higher-order-functions">
-</div>
-<div id="outline-container-highly-generic-programming" class="outline-3">
-<h3 id="highly-generic-programming"><span class="section-number-3">5.1.</span> Highly Generic Programming</h3>
-<div class="outline-text-3" id="text-highly-generic-programming">
-</div>
-<ol class="org-ol">
-<li><a id="org905a87a"></a>Polymorphic Functions<br />
-<div class="outline-text-4" id="text-5-1-1">
-<ul class="org-ul">
-<li>Higher-order functions are even more powerful when combined with type variables</li>
-<li>Allows us to say "This works on any type, as long as that type supports this kind of operation"</li>
-<li>Express ideas like "do this to every element in a list"</li>
-</ul>
-</div>
-</li>
-<li><a id="orgb151857"></a>Example: Sorting<br />
-<div class="outline-text-4" id="text-5-1-2">
-<div class="org-src-container">
-<pre class="src src-racket">(define (sortNumbers [xs : (Listof Number)]) : (Listof Number)
-  ....)
-
-;; These implementations are probably doing 99% the same thing
-;; except they're using different comparison operators
-(define (sortById [xs : (Listof (Number * String))])
-        : (Listof (Number * String))
-  ....)
-
-;; What we really want is this:
-(define (sortBy [xs : (Listof 'a)]
-                [compare : ('a 'a -&gt; Boolean)])
-  : (Listof 'a)
-  ....)
-</pre>
-</div>
-<ul class="org-ul">
-<li>Sort function that works on any type <code>'a</code>
-<ul class="org-ul">
-<li>So long as we have a comparison function <code>compare</code> that can find if one <code>'a</code> value is &lt;= another</li>
-</ul></li>
-</ul>
-</div>
-</li>
-<li><a id="org5daaf74"></a>Map<br />
-<div class="outline-text-4" id="text-5-1-3">
-<ul class="org-ul">
-<li>One of the most essential functions on list</li>
-<li>For each element in the list, apply this function to each element
-<ul class="org-ul">
-<li>Returns the resulting list, original list is unchanged</li>
-</ul></li>
-<li>If your function takes in type <code>'a</code> and produces type <code>'b</code>, then <code>map</code> can turn a <code>(Listof 'a)</code> into <code>(Listof 'b)</code></li>
-</ul>
-<div class="org-src-container">
-<pre class="src src-racket">(define (map [f : ('a -&gt; 'b)]
-           [xs : (Listof 'a)]) : (Listof 'b)
-  (type-case (Listof 'a) xs
-             [empty
-               empty]
-             [(cons x rest)
-               (cons (f x)
-                     (map f rest))]))
-</pre>
-</div>
-</div>
-</li>
-<li><a id="org6a1e0b0"></a>Examples<br />
-<div class="outline-text-4" id="text-5-1-4">
-<div class="org-src-container">
-<pre class="src src-racket">(map (lambda (x) (* x 1001)) '(1 2 3 4))
-(map not '(#t #f #f #t))
-(map some '("Hello" "Goodbye"))
-
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-racket">'(1001 2002 3003 4004)
-'(#f #t #t #f)
-(list (some "Hello") (some "Goodbye"))
-</pre>
-</div>
-</div>
-</li>
-<li><a id="org4a5ab15"></a>Map does recursion so you don't have to<br />
-<div class="outline-text-4" id="text-5-1-5">
-<ul class="org-ul">
-<li>Lots of times, we were writing code that looked exactly the same</li>
-<li>Higher-order functions and polymorphism let you turn those patterns into an actual <b>function</b></li>
-</ul>
-</div>
-</li>
-<li><a id="org691c4c5"></a>Filter<br />
-<div class="outline-text-4" id="text-5-1-6">
-<ul class="org-ul">
-<li>Another common function on lists</li>
-<li>Takes a <b>predicate</b> for some type:
-<ul class="org-ul">
-<li>Look at two values and return either true or false</li>
-<li>Defines a property on that type</li>
-</ul></li>
-<li>Returns a new list containing only the elements satisfying the predicate</li>
-</ul>
-<div class="org-src-container">
-<pre class="src src-racket">(define (filter [p : ('a  -&gt; Boolean)]
-                [xs : (Listof 'a)]) : (Listof 'a)
-  (type-case (Listof 'a) xs
-             [empty
-               empty]
-             [(cons x rest)
-              ;; Check if the first element satisfies p
-              ;; If it does, include it in the results,
-              ;; otherwise omit
-               (if (p x)
-                   (cons x (filter p rest))
-                   (filter p rest))]))
-</pre>
-</div>
-</div>
-</li>
-<li><a id="org9571f2a"></a>Filter examples<br />
-<div class="outline-text-4" id="text-5-1-7">
-<div class="org-src-container">
-<pre class="src src-racket">(filter (lambda (x) (zero? (modulo x 2)))
-        '(1 2 3 4 5 6))
-(filter some?
-        (list (none) (some "Hello") (none) (some "Goodbye")
-              (none) (none) (some "Cheers") (none)))
-(filter (lambda (x) (&gt; x 1000000))
-        (list 1 2 3 4 (* 100000 100000)) )
-(filter (lambda (x) #f) '(1 2 3 4))
-</pre>
-</div>
-</div>
-</li>
-<li><a id="orgb9002a6"></a>Using Filter: The Functional Quicksort<br />
-<div class="outline-text-4" id="text-5-1-8">
-<div class="org-src-container">
-<pre class="src src-racket" id="org802a770">(define (sortBy [compare : ('a 'a -&gt; Boolean)]
-                [xs : (Listof 'a)]) : (Listof 'a)
-  (type-case (Listof 'a) xs
-             [empty
-               empty]
-             [(cons first rest)
-               (let*
-                 ([smallers
-                    (filter (lambda (x) (compare x first))
-                            rest)]
-                  [biggers
-                    (filter (lambda (x) (not (compare x first)))
-                            rest)])
-                 (append (sortBy compare smallers)
-                         (cons first
-                               (sortBy compare biggers))))]))
-
-</pre>
-</div>
-</div>
-</li>
-<li><a id="org3df3f4f"></a>How Quicksort works<br />
-<div class="outline-text-4" id="text-5-1-9">
-<ul class="org-ul">
-<li>An empty list is already sorted</li>
-<li>If a list has at least one element, we can partition that list into everything smaller than that element, and greater than that element</li>
-<li>We recursively sort those lists</li>
-<li>This gives us 3 lists:
-<ul class="org-ul">
-<li>A sorted list of things smaller than (or equal to) the head</li>
-<li>The head</li>
-<li>A sorted list of things greater than (or equal to) the head</li>
-</ul></li>
-<li>If we append these together in that order, the result will still be sorted
-<ul class="org-ul">
-<li>And contains everything from the original list</li>
-</ul></li>
-</ul>
-</div>
-</li>
-<li><a id="org4006983"></a>Quicksort Examples<br />
-<div class="outline-text-4" id="text-5-1-10">
-<div class="org-src-container">
-<pre class="src src-racket">
-(sortBy &lt;= '(5 4 1 5 3 9 7))
-
-(sortBy (lambda (x y) (&lt;= (fst x) (fst y)))
-      (list (pair 5 "a") (pair 4 "b") (pair 1 "c") (pair 9 "d")))
-
-(sortBy (lambda (s1 s2) (&lt;= (string-length s1) (string-length s2)))
-        (list "goodbye" "hey" "hello" "a" "arithmetic" ))
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-racket">'(1 3 4 5 5 7 9)
-(list (values 1 "c") (values 4 "b") (values 5 "a") (values 9 "d"))
-'("a" "hey" "hello" "goodbye" "arithmetic")
-</pre>
-</div>
-</div>
-</li>
-<li><a id="orgfd64d11"></a>Polymorphic Combinators<br />
-<div class="outline-text-4" id="text-5-1-11">
-<ul class="org-ul">
-<li>Combinators that are polymorphic are highly general
-<ul class="org-ul">
-<li>Ways to build new functions out of old functions</li>
-</ul></li>
-<li>Often used to build up arguments to map or filter</li>
-</ul>
-</div>
-</li>
-<li><a id="orgb7c5044"></a>Function Composition<br />
-<div class="outline-text-4" id="text-5-1-12">
-<ul class="org-ul">
-<li>For any two functions, we can chain them together
-<ul class="org-ul">
-<li>If their types agree</li>
-</ul></li>
-</ul>
-<div class="org-src-container">
-<pre class="src src-racket" id="org3a5629e">;; Written that way to match the symbol in math
-(define (o [g : ('b -&gt; 'c)]
-           [f : ('a -&gt; 'b)]) : ('a -&gt; 'c)
-  (lambda (x)
-    (g (f x))))
-;; (g (f x)) = ((o g f) x) for all x
-;; Arguments in that order so that this equation looks nice
-</pre>
-</div>
-</div>
-</li>
-<li><a id="orgf94e724"></a>Example<br />
-<div class="outline-text-4" id="text-5-1-13">
-<div class="org-src-container">
-<pre class="src src-racket">
-(map (o (lambda (x) (* x 10)) add1)
-   '(1 2 3 4))
-
-(filter (o not empty?)
-        (list '() '(1 2) '(3 2 1) '() '(1)))
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-racket">'(20 30 40 50)
-'((1 2) (3 2 1) (1))
-</pre>
-</div>
-<ul class="org-ul">
-<li>See type example on the board</li>
-</ul>
-</div>
-</li>
-<li><a id="org14e0f78"></a>Partial Application<br />
-<div class="outline-text-4" id="text-5-1-14">
-<ul class="org-ul">
-<li><p>
-For functions that take multiple arguments, we can get a new function by providing only one argument
-</p>
-<div class="org-src-container">
-<pre class="src src-racket" id="org704e3bc">(define (curry [f : ('a 'b -&gt; 'c)]
-               [x : 'a])
-        : ('b -&gt; 'c)
-  (lambda (y) (f x y)))
-</pre>
-</div></li>
-
-<li><p>
-Can reverse order of arguments
-</p>
-
-<div class="org-src-container">
-<pre class="src src-racket" id="orgfcbc655">(define (flip [f : ('a 'b -&gt; 'c)])
-  : ('b 'a -&gt; 'c)
-  (lambda (bVal aVal) (f aVal bVal)))
-
-</pre>
-</div></li>
-</ul>
-</div>
-</li>
-<li><a id="org4f9de56"></a>Example<br />
-<div class="outline-text-4" id="text-5-1-15">
-<div class="org-src-container">
-<pre class="src src-racket">
-
-;; Gets (modulo x 2) for each x in the list
-(map (curry (flip modulo) 2)
-     '(1 2 3 4 5 6 7 8))
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-racket">'(1 0 1 0 1 0 1 0)
-</pre>
-</div>
-</div>
-</li>
-<li><a id="org10f23e1"></a>Point Free Programming<br />
-<div class="outline-text-4" id="text-5-1-16">
-<ul class="org-ul">
-<li>When you build functions using combinators instead of lambda, it's called
-<i>point free programming</i></li>
-<li>Building programs becomes kind of like putting Lego together</li>
-<li>Generally, don't want to always use point-free programming
-<ul class="org-ul">
-<li>Sometimes the lambda is just clearer</li>
-</ul></li>
-<li>But can be easier to read in many cases</li>
-</ul>
-</div>
-</li>
-</ol>
-</div>
-</div>
-<div id="outline-container-generative-recursion-and-tail-recursion" class="outline-2">
-<h2 id="generative-recursion-and-tail-recursion"><span class="section-number-2">6.</span> Generative Recursion and Tail Recursion</h2>
-<div class="outline-text-2" id="text-generative-recursion-and-tail-recursion">
-</div>
-<div id="outline-container-broad-goals-0" class="outline-3">
-<h3 id="broad-goals-0"><span class="section-number-3">6.1.</span> Broad Goals</h3>
-<div class="outline-text-3" id="text-broad-goals-0">
-</div>
-<ol class="org-ol">
-<li><a id="orge1d3bf8"></a>Overview<br />
-<div class="outline-text-4" id="text-6-1-1">
-<ul class="org-ul">
-<li>Objectives
-<ul class="org-ul">
-<li>Iteratively building solutions to problems in functional languages</li>
-<li>Implementing recursive procedures efficiently</li>
-<li>Capturing this pattern of recursion as a higher-order function</li>
-</ul></li>
-<li>Key Concepts
-<ul class="org-ul">
-<li>Generative recursion</li>
-<li>Tail-calls</li>
-<li>Tail-call elimination</li>
-<li>Folds</li>
-</ul></li>
-</ul>
-</div>
-</li>
-</ol>
-</div>
-<div id="outline-container-generative-recursion" class="outline-3">
-<h3 id="generative-recursion"><span class="section-number-3">6.2.</span> Generative Recursion</h3>
-<div class="outline-text-3" id="text-generative-recursion">
-</div>
-<ol class="org-ol">
-<li><a id="org3b46a97"></a>The Problem<br />
-<div class="outline-text-4" id="text-6-2-1">
-<ul class="org-ul">
-<li>Some problems don't obviously map to the style of recursion we've seen so far
-<ul class="org-ul">
-<li>Or do, but not efficiently</li>
-</ul></li>
-<li>Especially problems that are about incrementally updating a value
-<ul class="org-ul">
-<li>No good way to talk about "the result so far"</li>
-</ul></li>
-<li><p>
-e.g. What's the recursive version of:
-</p>
-<div class="org-src-container">
-<pre class="src src-c++">int x = startVal;
-for (int i = 0; i &lt; n; i++)
-{
-  x = f(x);
-}
-</pre>
-</div></li>
-</ul>
-</div>
-</li>
-<li><a id="org4ae33be"></a>Example: Reversing a List The Naive Way<br />
-<div class="outline-text-4" id="text-6-2-2">
-<div class="org-src-container">
-<pre class="src src-racket" id="orgde9725b">(define (reverse [xs : (Listof 'a)]) : (Listof 'a)
-  (type-case (Listof 'a) xs
-    [empty empty]
-    [(cons h t)
-       (append (reverse t) (list h))]))
-(reverse '(1 2 3))
-(reverse '("hello" "goodbye"))
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-racket">'(3 2 1)
-'("goodbye" "hello")
-</pre>
-</div>
-
-<ul class="org-ul">
-<li>Reversing the empty list produces the empty list</li>
-<li>Reversing a list with one element means
-<ul class="org-ul">
-<li>Reversing the tail of the list</li>
-<li>Putting the first element at the end of the new list</li>
-</ul></li>
-<li>\(\mathcal{O}(n^2)\): Each <code>append</code> has to walk through the whole list</li>
-</ul>
-</div>
-</li>
-<li><a id="org923c173"></a>Reverse: What we want (conceptually)<br />
-<div class="outline-text-4" id="text-6-2-3">
-<ul class="org-ul">
-<li>Start with an empty list</li>
-<li>Pop an element off the first list, then add it to our result list so far</li>
-<li>When reach the end, have a reversed list</li>
-</ul>
-</div>
-</li>
-<li><a id="org6ded376"></a>An efficient reverse<br />
-<div class="outline-text-4" id="text-6-2-4">
-<div class="org-src-container">
-<pre class="src src-racket">(define (reverseHelper [xs : (Listof 'a)]
-                       [listSoFar : (Listof 'a)]) : (Listof 'a)
-  (type-case (Listof 'a) xs
-    [empty
-       listSoFar]
-    [(cons h t)
-       (reverseHelper t (cons h listSoFar))]))
-(define (reverse xs) (reverseHelper xs '()))
-</pre>
-</div>
-
-<ul class="org-ul">
-<li>Helper function
-<ul class="org-ul">
-<li>Base case: finished, produce the list we've built so far</li>
-<li>Recursive case: keep building, but on the tail of the list
-<ul class="org-ul">
-<li>Call with head appended to <code>listSoFar</code></li>
-</ul></li>
-</ul></li>
-<li>Main function calls the helper with the start value
-<ul class="org-ul">
-<li>Empty list <code>'()</code></li>
-</ul></li>
-</ul>
-</div>
-</li>
-<li><a id="org3ac46b1"></a>General Template<br />
-<ol class="org-ol">
-<li><a id="org5e8be0e"></a>To write <code>f : (Ty1 Ty2 ... TyN -&gt; ReturnTy)</code><br />
-<div class="outline-text-5" id="text-6-2-5-1">
-<ul class="org-ul">
-<li>Write a helper function with one extra argument
-<ul class="org-ul">
-<li>Extra argument called the <i>accumulator</i>
-<ul class="org-ul">
-<li>Often named <code>accum</code></li>
-</ul></li>
-<li>Has same type as return type
-<ul class="org-ul">
-<li><code>fHelper : (Ty1 Ty2 ... TyN ReturnTy -&gt; ReturnTy)</code></li>
-</ul></li>
-</ul></li>
-<li>Helper function is recursive
-<ul class="org-ul">
-<li>Base case: return the accumulator</li>
-<li>Recursive case: call the helper recursively on the sub-value
-<ul class="org-ul">
-<li>Compute an updated value for the result so far</li>
-<li>Pass it as the accumulator for the recursive call</li>
-</ul></li>
-</ul></li>
-<li>Last step: <code>f</code> calls helper with initial accumulator value</li>
-</ul>
-</div>
-</li>
-</ol>
-</li>
-<li><a id="org4dee9f7"></a>The Call Stack<br />
-<div class="outline-text-4" id="text-6-2-6">
-<ul class="org-ul">
-<li>In Racket (or any language), when we make a function call, we need to know what to do with the result
-<ul class="org-ul">
-<li>In C/C++: where to execute after return is computed</li>
-<li>Keep track of the expression we'll plug the result into
-<ul class="org-ul">
-<li>Note: We don't have a stack in Curly (yet) because our interpreter is written such that the Racket stack keeps track of where to return.</li>
-</ul></li>
-</ul></li>
-<li>Each function call pushes onto the call stack, pops when it returns
-<ul class="org-ul">
-<li>You've probably seen this when you get an error message in e.g. Python</li>
-</ul></li>
-<li>Stack contents
-<ul class="org-ul">
-<li>Body of function being currently computed</li>
-<li>Environment for that body</li>
-<li>Position in expression that's waiting for the result of this function
-<ul class="org-ul">
-<li>Called the <i>continuation</i></li>
-</ul></li>
-</ul></li>
-</ul>
-</div>
-</li>
-<li><a id="org648aa00"></a>Stack Overflow<br />
-<div class="outline-text-4" id="text-6-2-7">
-<ul class="org-ul">
-<li>If the call stack gets too large, a <i>stack overflow</i> can be triggered
-<ul class="org-ul">
-<li>When the memory allocated for the stack is exceeded</li>
-</ul></li>
-<li>Typically the stack has much less space than the heap (dynamically allocated memory)
-<ul class="org-ul">
-<li>Specifics depend on the implementation of your language</li>
-</ul></li>
-</ul>
-</div>
-</li>
-<li><a id="org33cc023"></a>Example<br />
-<div class="outline-text-4" id="text-6-2-8">
-<div class="org-src-container">
-<pre class="src src-racket">(define (g y z) (+ y z))
-(define (f x)
-  (cons (g x 1) '()))
-(f 3)
-</pre>
-</div>
-<ul class="org-ul">
-<li>Start:  stack top empty</li>
-<li>Call <code>f</code>:
-<ul class="org-ul">
-<li>Push body <code>(cons (g x 1) empty)</code>, env <code>x := 3</code>, continuation is <code>END_OF_PROGRAM</code></li>
-</ul></li>
-<li>Call <code>g</code>
-<ul class="org-ul">
-<li>Push body <code>(+ y z)</code>, env <code>y := 3, z := 1</code>, continuation is <code>(cons [] '())</code>
-<ul class="org-ul">
-<li><code>[]</code> shows where the result of the body is used</li>
-</ul></li>
-</ul></li>
-<li>Return (pop) : plug <code>4</code> in place of <code>[]</code> to get <code>cons 4 '()</code></li>
-<li>Return (pop), see <code>END_OF_PROGRAM</code> marker, produce <code>'(4)</code> as result</li>
-</ul>
-</div>
-</li>
-<li><a id="orgbaf7cc7"></a>Returning a Function Call<br />
-<div class="outline-text-4" id="text-6-2-9">
-<ul class="org-ul">
-<li>Slightly different example</li>
-</ul>
-<div class="org-src-container">
-<pre class="src src-racket">(define (g y z) (+ y z))
-(define (f x)
-  (g x 1))
-(f 3)
-</pre>
-</div>
-<ul class="org-ul">
-<li>Start:  stack top empty</li>
-<li>Call <code>f</code>:
-<ul class="org-ul">
-<li>Push body <code>(g x 1)</code>, env <code>x := 3</code>, continuation is <code>END_OF_PROGRAM</code></li>
-</ul></li>
-<li>Call <code>g</code>
-<ul class="org-ul">
-<li>Push body <code>(+ y z)</code>, env <code>y := 3, z := 1</code>, continuation is <code>[]</code>
-<ul class="org-ul">
-<li>Result of <code>g</code> is value of <code>f</code>'s body</li>
-</ul></li>
-</ul></li>
-<li>Return (pop) : plug <code>4</code> in place of <code>[]</code> to get 4</li>
-<li>Return (pop), see <code>END_OF_PROGRAM</code> marker, produce <code>4</code> as result</li>
-</ul>
-</div>
-</li>
-<li><a id="org3e7b17b"></a>What's The Difference?<br />
-<div class="outline-text-4" id="text-6-2-10">
-<ul class="org-ul">
-<li>In the first example, we had to take the result of the call to <code>g</code> and incorporate it into the result of <code>f</code>
-<ul class="org-ul">
-<li>By adding it as the first field of <code>cons</code></li>
-</ul></li>
-<li>In the second example, the result of <code>g</code> <i>was</i> the result of <code>f</code>
-<ul class="org-ul">
-<li>We never needed <code>x</code> in the environment after making the call to <code>g</code></li>
-<li>We never need the body of <code>f</code> after making the call to <code>g</code>
-<ul class="org-ul">
-<li>All the body of <code>f</code> tells us is to compute the body of <code>g</code></li>
-</ul></li>
-</ul></li>
-<li>The Racket/Plait interpreter can just change the body and env on the stack, <i>without pushing to it</i>
-<ul class="org-ul">
-<li>Mutation \(\to\) fast</li>
-</ul></li>
-</ul>
-</div>
-</li>
-<li><a id="orga3abff8"></a>Tail Calls<br />
-<div class="outline-text-4" id="text-6-2-11">
-<ul class="org-ul">
-<li>An expression is in <b>tail position</b> if it is
-<ul class="org-ul">
-<li>The body of a function</li>
-<li>The branch of a conditional (if, type-case, etc.) that was in tail position</li>
-</ul></li>
-<li>A function call in tail position is a <b>tail call</b></li>
-<li>A function is NOT a tail call if it is
-<ul class="org-ul">
-<li>An argument to another function or constructor</li>
-</ul></li>
-<li>Tail calls can be implemented as <i>jumps</i> and <i>mutation</i>
-<ul class="org-ul">
-<li>Don't need to add to the stack</li>
-</ul></li>
-</ul>
-</div>
-</li>
-<li><a id="orgce6d2ce"></a>Tail Recursion<br />
-<div class="outline-text-4" id="text-6-2-12">
-<ul class="org-ul">
-<li>Tail recursion: when <b>all recursive calls in a function definition are tail calls</b></li>
-<li>Generative recursion (as described above) <i>is</i> tail recursion</li>
-<li>Tail recursive functions can be optimized into a loop
-<ul class="org-ul">
-<li>No need to change the stack</li>
-<li>Recursive call \(\to\) update parameters then jump</li>
-<li>Constant memory usage</li>
-<li>Less overhead</li>
-</ul></li>
-</ul>
-</div>
-</li>
-<li><a id="org43199c0"></a>Example: List Length in Constant Space<br />
-<div class="outline-text-4" id="text-6-2-13">
-<div class="org-src-container">
-<pre class="src src-racket">(define (fast-length-helper [xs : (Listof 'a)]
-                            [accum : Number])
-  (type-case (Listof 'a) xs
-    [empty accum]
-    [(cons h t)
-       (fast-length-helper t (+ 1 accum))]))
-(define (fast-length xs) (fast-length-helper xs 0))
-</pre>
-</div>
-<ul class="org-ul">
-<li>Instead of computing the result directly, we incorporate the "result so far" into the new information from the non-recursive arguments</li>
-<li>We keep computing by calling <code>fast-length-helper</code> recursively
-<ul class="org-ul">
-<li>Parameter gets smaller</li>
-<li>Accumulator gets more information</li>
-</ul></li>
-<li>Recursive call is tail call</li>
-<li>Won't stack overflow, even on large arguments</li>
-</ul>
-</div>
-</li>
-<li><a id="org26c60a8"></a>Live Example: Slow and Fast Factorial<br />
-<div class="outline-text-4" id="text-6-2-14">
-<ul class="org-ul">
-<li>See Racket in lecture</li>
-</ul>
-</div>
-</li>
-<li><a id="orgf4705f3"></a>A Note On Terminology<br />
-<div class="outline-text-4" id="text-6-2-15">
-<ul class="org-ul">
-<li><b>Generative recursion</b> is when recursion works by building up (generating) a solution as an extra parameter, and returning that parameter in the base case</li>
-<li><b>Tail recursion</b> is when all recursive calls in a function are tail calls</li>
-<li>Many examples we'll see in this course of tail recursion are also generative recursion, and vice versa
-<ul class="org-ul">
-<li>Some counter-examples, e.g. <code>foldr</code> that we'll see soon</li>
-</ul></li>
-</ul>
-</div>
-</li>
-<li><a id="orgb79f05c"></a>Tail Recursion and While Loops<br />
-<div class="outline-text-4" id="text-6-2-16">
-<ul class="org-ul">
-<li>We can relate tail recursion to while loops in imperative languages</li>
-</ul>
-<div class="org-src-container">
-<pre class="src src-c++">x = initialValue;
-while (test(x)){
- x = f(x);
-}
-return g(x);
-</pre>
-</div>
-<ul class="org-ul">
-<li>Is equivalent to</li>
-</ul>
-<div class="org-src-container">
-<pre class="src src-racket">(define (helper x)
-  (if (test x)
-      (helper (f x))
-      (g x)))
-</pre>
-</div>
-<ul class="org-ul">
-<li>Updating multiple variables \(\to\) multiple arguments to <code>helper</code></li>
-</ul>
-</div>
-</li>
-<li><a id="org5ae4a60"></a>Implicit vs. Explicit State<br />
-<div class="outline-text-4" id="text-6-2-17">
-<ul class="org-ul">
-<li>Once again, we see that functional languages can express the same patterns as imperative language</li>
-<li>We can still express stateful computations in functional languages, but it's <i>explicit state</i>
-<ul class="org-ul">
-<li>You can tell what state there is by looking at the type of a function</li>
-<li>Nothing is hidden from the</li>
-</ul></li>
-<li>Bugs in code are often due to subtle interactions between mutable states
-<ul class="org-ul">
-<li>Especially with parallelism/concurrency</li>
-</ul></li>
-<li>The functional style means that no state is hidden
-<ul class="org-ul">
-<li>Easier to debug state problems
-<ul class="org-ul">
-<li>By hand, or with tools/linters</li>
-</ul></li>
-</ul></li>
-</ul>
-</div>
-</li>
-</ol>
-</div>
-<div id="outline-container-abstracting-generative-recursion" class="outline-3">
-<h3 id="abstracting-generative-recursion"><span class="section-number-3">6.3.</span> Abstracting Generative Recursion</h3>
-<div class="outline-text-3" id="text-abstracting-generative-recursion">
-</div>
-<ol class="org-ol">
-<li><a id="org5c62d30"></a>Objective<br />
-<div class="outline-text-4" id="text-6-3-1">
-<ul class="org-ul">
-<li>Goals
-<ul class="org-ul">
-<li>To see how the pattern of generative recursion on lists can be represented concretely as a higher order function</li>
-</ul></li>
-<li>Key Concepts
-<ul class="org-ul">
-<li><code>foldl</code> and <code>foldr</code></li>
-</ul></li>
-</ul>
-</div>
-</li>
-<li><a id="orgfbb29d8"></a>Higher-Order Genrative Recursion: Folds<br />
-<div class="outline-text-4" id="text-6-3-2">
-<ul class="org-ul">
-<li>Recall: higher-order polymorphic functions let us turn design patterns into functions
-<ul class="org-ul">
-<li>e.g. <code>map</code> for "do this to each element of a list"</li>
-</ul></li>
-<li>Generative recursion is no exception</li>
-</ul>
-</div>
-</li>
-<li><a id="org84c8584"></a>Foldl<br />
-<div class="outline-text-4" id="text-6-3-3">
-<div class="org-src-container">
-<pre class="src src-racket" id="org7e939fb">(define (foldl [f : ('a 'b -&gt; 'b)]
-               [accum : 'b]
-               [xs : (Listof 'a)]) : 'b
-  (type-case (Listof 'a) xs
-    [empty
-      accum ]
-    [(cons h t)
-       (foldl f (f h accum) t)]))
-</pre>
-</div>
-<ul class="org-ul">
-<li>Generative recursion on a list as a function</li>
-<li>Name <code>foldl</code> means "fold left"
-<ul class="org-ul">
-<li>Processes elements in order</li>
-</ul></li>
-<li>If list empty, gives whatever the initial <code>accum</code> was</li>
-<li>If not empty, uses <code>f</code> to update the <code>accum</code> based on the first element of the list
-<ul class="org-ul">
-<li>Then processes the rest of the list with a recursive call</li>
-</ul></li>
-<li>Tail recursive, so fast and takes constant space</li>
-</ul>
-</div>
-</li>
-<li><a id="org3c5f51e"></a>Example: Reverse using folds<br />
-<div class="outline-text-4" id="text-6-3-4">
-<div class="org-src-container">
-<pre class="src src-racket">
-(define (fold-reverse [xs : (Listof 'elType)]) : (Listof 'elType)
-  (foldl (lambda (elem accum) (cons elem accum))
-         '()
-         xs))
-(fold-reverse '(1 2 3))
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-racket">'(3 2 1)
-</pre>
-</div>
-<ul class="org-ul">
-<li><code>'a</code> is <code>'elType</code>, <code>'b</code> is <code>(Listof 'elType)</code></li>
-<li>Update function type is <code>('elType (Listof 'elType) -&gt; (Listof 'elType))</code></li>
-<li>Initial accumulator is empty list, since we start with nothing</li>
-<li>Update function adds the current element to the front of the list we've built so far</li>
-</ul>
-</div>
-</li>
-<li><a id="orgd6964cd"></a>Reasoning with foldl<br />
-<div class="outline-text-4" id="text-6-3-5">
-<ul class="org-ul">
-<li><code>(foldl f init '(a b c d))</code> gives:
-<ul class="org-ul">
-<li><code>(f d (f c (f b (f a init))))</code></li>
-</ul></li>
-<li>Similar to normal recursion:
-<ul class="org-ul">
-<li>Assume that <code>accum</code> has the correct result so far</li>
-<li>Find the <code>f</code> that incorporates the next element of the list into the new <code>accum</code></li>
-</ul></li>
-<li>For <code>fold-reverse</code>
-<ul class="org-ul">
-<li>Assume that <code>accum</code> has the correct reversal of the list we've seen so far. How do we incorporate the next element?
-<ul class="org-ul">
-<li>We add it to the front, since it's the last of all elements we've seen so far, so the first in the reversed list</li>
-<li>Recursive call says "keep processing for the rest of the list"</li>
-</ul></li>
-</ul></li>
-</ul>
-</div>
-</li>
-<li><a id="org0a67158"></a>Non-tail Folds<br />
-<div class="outline-text-4" id="text-6-3-6">
-<div class="org-src-container">
-<pre class="src src-racket">(define (foldr [f : ('a 'b -&gt; 'b)]
-               [init : 'b]
-               [xs : (Listof 'a)]) : 'b
-  (type-case (Listof 'a) xs
-    [empty
-      init ]
-    [(cons h t)
-       (f h (foldr f init t))]))
-</pre>
-</div>
-<ul class="org-ul">
-<li>Like foldr, but processes the list right-to-left</li>
-<li><code>(foldr f init '(a b c d))</code> gives <code>(f a (f b (f c (f d init))))</code></li>
-<li>Reasoning the exact same, except we assume the argument to <code>f</code>
-has the accumulator for all elements <i>after</i> the current element</li>
-<li>Generally <code>foldl</code> is faster</li>
-</ul>
-</div>
-</li>
-<li><a id="org1d2718e"></a>List Recursion, Once And For All<br />
-<div class="outline-text-4" id="text-6-3-7">
-<ul class="org-ul">
-<li><code>foldr</code> is the higher-order function version of pattern matching on lists
-<ul class="org-ul">
-<li>Give an empty case (initial value)</li>
-<li>Give a function that incorporates head of the list with the recursive result on the rest of the list</li>
-</ul></li>
-<li><code>foldl</code> is the higher-order function version of generative recursion on lists
-<ul class="org-ul">
-<li>Give an initial accumulator</li>
-<li>Give a way to update the accumulator for each element of the list</li>
-</ul></li>
-<li>These two functions can replace (nearly) all pattern matching/recursion on lists</li>
-<li>Examples (see lecture Racket file)</li>
 </ul>
 </div>
 </li>
