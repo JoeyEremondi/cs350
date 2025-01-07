@@ -4814,4 +4814,5 @@ myFunction().then(
 * Emacs Variables (please ignore) :noexport:
 Local Variables:
 org-latex-packages-alist: nil
+org-modern-indent-guide: " "
 End:
