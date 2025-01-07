@@ -24,7 +24,6 @@
 
 #+BEAMER_THEME: moloch [block=fill]
 
-# -*- org-latex-packages-alist: nil; -*-
 
 
 
