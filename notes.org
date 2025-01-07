@@ -178,8 +178,6 @@ you may do so from Dr. Racket:
 which is secure enough
 for the handin tool, but not secure enough for sensitive personal information.
 
-***** TODO Make PLT file and upload link
-
 *** TODO Using Dr. Racket
 
 There are three main parts of the Dr. Racket interface: the toolbar at the top,
