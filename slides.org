@@ -14,7 +14,6 @@
 
 
 
-#+EXPORT_FILE_NAME: slides_all.pdf
 #+startup: beamer
 #+LaTeX_CLASS:beamer
 #+LaTeX_CLASS_OPTIONS: [bigger]

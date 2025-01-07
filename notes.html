@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2025-01-06 Mon 22:28 -->
+<!-- 2025-01-06 Mon 22:34 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Functional Languages, Interpreters and Types: CS 350 Course Notes</title>
@@ -212,6 +212,341 @@ if("undefined"==typeof jQuery)throw new Error("Bootstrap's JavaScript requires j
 <script type="text/javascript">
 $(function() {    $('.definition').before("<p class='admonition-title note'>Definition</p>"); $(function() {    $('.note').before("<p class='admonition-title note'>Note</p>");    $('.seealso').before("<p class='admonition-title seealso'>See also</p>");    $('.warning').before("<p class='admonition-title warning'>Warning</p>");    $('.caution').before("<p class='admonition-title caution'>Caution</p>");    $('.attention').before("<p class='admonition-title attention'>Attention</p>");    $('.tip').before("<p class='admonition-title tip'>Tip</p>");    $('.important').before("<p class='admonition-title important'>Important</p>");    $('.hint').before("<p class='admonition-title hint'>Hint</p>");    $('.error').before("<p class='admonition-title error'>Error</p>");    $('.danger').before("<p class='admonition-title danger'>Danger</p>");});$( document ).ready(function() {        $(document).on('click', "[data-toggle='wy-nav-top']", function() {      $("[data-toggle='wy-nav-shift']").toggleClass("shift");      $("[data-toggle='rst-versions']").toggleClass("shift");    });        $(document).on('click', ".wy-menu-vertical .current ul li a", function() {      $("[data-toggle='wy-nav-shift']").removeClass("shift");      $("[data-toggle='rst-versions']").toggleClass("shift");    });    $(document).on('click', "[data-toggle='rst-current-version']", function() {      $("[data-toggle='rst-versions']").toggleClass("shift-up");    });        $("table.docutils:not(.field-list)").wrap("<div class='wy-table-responsive'></div>");});$( document ).ready(function() {    $('#text-table-of-contents ul').first().addClass('nav');    $('body').scrollspy({target: '#text-table-of-contents'});            var $postamble = $('#postamble');    var $tableOfContents = $('#table-of-contents');    $tableOfContents.css({paddingBottom: $postamble.outerHeight()});        var toggleSidebar = $('<div id="toggle-sidebar"><a href="#table-of-contents"><h2>Table of Contents</h2></a></div>');    $('#content').prepend(toggleSidebar);        var closeBtn = $('<a class="close-sidebar" href="#">Close</a>');    var tocTitle = $('#table-of-contents').find('h2');    tocTitle.append(closeBtn);});window.SphinxRtdTheme = (function (jquery) {    var stickyNav = (function () {        var navBar,            win,            stickyNavCssClass = 'stickynav',            applyStickNav = function () {                if (navBar.height() <= win.height()) {                    navBar.addClass(stickyNavCssClass);                } else {                    navBar.removeClass(stickyNavCssClass);                }            },            enable = function () {                applyStickNav();                win.on('resize', applyStickNav);            },            init = function () {                navBar = jquery('nav.wy-nav-side:first');                win    = jquery(window);            };        jquery(init);        return {            enable : enable        };    }());    return {        StickyNav : stickyNav    };}($));
 </script>
+
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
+          
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
+          
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
+          
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
+          
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
 <script>
   window.MathJax = {
     tex: {
@@ -252,12 +587,12 @@ $(function() {    $('.definition').before("<p class='admonition-title note'>Defi
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgd9f0f29">1. Introduction</a>
+<li><a href="#org8016dd3">1. Introduction</a>
 <ul>
-<li><a href="#orgd2ad1ea">1.1. For Students</a></li>
+<li><a href="#org939ff4f">1.1. For Students</a></li>
 </ul>
 </li>
-<li><a href="#org2ab8840">2. Part I: Functional Programming</a>
+<li><a href="#org3c3ce51">2. Part I: Functional Programming</a>
 <ul>
 <li><a href="#setup">2.1. Setup: Editor and Tooling</a></li>
 <li><a href="#racket-synax">2.2. The Syntax of Flit</a></li>
@@ -271,44 +606,44 @@ $(function() {    $('.definition').before("<p class='admonition-title note'>Defi
 <li><a href="#flit-tailrec">2.10. Tail-Calls and Generative Recursion</a></li>
 </ul>
 </li>
-<li><a href="#orga091fab">3. Glossary</a></li>
+<li><a href="#org920237c">3. Glossary</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orgd9f0f29" class="outline-2">
-<h2 id="orgd9f0f29"><span class="section-number-2">1.</span> Introduction</h2>
+<div id="outline-container-org8016dd3" class="outline-2">
+<h2 id="org8016dd3"><span class="section-number-2">1.</span> Introduction</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-orgd2ad1ea" class="outline-3">
-<h3 id="orgd2ad1ea"><span class="section-number-3">1.1.</span> For Students</h3>
+<div id="outline-container-org939ff4f" class="outline-3">
+<h3 id="org939ff4f"><span class="section-number-3">1.1.</span> For Students</h3>
 <div class="outline-text-3" id="text-1-1">
 </div>
 <ol class="org-ol">
-<li><a id="orgc5599a0"></a>What This Course Is About<br />
+<li><a id="org1f6914d"></a>What This Course Is About<br />
 <div class="outline-text-4" id="text-1-1-1">
 <p>
 If you take into a linguistics class, you will not take French one week, German the next, Mandarin after that, etc.
 Instead, you learn about the things that all languages are made of: sounds, words, syntax, semantics, etc.
 You might learn about the history of certain languages, and how some languages influenced each other,
-or how some languages have certain features while others don't.
+or how some languages have certain features while others don&rsquo;t.
 </p>
 
 <p>
 In the same way, this course is not about teaching you multiple different languages.
-It's about teaching you <i>what languages are made of</i>.
+It&rsquo;s about teaching you <i>what languages are made of</i>.
 The idea is that you will then have the tools to understand the features of any language you encounter
 in your career.
 In particular, you will learn about <i>semantics</i>: what does a program mean, separate from a particular computer
-and input and environment that it's run on.
+and input and environment that it&rsquo;s run on.
 Some languages which are syntactically very different are semantically very similar, and some languages that look the same
 have very different features.
 </p>
 </div>
 </li>
-<li><a id="org825c9ea"></a>Why Functional Programming?<br />
+<li><a id="orgd1877bb"></a>Why Functional Programming?<br />
 <div class="outline-text-4" id="text-1-1-2">
 <p>
-In this course, we will learn about <i>functional programming,</i> where a variable's value never changes once it is set.
+In this course, we will learn about <i>functional programming,</i> where a variable&rsquo;s value never changes once it is set.
 Programming is focused around what a program <i>is</i>, not what a program <i>does</i>.
 There is no denying that functional programming is less popular in industry than imperative or object-oriented programming,
 so why are we going to learn it? We have a few reasons:
@@ -321,8 +656,8 @@ Just as one might study a bacterium or a mouse before studying human biology, we
 examine simple languages before complex ones.
 While it is certainly possible to formally reason about code in languages like C++, Python, or Java,
 doing so is much more complicated, and is beyond the scope of an introductory class.</li>
-<li>Functional languages are close to the "atoms" of programming languages.
-As we will see in the course, many concepts like mutable variables, loops, and objects
+<li>Functional languages are close to the &ldquo;atoms&rdquo; of programming languages.
+As we will see in the course, many concepts like <a class="org-gls" href="#gls.1" id="glsr.1.1">mutable</a> variables, loops, and objects
 are expressible using functions, datatypes, and recursion.
 Many of the concepts we language features we will learn about are obvious in functional languages,
 but implicit or hidden in other languages.
@@ -333,7 +668,7 @@ into existing ecosystems, yielding a bump in usage.
 More significantly, functional <i>ideas</i> are being added to more and more languages.
 Nearly every language has some kind of closure, with C being the main exception.
 JavaScript async is based around passing functions as arguments, and
-Rust's design draws heavily from research on algebraic datatypes, pattern matching, and polymorphism.</li>
+Rust&rsquo;s design draws heavily from research on algebraic datatypes, pattern matching, and polymorphism.</li>
 </ol>
 
 <p>
@@ -345,7 +680,7 @@ so that you are able to adapt and learn whatever language you need in your job t
 </p>
 </div>
 </li>
-<li><a id="org40f5362"></a>Why Interpreters?<br />
+<li><a id="org2378cac"></a>Why Interpreters?<br />
 <div class="outline-text-4" id="text-1-1-3">
 <p>
 In addition to learning how to use language features, this course will teach you
@@ -357,7 +692,7 @@ To write an interpreter, all we need is a few tree traversals.
 </p>
 
 <p>
-More importantly, when we write an interpreter for a language in a purely functional source language,
+More importantly, when we write an interpreter for a language in a <a class="org-gls" href="#gls.2" id="glsr.2.1">purely functional</a> source language,
 we get equations about programs.
 So we get a two-for-one: writing an interpreter for a language also serves to <i>define</i> the semantics of the language,
 and give us some rules and principles we can use to reason about programs in that language.
@@ -375,8 +710,8 @@ and beauty that lies at the heart of computation.
 </ol>
 </div>
 </div>
-<div id="outline-container-org2ab8840" class="outline-2">
-<h2 id="org2ab8840"><span class="section-number-2">2.</span> Part I: Functional Programming</h2>
+<div id="outline-container-org3c3ce51" class="outline-2">
+<h2 id="org3c3ce51"><span class="section-number-2">2.</span> Part I: Functional Programming</h2>
 <div class="outline-text-2" id="text-2">
 </div>
 <div id="outline-container-setup" class="outline-3">
@@ -384,19 +719,19 @@ and beauty that lies at the heart of computation.
 <div class="outline-text-3" id="text-setup">
 </div>
 <ol class="org-ol">
-<li><a id="org5e553a2"></a>Dr. Racket and <code>#lang flit</code><br />
+<li><a id="org550055a"></a>Dr. Racket and <code>#lang flit</code><br />
 <div class="outline-text-4" id="text-2-1-1">
 <p>
 All of the programming in this course takes place in Racket.
 Racket is a programming languages, but it is also a toolkit for making languages.
 At the beginning of every Racket file, there is a line <code>#lang nameOfLanguage</code> which says
 which language the following file is written in.
-The default is <code>#lang racket</code>, but for this course, we're going to be using the Flit language,
+The default is <code>#lang racket</code>, but for this course, we&rsquo;re going to be using the Flit language,
 i.e., <code>#lang flit</code>.
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="org52696f8"></a>Installing Dr. Racket<br />
+<li><a id="org3801812"></a>Installing Dr. Racket<br />
 <div class="outline-text-5" id="text-2-1-1-1">
 <p>
 Dr. Racket is the IDE for Racket, and language made using Racket, including Flit.
@@ -420,7 +755,7 @@ Many distributions also have their own packages, which you are welcome to use.
 </ul>
 </div>
 </li>
-<li><a id="org960367c"></a>Dr. Racket on Laboratory Computers<br />
+<li><a id="orge63b3e4"></a>Dr. Racket on Laboratory Computers<br />
 <div class="outline-text-5" id="text-2-1-1-2">
 <p>
 Dr. Racket is installed on computers in the following labs:
@@ -438,7 +773,7 @@ access to your own computer.
 </li>
 </ol>
 </li>
-<li><a id="orge8d3465"></a>Installing the Handin Tool<br />
+<li><a id="orgc8713ae"></a>Installing the Handin Tool<br />
 <div class="outline-text-4" id="text-2-1-2">
 <p>
 Whether you use your own computer or a lab computer, you will need to
@@ -446,9 +781,9 @@ install the Package for this class. You can do this as follows:
 </p>
 
 <ul class="org-ul">
-<li>Click "File &gt; Install .plt File&#x2026;"</li>
+<li>Click &ldquo;File &gt; Install .plt File&#x2026;&rdquo;</li>
 <li>In the URL box, paste <a href="https://eremondi.com/cs350/plt/cs350.plt">https://eremondi.com/cs350/plt/cs350.plt</a></li>
-<li>Click "OK"</li>
+<li>Click &ldquo;OK&rdquo;</li>
 </ul>
 
 <p>
@@ -465,14 +800,14 @@ include files relevant to specific assignments.
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="org29748fd"></a>Changing Your Password<br />
+<li><a id="orga785ab8"></a>Changing Your Password<br />
 <div class="outline-text-6" id="text-2-1-2-0-1">
 <p>
 You will be emailed a password for your account. If you wish to change your password,
 you may do so from Dr. Racket:
 </p>
 <ul class="org-ul">
-<li>Go to "File &gt; Manage CS350 Handin Account"</li>
+<li>Go to &ldquo;File &gt; Manage CS350 Handin Account&rdquo;</li>
 <li>Enter your old and new passwords and submit</li>
 </ul>
 
@@ -485,7 +820,7 @@ for the handin tool, but not secure enough for sensitive personal information.
 </li>
 </ol>
 </li>
-<li><a id="orgd326780"></a>Using Dr. Racket<br />
+<li><a id="org1e9f611"></a>Using Dr. Racket<br />
 <div class="outline-text-4" id="text-2-1-3">
 <p>
 There are three main parts of the Dr. Racket interface: the toolbar at the top,
@@ -493,18 +828,18 @@ the code editor window, and the REPL at the bottom.
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="org0ff33a5"></a>pictures<br /></li>
+<li><a id="org3cedfcd"></a>pictures<br /></li>
 
-<li><a id="org005363e"></a>The Definitions Window (Code Editor)<br />
+<li><a id="orgbf52519"></a>The Definitions Window (Code Editor)<br />
 <div class="outline-text-5" id="text-2-1-3-2">
 <p>
 The editor window is where you will type your Racket program.
-The top of every file should begin with <code>#lang flit</code>, though if you've set up
+The top of every file should begin with <code>#lang flit</code>, though if you&rsquo;ve set up
 Racket as described above this will happen by default.
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="orgc79ce35"></a>Type and Syntax Errors<br />
+<li><a id="org25e1b08"></a>Type and Syntax Errors<br />
 <div class="outline-text-6" id="text-2-1-3-2-1">
 <p>
 If there are type or syntax errors in your code, there will be
@@ -515,7 +850,7 @@ has a type or syntax error will get a grade of 0.
 </p>
 </div>
 </li>
-<li><a id="orga18e86f"></a>Useful Tools<br />
+<li><a id="org6ab9b6a"></a>Useful Tools<br />
 <div class="outline-text-6" id="text-2-1-3-2-2">
 <p>
 If you right click on a variable, function name, type name, etc. in Dr. Racket,
@@ -525,14 +860,14 @@ the code you are given on an assignment.
 </p>
 
 <p>
-Typing "Ctrl-I" (or "Cmd-I" on Mac) will re-indent your code based on the parentheses.
+Typing &ldquo;Ctrl-I&rdquo; (or &ldquo;Cmd-I&rdquo; on Mac) will re-indent your code based on the parentheses.
 This can be very useful to make your code more readable, or to find errors based on misplaced brackets.
 </p>
 </div>
 </li>
 </ol>
 </li>
-<li><a id="org9facd37"></a>The Toolbar<br />
+<li><a id="org2ddd3cc"></a>The Toolbar<br />
 <div class="outline-text-5" id="text-2-1-3-3">
 <p>
 There are two main buttons you need on the toolbar.
@@ -540,7 +875,7 @@ There are two main buttons you need on the toolbar.
 
 <p>
 First is the <img src="./img/run.png" alt="run.png" /> button, which will type-check and compile your code,
-as well as executing any tests or expressions that are in the file.
+as well as executing any tests or <a class="org-gls" href="#gls.3" id="glsr.3.1">expressions</a> that are in the file.
 </p>
 
 <p>
@@ -568,11 +903,11 @@ on which test that is. In these cases, <b>read the problem specification careful
 </p>
 </div>
 </li>
-<li><a id="org340b1f8"></a>The Interactions Window (REPL)<br />
+<li><a id="orgf909009"></a>The Interactions Window (REPL)<br />
 <div class="outline-text-5" id="text-2-1-3-4">
 <p>
 The interactions window features a Read-Evaluate-Print-Loop (REPL),
-where you can type in expressions to be read and evaluated, and have their results printed.
+where you can type in <a class="org-gls" href="#gls.3" id="glsr.3.2">expressions</a> to be read and evaluated, and have their results printed.
 This is very useful for quickly testing a piece of code you wrote, or
 running pre-existing code to better understand what it does.
 This is similar to the prompts that Python or JavaScript give you if you type <code>python</code> or <code>node</code> in a terminal window.
@@ -584,13 +919,13 @@ can be used in the REPL.
 </p>
 </div>
 </li>
-<li><a id="orgd62658e"></a>Submitting Assignments<br />
+<li><a id="orgba4f471"></a>Submitting Assignments<br />
 <div class="outline-text-5" id="text-2-1-3-5">
 <p>
 All assignments are to be submitted using the Handin tool. There are two ways to do this:
 </p>
 <ul class="org-ul">
-<li>By clicking the "CS350 Handin" button in the Dr. Racket toolbar
+<li>By clicking the &ldquo;CS350 Handin&rdquo; button in the Dr. Racket toolbar
 <ul class="org-ul">
 <li>This option is currently only available on-campus or when connected to the campus VPN, which you can set up using the instructions
 <a href="https://www.uregina.ca/is/tech-notes/technote569.html">here</a></li>
@@ -608,7 +943,7 @@ The test results are also visible on URCourses.
 </ul>
 </div>
 <ol class="org-ol">
-<li><a id="orga2dcada"></a>Submitting Multiple Times<br />
+<li><a id="orgd375df9"></a>Submitting Multiple Times<br />
 <div class="outline-text-6" id="text-2-1-3-5-1">
 <p>
 You may submit as many times as you like until the deadline. Your grade will be the grade
@@ -620,7 +955,7 @@ from the last submission before the deadline.
 </p>
 </div>
 </li>
-<li><a id="orgf9c8f24"></a>Syntax and Type Errors<br />
+<li><a id="orgec85d31"></a>Syntax and Type Errors<br />
 <div class="outline-text-6" id="text-2-1-3-5-2">
 <p>
 If your file contains syntax or type errors, the feedback in Dr. Racket or on the handin website will
@@ -644,7 +979,7 @@ If there is an error message you do not understand, then <b>ask a question on th
 </p>
 </div>
 </li>
-<li><a id="org9afa30e"></a>Public and Private Tests<br />
+<li><a id="orgf322771"></a>Public and Private Tests<br />
 <div class="outline-text-6" id="text-2-1-3-5-3">
 <p>
 When you submit an assignment, most tests are <i>public</i>, meaning that you
@@ -660,7 +995,7 @@ missed when writing your code.
 </p>
 </div>
 </li>
-<li><a id="org7babca7"></a>Submitting on URCourses (not preferred)<br />
+<li><a id="org4625cae"></a>Submitting on URCourses (not preferred)<br />
 <div class="outline-text-6" id="text-2-1-3-5-4">
 <p>
 Submitting assignments via URCourses is available as a backup.
@@ -686,32 +1021,33 @@ but you are then responsible for ensuring that it has no syntax or type errors.
 <div class="outline-text-3" id="text-racket-synax">
 </div>
 <ol class="org-ol">
-<li><a id="orgfc09392"></a>S-expressions<br />
+<li><a id="org1832161"></a>S-expressions<br />
 <div class="outline-text-4" id="text-2-2-1">
 <p>
-The syntax of Dr. Racket based around <i>S-Expressions</i>.
+The syntax of Dr. Racket based around <i><a class="org-gls" href="#gls.4" id="glsr.4.1">S-Expressions</a></i>.
 </p>
 
-<div class="definition" id="org7b5cbcc">
+<div id="gls.9" class="admonition note">
+                        <p class="admonition-title note">Definition: S-Expression</p>&nbsp;
 <p>
-Every S-Expression (or s-exp, pronounced "ess-exp") is either:
+Every <a class="org-gls" href="#gls.4" id="glsr.4.2">S-Expression</a> (or s-exp, pronounced &ldquo;ess-exp&rdquo;) is either:
 </p>
 <ol class="org-ol">
 <li>A literal (such as a number <code>3</code>, a boolean <code>#t</code> or <code>#f</code>, a string <code>"hello"</code>, a symbol <code>'a</code>, etc.)</li>
 <li>A name (such as <code>x</code>, <code>y</code>, <code>foo</code>, <code>map</code>, <code>if</code>, <code>type-case</code> )</li>
-<li>Parentheses <code>(...)</code> containing one or more  S-Expressions, separated by a space</li>
+<li>Parentheses <code>(...)</code> containing one or more  S-Expressions, <a class="org-gls" href="#gls.5" id="glsr.5.1">separated by a space</a></li>
 </ol>
 
 </div>
 
 
 <p>
-Since an s-exp can contain more s-expressions inside of it, they are effectively a notation
+Since an s-exp can contain more s-<a class="org-gls" href="#gls.3" id="glsr.3.3">expressions</a> inside of it, they are effectively a notation
 for writing trees in text:
 </p>
 <ul class="org-ul">
 <li>Names or literals are leaves</li>
-<li>A node with children is a bracketed expression <code>(e1 e2 ... en)</code> with children <code>e1</code>, <code>e2</code>, &#x2026;, <code>en</code>.</li>
+<li>A node with children is a bracketed <a class="org-gls" href="#gls.3" id="glsr.3.4">expression</a> <code>(e1 e2 ... en)</code> with children <code>e1</code>, <code>e2</code>, &#x2026;, <code>en</code>.</li>
 </ul>
 
 <p>
@@ -719,22 +1055,22 @@ After the <code>#lang</code> line, the contents of a Racket (or Flit) file are a
 Some are commands to Racket, like <code>(require ...)</code> for importing other files or <code>(test expected actual)</code>
 for declaring a test.
 Some are definitions <code>(define someThing ...)</code>, which define functions, or <code>(define-type Foo ...)</code> which defines a type.
-The rest that we see will be Flit expressions, i.e., programs that compute some value.
+The rest that we see will be Flit <a class="org-gls" href="#gls.3" id="glsr.3.5">expressions</a>, i.e., programs that compute some value.
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="org06c2ad6"></a>S-Exp diagram<br /></li>
+<li><a id="org8b31347"></a>S-Exp diagram<br /></li>
 </ol>
 </li>
-<li><a id="orgf5c5abb"></a>Special Characters<br />
+<li><a id="org66a1b40"></a>Special Characters<br />
 <div class="outline-text-4" id="text-2-2-2">
 <p>
-There are a few characters that you can't use in variable/function names in Racket:
+There are a few characters that you can&rsquo;t use in variable/function names in Racket:
 </p>
 <ul class="org-ul">
-<li>Whitespace is used to separate S-expressions</li>
+<li>Whitespace is used to separate S-<a class="org-gls" href="#gls.3" id="glsr.3.6">expressions</a></li>
 <li><code>;</code> begins a one-line comment</li>
-<li>Parentheses <code>()[]{}</code> aren't allowed in variable names</li>
+<li>Parentheses <code>()[]{}</code> aren&rsquo;t allowed in variable names</li>
 <li>Single, <code>'</code> and double <code>"</code> and backtick <code>`</code> quotes are used for strings and special symbols</li>
 <li><p>
 <code># | \ , @</code> are reserved for other purposes
@@ -757,65 +1093,66 @@ Likewise, functions converting between types often contain <code>-&gt;</code> in
 <div class="outline-text-3" id="text-flit-expr">
 </div>
 <ol class="org-ol">
-<li><a id="org33c67e3"></a>Expressions in Flit<br />
+<li><a id="orge423e02"></a>Expressions in Flit<br />
 <div class="outline-text-4" id="text-2-3-1">
 <p>
-<b>NOTE: All Flit expressions are S-Expressions, but not all S-Expressions are Flit Expressions, since some are declarations, etc. It's an unfortunate naming conflict.</b>
+<b>NOTE: All Flit <a class="org-gls" href="#gls.3" id="glsr.3.7">expressions</a> are <a class="org-gls" href="#gls.4" id="glsr.4.3">S-Expressions</a>, but not all <a class="org-gls" href="#gls.4" id="glsr.4.4">S-Expressions</a> are Flit <a class="org-gls" href="#gls.3" id="glsr.3.8">Expressions</a>, since some are declarations, etc. It&rsquo;s an unfortunate naming conflict.</b>
 </p>
 
 <p>
-Flit is an <i>expression-based</i> language. That means we're more focused on the results of
+Flit is an <i><a class="org-gls" href="#gls.3" id="glsr.3.9">expression</a>-based</i> language. That means we&rsquo;re more focused on the results of
 calling a function or other computations than we are with writing instructions
-and telling the program to "do" something.
+and telling the program to &ldquo;do&rdquo; something.
 </p>
 
-<div class="definition" id="org6c06723">
+<div id="gls.13" class="admonition note">
+                        <p class="admonition-title note">Definition: Expression</p>&nbsp;
 <p>
-An expression is part of a program that produces a result: it either has a <i>value</i>, unless it raises an error or runs forever.
+An <a class="org-gls" href="#gls.3" id="glsr.3.10">expression</a> is part of a program that produces a result: it either has a <i>value</i>, unless it raises an error or runs forever.
 </p>
 
 </div>
 </div>
 <ol class="org-ol">
-<li><a id="org0858ac0"></a>Literals<br />
+<li><a id="org1917916"></a>Literals<br />
 <div class="outline-text-5" id="text-2-3-1-1">
 <p>
-Literals are expressions that evaluate to themselves, denoting fixed values of some type. For example:
+Literals are <a class="org-gls" href="#gls.3" id="glsr.3.11">expressions</a> that evaluate to themselves, denoting fixed values of some type. For example:
 </p>
 <div class="org-src-container">
-<pre class="src src-racket">3 ;; The number 3
-#f ;; False (boolean literal)
-#t ;; True (boolean literal)
-"hello" ;; A String
+<pre class="src src-racket"><span style="color: #da8548; font-weight: bold;">3</span> <span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">The number 3</span>
+<span style="color: #b751b6;">#f</span> <span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">False (boolean literal)</span>
+<span style="color: #b751b6;">#t</span> <span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">True (boolean literal)</span>
+<span style="color: #50a14f;">"hello"</span> <span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">A String</span>
 </pre>
 </div>
 </div>
 </li>
-<li><a id="orgdca275b"></a>Keywords<br />
+<li><a id="org0b24855"></a>Keywords<br />
 <div class="outline-text-5" id="text-2-3-1-2">
 <p>
 If you write <code>(foo bar baz)</code> where <code>foo</code> is a keyword in Flit, then
-the result of the expression is computed however the keyword is defined.
+the result of the <a class="org-gls" href="#gls.3" id="glsr.3.12">expression</a> is computed however the keyword is defined.
 </p>
 
 <p>
-Some keywords that we'll see are <code>if</code>, <code>type-case</code>, and <code>list</code>.
+Some keywords that we&rsquo;ll see are <code>if</code>, <code>type-case</code>, and <code>list</code>.
 </p>
 </div>
 </li>
-<li><a id="orgb000bbc"></a>Function Calls<br />
+<li><a id="org0b6f2ae"></a>Function Calls<br />
 <div class="outline-text-5" id="text-2-3-1-3">
 <p>
-Any expression of the form <code>(f a)</code> is interpreted as calling the function <code>f</code> with the argument <code>a</code>,
-for any expressions <code>f</code> and <code>a</code>,
-as long as <code>f</code> isn't a keyword.
+Any <a class="org-gls" href="#gls.3" id="glsr.3.13">expression</a> of the form <code>(f a)</code> is interpreted as calling the function <code>f</code> with the argument <code>a</code>,
+for any <a class="org-gls" href="#gls.3" id="glsr.3.14">expressions</a> <code>f</code> and <code>a</code>,
+as long as <code>f</code> isn&rsquo;t a keyword.
 This extends to functions with multiple arguments: <code>(f a b c d ...)</code> is a call to function <code>f</code>
 with arguments <code>a</code>, <code>b</code>, <code>c</code>, <code>d</code>, etc.
 </p>
 
 <p>
-Function calls are the "default" for an expression with parentheses:
-any time there's an expression <code>(f a b c...)</code>, it is interpreted as a call to <code>f</code>
+Function calls are the &ldquo;default&rdquo; for an <a class="org-gls" href="#gls.3" id="glsr.3.15">expression</a> with parentheses:
+any time there&rsquo;s an <a class="org-gls" href="#gls.3" id="glsr.3.16">expression</a> <code>(f a b c...)</code>, it is interpreted as a call to <code>f</code>
 unless <code>f</code> is a special Flit keyword.
 </p>
 
@@ -827,7 +1164,7 @@ unless <code>f</code> is a special Flit keyword.
 So in C++, we might write:
 </p>
 <div class="org-src-container">
-<pre class="src src-C++">!((3 + 4 * 5) == 23); <span style="font-weight: bold; font-style: italic;">// </span><span style="font-weight: bold; font-style: italic;">Type bool</span>
+<pre class="src src-C++"><span style="color: #4078f2; font-weight: bold;">!</span>((<span style="color: #da8548; font-weight: bold;">3</span> + <span style="color: #da8548; font-weight: bold;">4</span> * <span style="color: #da8548; font-weight: bold;">5</span>) == <span style="color: #da8548; font-weight: bold;">23</span>); <span style="color: #9ca0a4;">// </span><span style="color: #9ca0a4;">Type bool</span>
 </pre>
 </div>
 
@@ -835,7 +1172,7 @@ So in C++, we might write:
 The Flit equivalent of this is:
 </p>
 <div class="org-src-container">
-<pre class="src src-racket">(not (= (+ 3 (* 4 5)) 23))
+<pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #a626a4;">not</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">=</span> <span style="color: #50a14f;">(</span><span style="color: #a626a4;">+</span> <span style="color: #da8548; font-weight: bold;">3</span> <span style="color: #b751b6;">(</span><span style="color: #a626a4;">*</span> <span style="color: #da8548; font-weight: bold;">4</span> <span style="color: #da8548; font-weight: bold;">5</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">)</span> <span style="color: #da8548; font-weight: bold;">23</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
 </pre>
 </div>
 
@@ -847,7 +1184,7 @@ The Flit equivalent of this is:
 </ul>
 
 <p>
-In the C++ version, the operator precedence told us that <code>*</code> was applied before <code>+</code>. In Flit and other S-Expression based languages, there is no need for
+In the C++ version, the operator precedence told us that <code>*</code> was applied before <code>+</code>. In Flit and other <a class="org-gls" href="#gls.4" id="glsr.4.5">S-Expression</a> based languages, there is no need for
 operator precedence rules. The brackets make it clear what order the operations are being applied.
 </p>
 
@@ -862,9 +1199,9 @@ Here, we have used color to indicate the matching brackets.
 </li>
 </ol>
 </li>
-<li><a id="orgc390315"></a>Computing Using Equations<br />
+<li><a id="org52aac62"></a>Computing Using Equations<br />
 <ol class="org-ol">
-<li><a id="orgf23e506"></a>Semantics<br />
+<li><a id="org66fd1b0"></a>Semantics<br />
 <div class="outline-text-5" id="text-2-3-2-1">
 <p>
 One of the goals of this course is to answer the question: <b>what do programs mean</b>?
@@ -881,7 +1218,7 @@ different meanings depending on the context you use it in.
 
 <p>
 You definitely have an informal notion of semantics in your head.
-When you look at a piece of code and imagine how it runs, you aren't actually
+When you look at a piece of code and imagine how it runs, you aren&rsquo;t actually
 allocating memory addresses
 </p>
 
@@ -891,44 +1228,47 @@ and make it into something formal that we can reason about logically.
 </p>
 </div>
 </li>
-<li><a id="org206a6dc"></a>Mutable and Immutable Variables<br />
+<li><a id="orgd35c875"></a>Mutable and Immutable Variables<br />
 <div class="outline-text-5" id="text-2-3-2-2">
 <p>
-Most of the programming languages that you have likely seen so far have mutable variables:
+Most of the programming languages that you have likely seen so far have <a class="org-gls" href="#gls.1" id="glsr.1.2">mutable</a> variables:
 </p>
 
-<div class="definition" id="orgec0c219">
+<div id="gls.7" class="admonition note">
+                        <p class="admonition-title note">Definition: mutable</p>&nbsp;
 <p>
-A variable is mutable if its value can change within its scope.
+A variable is <a class="org-gls" href="#gls.1" id="glsr.1.3">mutable</a> if its value can change within its scope.
 </p>
 
 </div>
 
 <p>
-C, C++, Java, Python, JavaScript, Swift, and Go all have mutable variables.
+C, C++, Java, Python, JavaScript, Swift, and Go all have <a class="org-gls" href="#gls.1" id="glsr.1.4">mutable</a> variables.
 When you call a function or method, the result might be different each time you call it, even if the arguments are the same, because the body
 of the function can might access variables whose value has changed.
 </p>
 
 <p>
-By contrast, Flit is a <i>purely functional language:</i>
+By contrast, Flit is a <i><a class="org-gls" href="#gls.2" id="glsr.2.2">purely functional</a> language:</i>
 </p>
 
-<div class="definition" id="org8fc2fbe">
+<div id="gls.6" class="admonition note">
+                        <p class="admonition-title note">Definition: purely functional</p>&nbsp;
 <p>
-A programming language is purely functional if every call to a function with the same inputs produces the same outputs.
+A programming language is <a class="org-gls" href="#gls.2" id="glsr.2.3">purely functional</a> if every call to a function with the same inputs produces the same outputs.
 </p>
 
 </div>
 
 <p>
-In Flit, the value of an expression only depends on the initial values of the variables in that expression.
-This is because all variables in Flit are immutable:
+In Flit, the value of an <a class="org-gls" href="#gls.3" id="glsr.3.17">expression</a> only depends on the initial values of the variables in that <a class="org-gls" href="#gls.3" id="glsr.3.18">expression</a>.
+This is because all variables in Flit are <a class="org-gls" href="#gls.6" id="glsr.6.1">immutable</a>:
 </p>
 
-<div class="definition" id="org57a67f3">
+<div id="gls.5" class="admonition note">
+                        <p class="admonition-title note">Definition: immutable</p>&nbsp;
 <p>
-A variable is immutable if its value value is constant in its scope
+A variable is <a class="org-gls" href="#gls.6" id="glsr.6.2">immutable</a> if its value value is constant in its scope
 </p>
 
 </div>
@@ -937,57 +1277,58 @@ A variable is immutable if its value value is constant in its scope
 Variables in Flit are more like the variables you have seen in mathematics.
 Consider the equation for a line,
 \(f(x) = mx + b\). The line is described by the different \(f(x)\) values that are possible for all the different values of \(x\),
-but when we're computing a value for \(f(x)\), the value of \(x\) never changes during that computation.
+but when we&rsquo;re computing a value for \(f(x)\), the value of \(x\) never changes during that computation.
 Each input value for \(x\) produces a single value for \(f(x)\), and the value of the output only depends on the values of the inputs.
 </p>
 
 <p>
-In languages with mutable variables, <i>the equals sign is a lie!</i> Consider the following C++ code:
+In languages with <a class="org-gls" href="#gls.1" id="glsr.1.5">mutable</a> variables, <i>the equals sign is a lie!</i> Consider the following C++ code:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-c++"><span style="font-weight: bold; text-decoration: underline;">int</span> <span style="font-weight: bold; font-style: italic;">x</span>;
-x = 3;
+<pre class="src src-c++"><span style="color: #986801;">int</span> <span style="color: #6a1868;">x</span>;
+x = <span style="color: #da8548; font-weight: bold;">3</span>;
 cout &lt;&lt; x;
-x = 4;
+x = <span style="color: #da8548; font-weight: bold;">4</span>;
 </pre>
 </div>
 
 <p>
-We have to "equations", <code>x = 3</code> and  <code>x = 4</code>. But clearly we don't have <code>3 = 4</code>.
-So we can't really say what the variable <code>x</code> means without talking about the state of memory
+We have to &ldquo;equations&rdquo;, <code>x = 3</code> and  <code>x = 4</code>. But clearly we don&rsquo;t have <code>3 = 4</code>.
+So we can&rsquo;t really say what the variable <code>x</code> means without talking about the state of memory
 at a particular point in time.
 </p>
 
 <p>
-In purely functional languages, we can reason about actual equality. This gives us a very convenient
+In <a class="org-gls" href="#gls.2" id="glsr.2.4">purely functional</a> languages, we can reason about actual equality. This gives us a very convenient
 way to describe what a program means, separately from any particular hardware.
 It also allows us to design programs using recipes, which we will learn about in <a href="#flit-types">the chapter on types.</a>
 </p>
 
 <p>
-It is possible to define semantics for programs with mutable variables, but that is (1) more complicated,
-and (2) ends up translating the programs to something that looks like a purely functional version anyways.
-We'll see a bit more of this <a href="#flit-tailrec">when we learn about tail recursion</a>.
+It is possible to define semantics for programs with <a class="org-gls" href="#gls.1" id="glsr.1.6">mutable</a> variables, but that is (1) more complicated,
+and (2) ends up translating the programs to something that looks like a <a class="org-gls" href="#gls.2" id="glsr.2.5">purely functional</a> version anyways.
+We&rsquo;ll see a bit more of this <a href="#flit-tailrec">when we learn about tail recursion</a>.
 </p>
 </div>
 </li>
-<li><a id="org193dd84"></a>Equations<br />
+<li><a id="org24fb72e"></a>Equations<br />
 <div class="outline-text-5" id="text-2-3-2-3">
 <p>
 We will describe the semantics of Flit using <i>Equations</i>. Here is our first
 semantic equation:
 </p>
 
-<div class="definition" id="org1c118a9">
+<div id="gls.14" class="admonition note">
+                        <p class="admonition-title note">Definition: Semantics of +</p>&nbsp;
 <p>
-For any number literals <code>m</code> and <code>n</code>, the expression <code>(+ m n)</code>
+For any number literals <code>m</code> and <code>n</code>, the <a class="org-gls" href="#gls.3" id="glsr.3.19">expression</a> <code>(+ m n)</code>
 is equal to the sum of <code>m</code> and <code>n</code>. The other arithmetic operations have similar rules.
 </p>
 
 </div>
 
-<pre class="example" id="org7031eab">
+<pre class="example" id="orgb7a0df6">
 (+ 3 4) = 7
 (+ 0 2) = 2
 </pre>
@@ -997,19 +1338,19 @@ There are a few tricky things to notice here.
 </p>
 </div>
 </li>
-<li><a id="org9bade73"></a>Types<br /></li>
+<li><a id="org29f5f02"></a>Types<br /></li>
 </ol>
 </li>
-<li><a id="org249c593"></a>Conditionals<br />
+<li><a id="org2354b79"></a>Conditionals<br />
 <div class="outline-text-4" id="text-2-3-3">
 <p>
-If-expressions are built into Flit:
+If-<a class="org-gls" href="#gls.3" id="glsr.3.20">expressions</a> are built into Flit:
 </p>
 <div class="org-src-container">
-<pre class="src src-racket">(if #f 3 4)
-(if #t 3 4)
-(if (odd? 7) (+ 7 1) (+ 7 2) )
-(if (odd? 6) (error 'crash "CRASH") (+ 6 9000) ) ;; Doesn't run the error
+<pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">if</span> <span style="color: #b751b6;">#f</span> <span style="color: #da8548; font-weight: bold;">3</span> <span style="color: #da8548; font-weight: bold;">4</span><span style="color: #4078f2;">)</span>
+<span style="color: #4078f2;">(</span><span style="color: #e45649;">if</span> <span style="color: #b751b6;">#t</span> <span style="color: #da8548; font-weight: bold;">3</span> <span style="color: #da8548; font-weight: bold;">4</span><span style="color: #4078f2;">)</span>
+<span style="color: #4078f2;">(</span><span style="color: #e45649;">if</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">odd?</span> <span style="color: #da8548; font-weight: bold;">7</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">+</span> <span style="color: #da8548; font-weight: bold;">7</span> <span style="color: #da8548; font-weight: bold;">1</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">+</span> <span style="color: #da8548; font-weight: bold;">7</span> <span style="color: #da8548; font-weight: bold;">2</span><span style="color: #a626a4;">)</span> <span style="color: #4078f2;">)</span>
+<span style="color: #4078f2;">(</span><span style="color: #e45649;">if</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">odd?</span> <span style="color: #da8548; font-weight: bold;">6</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">error</span> <span style="color: #b751b6;">'crash</span> <span style="color: #50a14f;">"CRASH"</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">+</span> <span style="color: #da8548; font-weight: bold;">6</span> <span style="color: #da8548; font-weight: bold;">9000</span><span style="color: #a626a4;">)</span> <span style="color: #4078f2;">)</span> <span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">Doesn't run the error</span>
 </pre>
 </div>
 
@@ -1023,9 +1364,10 @@ The true branch is not evaluated if the condition is false, and vice versa.
 We can describe <code>if</code> with the following equations:
 </p>
 
-<div class="definition" id="org3fd5db3">
+<div id="gls.1" class="admonition note">
+                        <p class="admonition-title note">Definition: Semantics of If</p>&nbsp;
 <p>
-For any expressions <code>EXPR1</code> and <code>EXPR2</code>
+For any <a class="org-gls" href="#gls.3" id="glsr.3.21">expressions</a> <code>EXPR1</code> and <code>EXPR2</code>
 </p>
 <ul class="org-ul">
 <li><code>(if #t EXPR1 EXPR2) = EXPR1</code></li>
@@ -1038,7 +1380,7 @@ For any expressions <code>EXPR1</code> and <code>EXPR2</code>
 <p>
 This is slightly different from <code>if</code> that you might have seen in C++ or Python.
 There, <code>if</code> is a <i>statement</i>: it evaluates its boolean, and then <i>does something</i> if it is true.
-In Flit, <code>if</code> doesn't do anything, like printing or updating values. It is an expression,
+In Flit, <code>if</code> doesn&rsquo;t do anything, like printing or updating values. It is an <a class="org-gls" href="#gls.3" id="glsr.3.22">expression</a>,
 and what value it has depends on whether the boolean it is given produces true or false.
 </p>
 
@@ -1047,22 +1389,22 @@ If you are familiar with the <code>cond ? foo : bar</code> syntax in C/C++, this
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="org008f612"></a>Example<br />
+<li><a id="org54f32c5"></a>Example<br />
 <div class="outline-text-5" id="text-2-3-3-1">
 <p>
-Let's use the equational rules we have so far to evaluate some example code to a result.
+Let&rsquo;s use the equational rules we have so far to evaluate some example code to a result.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-racket">(if (&lt; 3 4) (if (= (+ 2 6) 4) (* 3 33) (+ 50 50)) 9001)
+<pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">if</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">&lt;</span> <span style="color: #da8548; font-weight: bold;">3</span> <span style="color: #da8548; font-weight: bold;">4</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">(</span><span style="color: #e45649;">if</span> <span style="color: #50a14f;">(</span><span style="color: #a626a4;">=</span> <span style="color: #b751b6;">(</span><span style="color: #a626a4;">+</span> <span style="color: #da8548; font-weight: bold;">2</span> <span style="color: #da8548; font-weight: bold;">6</span><span style="color: #b751b6;">)</span> <span style="color: #da8548; font-weight: bold;">4</span><span style="color: #50a14f;">)</span> <span style="color: #50a14f;">(</span><span style="color: #a626a4;">*</span> <span style="color: #da8548; font-weight: bold;">3</span> <span style="color: #da8548; font-weight: bold;">33</span><span style="color: #50a14f;">)</span> <span style="color: #50a14f;">(</span><span style="color: #a626a4;">+</span> <span style="color: #da8548; font-weight: bold;">50</span> <span style="color: #da8548; font-weight: bold;">50</span><span style="color: #50a14f;">)</span><span style="color: #a626a4;">)</span> <span style="color: #da8548; font-weight: bold;">9001</span><span style="color: #4078f2;">)</span>
 </pre>
 </div>
 
 <p>
-We can deduce this result by applying our rules. We use the underscore <code>_</code> to show which part of the expression is being simplified by the rule.
+We can deduce this result by applying our rules. We use the underscore <code>_</code> to show which part of the <a class="org-gls" href="#gls.3" id="glsr.3.23">expression</a> is being simplified by the rule.
 </p>
 
-<table id="orgda67f62" border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<table id="org194a44d" border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
 <colgroup>
@@ -1072,14 +1414,14 @@ We can deduce this result by applying our rules. We use the underscore <code>_</
 </colgroup>
 <thead>
 <tr>
-<th scope="col" class="org-left">Expression</th>
+<th scope="col" class="org-left"><a class="org-gls" href="#gls.3" id="glsr.3.24">Expression</a></th>
 <th scope="col" class="org-left">Rule</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td class="org-left"><code>(if _(&lt; 3 4)_ (if (= (+ 2 6) 4) (* 3 33) (+ 50 50)) 9001)</code></td>
-<td class="org-left"><i>start expression</i></td>
+<td class="org-left"><i>start <a class="org-gls" href="#gls.3" id="glsr.3.25">expression</a></i></td>
 </tr>
 
 <tr>
@@ -1089,7 +1431,7 @@ We can deduce this result by applying our rules. We use the underscore <code>_</
 
 <tr>
 <td class="org-left"><code>(if (= _(+ 2 6)_ 4) (* 3 33) (+ 50 50))</code></td>
-<td class="org-left">True rule - Semantics of If</td>
+<td class="org-left">True rule - <a class="org-gls" href="#gls.7" id="glsr.7.1">Semantics of If</a></td>
 </tr>
 
 <tr>
@@ -1099,7 +1441,7 @@ We can deduce this result by applying our rules. We use the underscore <code>_</
 
 <tr>
 <td class="org-left"><code>(_if_ #f (* 3 33) (+ 50 50))</code></td>
-<td class="org-left">False rule - Semantics of If</td>
+<td class="org-left">False rule - <a class="org-gls" href="#gls.7" id="glsr.7.2">Semantics of If</a></td>
 </tr>
 
 <tr>
@@ -1112,13 +1454,13 @@ We can deduce this result by applying our rules. We use the underscore <code>_</
 
 <p>
 Evaluating examples like this will get much more interesting once we have functions and variables,
-which we'll see below.
+which we&rsquo;ll see below.
 </p>
 </div>
 </li>
 </ol>
 </li>
-<li><a id="org7c53c90"></a>Function Definitions<br />
+<li><a id="org7778879"></a>Function Definitions<br />
 <div class="outline-text-4" id="text-2-3-4">
 <p>
 Flit is a functional language, so the main way that we will write programs is by
@@ -1126,10 +1468,10 @@ defining one or more functions that compute the results we want.
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="org0261b24"></a>Semantics of Function Calls<br /></li>
+<li><a id="org5eeb71a"></a>Semantics of Function Calls<br /></li>
 </ol>
 </li>
-<li><a id="org3382401"></a>Local Variables<br /></li>
+<li><a id="orga39abbe"></a>Local Variables<br /></li>
 </ol>
 </div>
 <div id="outline-container-flit-types" class="outline-3">
@@ -1140,10 +1482,10 @@ Another way that we can talk about what programs mean is their <i>type</i>.
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="orgd202442"></a>Static and Dynamic Typing<br /></li>
-<li><a id="org09a3a11"></a>Typing Rules<br /></li>
-<li><a id="orgfc9489b"></a>Type Inference<br /></li>
-<li><a id="org2f9b484"></a>Polymorphism<br /></li>
+<li><a id="orgc864a99"></a>Static and Dynamic Typing<br /></li>
+<li><a id="org91d6bf3"></a>Typing Rules<br /></li>
+<li><a id="orga5dc763"></a>Type Inference<br /></li>
+<li><a id="org0bf7b91"></a>Polymorphism<br /></li>
 </ol>
 </div>
 <div id="outline-container-flit-recursion" class="outline-3">
@@ -1177,41 +1519,42 @@ Another way that we can talk about what programs mean is their <i>type</i>.
 </div>
 </div>
 </div>
-<div id="outline-container-orga091fab" class="outline-2">
-<h2 id="orga091fab"><span class="section-number-2">3.</span> Glossary</h2>
+<div id="outline-container-org920237c" class="outline-2">
+<h2 id="org920237c"><span class="section-number-2">3.</span> Glossary</h2>
 <div class="outline-text-2" id="text-3">
-<dl class="org-dl">
-<dt>Semantics of If</dt><dd>For any expressions <code>EXPR1</code> and <code>EXPR2</code></dd>
-<dt>(no term)</dt><dd><code>(if #t EXPR1 EXPR2) = EXPR1</code></dd>
-<dt>(no term)</dt><dd><code>(if #f EXPR1 EXPR2) = EXPR2</code></dd>
-
-<dt>Semantics of +</dt><dd>For any number literals <code>m</code> and <code>n</code>, the expression <code>(+ m n)</code></dd>
-</dl>
 <p>
-is equal to the sum of <code>m</code> and <code>n</code>. The other arithmetic operations have similar rules.
+<b><span class="org-glsdef" id="gls.1">Semantics of If</span></b>&emsp;For any expressions <code>EXPR1</code> and <code>EXPR2</code>&ensp;<a class="org-glsdef" href="#glsr.7.1">1</a>, <a class="org-glsdef" href="#glsr.7.2">2</a>
 </p>
 
-<dl class="org-dl">
-<dt>immutable</dt><dd>A variable is immutable if its value value is constant in its scope</dd>
+<p>
+<b><span class="org-glsdef" id="gls.9">S-Expression</span></b>&emsp;Every S-Expression (or s-exp, pronounced &ldquo;ess-exp&rdquo;) is either:&ensp;<a class="org-glsdef" href="#glsr.4.1">1</a>, <a class="org-glsdef" href="#glsr.4.2">2</a>, <a class="org-glsdef" href="#glsr.4.3">3</a>, <a class="org-glsdef" href="#glsr.4.4">4</a>, <a class="org-glsdef" href="#glsr.4.5">5</a>
+</p>
 
-<dt>purely functional</dt><dd>A programming language is purely functional if every call to a function with the same inputs produces the same outputs.</dd>
+<p>
+<b><span class="org-glsdef" id="gls.8">Expression</span></b>&emsp;An expression is part of a program that produces a result: it either has a <i>value</i>, unless it raises an error or runs forever.&ensp;<a class="org-glsdef" href="#glsr.3.1">1</a>, <a class="org-glsdef" href="#glsr.3.2">2</a>, <a class="org-glsdef" href="#glsr.3.3">3</a>, <a class="org-glsdef" href="#glsr.3.4">4</a>, <a class="org-glsdef" href="#glsr.3.5">5</a>, <a class="org-glsdef" href="#glsr.3.6">6</a>, <a class="org-glsdef" href="#glsr.3.7">7</a>, <a class="org-glsdef" href="#glsr.3.8">8</a>, <a class="org-glsdef" href="#glsr.3.9">9</a>, <a class="org-glsdef" href="#glsr.3.10">10</a>, <a class="org-glsdef" href="#glsr.3.11">11</a>, <a class="org-glsdef" href="#glsr.3.12">12</a>, <a class="org-glsdef" href="#glsr.3.13">13</a>, <a class="org-glsdef" href="#glsr.3.14">14</a>, <a class="org-glsdef" href="#glsr.3.15">15</a>, <a class="org-glsdef" href="#glsr.3.16">16</a>, <a class="org-glsdef" href="#glsr.3.17">17</a>, <a class="org-glsdef" href="#glsr.3.18">18</a>, <a class="org-glsdef" href="#glsr.3.19">19</a>, <a class="org-glsdef" href="#glsr.3.20">20</a>, <a class="org-glsdef" href="#glsr.3.21">21</a>, <a class="org-glsdef" href="#glsr.3.22">22</a>, <a class="org-glsdef" href="#glsr.3.23">23</a>, <a class="org-glsdef" href="#glsr.3.24">24</a>, <a class="org-glsdef" href="#glsr.3.25">25</a>
+</p>
 
-<dt>mutable</dt><dd>A variable is mutable if its value can change within its scope.</dd>
+<p>
+<b><span class="org-glsdef" id="gls.5">Immutable</span></b>&emsp;A variable is immutable if its value value is constant in its scope&ensp;<a class="org-glsdef" href="#glsr.6.1">1</a>, <a class="org-glsdef" href="#glsr.6.2">2</a>
+</p>
 
-<dt>Expression</dt><dd>An expression is part of a program that produces a result: it either has a <i>value</i>, unless it raises an error or runs forever.</dd>
+<p>
+<b><span class="org-glsdef" id="gls.7">Mutable</span></b>&emsp;A variable is mutable if its value can change within its scope.&ensp;<a class="org-glsdef" href="#glsr.1.1">1</a>, <a class="org-glsdef" href="#glsr.1.2">2</a>, <a class="org-glsdef" href="#glsr.1.3">3</a>, <a class="org-glsdef" href="#glsr.1.4">4</a>, <a class="org-glsdef" href="#glsr.1.5">5</a>, <a class="org-glsdef" href="#glsr.1.6">6</a>
+</p>
 
-<dt>S-Expression</dt><dd>Every S-Expression (or s-exp, pronounced "ess-exp") is either:</dd>
-<dt>(no term)</dt><dd>A literal (such as a number <code>3</code>, a boolean <code>#t</code> or <code>#f</code>, a string <code>"hello"</code>, a symbol <code>'a</code>, etc.)</dd>
-<dt>(no term)</dt><dd>A name (such as <code>x</code>, <code>y</code>, <code>foo</code>, <code>map</code>, <code>if</code>, <code>type-case</code> )</dd>
-<dt>(no term)</dt><dd>Parentheses <code>(...)</code> containing one or more  S-Expressions, separated by a space</dd>
-</dl>
+<p>
+<b><span class="org-glsdef" id="gls.6">Purely functional</span></b>&emsp;A programming language is purely functional if every call to a function with the same inputs produces the same outputs.&ensp;<a class="org-glsdef" href="#glsr.2.1">1</a>, <a class="org-glsdef" href="#glsr.2.2">2</a>, <a class="org-glsdef" href="#glsr.2.3">3</a>, <a class="org-glsdef" href="#glsr.2.4">4</a>, <a class="org-glsdef" href="#glsr.2.5">5</a>
+</p>
+
+<p>
+<b><span class="org-glsdef" id="gls.12">Parentheses ~(...)~ containing one or more  S-Expressions</span></b>&emsp;&ensp;<a class="org-glsdef" href="#glsr.5.1">1</a>
+</p>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: Dr. Joseph Eremondi, with material adapted from Dr. Shriram Krishnamurthi</p>
-<p class="date">Created: 2025-01-06 Mon 22:28</p>
-<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
+<p class="date">Created: 2025-01-06 Mon 22:34</p>
 </div>
 </body>
 </html>
