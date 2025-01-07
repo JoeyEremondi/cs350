@@ -1,6 +1,9 @@
 #+title: Functional Languages, Interpreters and Types: CS 350 Course Notes
 #+author: Dr. Joseph Eremondi, with material adapted from Dr. Shriram Krishnamurthi
 
+
+#+OPTIONS: toc:2 H:2 TODO:nil eval:yes
+
 #+SETUPFILE: readtheorg_inline.theme
 
 * Introduction
