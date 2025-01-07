@@ -582,6 +582,9 @@ which we'll see below.
 *** Function Definitions
 Flit is a functional language, so the main way that we will write programs is by
 defining one or more functions that compute the results we want.
+
+**** Semantics of Function Calls
+
 *** Local Variables
 ** Types
 :PROPERTIES:
