@@ -3,10 +3,10 @@
 
 #+SETUPFILE: readtheorg_inline.theme
 
+* Introduction
 :PROPERTIES:
 :header-args:racket: :results code :lang plait
 :END:
-* Introduction
 
 ** For Students
 

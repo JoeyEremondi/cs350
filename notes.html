@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2025-01-06 Mon 18:05 -->
+<!-- 2025-01-06 Mon 18:21 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Functional Languages, Interpreters and Types: CS 350 Course Notes</title>
@@ -252,39 +252,39 @@ $(function() {    $('.definition').before("<p class='admonition-title note'>Defi
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org4a9065c">1. Introduction</a>
+<li><a href="#orgf1eef2a">1. Introduction</a>
 <ul>
-<li><a href="#orgab6d6fd">1.1. For Students</a>
+<li><a href="#org65fd0b3">1.1. For Students</a>
 <ul>
-<li><a href="#orgd0c7389">1.1.1. What This Course Is About</a></li>
-<li><a href="#orgd4b3293">1.1.2. Why Functional Programming?</a></li>
-<li><a href="#org27f880f">1.1.3. Why Interpreters?</a></li>
+<li><a href="#orge7d3c6c">1.1.1. What This Course Is About</a></li>
+<li><a href="#org11cd639">1.1.2. Why Functional Programming?</a></li>
+<li><a href="#org8644cf6">1.1.3. Why Interpreters?</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgbf03a56">2. Part I: Functional Programming</a>
+<li><a href="#org7e3aebb">2. Part I: Functional Programming</a>
 <ul>
 <li><a href="#setup">2.1. Setup: Editor and Tooling</a>
 <ul>
-<li><a href="#org2040bd7">2.1.1. Dr. Racket and <code>#lang flit</code></a></li>
-<li><a href="#orgf1489c5">2.1.2. Installing the Handin Tool</a></li>
-<li><a href="#org68a0adf">2.1.3. <span class="todo TODO">TODO</span> Using Dr. Racket</a></li>
+<li><a href="#org36ee00b">2.1.1. Dr. Racket and <code>#lang flit</code></a></li>
+<li><a href="#org7ab08f4">2.1.2. Installing the Handin Tool</a></li>
+<li><a href="#org689f1be">2.1.3. <span class="todo TODO">TODO</span> Using Dr. Racket</a></li>
 </ul>
 </li>
 <li><a href="#racket-synax">2.2. The Syntax of Flit</a>
 <ul>
-<li><a href="#orgb9af8c1">2.2.1. S-expressions</a></li>
-<li><a href="#org802d570">2.2.2. Special Characters</a></li>
+<li><a href="#org8ebcdf9">2.2.1. S-expressions</a></li>
+<li><a href="#orgca19198">2.2.2. Special Characters</a></li>
 </ul>
 </li>
 <li><a href="#flit-expr">2.3. Functions and Expressions</a>
 <ul>
-<li><a href="#org8e8ed5b">2.3.1. Expressions in Flit</a></li>
-<li><a href="#org74f815c">2.3.2. Computing Using Equations</a></li>
-<li><a href="#org44fdde3">2.3.3. Conditionals</a></li>
-<li><a href="#orgca23704">2.3.4. Function Definitions</a></li>
-<li><a href="#org36c1d4d">2.3.5. Local Variables</a></li>
+<li><a href="#orgc4d8c9c">2.3.1. Expressions in Flit</a></li>
+<li><a href="#orgf93aed0">2.3.2. Computing Using Equations</a></li>
+<li><a href="#org92165c0">2.3.3. Conditionals</a></li>
+<li><a href="#org00aa447">2.3.4. Function Definitions</a></li>
+<li><a href="#orgc8b4fc0">2.3.5. Local Variables</a></li>
 </ul>
 </li>
 <li><a href="#flit-types">2.4. Types</a></li>
@@ -296,23 +296,20 @@ $(function() {    $('.definition').before("<p class='admonition-title note'>Defi
 <li><a href="#flit-tailrec">2.10. Tail-Calls and Generative Recursion</a></li>
 </ul>
 </li>
-<li><a href="#org89718c6">3. Glossary</a></li>
+<li><a href="#org261543f">3. Glossary</a></li>
 </ul>
 </div>
 </div>
-<p>
-:header-args:racket: :results code :lang plait
-</p>
-<div id="outline-container-org4a9065c" class="outline-2">
-<h2 id="org4a9065c"><span class="section-number-2">1.</span> Introduction</h2>
+<div id="outline-container-orgf1eef2a" class="outline-2">
+<h2 id="orgf1eef2a"><span class="section-number-2">1.</span> Introduction</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-orgab6d6fd" class="outline-3">
-<h3 id="orgab6d6fd"><span class="section-number-3">1.1.</span> For Students</h3>
+<div id="outline-container-org65fd0b3" class="outline-3">
+<h3 id="org65fd0b3"><span class="section-number-3">1.1.</span> For Students</h3>
 <div class="outline-text-3" id="text-1-1">
 </div>
-<div id="outline-container-orgd0c7389" class="outline-4">
-<h4 id="orgd0c7389"><span class="section-number-4">1.1.1.</span> What This Course Is About</h4>
+<div id="outline-container-orge7d3c6c" class="outline-4">
+<h4 id="orge7d3c6c"><span class="section-number-4">1.1.1.</span> What This Course Is About</h4>
 <div class="outline-text-4" id="text-1-1-1">
 <p>
 If you take into a linguistics class, you will not take French one week, German the next, Mandarin after that, etc.
@@ -333,8 +330,8 @@ have very different features.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd4b3293" class="outline-4">
-<h4 id="orgd4b3293"><span class="section-number-4">1.1.2.</span> Why Functional Programming?</h4>
+<div id="outline-container-org11cd639" class="outline-4">
+<h4 id="org11cd639"><span class="section-number-4">1.1.2.</span> Why Functional Programming?</h4>
 <div class="outline-text-4" id="text-1-1-2">
 <p>
 In this course, we will learn about <i>functional programming,</i> where a variable's value never changes once it is set.
@@ -374,8 +371,8 @@ so that you are able to adapt and learn whatever language you need in your job t
 </p>
 </div>
 </div>
-<div id="outline-container-org27f880f" class="outline-4">
-<h4 id="org27f880f"><span class="section-number-4">1.1.3.</span> Why Interpreters?</h4>
+<div id="outline-container-org8644cf6" class="outline-4">
+<h4 id="org8644cf6"><span class="section-number-4">1.1.3.</span> Why Interpreters?</h4>
 <div class="outline-text-4" id="text-1-1-3">
 <p>
 In addition to learning how to use language features, this course will teach you
@@ -404,16 +401,16 @@ and beauty that lies at the heart of computation.
 </div>
 </div>
 </div>
-<div id="outline-container-orgbf03a56" class="outline-2">
-<h2 id="orgbf03a56"><span class="section-number-2">2.</span> Part I: Functional Programming</h2>
+<div id="outline-container-org7e3aebb" class="outline-2">
+<h2 id="org7e3aebb"><span class="section-number-2">2.</span> Part I: Functional Programming</h2>
 <div class="outline-text-2" id="text-2">
 </div>
 <div id="outline-container-setup" class="outline-3">
 <h3 id="setup"><span class="section-number-3">2.1.</span> Setup: Editor and Tooling</h3>
 <div class="outline-text-3" id="text-setup">
 </div>
-<div id="outline-container-org2040bd7" class="outline-4">
-<h4 id="org2040bd7"><span class="section-number-4">2.1.1.</span> Dr. Racket and <code>#lang flit</code></h4>
+<div id="outline-container-org36ee00b" class="outline-4">
+<h4 id="org36ee00b"><span class="section-number-4">2.1.1.</span> Dr. Racket and <code>#lang flit</code></h4>
 <div class="outline-text-4" id="text-2-1-1">
 <p>
 All of the programming in this course takes place in Racket.
@@ -425,7 +422,7 @@ i.e., <code>#lang flit</code>.
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="org8e92a89"></a><span class="todo TODO">TODO</span> Installing Dr. Racket<br />
+<li><a id="orgdcb8c60"></a><span class="todo TODO">TODO</span> Installing Dr. Racket<br />
 <div class="outline-text-5" id="text-2-1-1-1">
 <p>
 Dr. Racket is the IDE for Racket, and language made using Racket, including Flit.
@@ -449,7 +446,7 @@ Many distributions also have their own packages, which you are welcome to use.
 </ul>
 </div>
 </li>
-<li><a id="org7174a8f"></a>Dr. Racket on Laboratory Computers<br />
+<li><a id="orge8e445b"></a>Dr. Racket on Laboratory Computers<br />
 <div class="outline-text-5" id="text-2-1-1-2">
 <p>
 Dr. Racket is installed on computers in the following labs:
@@ -467,8 +464,8 @@ access to your own computer.
 </li>
 </ol>
 </div>
-<div id="outline-container-orgf1489c5" class="outline-4">
-<h4 id="orgf1489c5"><span class="section-number-4">2.1.2.</span> Installing the Handin Tool</h4>
+<div id="outline-container-org7ab08f4" class="outline-4">
+<h4 id="org7ab08f4"><span class="section-number-4">2.1.2.</span> Installing the Handin Tool</h4>
 <div class="outline-text-4" id="text-2-1-2">
 <p>
 Whether you use your own computer or a lab computer, you will need to
@@ -495,7 +492,7 @@ include files relevant to specific assignments.
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="orgc2d21b8"></a>Changing Your Password<br />
+<li><a id="orga0fb44c"></a>Changing Your Password<br />
 <div class="outline-text-6" id="text-2-1-2-0-1">
 <p>
 You will be emailed a password for your account. If you wish to change your password,
@@ -513,11 +510,11 @@ for the handin tool, but not secure enough for sensitive personal information.
 </p>
 </div>
 </li>
-<li><a id="org78c9c76"></a><span class="todo TODO">TODO</span> Make PLT file and upload link<br /></li>
+<li><a id="orgb461ff9"></a><span class="todo TODO">TODO</span> Make PLT file and upload link<br /></li>
 </ol>
 </div>
-<div id="outline-container-org68a0adf" class="outline-4">
-<h4 id="org68a0adf"><span class="section-number-4">2.1.3.</span> <span class="todo TODO">TODO</span> Using Dr. Racket</h4>
+<div id="outline-container-org689f1be" class="outline-4">
+<h4 id="org689f1be"><span class="section-number-4">2.1.3.</span> <span class="todo TODO">TODO</span> Using Dr. Racket</h4>
 <div class="outline-text-4" id="text-2-1-3">
 <p>
 There are three main parts of the Dr. Racket interface: the toolbar at the top,
@@ -525,9 +522,9 @@ the code editor window, and the REPL at the bottom.
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="org73a1638"></a><span class="todo TODO">TODO</span> pictures<br /></li>
+<li><a id="orga31f551"></a><span class="todo TODO">TODO</span> pictures<br /></li>
 
-<li><a id="org25ef753"></a>The Definitions Window (Code Editor)<br />
+<li><a id="orgc4c4886"></a>The Definitions Window (Code Editor)<br />
 <div class="outline-text-5" id="text-2-1-3-2">
 <p>
 The editor window is where you will type your Racket program.
@@ -536,7 +533,7 @@ Racket as described above this will happen by default.
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="org7889f9e"></a>Type and Syntax Errors<br />
+<li><a id="orgcacce71"></a>Type and Syntax Errors<br />
 <div class="outline-text-6" id="text-2-1-3-2-1">
 <p>
 If there are type or syntax errors in your code, there will be
@@ -547,7 +544,7 @@ has a type or syntax error will get a grade of 0.
 </p>
 </div>
 </li>
-<li><a id="org9914db0"></a>Useful Tools<br />
+<li><a id="org1977b0e"></a>Useful Tools<br />
 <div class="outline-text-6" id="text-2-1-3-2-2">
 <p>
 If you right click on a variable, function name, type name, etc. in Dr. Racket,
@@ -564,7 +561,7 @@ This can be very useful to make your code more readable, or to find errors based
 </li>
 </ol>
 </li>
-<li><a id="orge2b1aa2"></a>The Toolbar<br />
+<li><a id="org2ef3936"></a>The Toolbar<br />
 <div class="outline-text-5" id="text-2-1-3-3">
 <p>
 There are two main buttons you need on the toolbar.
@@ -600,7 +597,7 @@ on which test that is. In these cases, <b>read the problem specification careful
 </p>
 </div>
 </li>
-<li><a id="org2a41287"></a>The Interactions Window (REPL)<br />
+<li><a id="org9a4da62"></a>The Interactions Window (REPL)<br />
 <div class="outline-text-5" id="text-2-1-3-4">
 <p>
 The interactions window features a Read-Evaluate-Print-Loop (REPL),
@@ -616,7 +613,7 @@ can be used in the REPL.
 </p>
 </div>
 </li>
-<li><a id="orgd8391d7"></a>Submitting Assignments<br />
+<li><a id="orga8853f6"></a>Submitting Assignments<br />
 <div class="outline-text-5" id="text-2-1-3-5">
 <p>
 All assignments are to be submitted using the Handin tool. There are two ways to do this:
@@ -640,7 +637,7 @@ The test results are also visible on URCourses.
 </ul>
 </div>
 <ol class="org-ol">
-<li><a id="org8132eb9"></a>Submitting Multiple Times<br />
+<li><a id="org6e0e093"></a>Submitting Multiple Times<br />
 <div class="outline-text-6" id="text-2-1-3-5-1">
 <p>
 You may submit as many times as you like until the deadline. Your grade will be the grade
@@ -652,7 +649,7 @@ from the last submission before the deadline.
 </p>
 </div>
 </li>
-<li><a id="orgf107657"></a>Syntax and Type Errors<br />
+<li><a id="org9f11ed4"></a>Syntax and Type Errors<br />
 <div class="outline-text-6" id="text-2-1-3-5-2">
 <p>
 If your file contains syntax or type errors, the feedback in Dr. Racket or on the handin website will
@@ -676,7 +673,7 @@ If there is an error message you do not understand, then <b>ask a question on th
 </p>
 </div>
 </li>
-<li><a id="org7877962"></a>Public and Private Tests<br />
+<li><a id="org9b92313"></a>Public and Private Tests<br />
 <div class="outline-text-6" id="text-2-1-3-5-3">
 <p>
 When you submit an assignment, most tests are <i>public</i>, meaning that you
@@ -692,7 +689,7 @@ missed when writing your code.
 </p>
 </div>
 </li>
-<li><a id="org73affa0"></a>Submitting on URCourses (not preferred)<br />
+<li><a id="org82cb384"></a>Submitting on URCourses (not preferred)<br />
 <div class="outline-text-6" id="text-2-1-3-5-4">
 <p>
 Submitting assignments via URCourses is available as a backup.
@@ -716,14 +713,14 @@ but you are then responsible for ensuring that it has no syntax or type errors.
 <h3 id="racket-synax"><span class="section-number-3">2.2.</span> The Syntax of Flit</h3>
 <div class="outline-text-3" id="text-racket-synax">
 </div>
-<div id="outline-container-orgb9af8c1" class="outline-4">
-<h4 id="orgb9af8c1"><span class="section-number-4">2.2.1.</span> S-expressions</h4>
+<div id="outline-container-org8ebcdf9" class="outline-4">
+<h4 id="org8ebcdf9"><span class="section-number-4">2.2.1.</span> S-expressions</h4>
 <div class="outline-text-4" id="text-2-2-1">
 <p>
 The syntax of Dr. Racket based around <i>S-Expressions</i>.
 </p>
 
-<div class="definition" id="org1e78df8">
+<div class="definition" id="org8373106">
 <p>
 Every S-Expression (or s-exp, pronounced "ess-exp") is either:
 </p>
@@ -754,11 +751,11 @@ The rest that we see will be Flit expressions, i.e., programs that compute some 
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="org275192f"></a><span class="todo TODO">TODO</span> S-Exp diagram<br /></li>
+<li><a id="org987f132"></a><span class="todo TODO">TODO</span> S-Exp diagram<br /></li>
 </ol>
 </div>
-<div id="outline-container-org802d570" class="outline-4">
-<h4 id="org802d570"><span class="section-number-4">2.2.2.</span> Special Characters</h4>
+<div id="outline-container-orgca19198" class="outline-4">
+<h4 id="orgca19198"><span class="section-number-4">2.2.2.</span> Special Characters</h4>
 <div class="outline-text-4" id="text-2-2-2">
 <p>
 There are a few characters that you can't use in variable/function names in Racket:
@@ -787,8 +784,8 @@ Likewise, functions converting between types often contain <code>-&gt;</code> in
 <h3 id="flit-expr"><span class="section-number-3">2.3.</span> Functions and Expressions</h3>
 <div class="outline-text-3" id="text-flit-expr">
 </div>
-<div id="outline-container-org8e8ed5b" class="outline-4">
-<h4 id="org8e8ed5b"><span class="section-number-4">2.3.1.</span> Expressions in Flit</h4>
+<div id="outline-container-orgc4d8c9c" class="outline-4">
+<h4 id="orgc4d8c9c"><span class="section-number-4">2.3.1.</span> Expressions in Flit</h4>
 <div class="outline-text-4" id="text-2-3-1">
 <p>
 <b>NOTE: All Flit expressions are S-Expressions, but not all S-Expressions are Flit Expressions, since some are declarations, etc. It's an unfortunate naming conflict.</b>
@@ -800,7 +797,7 @@ calling a function or other computations than we are with writing instructions
 and telling the program to "do" something.
 </p>
 
-<div class="definition" id="org3722658">
+<div class="definition" id="org854ff1e">
 <p>
 An expression is part of a program that produces a result: it either has a <i>value</i>, unless it raises an error or runs forever.
 </p>
@@ -808,7 +805,7 @@ An expression is part of a program that produces a result: it either has a <i>va
 </div>
 </div>
 <ol class="org-ol">
-<li><a id="orgf71a7d7"></a>Literals<br />
+<li><a id="org9d201e4"></a>Literals<br />
 <div class="outline-text-5" id="text-2-3-1-1">
 <p>
 Literals are expressions that evaluate to themselves, denoting fixed values of some type. For example:
@@ -822,7 +819,7 @@ Literals are expressions that evaluate to themselves, denoting fixed values of s
 </div>
 </div>
 </li>
-<li><a id="orgb3439a6"></a>Keywords<br />
+<li><a id="org6f1bf60"></a>Keywords<br />
 <div class="outline-text-5" id="text-2-3-1-2">
 <p>
 If you write <code>(foo bar baz)</code> where <code>foo</code> is a keyword in Flit, then
@@ -834,7 +831,7 @@ Some keywords that we'll see are <code>if</code>, <code>type-case</code>, and <c
 </p>
 </div>
 </li>
-<li><a id="orge855a0c"></a>Function Calls<br />
+<li><a id="orgc65af8d"></a>Function Calls<br />
 <div class="outline-text-5" id="text-2-3-1-3">
 <p>
 Any expression of the form <code>(f a)</code> is interpreted as calling the function <code>f</code> with the argument <code>a</code>,
@@ -893,12 +890,12 @@ Here, we have used color to indicate the matching brackets.
 </li>
 </ol>
 </div>
-<div id="outline-container-org74f815c" class="outline-4">
-<h4 id="org74f815c"><span class="section-number-4">2.3.2.</span> Computing Using Equations</h4>
+<div id="outline-container-orgf93aed0" class="outline-4">
+<h4 id="orgf93aed0"><span class="section-number-4">2.3.2.</span> Computing Using Equations</h4>
 <div class="outline-text-4" id="text-2-3-2">
 </div>
 <ol class="org-ol">
-<li><a id="orga97264d"></a>Semantics<br />
+<li><a id="org7b9cb25"></a>Semantics<br />
 <div class="outline-text-5" id="text-2-3-2-1">
 <p>
 One of the goals of this course is to answer the question: <b>what do programs mean</b>?
@@ -925,13 +922,13 @@ and make it into something formal that we can reason about logically.
 </p>
 </div>
 </li>
-<li><a id="orgce2a358"></a>Mutable and Immutable Variables<br />
+<li><a id="org28ea904"></a>Mutable and Immutable Variables<br />
 <div class="outline-text-5" id="text-2-3-2-2">
 <p>
 Most of the programming languages that you have likely seen so far have mutable variables:
 </p>
 
-<div class="definition" id="orgb083d02">
+<div class="definition" id="org31fe939">
 <p>
 A variable is mutable if its value can change within its scope.
 </p>
@@ -948,7 +945,7 @@ of the function can might access variables whose value has changed.
 By contrast, Flit is a <i>purely functional language:</i>
 </p>
 
-<div class="definition" id="org66c14e1">
+<div class="definition" id="orgb421269">
 <p>
 A programming language is purely functional if every call to a function with the same inputs produces the same outputs.
 </p>
@@ -960,7 +957,7 @@ In Flit, the value of an expression only depends on the initial values of the va
 This is because all variables in Flit are immutable:
 </p>
 
-<div class="definition" id="org15dc01a">
+<div class="definition" id="orgb46d9b0">
 <p>
 A variable is immutable if its value value is constant in its scope
 </p>
@@ -1006,14 +1003,14 @@ We'll see a bit more of this <a href="#flit-tailrec">when we learn about tail re
 </p>
 </div>
 </li>
-<li><a id="orgdf3ba16"></a>Equations<br />
+<li><a id="org98ae6f4"></a>Equations<br />
 <div class="outline-text-5" id="text-2-3-2-3">
 <p>
 We will describe the semantics of Flit using <i>Equations</i>. Here is our first
 semantic equation:
 </p>
 
-<div class="definition" id="orgf7d4b65">
+<div class="definition" id="orgc8cd5d6">
 <p>
 For any number literals <code>m</code> and <code>n</code>, the expression <code>(+ m n)</code>
 is equal to the sum of <code>m</code> and <code>n</code>. The other arithmetic operations have similar rules.
@@ -1021,7 +1018,7 @@ is equal to the sum of <code>m</code> and <code>n</code>. The other arithmetic o
 
 </div>
 
-<pre class="example" id="orgee93ffc">
+<pre class="example" id="org3178360">
 (+ 3 4) = 7
 (+ 0 2) = 2
 </pre>
@@ -1031,11 +1028,11 @@ There are a few tricky things to notice here.
 </p>
 </div>
 </li>
-<li><a id="org3fa6c04"></a>Types<br /></li>
+<li><a id="org631e470"></a>Types<br /></li>
 </ol>
 </div>
-<div id="outline-container-org44fdde3" class="outline-4">
-<h4 id="org44fdde3"><span class="section-number-4">2.3.3.</span> Conditionals</h4>
+<div id="outline-container-org92165c0" class="outline-4">
+<h4 id="org92165c0"><span class="section-number-4">2.3.3.</span> Conditionals</h4>
 <div class="outline-text-4" id="text-2-3-3">
 <p>
 If-expressions are built into Flit:
@@ -1058,7 +1055,7 @@ The true branch is not evaluated if the condition is false, and vice versa.
 We can describe <code>if</code> with the following equations:
 </p>
 
-<div class="definition" id="org8f3d5ad">
+<div class="definition" id="org2016dbe">
 <p>
 For any expressions <code>EXPR1</code> and <code>EXPR2</code>
 </p>
@@ -1082,7 +1079,7 @@ If you are familiar with the <code>cond ? foo : bar</code> syntax in C/C++, this
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="orga0fb3d3"></a>Example<br />
+<li><a id="org6ad2bf7"></a>Example<br />
 <div class="outline-text-5" id="text-2-3-3-1">
 <p>
 Let's use the equational rules we have so far to evaluate some example code to a result.
@@ -1097,7 +1094,7 @@ Let's use the equational rules we have so far to evaluate some example code to a
 We can deduce this result by applying our rules. We use the underscore <code>_</code> to show which part of the expression is being simplified by the rule.
 </p>
 
-<table id="org42754ee" border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<table id="org3048d13" border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
 <colgroup>
@@ -1153,8 +1150,8 @@ which we'll see below.
 </li>
 </ol>
 </div>
-<div id="outline-container-orgca23704" class="outline-4">
-<h4 id="orgca23704"><span class="section-number-4">2.3.4.</span> Function Definitions</h4>
+<div id="outline-container-org00aa447" class="outline-4">
+<h4 id="org00aa447"><span class="section-number-4">2.3.4.</span> Function Definitions</h4>
 <div class="outline-text-4" id="text-2-3-4">
 <p>
 Flit is a functional language, so the main way that we will write programs is by
@@ -1162,8 +1159,8 @@ defining one or more functions that compute the results we want.
 </p>
 </div>
 </div>
-<div id="outline-container-org36c1d4d" class="outline-4">
-<h4 id="org36c1d4d"><span class="section-number-4">2.3.5.</span> Local Variables</h4>
+<div id="outline-container-orgc8b4fc0" class="outline-4">
+<h4 id="orgc8b4fc0"><span class="section-number-4">2.3.5.</span> Local Variables</h4>
 </div>
 </div>
 <div id="outline-container-flit-types" class="outline-3">
@@ -1174,10 +1171,10 @@ Another way that we can talk about what programs mean is their <i>type</i>.
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="org43641ec"></a>Static and Dynamic Typing<br /></li>
-<li><a id="org8985f70"></a>Typing Rules<br /></li>
-<li><a id="org3cbe8a3"></a>Type Inference<br /></li>
-<li><a id="orgb1c1787"></a>Polymorphism<br /></li>
+<li><a id="orgb0f966a"></a>Static and Dynamic Typing<br /></li>
+<li><a id="org47a5f54"></a>Typing Rules<br /></li>
+<li><a id="org92defe3"></a>Type Inference<br /></li>
+<li><a id="org1b30224"></a>Polymorphism<br /></li>
 </ol>
 </div>
 <div id="outline-container-flit-recursion" class="outline-3">
@@ -1211,8 +1208,8 @@ Another way that we can talk about what programs mean is their <i>type</i>.
 </div>
 </div>
 </div>
-<div id="outline-container-org89718c6" class="outline-2">
-<h2 id="org89718c6"><span class="section-number-2">3.</span> Glossary</h2>
+<div id="outline-container-org261543f" class="outline-2">
+<h2 id="org261543f"><span class="section-number-2">3.</span> Glossary</h2>
 <div class="outline-text-2" id="text-3">
 <dl class="org-dl">
 <dt>Semantics of If</dt><dd>For any expressions <code>EXPR1</code> and <code>EXPR2</code></dd>
