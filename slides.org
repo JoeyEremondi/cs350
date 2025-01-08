@@ -320,6 +320,14 @@ To learn:
   + Can  evaluate expressions while you're writing your code
 
 ** Flit
+
+*** Objectives
+- Learn the syntax of core flit features
+  + Numbers, booleans, ~if~, functions, ~let*~
+- Learn the semantics of these features
+  + First view of equations for understanding programs
+- Understand how functional ~if~ differs from imperative ~if~
+
 *** What is Flit?
 - "Functional Languages, Interpreters and Types"
 - Language defined in Racket
@@ -751,14 +759,14 @@ where ~[x => EXPR]body~ is ~body~ with all non-shadowed occurrences of ~x~ repla
 - E.g. the purpose of booleans is to be things we give to ~if~ expressions
 
 
-*** Typing For If
+*** Types for If
 - ~if~ is not a function
   + We'll learn exactly why later
 - Need a special rule to determine its type
   + Can have ~any~ type, depending on the type you give it
 - Just like we have equations, we can make formal rules for typing
 
-*** The Rule
+*** Typing Rule for If
   #+name: flit-if-typing
   #+begin_definition Typing for If
   For any expressions ~EXPR1~, ~EXPR2~ and ~EXPR3~,
@@ -770,7 +778,82 @@ where ~[x => EXPR]body~ is ~body~ with all non-shadowed occurrences of ~x~ repla
 
   - Condition must always be boolean
   - Don't care what the type of the branches is, but the *need to be the same*
+    + Type-checker will give error if branches have different types
   - Result of the ~if~ has the same type as the branches
+
+*** Typing In General
+
+  #+name: flit-plus-typing
+  #+begin_definition Typing for Plus
+        For any expressions ~EXPR1~, ~EXPR2~
+        - if ~EXPR1 : Number~
+        - and ~EXPR2 : Number~
+        - then ~(+ EXPR1 EXPR2) : Number~
+  #+end_definition
+
+- E.g. the type checker will make sure that both inputs to ~+~ are numbers,
+  and that you use the result in a context expecting a number
+- Can make rules for all expressions this way
+
+
+
+*** Function Calls
+  #+name: flit-app-typing
+  #+begin_definition Typing for Function Calls
+  For any expressions ~EXPR_f~ and ~EXPR_arg~
+  - if ~EXPR_f : T1 -> T2~
+  - and ~EXPR_arg : T1~
+  - then ~(EXPR_f EXPR_arg) : T2~
+  #+end_definition
+
+- When asking "how can I make a value of this type":
+  + Can always try "call a function that returns that type"
+
+
+*** Function Definitions
+
+  #+name: flit-fundef-typing
+  #+begin_definition Typing for Function Definitions
+  For a definition ~(define (f x1 ... xN) body)~
+  - if ~body : T_ret~
+    +  /under the assumption that/ ~x1 : T_1~ ... ~xN : T_N~
+  - then ~f : (T_1 ... T_N -> T_ret)~
+  #+end_definition
+  - e.g. a function type with arguments matching the ~x~'s types, and return type matching the body
+
+  - Function variable types are /assumptions/, not obligations
+
+    + To /define/ function, don't provide things of the argument types
+
+    + Instead, can assume you already have things of those types
+
+      - e.g. the parameters
+
+*** Programming Via Holes
+- Figure out the type of the thing you're trying to write
+  + Often, I give this to you
+- Write a dummy function with that type, with ~TODO~ as the body
+- Write some tests that capture what you're expecting the function to do
+- Repeat until all tests pass and there's no more holes:
+  + Fill in a hole with something of the right type
+    - Which might contain more holes
+    - Could be function call, ~if~, in-scope variable, etc.
+
+
+*** Functions for Filling Holes
+- Can always fill a hole of type ~T~ by applying a function that returns type ~T~
+  + Give a hole as each argument for that function
+- Now, you've replaced one hole with 0 or more holes
+  + Yay?
+  + Hopefully these holes are simpler
+  + Can try to fill them with literals, variables, or other function calls
+- We'll see more of this with recursion and datatypes
+
+*** Examples
+- Maximum function
+  + Writing it
+  + Reasoning about it with equations
+
 * Recursion
 ** Functional Thinking and Recursion
 
