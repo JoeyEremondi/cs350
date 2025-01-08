@@ -854,7 +854,7 @@ where ~[x => EXPR]body~ is ~body~ with all non-shadowed occurrences of ~x~ repla
   + Writing it
   + Reasoning about it with equations
 
-* Recursion
+* Recursion :noexport:
 ** Functional Thinking and Recursion
 
 *** What Is Functional Programming?
