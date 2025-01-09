@@ -5059,4 +5059,5 @@ myFunction().then(
 Local Variables:
 org-latex-packages-alist: nil
 org-modern-indent-guide: " "
+indent-bars-mode: 0
 End:
