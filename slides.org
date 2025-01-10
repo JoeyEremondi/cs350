@@ -1,11 +1,10 @@
-#+title: University of Regina, CS 350, Winter 2025
+#+title: Lecture Slides for CS 350, URegina Winter 2025
 #+subtitle: CS 350
 #+AUTHOR: Dr. Joseph Eremondi
-#+DATE: Last updated: \today{}
 
 
 
-#+OPTIONS: toc:1 H:2 TODO:nil eval:yes
+#+OPTIONS: toc:1 H:2
 
 #+BEAMER_HEADER: \usepackage[sfdefault]{atkinson} %% Option 'sfdefault' if the base
 #+BEAMER_HEADER: \usepackage{FiraMono}
@@ -705,14 +704,21 @@ where ~[x => EXPR]body~ is ~body~ with all non-shadowed occurrences of ~x~ repla
 *** Alternate versions of Let
 - There's also ~let~
   + Like ~let*~, but when multiple variables, can't refer to each other
-  + Recursive version ~letrec~
-    - Can define multiple variables that all refer to each other and themselves
+- Recursive version ~letrec~
+  + Can define multiple variables that all refer to each other and themselves
 - For now you only need ~let*~
   + Very useful for gradually building up a complex solution from previous smaller bits
 
-** Types in Flit
+* Types in Flit
+:PROPERTIES:
+:EXPORT_FILE_NAME: pdf/slides003-types.pdf
+:header-args:racket: :results code :lang plait
+:CUSTOM_ID: functional-programming-1-recursion-and-immutable-data
+:END:
+#+beamer: \beamerdefaultoverlayspecification{<+->}
+** Programming with Holes
 
-*** Why write down types?
+***  Why write down types?
 - With type inference, we don't /need/ to write down types
 - Still a good idea to write them down
 - Writing a type is like running an infinite number of tests
@@ -738,19 +744,36 @@ where ~[x => EXPR]body~ is ~body~ with all non-shadowed occurrences of ~x~ repla
 "hello"
 #+end_src
 
+*** Strong Typing
+- Flit is /strongly typed/
+  + Won't do automatic conversions for you
+  + No ~void*~ type that we can use to cast through
+  + Doesn't have JavaScript ~"1"+1="11"~ but ~"1"-1=0~
+#+begin_src racket
+(+ "1" 1)
+#+end_src
+- Gives ~typecheck failed: Number vs. String~
+
 *** Thinking About Types
 - With any type, there are two things we care about
   + How to /directly/ create a value of that type
   + How to /directly/ use a value of that type
-    - Can also create/use any value by giving it to a function expecting/returning  that type
-    - But eventually, you need some primitive operations
+    - Can also create/use any value by giving it to a function expecting/returning that type
+    - Eventually, you need some primitive operations
 
 *** Numbers
 - To create: literals ~3~, ~22~, ~0.00001~
 - To use: built in arithmetic ~+, -,  *, /~  etc. and comparisons like ~zero?~
+- Operations have function types
+  + ~+ : (Number Number -> Number)~
+  + ~zero? : (Number -> Boolean)~
 
 *** Strings
+- To create: string literals
+  + ~"hello"~ ,  ~""~,  ~"abcdefg"~
 - To use: mostly built-in operations
+  + e.g. ~string-ref : (String Number -> Char)~
+  + ~string-append : (String String -> String)~
   + I'll highlight relevant functions as we see them
 
 *** Booleans
@@ -761,7 +784,7 @@ where ~[x => EXPR]body~ is ~body~ with all non-shadowed occurrences of ~x~ repla
 
 *** Types for If
 - ~if~ is not a function
-  + We'll learn exactly why later
+  + Doesn't evaluate unused branches
 - Need a special rule to determine its type
   + Can have ~any~ type, depending on the type you give it
 - Just like we have equations, we can make formal rules for typing
@@ -781,20 +804,6 @@ where ~[x => EXPR]body~ is ~body~ with all non-shadowed occurrences of ~x~ repla
     + Type-checker will give error if branches have different types
   - Result of the ~if~ has the same type as the branches
 
-*** Typing In General
-
-  #+name: flit-plus-typing
-  #+begin_definition Typing for Plus
-        For any expressions ~EXPR1~, ~EXPR2~
-        - if ~EXPR1 : Number~
-        - and ~EXPR2 : Number~
-        - then ~(+ EXPR1 EXPR2) : Number~
-  #+end_definition
-
-- E.g. the type checker will make sure that both inputs to ~+~ are numbers,
-  and that you use the result in a context expecting a number
-- Can make rules for all expressions this way
-
 
 
 *** Function Calls
@@ -808,6 +817,10 @@ where ~[x => EXPR]body~ is ~body~ with all non-shadowed occurrences of ~x~ repla
 
 - When asking "how can I make a value of this type":
   + Can always try "call a function that returns that type"
+- The type-checker makes sure that:
+  + The arguments have the type the function expects
+- Multi-argument functions are similar
+
 
 
 *** Function Definitions
@@ -825,7 +838,7 @@ where ~[x => EXPR]body~ is ~body~ with all non-shadowed occurrences of ~x~ repla
 
     + To /define/ function, don't provide things of the argument types
 
-    + Instead, can assume you already have things of those types
+    + Instead, can pretend you already have things of those types
 
       - e.g. the parameters
 
@@ -849,79 +862,156 @@ where ~[x => EXPR]body~ is ~body~ with all non-shadowed occurrences of ~x~ repla
   + Can try to fill them with literals, variables, or other function calls
 - We'll see more of this with recursion and datatypes
 
-*** Examples
-- Maximum function
-  + Writing it
-  + Reasoning about it with equations
+*** Example: Max
+#+begin_src racket
+(define (max [x : Number] [ y : Number]) : Number
+  TODO)
+#+end_src
+#+BEGIN_EXAMPLE
+x : Number
+y : Number
+---------------
+TODO : Number
+#+END_EXAMPLE
+- We /have/ two numbers ~x~ and ~y~
+- We /want/ a number
 
-* Recursion :noexport:
+*** Example: Max (ctd.)
+- Try putting in an ~if~
+#+begin_src racket
+(define (max [x : Number] [ y : Number]) : Number
+  (if TODO TODO TODO))
+#+end_src
+#+BEGIN_EXAMPLE
+x : Number
+y : Number
+---------------
+TODO1 : Boolean
+TODO2 : Number
+TODO3 : Number
+#+END_EXAMPLE
+- Now we need a condition, and something for the true/false cases
+
+*** Finishing Max
+
+- Try putting in an ~if~
+#+begin_src racket
+(define (max [x : Number] [ y : Number]) : Number
+  (if (<= x y) x y))
+#+end_src
+
+- The variables ~x~ and ~y~ were available for filling the holes
+  + Because we were inside the function body
+
+*** Calling Max
+- Can use equations to determine the result
+ |-------------------------------+-----------------------|
+ | ~(max 3 4)~                     | Starting value        |
+ | ~[x=>3][y=>4](if (<= x y) x y)~ | Sem. of function call |
+ | ~(if (<= 3 4) 3 4)~             | Do the substitution   |
+ | ~(if #f 3 4)~                   | Semantics of ~<=~       |
+ | ~4~                             | Semantics of If       |
+ |-------------------------------+-----------------------|
+
+* Recursion and Lists
+:PROPERTIES:
+:EXPORT_FILE_NAME: pdf/slides004-recursion.pdf
+:header-args:racket: :results code :lang flit
+:CUSTOM_ID: fun-prog-recursion
+:END:
+#+beamer: \beamerdefaultoverlayspecification{<+->}
 ** Functional Thinking and Recursion
 
-*** What Is Functional Programming?
-- Functions in our program correspond to functions in math
-  + Mapping from inputs to outputs
-  + Same inputs always produce the same outputs
-- Talk about what programs *are*, not what programs do
-- Instead of changing variable values
-  + We call functions with different arguments
-- Instead of changing data structures
-  + We decompose them, copy the parts, and reassemble them in new ways
-  + Copying is implemented with pointers
-    - Fast, memory efficient
+[[./img/smbc_recursion.png]]
+# *** What Is Functional Programming?
+# - Functions in our program correspond to functions in math
+#   + Mapping from inputs to outputs
+#   + Same inputs always produce the same outputs
+# - Talk about what programs *are*, not what programs do
+# - Instead of changing variable values
+#   + We call functions with different arguments
+# - Instead of changing data structures
+#   + We decompose them, copy the parts, and reassemble them in new ways
+#   + Copying is implemented with pointers
+#     - Fast, memory efficient
 
-*** Advantages of Functional Programming
-- All program state is *explicit*
-  + Easy to tell exactly what a function can change
-  + No shared state between components
-    - Other function can't change value without realizing
-    - No data races for threading
-- Programming is *declarative*
-  + Structure of the problem guides structure of the solution
-- Equational reasoning
-  + In imperative languages, equals sign ~=~ is a LIE
-    - Can write ~x = 3; x = 4;~, but ~3 != 4~
-  + If have ~(define (f x) body)~, then for all ~y~,
-    ~(f y)~ and ~body~ are interchangable
-    - after replace ~x~ with ~y~ in ~body~
-    - Easier to tell if your program is correct
-    - Some optimizations easier
-*** Disadvantages of Functional Programming
-- None?
-- Sometimes slower
-  + Very hard to do without Garbage Collection
-    - e.g. see Closures in Rust
-  + Sometimes faster because you need fewer safety checks in your code
-- Farther from what the CPU is actually doing
-- Some algorithms are more concise with mutation
-  + But lots aren't
-*** How to design functional programs
-**** 5 Step method:
-1. Determine the *representation* of inputs and outputs
-2. Write *examples* and tests
-3. Create a *template* of the function
-   - Depends on input/output types
-   - Covers all cases
-   - Possibly extracts fields, recursive calls, etc.
-4. *Fill* in the holes in the template
+# *** Advantages of Functional Programming
+# - All program state is *explicit*
+#   + Easy to tell exactly what a function can change
+#   + No shared state between components
+#     - Other function can't change value without realizing
+#     - No data races for threading
+# - Programming is *declarative*
+#   + Structure of the problem guides structure of the solution
+# - Equational reasoning
+#   + In imperative languages, equals sign ~=~ is a LIE
+#     - Can write ~x = 3; x = 4;~, but ~3 != 4~
+#   + If have ~(define (f x) body)~, then for all ~y~,
+#     ~(f y)~ and ~body~ are interchangable
+#     - after replace ~x~ with ~y~ in ~body~
+#     - Easier to tell if your program is correct
+#     - Some optimizations easier
+# *** Disadvantages of Functional Programming
+# - None?
+# - Sometimes slower
+#   + Very hard to do without Garbage Collection
+#     - e.g. see Closures in Rust
+#   + Sometimes faster because you need fewer safety checks in your code
+# - Farther from what the CPU is actually doing
+# - Some algorithms are more concise with mutation
+#   + But lots aren't
 
-5. *Run* tests
+*** Trees and Recursion
+- A lot of data has tree-like structure
+- Recursion is the natural way to process hierarchical data
+  + Especially if there's not a bound on the depth
+  + E.g. how do we handle input when we don't know how big it is?
 
-**** Further reference:
-http://htdp.org, Matthew Flatt's Notes (URCourses)
+*** Example: Natural Numbers
+- Any whole, positive number is either:
+  + Zero
+  + One plus another smaller number
+
+*** The Magic of Recursion
+- When writing a function, you can pretend:
+  + You already have a function
+  + With the same type as the function you're trying to write
+  + That always produces the correct result
+  + As long as you give it /smaller/ inputs
+    - For some notion of smaller
+- If your data is composed of smaller pieces, you probably want to call the recursive function on those pieces
+- *DO NOT* try to "unfold the recursion" in your head
+  + Or even think about a function calling itself
+  + The "assume we have a solution for smaller inputs" is the correct way to think about recursion
+- If you've seen mathematical induction, it's the same idea
+  + In my special topics class they're /literally/ the same
+
+*** Writing Recursion Functions Using Holes
+- Write the type of the function you're trying to make
+- Put ~TODO~ as its body
+- Use ~if~  to make a branch for each possible shape the input has
+  + Put ~(let* () TODO)~ as the body
+- In the ~let*~, define variable:
+  + Decompose your input into its parts
+  + Call the recursive function on the parts that have the right type
+    - You might need to guess/figure out some of the other arguments
+- Look at what you have in scope
+- Put the pieces together to create a result of the correct type
+  + Hopefully that solves the problem
 
 
 
-
-*** Factorial - Representation
+*** Factorial - Types
 - $n! = 1 \times 2 \times \ldots n$
 - Takes in a (natural) number, outputs a number
   #+begin_src racket
   (define (factorial [n : Number]) : Number
-    (error 'factorial "TODO"))
+    TODO)
   #+end_src
 
 
-*** Factorial - Examples
+
+*** Factorial - Tests
   #+begin_src racket
 
   (test (factorial 0) 1 )
@@ -942,32 +1032,55 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
 #+begin_src racket
 (define (factorial [n : Number]) : Number
   (if (zero? n)
-      (error 'zero "TODO")
-      (let ([n-1 (- n 1)])
-        (error 'suc "TODO"))
+      ;; zero case
+      (let* ()
+        TODO)
+      ;;n+1 case
+      (let* ()
+        TODO)
       ))
 #+end_src
 
 
-*** Factorial - Recursion
-- Divide problem into base case and recursive cases
-- Can use recursive calls to smaller arguments
-- Build up solution in terms of solutions to smaller problems
+*** Factorial - Decomposing the Input
+- No "parts" of zero
+  + This is the base case
+  + One more than some other number
+    - We call this the "successor", written "S" or "suc"
+    - Probably want to use this in the solution
+- ~>0~ case: it's one greater than another number
+  + This is a recursive case
 #+begin_src racket
 (define (factorial [n : Number]) : Number
   (if (zero? n)
-      (error 'zero "TODO")
+      ;; zero case
+      TODO ;; no parts of zero
+      ;;n+1 case
+      (let* ([n-1 (- n 1)])
+        TODO)
+      ))
+#+end_src
+
+*** Factorial - Recursion
+- Input to ~factorial~ is a number
+- Component ~n-1~ is a number
+  + So can call ~factorial~ recursively on it!
+#+begin_src racket
+(define (factorial [n : Number]) : Number
+  (if (zero? n)
+      TODO
       (let*
           ([n-1 (- n 1)]
-           [fn-1 (factorial n-1)])
-          (error 'suc "TODO"))
+           [factn-1 (factorial n-1)])
+          TODO)
       ))
 #+end_src
 
 *** Factorial - Filling holes
-- Example gives the base case for 0
+- Base case: factorial of 0 is 1
+  + Can't be zero, otherwise everything would be zero
 - Notice the pattern
-  + Multiplying the first n numbers is the same as n times the first n-1 numbers
+  + The product of the first n numbers is the same as n times the product of first n-1 numbers
   + We get that from our recursive call
 #+name: factorial-complete
 #+begin_src racket
@@ -976,8 +1089,8 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
       1
       (let*
           ([n-1 (- n 1)]
-           [fn-1 (factorial n-1)])
-          (* n fn-1))
+           [factn-1 (factorial n-1)])
+          (* n factn-1))
       ))
 #+end_src
 
@@ -989,17 +1102,19 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
 (test (factorial 5) 120 )
 #+end_src
 
+#+RESULTS[34a75a914469fc8950d69bb58fcc1f91aaa35232]:
+#+begin_src racket
+good (factorial 0) at line 11
+  expected: 1
+  given: 1
 
-*** Trust the Natural Recursion
+good (factorial 5) at line 12
+  expected: 120
+  given: 120
 
-- The magic key:
-  + /Assume/ you have a solution already, but only for smaller arguments
-  + Express solution for larger ones in terms of smaller ones
-  + Like induction in math
-- The shape of the data guided the shape of the solution
-  + Zero had no sub-data, so there were no recursive calls
-  + $suc\ n$ has one sub-value, namely $n$
-    - One recursive call
+#+end_src
+
+
 
 *** Preconditions
 - Note: types not quite precise enough
@@ -1007,6 +1122,13 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
 - Precondition: argument is a non-negative whole number
   + Can't express this in the code, so write in the comments
   + Aside: I research languages where you /can/ express this with types
+- It's the responsibility of the callee to make sure the precondition holds
+  + You can check for safety, but you don't have to
+
+*** Postcondition
+- Something true about the return of the function
+  + That can't be expressed in the types
+- Writer of the function must make sure that it holds
 
 *** Another Example: Exponentiation
 + Live coding in Dr. Racket
@@ -1015,42 +1137,86 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
 
 ** Unbounded Data: Lists
 
+*** Lists Abstractly
+- Sometimes you want a bunch of things
+- e.g. ~'(1 2 3 4 5)~ or ~("To" "be" "or" "not" "to" "be")~
+- You might want to track some things you encounter/generate
+  + E.g. Add to a list, combine lists, etc.
+- Might want to do something for each element of a list
+- If you have some number of things:
+  + Either that number is 0, and you have nothing
+  + Or you have at least one thing, plus the rest of the things
+
 *** Functional Linked Lists
 - Every linked list is one of:
   + Empty (sometimes called ~nil~ or ~null~)
+    - No relation to ~NULL~ pointer in C++
   + An element appended to the beginning of another list
 - We call the operation of appending an element to a list ~cons~
   + Historical name, goes back to LISP days
 - Cons does *not* change its input
   + Creates a new list whose tail is the old list
+  + Like const reference  in C++
 
-*** Lists in Racket
+*** Lists in Flit
 + Multiple ways to write lists
 + ~'()~ is the empty list, can also write ~empty~
 + Extending lists:  ~(cons h t)~ creates list with element ~h~ appended to list ~t~
   - ~h~ and ~t~ for ~head~ and ~tail~
 + List literals, can write ~(list 1 2 3 4)~ or ~'(1 2 3 4)~
   - Shorthand for:
-  - ~(cons 1 (cons 2 (cons 3 (cons 4 '()))))~
-+ Lots more helper functions, see the documentation
+  - ~(cons 1 (cons 2 (cons 3 (cons 4 empty))))~
++ We'll favour ~list~, but the REPL might use ~'(...)~
++ Lots more helper functions, we'll see throughout the class
+  
 
+*** Types for Lists
+- Lists are a /parameterized type/
+  + For any type ~T~, you can have ~Listof ~T~
+  + Like C++ Generics
+- Common list operations
+  + ~empty : (Listof 'a)~
+  + ~cons : ('a (Listof 'a) -> (Listof 'a))~
+  + ~empty : ((Listof 'a) -> Boolean)~
+  + ~first : ((Listof 'a) -> 'a)~
+  + ~rest : ((Listof 'a) -> (Listof 'a))~
+- ~'a~ is /type variable/, functions will work for any type in place of ~'a~
+  +  We'll learn more about this later
 
 *** Template for Lists
 - Two cases: list is empty or cons
-- Make a recursive call on tail of cons case
+- Cons case has
+  + Head (first element)
+  + Tail (rest of the list)
+- Can make a recursive call on tail of cons case
   #+begin_src racket
   (define (list-template
            [xs : (Listof Number)])
     (if (empty? xs)
-        (error 'nil "TODO")
+       TODO
         (let ([h (first xs)]
               [t (rest xs)]
-              [tRet (list-template t)])
-          (error 'cons "TODO"))
+              [sumRest (list-template t)])
+          TODO)
         ))
   #+end_src
 
+
+*** Example: Sum Template
+#+begin_src racket :exports both
+  (define (sum [xs : (Listof Number)])
+    : Number
+    (if (empty? xs)
+        TODO
+        (let* ([h (first xs)]
+               [t (rest xs)]
+               [sumRest (sum t)])
+          TODO)))
+#+end_src
 *** Example: Sum
+- Have the first number
+- Recursive call gives us the sum of the rest of the list
+- Adding them together gives the final result
 #+begin_src racket :exports both
   (define (sum [xs : (Listof Number)])
     : Number
@@ -1058,47 +1224,95 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
         0
         (let* ([h (first xs)]
                [t (rest xs)]
-               [tRet (sum t)])
-          (+ h tRet))))
-   (sum '())
+               [sumRest (sum t)])
+          (+ h sumRest))))
+   (sum empty)
    (sum '(1 2 3))
    (sum '(100 2 3))
 #+end_src
 
-#+RESULTS:
+#+RESULTS[7368d2c35d6fa7c13e931c55a9f9d4723a939ff1]:
 #+begin_src racket
 0
 6
+105
 #+end_src
 
-*** Pattern Matching: Motivation
+*** Pattern Matching: Intuition
 + Recursive case: used "getter" function to get the sub-data in the recursive case
   - ~(- x 1)~ for numbers
   - ~first~ and ~rest~ for lists
 + Always want to have the sub-parts available
 + Don't want to apply getters on the wrong data
-  - e.g. ~first '()~ will raise an error
+  - e.g. ~first empty~ will raise an error
 
 
-*** Pattern Matching:
+*** Pattern Matching
+#+begin_src racket
+  (define (sum [xs : (Listof Number)])
+    : Number
+    (type-case (Listof Number) xs
+        [(empty) 0]
+        [(cons h t)
+        (let* ([sumRest (sum t)])
+          (+ h sumRest))
+        ]))
+#+end_src
 
+
+*** General Syntax for List Matching
+#+begin_src racket
+(type-case (Listof SOME_TYPE) listToExamine
+        [(empty) emptyResult]
+        [(cons h t) consResult
+        ])
+#+end_src
+- We have to specify the type
+  + Technical limitation, I'm working on getting rid of this
+- ~h~ and ~t~ are variable names
+  + You can choose whatever names you want
+- The pattern match /defines/ two new variables ~h~ and ~t~
+  + In-scope in ~consResult~
+  + Not in-scope for ~emptyResult~
+    - Can't get the head and tail of an empty list
+
+*** Why pattern matching?
+- Never perform an un-safe operation
+  + Only extract head and tail of list when we know they exist
+- Compiler checks that you've handled all the cases
+  + e.g. Will error if you leave out ~empty~ case
+  + Never forget an edge-case
+- Naturally follows the flow of recursion
+  + Matched variables are always for "smaller" values that you can call recursive function on
 
 *** Example: Generating a Modified List
++ Can also generate lists
 + e.g. Increment each number in a list
   + Uses pattern matching
   + Shows how to create lists recursively
-  #+begin_src racket :exports both
-(define (increment [xs : (Listof Number)])
-        : (Listof Number)
-  (type-case (Listof Number) xs
-    [empty
-       empty]
-    [(cons h t)
-       (cons (+ h 1) (increment t))]))
-(increment '(2 3 4))
+        #+name: list-increment
+    #+begin_src racket :exports both
+  (define (increment [xs : (Listof Number)])
+          : (Listof Number)
+    (type-case (Listof Number) xs
+      [(empty)
+         empty]
+      [(cons h t)
+         (cons (+ h 1) (increment t))]))
+  (increment '(2 3 4))
+    #+end_src
+
+
+
+*** Generating is not Modifying
+- In ~increment~, the old list still exists
+  #+begin_src racket :noweb strip-export
+  <<list-increment>>
+  (define someList (list 1 2 3 4))
+  (define otherList (increment someList))
+  someList
+  otherList
   #+end_src
-
-
 
 *** Parametric Polymorphism
 + Lists are a *parameterized type*
@@ -1119,14 +1333,14 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
 - Polymorphic type
   + Works for list with any contents
   + We never do anything with the contents other than copy
-  + This function is built into Plait as ~append~
+  + This function is built into Flit as ~append~
     #+name: plait-concat-def
     #+begin_src racket :exports both
   (define (concat [xs : (Listof 'elem)]
                   [ys : (Listof 'elem)])
           : (Listof 'elem)
     (type-case (Listof 'elem) xs
-      [empty
+      [(empty)
          ys]
       [(cons h t)
          (cons h (concat t ys))]))
@@ -1144,8 +1358,8 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
 
   (concat '(1 2 3) '(4 5 6))
   (concat '("3" "5") '("0"))
-  (concat '() '(#t))
-  (concat '(#f) '())
+  (concat empty '(#t))
+  (concat '(#f) empty)
     #+end_src
 
 **** Results
@@ -1813,7 +2027,7 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
    '(1 2 3 4))
 
 (filter (o not empty?)
-        (list '() '(1 2) '(3 2 1) '() '(1)))
+        (list empty '(1 2) '(3 2 1) empty '(1)))
 #+end_src
 
 #+RESULTS:
@@ -1939,7 +2153,7 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
        listSoFar]
     [(cons h t)
        (reverseHelper t (cons h listSoFar))]))
-(define (reverse xs) (reverseHelper xs '()))
+(define (reverse xs) (reverseHelper xs empty))
 #+end_src
 
 - Helper function
@@ -1947,7 +2161,7 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
   + Recursive case: keep building, but on the tail of the list
     - Call with head appended to ~listSoFar~
 - Main function calls the helper with the start value
-  + Empty list ~'()~
+  + Empty list ~empty~
 *** General Template
 **** To write ~f : (Ty1 Ty2 ... TyN -> ReturnTy)~
 + Write a helper function with one extra argument
@@ -1982,16 +2196,16 @@ http://htdp.org, Matthew Flatt's Notes (URCourses)
 #+begin_src racket
 (define (g y z) (+ y z))
 (define (f x)
-  (cons (g x 1) '()))
+  (cons (g x 1) empty))
 (f 3)
 #+end_src
 - Start:  stack top empty
 - Call ~f~:
   + Push body ~(cons (g x 1) empty)~, env ~x := 3~, continuation is ~END_OF_PROGRAM~
 - Call ~g~
-  + Push body ~(+ y z)~, env ~y := 3, z := 1~, continuation is ~(cons [] '())~
+  + Push body ~(+ y z)~, env ~y := 3, z := 1~, continuation is ~(cons [] empty)~
     - ~[]~ shows where the result of the body is used
-- Return (pop) : plug ~4~ in place of ~[]~ to get ~cons 4 '()~
+- Return (pop) : plug ~4~ in place of ~[]~ to get ~cons 4 empty~
 - Return (pop), see ~END_OF_PROGRAM~ marker, produce ~'(4)~ as result
 *** Returning a Function Call
 - Slightly different example
@@ -2122,7 +2336,7 @@ return g(x);
 <<foldl>>
 (define (fold-reverse [xs : (Listof 'elType)]) : (Listof 'elType)
   (foldl (lambda (elem accum) (cons elem accum))
-         '()
+         empty
          xs))
 (fold-reverse '(1 2 3))
 #+end_src
