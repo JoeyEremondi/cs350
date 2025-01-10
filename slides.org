@@ -283,7 +283,7 @@ To learn:
 *  Expressions and Immutable Data
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides002-flit.pdf
-:header-args:racket: :results code :lang plait
+:header-args:racket: :results code :lang flit
 :CUSTOM_ID: functional-programming-1-recursion-and-immutable-data
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
@@ -712,7 +712,7 @@ where ~[x => EXPR]body~ is ~body~ with all non-shadowed occurrences of ~x~ repla
 * Types in Flit
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides003-types.pdf
-:header-args:racket: :results code :lang plait
+:header-args:racket: :results code :lang flit
 :CUSTOM_ID: functional-programming-1-recursion-and-immutable-data
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
@@ -922,7 +922,7 @@ TODO3 : Number
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 ** Functional Thinking and Recursion
 
-[[./img/smbc_recursion.png]]
+# [[./img/smbc_recursion.png]]
 # *** What Is Functional Programming?
 # - Functions in our program correspond to functions in math
 #   + Mapping from inputs to outputs
@@ -1172,7 +1172,7 @@ good (factorial 5) at line 12
 
 *** Types for Lists
 - Lists are a /parameterized type/
-  + For any type ~T~, you can have ~Listof ~T~
+  + For any type ~T~, you can have ~Listof T~
   + Like C++ Generics
 - Common list operations
   + ~empty : (Listof 'a)~
@@ -1285,33 +1285,83 @@ good (factorial 5) at line 12
 - Naturally follows the flow of recursion
   + Matched variables are always for "smaller" values that you can call recursive function on
 
+
 *** Example: Generating a Modified List
+:PROPERTIES:
+:BEAMER_env: exampleblock
+:END:
 + Can also generate lists
 + e.g. Increment each number in a list
   + Uses pattern matching
   + Shows how to create lists recursively
-        #+name: list-increment
     #+begin_src racket :exports both
   (define (increment [xs : (Listof Number)])
           : (Listof Number)
     (type-case (Listof Number) xs
-      [(empty)
-         empty]
+      [empty
+         TODO]
       [(cons h t)
-         (cons (+ h 1) (increment t))]))
+        (let* ([incrTail (increment t)])
+         TODO)]))
   (increment '(2 3 4))
     #+end_src
 
+*** Example: Types
+- Empty Case
+ #+begin_example
+ xs : (Listof Number)
+ --------------
+ TODO : (Listof Number)
+ #+end_example
+
+- Cons Case
+ #+begin_example
+ xs : (Listof Number)
+ h : Number
+ t : (Listof Number)
+ incrTail : (Listof Number)
+ --------------
+ TODO : (Listof Number)
+ #+end_example
+
+*** Example: Generating a Modified List
+- If we've got a list that is the tail, but with each number incremented
+  + Then we can increment the first
+- Use ~cons~ to make a result list containing the new head and new tail
+
+     #+name: list-increment
+     #+begin_src racket :exports both
+   (define (increment [xs : (Listof Number)])
+           : (Listof Number)
+     (type-case (Listof Number) xs
+       [empty
+          empty]
+       [(cons h t)
+          (let* ([incrTail (increment t)]
+                 [incrHead (+ 1 h)])
+            (cons incrHead incrTail))]))
+     #+end_src
+
+     #+RESULTS[8da26113077cfbea3146f3352f5dace91fae5a05]:
+     #+begin_src racket
+     #+end_src
 
 
 *** Generating is not Modifying
-- In ~increment~, the old list still exists
-  #+begin_src racket :noweb strip-export
+- After ~increment~, the old list still exists
+  #+begin_src racket :exports both :noweb strip-export
   <<list-increment>>
-  (define someList (list 1 2 3 4))
+  (define someList   (list 1 2 3 4))
   (define otherList (increment someList))
+
   someList
   otherList
+  #+end_src
+
+  #+RESULTS[c98f7328d149d54e0491af00bc3a61c2b0338cee]:
+  #+begin_src racket
+  '(1 2 3 4)
+  '(2 3 4 5)
   #+end_src
 
 *** Parametric Polymorphism
@@ -1380,7 +1430,7 @@ good (factorial 5) at line 12
 * Defining Data Types :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides003-datatypes.pdf
-:header-args:racket: :results code :lang plait
+:header-args:racket: :results code :lang flit
 :CUSTOM_ID: functional-programming-2-defining-data-types
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
@@ -1654,7 +1704,7 @@ good (factorial 5) at line 12
 * First-Class Functions :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides010-lambda.pdf
-:header-args:racket: :results code :lang plait
+:header-args:racket: :results code :lang flit
 :CUSTOM_ID: functional-programming-2-first-class-functions
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
@@ -1849,7 +1899,7 @@ good (factorial 5) at line 12
 * Polymorphic Higher-Order Functions :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides011-map.pdf
-:header-args:racket: :results code :lang plait
+:header-args:racket: :results code :lang flit
 :CUSTOM_ID: polymorphic-higher-order-functions
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
@@ -2082,7 +2132,7 @@ good (factorial 5) at line 12
 * Generative Recursion and Tail Recursion :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides015-tailrec.pdf
-:header-args:racket: :results code :lang plait
+:header-args:racket: :results code :lang flit
 :CUSTOM_ID: generative-recursion-and-tail-recursion
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
@@ -2388,7 +2438,7 @@ return g(x);
 * Abstract Syntax and Parsing :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides004-syntax.pdf
-:header-args:racket: :results code :lang plait
+:header-args:racket: :results code :lang flit
 :CUSTOM_ID: abstract-syntax-and-parsing
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
@@ -2579,7 +2629,7 @@ return g(x);
 * Arithmetic: Our First Interpreter :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides005-arith.pdf
-:header-args:racket: :results code :lang plait
+:header-args:racket: :results code :lang flit
 :CUSTOM_ID: arithmetic-our-first-interpreter
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
@@ -2735,7 +2785,7 @@ return g(x);
 * Desugaring: Our First Elaborator :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides006-desugar.pdf
-:header-args:racket: :results code :lang plait
+:header-args:racket: :results code :lang flit
 :CUSTOM_ID: desugaring-our-first-elaborator
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
@@ -2813,7 +2863,7 @@ return g(x);
 * Functions, Variables and Substitution :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides007-subst.pdf
-:header-args:racket: :results code :lang plait
+:header-args:racket: :results code :lang flit
 :CUSTOM_ID: functions-variables-and-substitution
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
@@ -2980,7 +3030,7 @@ return g(x);
 * Review :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides008-review.pdf
-:header-args:racket: :results code :lang plait
+:header-args:racket: :results code :lang flit
 :CUSTOM_ID: review
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
@@ -3064,7 +3114,7 @@ return g(x);
 * Environments, Binding, and Scope :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides009-environments.pdf
-:header-args:racket: :results code :lang plait
+:header-args:racket: :results code :lang flit
 :CUSTOM_ID: environments-binding-and-scope
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
@@ -3360,7 +3410,7 @@ emptyEnv
 ** Implementing Lambdas with Substitution and Dynamic Typing
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides012-dyntype.pdf
-:header-args:racket: :results code :lang plait
+:header-args:racket: :results code :lang flit
 :CUSTOM_ID: implementing-lambdas-with-substitution-and-dynamic-typing
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
@@ -3625,7 +3675,7 @@ emptyEnv
 * Implementing Lambdas with Environments: Closures :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides013-closures.pdf
-:header-args:racket: :results code :lang plait
+:header-args:racket: :results code :lang flit
 :CUSTOM_ID: implementing-lambdas-with-environments-closures
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
@@ -3907,7 +3957,7 @@ myFunction().then(
 * Midterm Review :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides014-midterm-review.pdf
-:header-args:racket: :results code :lang plait
+:header-args:racket: :results code :lang flit
 :CUSTOM_ID: midterm-review
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
@@ -4031,7 +4081,7 @@ myFunction().then(
 * Currying and the Lambda Calculus :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides016-currying.pdf
-:header-args:racket: :results code :lang plait
+:header-args:racket: :results code :lang flit
 :CUSTOM_ID: currying-and-the-lambda-calculus
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
@@ -4254,7 +4304,7 @@ myFunction().then(
 * Store Passing and Boxes :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides017-box.pdf
-:header-args:racket: :results code :lang plait
+:header-args:racket: :results code :lang flit
 :CUSTOM_ID: store-passing-and-boxes
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
@@ -4554,7 +4604,7 @@ myFunction().then(
 * Mutable Variables :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides018-mutvar.pdf
-:header-args:racket: :results code :lang plait
+:header-args:racket: :results code :lang flit
 :CUSTOM_ID: mutable-variables
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
@@ -4731,7 +4781,7 @@ myFunction().then(
 * Implementing Recursion via State :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides019-recursion.pdf
-:header-args:racket: :results code :lang plait
+:header-args:racket: :results code :lang flit
 :CUSTOM_ID: implementing-recursion-via-state
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
@@ -4886,7 +4936,7 @@ myFunction().then(
 * Objects and OOP :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides020-oop.pdf
-:header-args:racket: :results code :lang plait
+:header-args:racket: :results code :lang flit
 :CUSTOM_ID: objects-and-oop
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
@@ -5138,7 +5188,7 @@ myFunction().then(
 * Lazy Evaluation :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides021-lazy.pdf
-:header-args:racket: :results code :lang plait
+:header-args:racket: :results code :lang flit
 :CUSTOM_ID: lazy-evaluation
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
