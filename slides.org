@@ -687,7 +687,7 @@ where ~[x => EXPR]body~ is ~body~, with all non-shadowed occurrences of the vari
 - Defined vars ~[variableName variableValue]~
   + Round vs. Square not important
   + Defining just one variable has double brackets
-    - ~(let* ([x 3]]) (+ x 1))~
+    - ~(let* ([x 3]) (+ x 1))~
     - Kind of awkward, but just how it works
 
 *** Semantics of Let
@@ -897,7 +897,7 @@ TODO3 : Number
 - Try putting in an ~if~
 #+begin_src racket
 (define (max [x : Number] [ y : Number]) : Number
-  (if (<= x y) x y))
+  (if (<= x y) y x))
 #+end_src
 
 - The variables ~x~ and ~y~ were available for filling the holes
@@ -907,9 +907,9 @@ TODO3 : Number
 - Can use equations to determine the result
  |-------------------------------+-----------------------|
  | ~(max 3 4)~                     | Starting value        |
- | ~[x=>3][y=>4](if (<= x y) x y)~ | Sem. of function call |
- | ~(if (<= 3 4) 3 4)~             | Do the substitution   |
- | ~(if #f 3 4)~                   | Semantics of ~<=~       |
+ | ~[x=>3][y=>4](if (<= x y) y x)~ | Sem. of function call |
+ | ~(if (<= 3 4) 4 3)~             | Do the substitution   |
+ | ~(if #t 4 3)~                   | Semantics of ~<=~       |
  | ~4~                             | Semantics of If       |
  |-------------------------------+-----------------------|
 
@@ -968,7 +968,7 @@ TODO3 : Number
   + E.g. how do we handle input when we don't know how big it is?
 
 *** Example: Natural Numbers
-- Any whole, positive number is either:
+- Any whole, non-negative number is either:
   + Zero
   + One plus another smaller number
 
@@ -1177,7 +1177,7 @@ good (factorial 5) at line 12
 - Common list operations
   + ~empty : (Listof 'a)~
   + ~cons : ('a (Listof 'a) -> (Listof 'a))~
-  + ~empty : ((Listof 'a) -> Boolean)~
+  + ~empty? : ((Listof 'a) -> Boolean)~
   + ~first : ((Listof 'a) -> 'a)~
   + ~rest : ((Listof 'a) -> (Listof 'a))~
 - ~'a~ is /type variable/, functions will work for any type in place of ~'a~
