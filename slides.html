@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2025-01-10 Fri 17:29 -->
+<!-- 2025-01-16 Thu 15:19 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Lecture Slides for CS 350, URegina Winter 2025</title>
@@ -210,9 +210,143 @@ if("undefined"==typeof jQuery)throw new Error("Bootstrap's JavaScript requires j
 </script>
 <script src="https://kit.fontawesome.com/c751a20726.js" crossorigin="anonymous"></script>
 <script type="text/javascript">
-$(function() {    $('.definition').before("<p class='admonition-title note'>Definition</p>"); $(function() {    $('.note').before("<p class='admonition-title note'>Note</p>");    $('.seealso').before("<p class='admonition-title seealso'>See also</p>");    $('.warning').before("<p class='admonition-title warning'>Warning</p>");    $('.caution').before("<p class='admonition-title caution'>Caution</p>");    $('.attention').before("<p class='admonition-title attention'>Attention</p>");    $('.tip').before("<p class='admonition-title tip'>Tip</p>");    $('.important').before("<p class='admonition-title important'>Important</p>");    $('.hint').before("<p class='admonition-title hint'>Hint</p>");    $('.error').before("<p class='admonition-title error'>Error</p>");    $('.danger').before("<p class='admonition-title danger'>Danger</p>");});$( document ).ready(function() {        $(document).on('click', "[data-toggle='wy-nav-top']", function() {      $("[data-toggle='wy-nav-shift']").toggleClass("shift");      $("[data-toggle='rst-versions']").toggleClass("shift");    });        $(document).on('click', ".wy-menu-vertical .current ul li a", function() {      $("[data-toggle='wy-nav-shift']").removeClass("shift");      $("[data-toggle='rst-versions']").toggleClass("shift");    });    $(document).on('click', "[data-toggle='rst-current-version']", function() {      $("[data-toggle='rst-versions']").toggleClass("shift-up");    });        $("table.docutils:not(.field-list)").wrap("<div class='wy-table-responsive'></div>");});$( document ).ready(function() {    $('#text-table-of-contents ul').first().addClass('nav');    $('body').scrollspy({target: '#text-table-of-contents'});            var $postamble = $('#postamble');    var $tableOfContents = $('#table-of-contents');    $tableOfContents.css({paddingBottom: $postamble.outerHeight()});        var toggleSidebar = $('<div id="toggle-sidebar"><a href="#table-of-contents"><h2>Table of Contents</h2></a></div>');    $('#content').prepend(toggleSidebar);        var closeBtn = $('<a class="close-sidebar" href="#">Close</a>');    var tocTitle = $('#table-of-contents').find('h2');    tocTitle.append(closeBtn);});window.SphinxRtdTheme = (function (jquery) {    var stickyNav = (function () {        var navBar,            win,            stickyNavCssClass = 'stickynav',            applyStickNav = function () {                if (navBar.height() <= win.height()) {                    navBar.addClass(stickyNavCssClass);                } else {                    navBar.removeClass(stickyNavCssClass);                }            },            enable = function () {                applyStickNav();                win.on('resize', applyStickNav);            },            init = function () {                navBar = jquery('nav.wy-nav-side:first');                win    = jquery(window);            };        jquery(init);        return {            enable : enable        };    }());    return {        StickyNav : stickyNav    };}($));
+$(function() {    $('.definition').before("<p class='admonition-title note'>Definition</p>");} $(function() {    $('.note').before("<p class='admonition-title note'>Note</p>");    $('.seealso').before("<p class='admonition-title seealso'>See also</p>");    $('.warning').before("<p class='admonition-title warning'>Warning</p>");    $('.caution').before("<p class='admonition-title caution'>Caution</p>");    $('.attention').before("<p class='admonition-title attention'>Attention</p>");    $('.tip').before("<p class='admonition-title tip'>Tip</p>");    $('.important').before("<p class='admonition-title important'>Important</p>");    $('.hint').before("<p class='admonition-title hint'>Hint</p>");    $('.error').before("<p class='admonition-title error'>Error</p>");    $('.danger').before("<p class='admonition-title danger'>Danger</p>");});$( document ).ready(function() {        $(document).on('click', "[data-toggle='wy-nav-top']", function() {      $("[data-toggle='wy-nav-shift']").toggleClass("shift");      $("[data-toggle='rst-versions']").toggleClass("shift");    });        $(document).on('click', ".wy-menu-vertical .current ul li a", function() {      $("[data-toggle='wy-nav-shift']").removeClass("shift");      $("[data-toggle='rst-versions']").toggleClass("shift");    });    $(document).on('click', "[data-toggle='rst-current-version']", function() {      $("[data-toggle='rst-versions']").toggleClass("shift-up");    });        $("table.docutils:not(.field-list)").wrap("<div class='wy-table-responsive'></div>");});$( document ).ready(function() {    $('#text-table-of-contents ul').first().addClass('nav');    $('body').scrollspy({target: '#text-table-of-contents'});            var $postamble = $('#postamble');    var $tableOfContents = $('#table-of-contents');    $tableOfContents.css({paddingBottom: $postamble.outerHeight()});        var toggleSidebar = $('<div id="toggle-sidebar"><a href="#table-of-contents"><h2>Table of Contents</h2></a></div>');    $('#content').prepend(toggleSidebar);        var closeBtn = $('<a class="close-sidebar" href="#">Close</a>');    var tocTitle = $('#table-of-contents').find('h2');    tocTitle.append(closeBtn);});window.SphinxRtdTheme = (function (jquery) {    var stickyNav = (function () {        var navBar,            win,            stickyNavCssClass = 'stickynav',            applyStickNav = function () {                if (navBar.height() <= win.height()) {                    navBar.addClass(stickyNavCssClass);                } else {                    navBar.removeClass(stickyNavCssClass);                }            },            enable = function () {                applyStickNav();                win.on('resize', applyStickNav);            },            init = function () {                navBar = jquery('nav.wy-nav-side:first');                win    = jquery(window);            };        jquery(init);        return {            enable : enable        };    }());    return {        StickyNav : stickyNav    };}($));
 </script>
 
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
+          
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
+          
           <style>
           /* From: https://endlessparentheses.com/public/css/endless.css */
           /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
@@ -326,6 +460,7 @@ $(function() {    $('.definition').before("<p class='admonition-title note'>Defi
 <li><a href="#functional-programming-1-recursion-and-immutable-data">2. Expressions and Immutable Data</a></li>
 <li><a href="#functional-programming-1-recursion-and-immutable-data">3. Types in Flit</a></li>
 <li><a href="#fun-prog-recursion">4. Recursion and Lists</a></li>
+<li><a href="#functional-programming-2-defining-data-types">5. Defining Data Types</a></li>
 </ul>
 </div>
 </div>
@@ -338,7 +473,7 @@ $(function() {    $('.definition').before("<p class='admonition-title note'>Defi
 <div class="outline-text-3" id="text-course-overview">
 </div>
 <ol class="org-ol">
-<li><a id="org489d2f8"></a>Course Objectives<br />
+<li><a id="org87ea318"></a>Course Objectives<br />
 <div class="outline-text-4" id="text-1-1-1">
 <p>
 To learn:
@@ -360,10 +495,10 @@ To learn:
 </ul>
 </div>
 <ol class="org-ol">
-<li><a id="orgec7393d"></a><span class="underline">To change how you <i>think</i> about programming</span><br /></li>
+<li><a id="org8ec2ae7"></a><span class="underline">To change how you <i>think</i> about programming</span><br /></li>
 </ol>
 </li>
-<li><a id="org552b24d"></a>Course Notes / Textbook<br />
+<li><a id="orgadbf3ea"></a>Course Notes / Textbook<br />
 <div class="outline-text-4" id="text-1-1-2">
 <ul class="org-ul">
 <li>Course Notes: <i>Functional Languages, Interpreters and Types</i>
@@ -384,7 +519,7 @@ To learn:
 </ul>
 </div>
 </li>
-<li><a id="org4e58c16"></a>Course Communication<br />
+<li><a id="orga8992b6"></a>Course Communication<br />
 <div class="outline-text-4" id="text-1-1-3">
 <ul class="org-ul">
 <li>Everything on URCourses
@@ -406,7 +541,7 @@ your solution to the assignment</li>
 </ul>
 </div>
 </li>
-<li><a id="org5e42240"></a>Office Hours<br />
+<li><a id="org927dc8b"></a>Office Hours<br />
 <div class="outline-text-4" id="text-1-1-4">
 <ul class="org-ul">
 <li>Location: RIC 317
@@ -420,7 +555,7 @@ your solution to the assignment</li>
 </ul>
 </div>
 </li>
-<li><a id="orgd54f2bc"></a>Grading Scheme<br />
+<li><a id="orgd244258"></a>Grading Scheme<br />
 <div class="outline-text-4" id="text-1-1-5">
 <ul class="org-ul">
 <li>35% assignments</li>
@@ -434,7 +569,7 @@ your solution to the assignment</li>
 </ul>
 </div>
 </li>
-<li><a id="orgc078a7c"></a>Participation<br />
+<li><a id="org9dab4dc"></a>Participation<br />
 <div class="outline-text-4" id="text-1-1-6">
 <ul class="org-ul">
 <li>You get marks just for showing up</li>
@@ -447,7 +582,7 @@ your solution to the assignment</li>
 </ul>
 </div>
 </li>
-<li><a id="orgd3cc149"></a>Assignment 0<br />
+<li><a id="org8706308"></a>Assignment 0<br />
 <div class="outline-text-4" id="text-1-1-7">
 <ul class="org-ul">
 <li>Due Monday, On URCourses</li>
@@ -465,7 +600,7 @@ your solution to the assignment</li>
 </ul>
 </div>
 </li>
-<li><a id="org3cfb597"></a>Assignments 1-6<br />
+<li><a id="org231fa67"></a>Assignments 1-6<br />
 <div class="outline-text-4" id="text-1-1-8">
 <ul class="org-ul">
 <li>Six bi-weekly assignments</li>
@@ -480,7 +615,7 @@ your solution to the assignment</li>
 </ul>
 </div>
 </li>
-<li><a id="org4672946"></a>Assignments (ctd.)<br />
+<li><a id="orgf4f93ce"></a>Assignments (ctd.)<br />
 <div class="outline-text-4" id="text-1-1-9">
 <ul class="org-ul">
 <li>Mostly programming
@@ -500,7 +635,7 @@ your solution to the assignment</li>
 </ul>
 </div>
 </li>
-<li><a id="org96923fa"></a>Submitting Assignments via Handin<br />
+<li><a id="org0d4dee3"></a>Submitting Assignments via Handin<br />
 <div class="outline-text-4" id="text-1-1-10">
 <ul class="org-ul">
 <li>Unlimited submissions before deadline</li>
@@ -513,7 +648,7 @@ your solution to the assignment</li>
 </ul>
 </div>
 </li>
-<li><a id="org0a8edfa"></a>Syntax and Type Errors<br />
+<li><a id="org24eb4d0"></a>Syntax and Type Errors<br />
 <div class="outline-text-4" id="text-1-1-11">
 <ul class="org-ul">
 <li><b>ALL CODE CONTAINING SYNTAX OR TYPE ERRORS WILL GET A GRADE OF ZERO</b>
@@ -525,7 +660,7 @@ your solution to the assignment</li>
 </ul>
 </div>
 </li>
-<li><a id="org6e31f32"></a>Resources for This Course<br />
+<li><a id="org70d3636"></a>Resources for This Course<br />
 <div class="outline-text-4" id="text-1-1-12">
 <ul class="org-ul">
 <li>There are few resources available for you to learn about <code>flit</code>
@@ -548,7 +683,7 @@ your solution to the assignment</li>
 </ul>
 </div>
 </li>
-<li><a id="org5f6a961"></a>Academic Integrity<br />
+<li><a id="org8af9b4a"></a>Academic Integrity<br />
 <div class="outline-text-4" id="text-1-1-13">
 <ul class="org-ul">
 <li>You are to complete all assignments <b>individually</b></li>
@@ -566,17 +701,17 @@ your solution to the assignment</li>
 </ul>
 </div>
 <ol class="org-ol">
-<li><a id="org9aab9a9"></a>Don&rsquo;t set yourself up for failure on the exams<br /></li>
+<li><a id="org20f2e72"></a>Don&rsquo;t set yourself up for failure on the exams<br /></li>
 </ol>
 </li>
 </ol>
 </div>
-<div id="outline-container-org2786dfe" class="outline-3">
-<h3 id="org2786dfe"><span class="section-number-3">1.2.</span> Course Content</h3>
+<div id="outline-container-org9778673" class="outline-3">
+<h3 id="org9778673"><span class="section-number-3">1.2.</span> Course Content</h3>
 <div class="outline-text-3" id="text-1-2">
 </div>
 <ol class="org-ol">
-<li><a id="org9bb25f6"></a>Course Objectives<br />
+<li><a id="org75f4ea7"></a>Course Objectives<br />
 <div class="outline-text-4" id="text-1-2-1">
 <p>
 Programming language genealogy and design.
@@ -611,7 +746,7 @@ Parallel programming.
 </p>
 </div>
 </li>
-<li><a id="org5dfb75c"></a>Course Objectives<br />
+<li><a id="org71716ae"></a>Course Objectives<br />
 <div class="outline-text-4" id="text-1-2-2">
 <p>
 Programming language genealogy and design.
@@ -646,7 +781,7 @@ Parallel programming.
 </ul>
 </div>
 </li>
-<li><a id="org4a4d083"></a>Course Objectives<br />
+<li><a id="org6a840e0"></a>Course Objectives<br />
 <div class="outline-text-4" id="text-1-2-3">
 <p>
 <b>Programming language genealogy and design.</b>
@@ -681,7 +816,7 @@ Parallel programming.
 </ul>
 </div>
 </li>
-<li><a id="orgee5ea2e"></a>Common Questions<br />
+<li><a id="orgd9d2f34"></a>Common Questions<br />
 <div class="outline-text-4" id="text-1-2-4">
 <ul class="org-ul">
 <li>Am I going to use Racket in Industry?
@@ -691,7 +826,7 @@ Parallel programming.
 </ul>
 </div>
 </li>
-<li><a id="orgff0321a"></a>Common Questions<br />
+<li><a id="org1c88854"></a>Common Questions<br />
 <div class="outline-text-4" id="text-1-2-5">
 <ul class="org-ul">
 <li>Then why are we learning it
@@ -708,7 +843,7 @@ Parallel programming.
 </ul>
 </div>
 </li>
-<li><a id="org2dbac95"></a>Common Questions<br />
+<li><a id="orgf467549"></a>Common Questions<br />
 <div class="outline-text-4" id="text-1-2-6">
 <ul class="org-ul">
 <li>Do you really expect me to learn a new language in just one term?
@@ -719,7 +854,7 @@ Parallel programming.
 </ul>
 </div>
 </li>
-<li><a id="orge8339d0"></a>When might this course be useful?<br />
+<li><a id="org420b035"></a>When might this course be useful?<br />
 <div class="outline-text-4" id="text-1-2-7">
 <ul class="org-ul">
 <li><p>
@@ -742,7 +877,7 @@ You might get hired to
 </ul>
 </div>
 </li>
-<li><a id="org315aa1c"></a>The Science of Computer Science<br />
+<li><a id="org8c038cf"></a>The Science of Computer Science<br />
 <div class="outline-text-4" id="text-1-2-8">
 <ul class="org-ul">
 <li>How to think about programs in a rigorous way
@@ -770,17 +905,17 @@ You might get hired to
 <h2 id="functional-programming-1-recursion-and-immutable-data"><span class="section-number-2">2.</span> Expressions and Immutable Data</h2>
 <div class="outline-text-2" id="text-functional-programming-1-recursion-and-immutable-data">
 
-<div id="org41d5780" class="figure">
+<div id="orgd7bf22f" class="figure">
 <p><img src="./img/xkcd_parens.png" alt="xkcd_parens.png" />
 </p>
 </div>
 </div>
-<div id="outline-container-orga7500ee" class="outline-3">
-<h3 id="orga7500ee"><span class="section-number-3">2.1.</span> Overview</h3>
+<div id="outline-container-org2fe69e0" class="outline-3">
+<h3 id="org2fe69e0"><span class="section-number-3">2.1.</span> Overview</h3>
 <div class="outline-text-3" id="text-2-1">
 </div>
 <ol class="org-ol">
-<li><a id="org3827dcf"></a>Objectives<br />
+<li><a id="orga752a58"></a>Objectives<br />
 <div class="outline-text-4" id="text-2-1-1">
 <ul class="org-ul">
 <li>To learn how to use Dr. Racket</li>
@@ -790,12 +925,12 @@ You might get hired to
 </li>
 </ol>
 </div>
-<div id="outline-container-orgc5ee774" class="outline-3">
-<h3 id="orgc5ee774"><span class="section-number-3">2.2.</span> Programming in CS 350</h3>
+<div id="outline-container-org9102e2e" class="outline-3">
+<h3 id="org9102e2e"><span class="section-number-3">2.2.</span> Programming in CS 350</h3>
 <div class="outline-text-3" id="text-2-2">
 </div>
 <ol class="org-ol">
-<li><a id="orgabff92b"></a>All coding for this class uses:<br />
+<li><a id="org0c10847"></a>All coding for this class uses:<br />
 <div class="outline-text-4" id="text-2-2-1">
 <ul class="org-ul">
 <li>The Racket Programming Language</li>
@@ -812,12 +947,12 @@ You might get hired to
 </li>
 </ol>
 </div>
-<div id="outline-container-org2ae44ba" class="outline-3">
-<h3 id="org2ae44ba"><span class="section-number-3">2.3.</span> Racket</h3>
+<div id="outline-container-org6a1db15" class="outline-3">
+<h3 id="org6a1db15"><span class="section-number-3">2.3.</span> Racket</h3>
 <div class="outline-text-3" id="text-2-3">
 </div>
 <ol class="org-ol">
-<li><a id="org7fd0fff"></a>What is Racket?<br />
+<li><a id="org2ace5ea"></a>What is Racket?<br />
 <div class="outline-text-4" id="text-2-3-1">
 <ul class="org-ul">
 <li>Lisp-style language
@@ -832,7 +967,7 @@ You might get hired to
 </ul>
 </div>
 </li>
-<li><a id="orga78d46c"></a>What is Dr. Racket?<br />
+<li><a id="orgbf49dc9"></a>What is Dr. Racket?<br />
 <div class="outline-text-4" id="text-2-3-2">
 <ul class="org-ul">
 <li>IDE for Racket
@@ -854,12 +989,12 @@ You might get hired to
 </li>
 </ol>
 </div>
-<div id="outline-container-org2cb25a4" class="outline-3">
-<h3 id="org2cb25a4"><span class="section-number-3">2.4.</span> Flit</h3>
+<div id="outline-container-org7e09145" class="outline-3">
+<h3 id="org7e09145"><span class="section-number-3">2.4.</span> Flit</h3>
 <div class="outline-text-3" id="text-2-4">
 </div>
 <ol class="org-ol">
-<li><a id="orgf4fd029"></a>Objectives<br />
+<li><a id="org3ffaf43"></a>Objectives<br />
 <div class="outline-text-4" id="text-2-4-1">
 <ul class="org-ul">
 <li>Learn the syntax of core flit features
@@ -874,7 +1009,7 @@ You might get hired to
 </ul>
 </div>
 </li>
-<li><a id="orgabe8594"></a>What is Flit?<br />
+<li><a id="orgcf0d51f"></a>What is Flit?<br />
 <div class="outline-text-4" id="text-2-4-2">
 <ul class="org-ul">
 <li>&ldquo;Functional Languages, Interpreters and Types&rdquo;</li>
@@ -896,7 +1031,7 @@ You might get hired to
 </ul>
 </div>
 </li>
-<li><a id="orge8cdc7c"></a>Flit features:<br />
+<li><a id="orgdd61ebd"></a>Flit features:<br />
 <div class="outline-text-4" id="text-2-4-3">
 <ul class="org-ul">
 <li>Purely functional
@@ -922,7 +1057,7 @@ You might get hired to
 </ul>
 </div>
 </li>
-<li><a id="orgb842608"></a>Syntax in Flit<br />
+<li><a id="org15e38ee"></a>Syntax in Flit<br />
 <div class="outline-text-4" id="text-2-4-4">
 <ul class="org-ul">
 <li>Expression: something that we run to compute a value</li>
@@ -948,7 +1083,7 @@ the meaning of the expression
 </ul>
 </div>
 </li>
-<li><a id="org261e042"></a>Infix vs. Prefix<br />
+<li><a id="org4d37cbc"></a>Infix vs. Prefix<br />
 <div class="outline-text-4" id="text-2-4-5">
 <ul class="org-ul">
 <li>All operations in Flit are written using &ldquo;prefix notation&rdquo;
@@ -960,7 +1095,7 @@ the meaning of the expression
 </ul>
 </div>
 </li>
-<li><a id="orga754eb6"></a>Function calls<br />
+<li><a id="orgff57649"></a>Function calls<br />
 <div class="outline-text-4" id="text-2-4-6">
 <ul class="org-ul">
 <li>In C++ you write <code>f(x,y,z)</code></li>
@@ -969,7 +1104,7 @@ the meaning of the expression
 </ul>
 </div>
 </li>
-<li><a id="org5aaf67e"></a>Why Parentheses?<br />
+<li><a id="orgab14e34"></a>Why Parentheses?<br />
 <div class="outline-text-4" id="text-2-4-7">
 <ul class="org-ul">
 <li>They&rsquo;re different from what you&rsquo;re used to
@@ -989,7 +1124,7 @@ the meaning of the expression
 </ul>
 </div>
 </li>
-<li><a id="org067e1bd"></a>Square vs. Round vs. Curly<br />
+<li><a id="orgd739cff"></a>Square vs. Round vs. Curly<br />
 <div class="outline-text-4" id="text-2-4-8">
 <ul class="org-ul">
 <li>Racket treats all parentheses as the same</li>
@@ -1016,7 +1151,7 @@ the meaning of the expression
 </ul>
 </div>
 </li>
-<li><a id="org5c06a94"></a>Parentheses in the real world<br />
+<li><a id="orgf4296f4"></a>Parentheses in the real world<br />
 <div class="outline-text-4" id="text-2-4-9">
 <ul class="org-ul">
 <li>e.g. Clojure, uses parentheses</li>
@@ -1025,7 +1160,7 @@ the meaning of the expression
 </ul>
 </div>
 </li>
-<li><a id="orgb7aad12"></a>Numbers<br />
+<li><a id="orgc992c7e"></a>Numbers<br />
 <div class="outline-text-4" id="text-2-4-10">
 <ul class="org-ul">
 <li>Most operations prefix version of what you&rsquo;ve seen in C++/python</li>
@@ -1052,7 +1187,7 @@ the meaning of the expression
 </div>
 </div>
 </li>
-<li><a id="org616e3c8"></a>Booleans<br />
+<li><a id="org883773a"></a>Booleans<br />
 <div class="outline-text-4" id="text-2-4-11">
 <ul class="org-ul">
 <li>Literals written #t and #f</li>
@@ -1078,7 +1213,7 @@ the meaning of the expression
 </div>
 </div>
 </li>
-<li><a id="orgca89d92"></a>Imperative Languages<br />
+<li><a id="orgf169dc4"></a>Imperative Languages<br />
 <div class="outline-text-4" id="text-2-4-12">
 <ul class="org-ul">
 <li>C, C++, and Python are <i>imperative languages</i>
@@ -1096,7 +1231,7 @@ the meaning of the expression
 </ul>
 </div>
 </li>
-<li><a id="orge23996a"></a>Functional Language<br />
+<li><a id="orgd7f118e"></a>Functional Language<br />
 <div class="outline-text-4" id="text-2-4-13">
 <ul class="org-ul">
 <li>Flit is <i>purely functional</i></li>
@@ -1113,7 +1248,7 @@ the meaning of the expression
 </ul>
 </div>
 </li>
-<li><a id="orgc8d86c0"></a>Example: Imperative Conditionals<br />
+<li><a id="orge18d1ce"></a>Example: Imperative Conditionals<br />
 <div class="outline-text-4" id="text-2-4-14">
 <ul class="org-ul">
 <li>Conditionals in C++/Python tell what to <i>do</i></li>
@@ -1130,7 +1265,7 @@ the meaning of the expression
 </ul>
 </div>
 </li>
-<li><a id="orgfe5fa11"></a>Conditional Expressions<br />
+<li><a id="orga8b57c8"></a>Conditional Expressions<br />
 <div class="outline-text-4" id="text-2-4-15">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">if</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">&lt;</span> <span style="color: #da8548; font-weight: bold;">2</span> <span style="color: #da8548; font-weight: bold;">3</span><span style="color: #a626a4;">)</span> <span style="color: #50a14f;">"hello"</span> <span style="color: #50a14f;">"goodbye"</span><span style="color: #4078f2;">)</span>
@@ -1161,7 +1296,7 @@ the meaning of the expression
 </ul>
 </div>
 </li>
-<li><a id="orgd991433"></a>Equational Reasoning<br />
+<li><a id="org638894a"></a>Equational Reasoning<br />
 <div class="outline-text-4" id="text-2-4-16">
 <ul class="org-ul">
 <li>When all variables are immutable, we can treat programs as mathematical objects</li>
@@ -1180,7 +1315,7 @@ Example:
 </ul>
 </div>
 </li>
-<li><a id="orgaeda3f6"></a>Imperative Breaks Equational Reasoning<br />
+<li><a id="orgdbd98aa"></a>Imperative Breaks Equational Reasoning<br />
 <div class="outline-text-4" id="text-2-4-17">
 <ul class="org-ul">
 <li><p>
@@ -1198,7 +1333,7 @@ In C++, the equals sign is a LIE
 </ul>
 </div>
 </li>
-<li><a id="orgcae050e"></a>Equations for IF<br />
+<li><a id="org66a7d56"></a>Equations for IF<br />
 <div class="outline-text-4" id="text-2-4-18">
 <ul class="org-ul">
 <li>We can describe the behaviour of if-expressions with the following two equations:</li>
@@ -1225,7 +1360,7 @@ For any expressions <code>EXPR1</code> and <code>EXPR2</code>
 </ul>
 </div>
 </li>
-<li><a id="org225bc7e"></a>Functions<br />
+<li><a id="orgb29914c"></a>Functions<br />
 <div class="outline-text-4" id="text-2-4-19">
 <ul class="org-ul">
 <li>Calling a function replaces variable with concrete argument</li>
@@ -1246,7 +1381,7 @@ For any expressions <code>EXPR1</code> and <code>EXPR2</code>
 </div>
 </div>
 </li>
-<li><a id="org63eacfb"></a>Calling Functions<br />
+<li><a id="org7a9a57a"></a>Calling Functions<br />
 <div class="outline-text-4" id="text-2-4-20">
 <ul class="org-ul">
 <li>Syntax for calling a function is
@@ -1267,7 +1402,7 @@ For any expressions <code>EXPR1</code> and <code>EXPR2</code>
 </ul>
 </div>
 </li>
-<li><a id="org64ee32b"></a>Defining Multi-Argument Functions<br />
+<li><a id="org9ce8699"></a>Defining Multi-Argument Functions<br />
 <div class="outline-text-4" id="text-2-4-21">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">isRemainder</span> <span style="color: #50a14f;">[</span>x <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span>
@@ -1287,7 +1422,7 @@ For any expressions <code>EXPR1</code> and <code>EXPR2</code>
 </div>
 </div>
 </li>
-<li><a id="org7a91f31"></a>General Form Defining Functions<br />
+<li><a id="org8d0c77c"></a>General Form Defining Functions<br />
 <div class="outline-text-4" id="text-2-4-22">
 <ul class="org-ul">
 <li>General form:</li>
@@ -1316,7 +1451,7 @@ For any expressions <code>EXPR1</code> and <code>EXPR2</code>
 </ul>
 </div>
 </li>
-<li><a id="org57d5a0b"></a>Type Inference<br />
+<li><a id="org279b2bc"></a>Type Inference<br />
 <div class="outline-text-4" id="text-2-4-23">
 <ul class="org-ul">
 <li>We can leave types off function arguments and return type</li>
@@ -1336,7 +1471,7 @@ Compiler is <i>usually</i> smart enough to figure out the types
 </ul>
 </div>
 </li>
-<li><a id="org650117f"></a>Semantics of Function Calls<br />
+<li><a id="org2a11b99"></a>Semantics of Function Calls<br />
 <div class="outline-text-4" id="text-2-4-24">
 <ul class="org-ul">
 <li>Functions are about <i>substitution</i>:</li>
@@ -1362,7 +1497,7 @@ where <code>[x =&gt; EXPR]body</code> is <code>body</code>, with all non-shadowe
 </div>
 </div>
 </li>
-<li><a id="orgf8ba3cb"></a>Intermediate definitions<br />
+<li><a id="org0f7bdfe"></a>Intermediate definitions<br />
 <div class="outline-text-4" id="text-2-4-25">
 <ul class="org-ul">
 <li>Can still define variables
@@ -1389,9 +1524,9 @@ where <code>[x =&gt; EXPR]body</code> is <code>body</code>, with all non-shadowe
 </div>
 </div>
 </li>
-<li><a id="orgd5b13fd"></a>Understanding Definitions<br />
+<li><a id="org00dc08a"></a>Understanding Definitions<br />
 <ol class="org-ol">
-<li><a id="org0c18fd2"></a>In C++, you might write<br />
+<li><a id="org97b7e91"></a>In C++, you might write<br />
 <div class="outline-text-5" id="text-2-4-26-1">
 <div class="org-src-container">
 <pre class="src src-C++">&nbsp; &nbsp; &nbsp; &nbsp; <span style="color: #e45649;">while</span> (someCond){
@@ -1417,7 +1552,7 @@ where <code>[x =&gt; EXPR]body</code> is <code>body</code>, with all non-shadowe
 </li>
 </ol>
 </li>
-<li><a id="orgc5270ed"></a>General Syntax<br />
+<li><a id="orge7d8b5a"></a>General Syntax<br />
 <div class="outline-text-4" id="text-2-4-27">
 <ul class="org-ul">
 <li>In general:</li>
@@ -1439,14 +1574,14 @@ where <code>[x =&gt; EXPR]body</code> is <code>body</code>, with all non-shadowe
 <li>Round vs. Square not important</li>
 <li>Defining just one variable has double brackets
 <ul class="org-ul">
-<li><code>(let* ([x 3]]) (+ x 1))</code></li>
+<li><code>(let* ([x 3]) (+ x 1))</code></li>
 <li>Kind of awkward, but just how it works</li>
 </ul></li>
 </ul></li>
 </ul>
 </div>
 </li>
-<li><a id="org4910577"></a>Semantics of Let<br />
+<li><a id="orga643a6d"></a>Semantics of Let<br />
 <div class="outline-text-4" id="text-2-4-28">
 <div id="gls.3" class="admonition note">
                         <p class="admonition-title note">Definition: Semantics of Let for Single Variables</p>&nbsp;
@@ -1470,7 +1605,7 @@ where <code>[x =&gt; EXPR]body</code> is <code>body</code> with all non-shadowed
 </ul>
 </div>
 </li>
-<li><a id="orgac9f37a"></a>Alternate versions of Let<br />
+<li><a id="orga0db887"></a>Alternate versions of Let<br />
 <div class="outline-text-4" id="text-2-4-29">
 <ul class="org-ul">
 <li>There&rsquo;s also <code>let</code>
@@ -1495,12 +1630,12 @@ where <code>[x =&gt; EXPR]body</code> is <code>body</code> with all non-shadowed
 <h2 id="functional-programming-1-recursion-and-immutable-data"><span class="section-number-2">3.</span> Types in Flit</h2>
 <div class="outline-text-2" id="text-functional-programming-1-recursion-and-immutable-data">
 </div>
-<div id="outline-container-org87af537" class="outline-3">
-<h3 id="org87af537"><span class="section-number-3">3.1.</span> Programming with Holes</h3>
+<div id="outline-container-orgd0877db" class="outline-3">
+<h3 id="orgd0877db"><span class="section-number-3">3.1.</span> Programming with Holes</h3>
 <div class="outline-text-3" id="text-3-1">
 </div>
 <ol class="org-ol">
-<li><a id="orgf240cee"></a>Why write down types?<br />
+<li><a id="orgab20935"></a>Why write down types?<br />
 <div class="outline-text-4" id="text-3-1-1">
 <ul class="org-ul">
 <li>With type inference, we don&rsquo;t <i>need</i> to write down types</li>
@@ -1520,7 +1655,7 @@ where <code>[x =&gt; EXPR]body</code> is <code>body</code> with all non-shadowed
 </ul>
 </div>
 </li>
-<li><a id="org8512db4"></a>Checking Types<br />
+<li><a id="orgdaa7524"></a>Checking Types<br />
 <div class="outline-text-4" id="text-3-1-2">
 <ul class="org-ul">
 <li>Can annotate any expression to confirm its type</li>
@@ -1540,7 +1675,7 @@ where <code>[x =&gt; EXPR]body</code> is <code>body</code> with all non-shadowed
 </div>
 </div>
 </li>
-<li><a id="org89c619a"></a>Strong Typing<br />
+<li><a id="orge0a6152"></a>Strong Typing<br />
 <div class="outline-text-4" id="text-3-1-3">
 <ul class="org-ul">
 <li>Flit is <i>strongly typed</i>
@@ -1559,7 +1694,7 @@ where <code>[x =&gt; EXPR]body</code> is <code>body</code> with all non-shadowed
 </ul>
 </div>
 </li>
-<li><a id="orge707a71"></a>Thinking About Types<br />
+<li><a id="orgee3e09a"></a>Thinking About Types<br />
 <div class="outline-text-4" id="text-3-1-4">
 <ul class="org-ul">
 <li>With any type, there are two things we care about
@@ -1574,7 +1709,7 @@ where <code>[x =&gt; EXPR]body</code> is <code>body</code> with all non-shadowed
 </ul>
 </div>
 </li>
-<li><a id="orgafa2e39"></a>Numbers<br />
+<li><a id="orgf4b4bfd"></a>Numbers<br />
 <div class="outline-text-4" id="text-3-1-5">
 <ul class="org-ul">
 <li>To create: literals <code>3</code>, <code>22</code>, <code>0.00001</code></li>
@@ -1587,7 +1722,7 @@ where <code>[x =&gt; EXPR]body</code> is <code>body</code> with all non-shadowed
 </ul>
 </div>
 </li>
-<li><a id="org52f24c1"></a>Strings<br />
+<li><a id="org1f46d39"></a>Strings<br />
 <div class="outline-text-4" id="text-3-1-6">
 <ul class="org-ul">
 <li>To create: string literals
@@ -1603,7 +1738,7 @@ where <code>[x =&gt; EXPR]body</code> is <code>body</code> with all non-shadowed
 </ul>
 </div>
 </li>
-<li><a id="orgd336ed6"></a>Booleans<br />
+<li><a id="org47e8970"></a>Booleans<br />
 <div class="outline-text-4" id="text-3-1-7">
 <ul class="org-ul">
 <li>To create: literals <code>#t</code>, <code>#f</code></li>
@@ -1612,7 +1747,7 @@ where <code>[x =&gt; EXPR]body</code> is <code>body</code> with all non-shadowed
 </ul>
 </div>
 </li>
-<li><a id="orgf037f72"></a>Types for If<br />
+<li><a id="org2fcfbd1"></a>Types for If<br />
 <div class="outline-text-4" id="text-3-1-8">
 <ul class="org-ul">
 <li><code>if</code> is not a function
@@ -1627,7 +1762,7 @@ where <code>[x =&gt; EXPR]body</code> is <code>body</code> with all non-shadowed
 </ul>
 </div>
 </li>
-<li><a id="org17a75bc"></a>Typing Rule for If<br />
+<li><a id="orgd45b56b"></a>Typing Rule for If<br />
 <div class="outline-text-4" id="text-3-1-9">
 <div id="gls.4" class="admonition note">
                         <p class="admonition-title note">Definition: Typing for If</p>&nbsp;
@@ -1657,7 +1792,7 @@ then:
 </ul>
 </div>
 </li>
-<li><a id="orgc977c5c"></a>Function Calls<br />
+<li><a id="orga91e257"></a>Function Calls<br />
 <div class="outline-text-4" id="text-3-1-10">
 <div id="gls.5" class="admonition note">
                         <p class="admonition-title note">Definition: Typing for Function Calls</p>&nbsp;
@@ -1685,7 +1820,7 @@ For any expressions <code>EXPR_f</code> and <code>EXPR_arg</code>
 </ul>
 </div>
 </li>
-<li><a id="orgd7240e9"></a>Function Definitions<br />
+<li><a id="orga7029a7"></a>Function Definitions<br />
 <div class="outline-text-4" id="text-3-1-11">
 <div id="gls.6" class="admonition note">
                         <p class="admonition-title note">Definition: Typing for Function Definitions</p>&nbsp;
@@ -1718,7 +1853,7 @@ For a definition <code>(define (f x1 ... xN) body)</code>
 </ul>
 </div>
 </li>
-<li><a id="org4c63bf8"></a>Programming Via Holes<br />
+<li><a id="org012cf46"></a>Programming Via Holes<br />
 <div class="outline-text-4" id="text-3-1-12">
 <ul class="org-ul">
 <li>Figure out the type of the thing you&rsquo;re trying to write
@@ -1738,7 +1873,7 @@ For a definition <code>(define (f x1 ... xN) body)</code>
 </ul>
 </div>
 </li>
-<li><a id="org61b62ce"></a>Functions for Filling Holes<br />
+<li><a id="org19e1f10"></a>Functions for Filling Holes<br />
 <div class="outline-text-4" id="text-3-1-13">
 <ul class="org-ul">
 <li>Can always fill a hole of type <code>T</code> by applying a function that returns type <code>T</code>
@@ -1755,14 +1890,14 @@ For a definition <code>(define (f x1 ... xN) body)</code>
 </ul>
 </div>
 </li>
-<li><a id="org40c97ca"></a>Example: Max<br />
+<li><a id="org2cd6b5d"></a>Example: Max<br />
 <div class="outline-text-4" id="text-3-1-14">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">max</span> <span style="color: #50a14f;">[</span>x <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span> <span style="color: #50a14f;">[</span> y <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span>
 &nbsp; TODO<span style="color: #4078f2;">)</span>
 </pre>
 </div>
-<pre class="example" id="orgbfaa0af">
+<pre class="example" id="org29d6664">
 x : Number
 y : Number
 ---------------
@@ -1774,7 +1909,7 @@ TODO : Number
 </ul>
 </div>
 </li>
-<li><a id="orgcd5a89f"></a>Example: Max (ctd.)<br />
+<li><a id="org1c37cac"></a>Example: Max (ctd.)<br />
 <div class="outline-text-4" id="text-3-1-15">
 <ul class="org-ul">
 <li>Try putting in an <code>if</code></li>
@@ -1784,7 +1919,7 @@ TODO : Number
 &nbsp; <span style="color: #a626a4;">(</span><span style="color: #e45649;">if</span> TODO TODO TODO<span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
 </pre>
 </div>
-<pre class="example" id="org9837a31">
+<pre class="example" id="org54387ff">
 x : Number
 y : Number
 ---------------
@@ -1797,14 +1932,14 @@ TODO3 : Number
 </ul>
 </div>
 </li>
-<li><a id="org7936656"></a>Finishing Max<br />
+<li><a id="org286d6c9"></a>Finishing Max<br />
 <div class="outline-text-4" id="text-3-1-16">
 <ul class="org-ul">
 <li>Try putting in an <code>if</code></li>
 </ul>
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">max</span> <span style="color: #50a14f;">[</span>x <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span> <span style="color: #50a14f;">[</span> y <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span>
-&nbsp; <span style="color: #a626a4;">(</span><span style="color: #e45649;">if</span> <span style="color: #50a14f;">(</span><span style="color: #a626a4;">&lt;=</span> x y<span style="color: #50a14f;">)</span> x y<span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+&nbsp; <span style="color: #a626a4;">(</span><span style="color: #e45649;">if</span> <span style="color: #50a14f;">(</span><span style="color: #a626a4;">&lt;=</span> x y<span style="color: #50a14f;">)</span> y x<span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
 </pre>
 </div>
 
@@ -1816,7 +1951,7 @@ TODO3 : Number
 </ul>
 </div>
 </li>
-<li><a id="orgb0d1b80"></a>Calling Max<br />
+<li><a id="orgf43605c"></a>Calling Max<br />
 <div class="outline-text-4" id="text-3-1-17">
 <ul class="org-ul">
 <li><p>
@@ -1837,17 +1972,17 @@ Can use equations to determine the result
 </tr>
 
 <tr>
-<td class="org-left"><code>[x=&gt;3][y=&gt;4](if (&lt;= x y) x y)</code></td>
+<td class="org-left"><code>[x=&gt;3][y=&gt;4](if (&lt;= x y) y x)</code></td>
 <td class="org-left">Sem. of function call</td>
 </tr>
 
 <tr>
-<td class="org-left"><code>(if (&lt;= 3 4) 3 4)</code></td>
+<td class="org-left"><code>(if (&lt;= 3 4) 4 3)</code></td>
 <td class="org-left">Do the substitution</td>
 </tr>
 
 <tr>
-<td class="org-left"><code>(if #f 3 4)</code></td>
+<td class="org-left"><code>(if #t 4 3)</code></td>
 <td class="org-left">Semantics of <code>&lt;=</code></td>
 </tr>
 
@@ -1867,12 +2002,12 @@ Can use equations to determine the result
 <h2 id="fun-prog-recursion"><span class="section-number-2">4.</span> Recursion and Lists</h2>
 <div class="outline-text-2" id="text-fun-prog-recursion">
 </div>
-<div id="outline-container-orgb8727b5" class="outline-3">
-<h3 id="orgb8727b5"><span class="section-number-3">4.1.</span> Functional Thinking and Recursion</h3>
+<div id="outline-container-org9238a38" class="outline-3">
+<h3 id="org9238a38"><span class="section-number-3">4.1.</span> Functional Thinking and Recursion</h3>
 <div class="outline-text-3" id="text-4-1">
 </div>
 <ol class="org-ol">
-<li><a id="orgc287dbe"></a>Trees and Recursion<br />
+<li><a id="org308af1b"></a>Trees and Recursion<br />
 <div class="outline-text-4" id="text-4-1-1">
 <ul class="org-ul">
 <li>A lot of data has tree-like structure</li>
@@ -1884,10 +2019,10 @@ Can use equations to determine the result
 </ul>
 </div>
 </li>
-<li><a id="org149eac3"></a>Example: Natural Numbers<br />
+<li><a id="orgcc4b548"></a>Example: Natural Numbers<br />
 <div class="outline-text-4" id="text-4-1-2">
 <ul class="org-ul">
-<li>Any whole, positive number is either:
+<li>Any whole, non-negative number is either:
 <ul class="org-ul">
 <li>Zero</li>
 <li>One plus another smaller number</li>
@@ -1895,7 +2030,7 @@ Can use equations to determine the result
 </ul>
 </div>
 </li>
-<li><a id="org08f8710"></a>The Magic of Recursion<br />
+<li><a id="org0d4c6ee"></a>The Magic of Recursion<br />
 <div class="outline-text-4" id="text-4-1-3">
 <ul class="org-ul">
 <li>When writing a function, you can pretend:
@@ -1921,7 +2056,7 @@ Can use equations to determine the result
 </ul>
 </div>
 </li>
-<li><a id="org6d74827"></a>Writing Recursion Functions Using Holes<br />
+<li><a id="org18706cb"></a>Writing Recursion Functions Using Holes<br />
 <div class="outline-text-4" id="text-4-1-4">
 <ul class="org-ul">
 <li>Write the type of the function you&rsquo;re trying to make</li>
@@ -1946,7 +2081,7 @@ Can use equations to determine the result
 </ul>
 </div>
 </li>
-<li><a id="org3c53ba7"></a>Factorial - Types<br />
+<li><a id="org2eac82e"></a>Factorial - Types<br />
 <div class="outline-text-4" id="text-4-1-5">
 <ul class="org-ul">
 <li>\(n! = 1 \times 2 \times \ldots n\)</li>
@@ -1961,7 +2096,7 @@ Takes in a (natural) number, outputs a number
 </ul>
 </div>
 </li>
-<li><a id="org15287ca"></a>Factorial - Tests<br />
+<li><a id="org4172a4a"></a>Factorial - Tests<br />
 <div class="outline-text-4" id="text-4-1-6">
 <div class="org-src-container">
 <pre class="src src-racket">&nbsp;
@@ -1978,7 +2113,7 @@ Takes in a (natural) number, outputs a number
 </ul>
 </div>
 </li>
-<li><a id="org05cfa2d"></a>Factorial - Template<br />
+<li><a id="org1dff6d6"></a>Factorial - Template<br />
 <div class="outline-text-4" id="text-4-1-7">
 <ul class="org-ul">
 <li>A natural number is either
@@ -2005,7 +2140,7 @@ Takes in a (natural) number, outputs a number
 </div>
 </div>
 </li>
-<li><a id="orgdc12639"></a>Factorial - Decomposing the Input<br />
+<li><a id="orgcfc0798"></a>Factorial - Decomposing the Input<br />
 <div class="outline-text-4" id="text-4-1-8">
 <ul class="org-ul">
 <li>No &ldquo;parts&rdquo; of zero
@@ -2035,7 +2170,7 @@ Takes in a (natural) number, outputs a number
 </div>
 </div>
 </li>
-<li><a id="org31f5d4e"></a>Factorial - Recursion<br />
+<li><a id="orgc94b779"></a>Factorial - Recursion<br />
 <div class="outline-text-4" id="text-4-1-9">
 <ul class="org-ul">
 <li>Input to <code>factorial</code> is a number</li>
@@ -2057,7 +2192,7 @@ Takes in a (natural) number, outputs a number
 </div>
 </div>
 </li>
-<li><a id="orge9bc811"></a>Factorial - Filling holes<br />
+<li><a id="orge3dd569"></a>Factorial - Filling holes<br />
 <div class="outline-text-4" id="text-4-1-10">
 <ul class="org-ul">
 <li>Base case: factorial of 0 is 1
@@ -2071,7 +2206,7 @@ Takes in a (natural) number, outputs a number
 </ul></li>
 </ul>
 <div class="org-src-container">
-<pre class="src src-racket" id="orgc9a6726"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">factorial</span> <span style="color: #50a14f;">[</span>n <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span>
+<pre class="src src-racket" id="org0cbdeac"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">factorial</span> <span style="color: #50a14f;">[</span>n <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span>
 &nbsp; <span style="color: #a626a4;">(</span><span style="color: #e45649;">if</span> <span style="color: #50a14f;">(</span><span style="color: #a626a4;">zero?</span> n<span style="color: #50a14f;">)</span>
 &nbsp;   &nbsp; <span style="color: #da8548; font-weight: bold;">1</span>
 &nbsp;   &nbsp; <span style="color: #50a14f;">(</span><span style="color: #e45649;">let*</span>
@@ -2083,7 +2218,7 @@ Takes in a (natural) number, outputs a number
 </div>
 </div>
 </li>
-<li><a id="orgef68cda"></a>Run Tests<br />
+<li><a id="orgf991a13"></a>Run Tests<br />
 <div class="outline-text-4" id="text-4-1-11">
 <div class="org-src-container">
 <pre class="src src-racket">
@@ -2105,7 +2240,7 @@ good <span style="color: #4078f2;">(</span>factorial <span style="color: #da8548
 </div>
 </div>
 </li>
-<li><a id="orge2c55e5"></a>Preconditions<br />
+<li><a id="orgff1e6ae"></a>Preconditions<br />
 <div class="outline-text-4" id="text-4-1-12">
 <ul class="org-ul">
 <li>Note: types not quite precise enough
@@ -2124,7 +2259,7 @@ good <span style="color: #4078f2;">(</span>factorial <span style="color: #da8548
 </ul>
 </div>
 </li>
-<li><a id="orgd45e4b6"></a>Postcondition<br />
+<li><a id="org40e6a85"></a>Postcondition<br />
 <div class="outline-text-4" id="text-4-1-13">
 <ul class="org-ul">
 <li>Something true about the return of the function
@@ -2135,7 +2270,7 @@ good <span style="color: #4078f2;">(</span>factorial <span style="color: #da8548
 </ul>
 </div>
 </li>
-<li><a id="orge53c631"></a>Another Example: Exponentiation<br />
+<li><a id="orgf0d7d55"></a>Another Example: Exponentiation<br />
 <div class="outline-text-4" id="text-4-1-14">
 <ul class="org-ul">
 <li>Live coding in Dr. Racket</li>
@@ -2144,12 +2279,12 @@ good <span style="color: #4078f2;">(</span>factorial <span style="color: #da8548
 </li>
 </ol>
 </div>
-<div id="outline-container-org2b5039c" class="outline-3">
-<h3 id="org2b5039c"><span class="section-number-3">4.2.</span> Unbounded Data: Lists</h3>
+<div id="outline-container-org2167931" class="outline-3">
+<h3 id="org2167931"><span class="section-number-3">4.2.</span> Unbounded Data: Lists</h3>
 <div class="outline-text-3" id="text-4-2">
 </div>
 <ol class="org-ol">
-<li><a id="org6c2ad3a"></a>Lists Abstractly<br />
+<li><a id="orgf8b3b13"></a>Lists Abstractly<br />
 <div class="outline-text-4" id="text-4-2-1">
 <ul class="org-ul">
 <li>Sometimes you want a bunch of things</li>
@@ -2167,7 +2302,7 @@ good <span style="color: #4078f2;">(</span>factorial <span style="color: #da8548
 </ul>
 </div>
 </li>
-<li><a id="org05673b9"></a>Functional Linked Lists<br />
+<li><a id="orgb2bf63a"></a>Functional Linked Lists<br />
 <div class="outline-text-4" id="text-4-2-2">
 <ul class="org-ul">
 <li>Every linked list is one of:
@@ -2190,7 +2325,7 @@ good <span style="color: #4078f2;">(</span>factorial <span style="color: #da8548
 </ul>
 </div>
 </li>
-<li><a id="org01d6eef"></a>Lists in Flit<br />
+<li><a id="orge14664d"></a>Lists in Flit<br />
 <div class="outline-text-4" id="text-4-2-3">
 <ul class="org-ul">
 <li>Multiple ways to write lists</li>
@@ -2209,7 +2344,7 @@ good <span style="color: #4078f2;">(</span>factorial <span style="color: #da8548
 </ul>
 </div>
 </li>
-<li><a id="org8e89b1b"></a>Types for Lists<br />
+<li><a id="org8617ec6"></a>Types for Lists<br />
 <div class="outline-text-4" id="text-4-2-4">
 <ul class="org-ul">
 <li>Lists are a <i>parameterized type</i>
@@ -2221,7 +2356,7 @@ good <span style="color: #4078f2;">(</span>factorial <span style="color: #da8548
 <ul class="org-ul">
 <li><code>empty : (Listof 'a)</code></li>
 <li><code>cons : ('a (Listof 'a) -&gt; (Listof 'a))</code></li>
-<li><code>empty : ((Listof 'a) -&gt; Boolean)</code></li>
+<li><code>empty? : ((Listof 'a) -&gt; Boolean)</code></li>
 <li><code>first : ((Listof 'a) -&gt; 'a)</code></li>
 <li><code>rest : ((Listof 'a) -&gt; (Listof 'a))</code></li>
 </ul></li>
@@ -2232,7 +2367,7 @@ good <span style="color: #4078f2;">(</span>factorial <span style="color: #da8548
 </ul>
 </div>
 </li>
-<li><a id="orga3f9acf"></a>Template for Lists<br />
+<li><a id="org8245762"></a>Template for Lists<br />
 <div class="outline-text-4" id="text-4-2-5">
 <ul class="org-ul">
 <li>Two cases: list is empty or cons</li>
@@ -2251,7 +2386,7 @@ Can make a recursive call on tail of cons case
 &nbsp;   &nbsp;  TODO
 &nbsp;   &nbsp;   <span style="color: #50a14f;">(</span><span style="color: #e45649;">let</span> <span style="color: #b751b6;">(</span><span style="color: #4078f2;">[</span><span style="color: #6a1868;">h</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">first</span> xs<span style="color: #a626a4;">)</span><span style="color: #4078f2;">]</span>
 &nbsp;   &nbsp;   &nbsp;   &nbsp; <span style="color: #4078f2;">[</span><span style="color: #6a1868;">t</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">rest</span> xs<span style="color: #a626a4;">)</span><span style="color: #4078f2;">]</span>
-&nbsp;   &nbsp;   &nbsp;   &nbsp; <span style="color: #4078f2;">[</span><span style="color: #6a1868;">sumRest</span> <span style="color: #a626a4;">(</span>list-template t<span style="color: #a626a4;">)</span><span style="color: #4078f2;">]</span><span style="color: #b751b6;">)</span>
+&nbsp;   &nbsp;   &nbsp;   &nbsp; <span style="color: #4078f2;">[</span><span style="color: #6a1868;">recRest</span> <span style="color: #a626a4;">(</span>list-template t<span style="color: #a626a4;">)</span><span style="color: #4078f2;">]</span><span style="color: #b751b6;">)</span>
 &nbsp;   &nbsp;   &nbsp; TODO<span style="color: #50a14f;">)</span>
 &nbsp;   &nbsp;   <span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
 </pre>
@@ -2259,7 +2394,7 @@ Can make a recursive call on tail of cons case
 </ul>
 </div>
 </li>
-<li><a id="org4f2cdbc"></a>Example: Sum Template<br />
+<li><a id="orgc1eda57"></a>Example: Sum Template<br />
 <div class="outline-text-4" id="text-4-2-6">
 <div class="org-src-container">
 <pre class="src src-racket">&nbsp; <span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">sum</span> <span style="color: #50a14f;">[</span>xs <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> <span style="color: #986801;">Number</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
@@ -2279,7 +2414,7 @@ Can make a recursive call on tail of cons case
 </div>
 </div>
 </li>
-<li><a id="orgb5f06fe"></a>Example: Sum<br />
+<li><a id="org9c5e932"></a>Example: Sum<br />
 <div class="outline-text-4" id="text-4-2-7">
 <ul class="org-ul">
 <li>Have the first number</li>
@@ -2309,7 +2444,7 @@ Can make a recursive call on tail of cons case
 </div>
 </div>
 </li>
-<li><a id="orgafd0c45"></a>Pattern Matching: Intuition<br />
+<li><a id="org74ecc8e"></a>Pattern Matching: Intuition<br />
 <div class="outline-text-4" id="text-4-2-8">
 <ul class="org-ul">
 <li>Recursive case: used &ldquo;getter&rdquo; function to get the sub-data in the recursive case
@@ -2325,7 +2460,7 @@ Can make a recursive call on tail of cons case
 </ul>
 </div>
 </li>
-<li><a id="org536434a"></a>Pattern Matching<br />
+<li><a id="org7460c6f"></a>Pattern Matching<br />
 <div class="outline-text-4" id="text-4-2-9">
 <div class="org-src-container">
 <pre class="src src-racket">&nbsp; <span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">sum</span> <span style="color: #50a14f;">[</span>xs <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> <span style="color: #986801;">Number</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
@@ -2340,7 +2475,7 @@ Can make a recursive call on tail of cons case
 </div>
 </div>
 </li>
-<li><a id="org01dc521"></a>General Syntax for List Matching<br />
+<li><a id="orga688a41"></a>General Syntax for List Matching<br />
 <div class="outline-text-4" id="text-4-2-10">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #4078f2;">(</span>type-case <span style="color: #a626a4;">(</span><span style="color: #986801;">Listof</span> SOME_TYPE<span style="color: #a626a4;">)</span> listToExamine
@@ -2369,7 +2504,7 @@ Can make a recursive call on tail of cons case
 </ul>
 </div>
 </li>
-<li><a id="org780a8d7"></a>Why pattern matching?<br />
+<li><a id="orgac559b4"></a>Why pattern matching?<br />
 <div class="outline-text-4" id="text-4-2-11">
 <ul class="org-ul">
 <li>Never perform an un-safe operation
@@ -2388,7 +2523,7 @@ Can make a recursive call on tail of cons case
 </ul>
 </div>
 </li>
-<li><a id="org36c9490"></a>Example: Generating a Modified List<br />
+<li><a id="org22d40e4"></a>Example: Generating a Modified List<br />
 <div class="outline-text-4" id="text-4-2-12">
 <ul class="org-ul">
 <li>Can also generate lists</li>
@@ -2402,7 +2537,7 @@ Shows how to create lists recursively
 <pre class="src src-racket">&nbsp; <span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">increment</span> <span style="color: #50a14f;">[</span>xs <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> <span style="color: #986801;">Number</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
 &nbsp;   &nbsp;   &nbsp; <span style="color: #a626a4;">:</span> <span style="color: #a626a4;">(</span><span style="color: #986801;">Listof</span> <span style="color: #986801;">Number</span><span style="color: #a626a4;">)</span>
 &nbsp;   <span style="color: #a626a4;">(</span>type-case <span style="color: #50a14f;">(</span><span style="color: #986801;">Listof</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">)</span> xs
-&nbsp;   &nbsp; <span style="color: #50a14f;">[</span><span style="color: #a626a4;">empty</span>
+&nbsp;   &nbsp; <span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span><span style="color: #a626a4;">empty</span><span style="color: #b751b6;">)</span>
 &nbsp;   &nbsp;   &nbsp;TODO<span style="color: #50a14f;">]</span>
 &nbsp;   &nbsp; <span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span><span style="color: #a626a4;">cons</span> h t<span style="color: #b751b6;">)</span>
 &nbsp;   &nbsp;   <span style="color: #b751b6;">(</span><span style="color: #e45649;">let*</span> <span style="color: #4078f2;">(</span><span style="color: #a626a4;">[</span><span style="color: #6a1868;">incrTail</span> <span style="color: #50a14f;">(</span>increment t<span style="color: #50a14f;">)</span><span style="color: #a626a4;">]</span><span style="color: #4078f2;">)</span>
@@ -2419,13 +2554,13 @@ Shows how to create lists recursively
 </ul>
 </div>
 </li>
-<li><a id="orgb081d70"></a>Example: Types<br />
+<li><a id="org74c28fd"></a>Example: Types<br />
 <div class="outline-text-4" id="text-4-2-13">
 <ul class="org-ul">
 <li><p>
 Empty Case
 </p>
-<pre class="example" id="orgbe3658f">
+<pre class="example" id="orgef9c6b5">
  xs : (Listof Number)
  --------------
  TODO : (Listof Number)
@@ -2434,7 +2569,7 @@ Empty Case
 <li><p>
 Cons Case
 </p>
-<pre class="example" id="orgf892cc0">
+<pre class="example" id="org155c033">
  xs : (Listof Number)
  h : Number
  t : (Listof Number)
@@ -2445,7 +2580,7 @@ Cons Case
 </ul>
 </div>
 </li>
-<li><a id="org0796c10"></a>Example: Generating a Modified List<br />
+<li><a id="org7b819d6"></a>Example: Generating a Modified List<br />
 <div class="outline-text-4" id="text-4-2-14">
 <ul class="org-ul">
 <li>If we&rsquo;ve got a list that is the tail, but with each number incremented
@@ -2457,26 +2592,28 @@ Use <code>cons</code> to make a result list containing the new head and new tail
 </p>
 
 <div class="org-src-container">
-<pre class="src src-racket" id="org60f871f">&nbsp;  <span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">increment</span> <span style="color: #50a14f;">[</span>xs <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> <span style="color: #986801;">Number</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
+<pre class="src src-racket" id="org57a8555">&nbsp;  <span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">increment</span> <span style="color: #50a14f;">[</span>xs <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> <span style="color: #986801;">Number</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
 &nbsp;   &nbsp;   &nbsp;  <span style="color: #a626a4;">:</span> <span style="color: #a626a4;">(</span><span style="color: #986801;">Listof</span> <span style="color: #986801;">Number</span><span style="color: #a626a4;">)</span>
 &nbsp;   &nbsp;<span style="color: #a626a4;">(</span>type-case <span style="color: #50a14f;">(</span><span style="color: #986801;">Listof</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">)</span> xs
-&nbsp;   &nbsp;  <span style="color: #50a14f;">[</span><span style="color: #a626a4;">empty</span>
+&nbsp;   &nbsp;  <span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span><span style="color: #a626a4;">empty</span><span style="color: #b751b6;">)</span>
 &nbsp;   &nbsp;   &nbsp; <span style="color: #a626a4;">empty</span><span style="color: #50a14f;">]</span>
 &nbsp;   &nbsp;  <span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span><span style="color: #a626a4;">cons</span> h t<span style="color: #b751b6;">)</span>
 &nbsp;   &nbsp;   &nbsp; <span style="color: #b751b6;">(</span><span style="color: #e45649;">let*</span> <span style="color: #4078f2;">(</span><span style="color: #a626a4;">[</span><span style="color: #6a1868;">incrTail</span> <span style="color: #50a14f;">(</span>increment t<span style="color: #50a14f;">)</span><span style="color: #a626a4;">]</span>
 &nbsp;   &nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #a626a4;">[</span><span style="color: #6a1868;">incrHead</span> <span style="color: #50a14f;">(</span><span style="color: #a626a4;">+</span> <span style="color: #da8548; font-weight: bold;">1</span> h<span style="color: #50a14f;">)</span><span style="color: #a626a4;">]</span><span style="color: #4078f2;">)</span>
 &nbsp;   &nbsp;   &nbsp;   <span style="color: #4078f2;">(</span><span style="color: #a626a4;">cons</span> incrHead incrTail<span style="color: #4078f2;">)</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+&nbsp;   &nbsp;   &nbsp;
+&nbsp;   &nbsp;<span style="color: #4078f2;">(</span>increment <span style="color: #a626a4;">(</span><span style="color: #a626a4;">list</span> <span style="color: #da8548; font-weight: bold;">1</span> <span style="color: #da8548; font-weight: bold;">2</span> <span style="color: #da8548; font-weight: bold;">3</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
 </pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-racket">
+<pre class="src src-racket">&nbsp;   &nbsp;<span style="color: #4078f2;">'</span><span style="color: #4078f2;">(</span><span style="color: #da8548; font-weight: bold;">2</span> <span style="color: #da8548; font-weight: bold;">3</span> <span style="color: #da8548; font-weight: bold;">4</span><span style="color: #4078f2;">)</span>
 </pre>
 </div></li>
 </ul>
 </div>
 </li>
-<li><a id="org9fa2d4f"></a>Generating is not Modifying<br />
+<li><a id="org7fe1a3f"></a>Generating is not Modifying<br />
 <div class="outline-text-4" id="text-4-2-15">
 <ul class="org-ul">
 <li><p>
@@ -2493,14 +2630,15 @@ After <code>increment</code>, the old list still exists
 </div>
 
 <div class="org-src-container">
-<pre class="src src-racket">&nbsp; <span style="color: #4078f2;">'</span><span style="color: #4078f2;">(</span><span style="color: #da8548; font-weight: bold;">1</span> <span style="color: #da8548; font-weight: bold;">2</span> <span style="color: #da8548; font-weight: bold;">3</span> <span style="color: #da8548; font-weight: bold;">4</span><span style="color: #4078f2;">)</span>
+<pre class="src src-racket">&nbsp; <span style="color: #4078f2;">'</span><span style="color: #4078f2;">(</span><span style="color: #da8548; font-weight: bold;">2</span> <span style="color: #da8548; font-weight: bold;">3</span> <span style="color: #da8548; font-weight: bold;">4</span><span style="color: #4078f2;">)</span>
+&nbsp; <span style="color: #4078f2;">'</span><span style="color: #4078f2;">(</span><span style="color: #da8548; font-weight: bold;">1</span> <span style="color: #da8548; font-weight: bold;">2</span> <span style="color: #da8548; font-weight: bold;">3</span> <span style="color: #da8548; font-weight: bold;">4</span><span style="color: #4078f2;">)</span>
 &nbsp; <span style="color: #4078f2;">'</span><span style="color: #4078f2;">(</span><span style="color: #da8548; font-weight: bold;">2</span> <span style="color: #da8548; font-weight: bold;">3</span> <span style="color: #da8548; font-weight: bold;">4</span> <span style="color: #da8548; font-weight: bold;">5</span><span style="color: #4078f2;">)</span>
 </pre>
 </div></li>
 </ul>
 </div>
 </li>
-<li><a id="orgfdea801"></a>Parametric Polymorphism<br />
+<li><a id="org5075f59"></a>Parametric Polymorphism<br />
 <div class="outline-text-4" id="text-4-2-16">
 <ul class="org-ul">
 <li>Lists are a <b>parameterized type</b>
@@ -2526,7 +2664,7 @@ After <code>increment</code>, the old list still exists
 </ul>
 </div>
 </li>
-<li><a id="orgb3aa056"></a>Example: List Concatenation<br />
+<li><a id="org11554e9"></a>Example: List Concatenation<br />
 <div class="outline-text-4" id="text-4-2-17">
 <ul class="org-ul">
 <li>We can combine two lists into a single list</li>
@@ -2538,7 +2676,7 @@ After <code>increment</code>, the old list still exists
 This function is built into Flit as <code>append</code>
 </p>
 <div class="org-src-container">
-<pre class="src src-racket" id="org8a860c6">&nbsp; <span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">concat</span> <span style="color: #50a14f;">[</span>xs <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> <span style="color: #b751b6;">'elem</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
+<pre class="src src-racket" id="org18cfcbe">&nbsp; <span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">concat</span> <span style="color: #50a14f;">[</span>xs <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> <span style="color: #b751b6;">'elem</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
 &nbsp;   &nbsp;   &nbsp;   &nbsp;   &nbsp; <span style="color: #50a14f;">[</span>ys <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> <span style="color: #b751b6;">'elem</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
 &nbsp;   &nbsp;   &nbsp; <span style="color: #a626a4;">:</span> <span style="color: #a626a4;">(</span><span style="color: #986801;">Listof</span> <span style="color: #b751b6;">'elem</span><span style="color: #a626a4;">)</span>
 &nbsp;   <span style="color: #a626a4;">(</span>type-case <span style="color: #50a14f;">(</span><span style="color: #986801;">Listof</span> <span style="color: #b751b6;">'elem</span><span style="color: #50a14f;">)</span> xs
@@ -2547,22 +2685,17 @@ This function is built into Flit as <code>append</code>
 &nbsp;   &nbsp; <span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span><span style="color: #a626a4;">cons</span> h t<span style="color: #b751b6;">)</span>
 &nbsp;   &nbsp;   &nbsp;<span style="color: #b751b6;">(</span><span style="color: #a626a4;">cons</span> h <span style="color: #4078f2;">(</span>concat t ys<span style="color: #4078f2;">)</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
 </pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-racket">
-</pre>
 </div></li>
 </ul></li>
 </ul>
 </div>
 </li>
-<li><a id="org340c758"></a>Example: List Concatenation (ctd.)<br />
+<li><a id="org79b8a5c"></a>Example: List Concatenation (ctd.)<br />
 <ol class="org-ol">
-<li><a id="org4c7f5a7"></a>Example<br />
+<li><a id="org09edb6d"></a>Example<br />
 <div class="outline-text-5" id="text-4-2-18-1">
 <div class="org-src-container">
-<pre class="src src-racket" id="orgabc0b7c">&nbsp; 
+<pre class="src src-racket" id="orga69fba4">&nbsp; 
 &nbsp;
 &nbsp; <span style="color: #4078f2;">(</span>concat <span style="color: #4078f2;">'</span><span style="color: #a626a4;">(</span><span style="color: #da8548; font-weight: bold;">1</span> <span style="color: #da8548; font-weight: bold;">2</span> <span style="color: #da8548; font-weight: bold;">3</span><span style="color: #a626a4;">)</span> <span style="color: #4078f2;">'</span><span style="color: #a626a4;">(</span><span style="color: #da8548; font-weight: bold;">4</span> <span style="color: #da8548; font-weight: bold;">5</span> <span style="color: #da8548; font-weight: bold;">6</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
 &nbsp; <span style="color: #4078f2;">(</span>concat <span style="color: #4078f2;">'</span><span style="color: #a626a4;">(</span><span style="color: #50a14f;">"3"</span> <span style="color: #50a14f;">"5"</span><span style="color: #a626a4;">)</span> <span style="color: #4078f2;">'</span><span style="color: #a626a4;">(</span><span style="color: #50a14f;">"0"</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
@@ -2572,23 +2705,25 @@ This function is built into Flit as <code>append</code>
 </div>
 </div>
 </li>
-<li><a id="org0ade182"></a>Results<br />
+<li><a id="orgf414d74"></a>Results<br />
 <div class="outline-text-5" id="text-4-2-18-2">
 <div class="org-src-container">
-<pre class="src src-racket">
+<pre class="src src-racket"><span style="color: #4078f2;">'</span><span style="color: #4078f2;">(</span><span style="color: #da8548; font-weight: bold;">1</span> <span style="color: #da8548; font-weight: bold;">2</span> <span style="color: #da8548; font-weight: bold;">3</span> <span style="color: #da8548; font-weight: bold;">4</span> <span style="color: #da8548; font-weight: bold;">5</span> <span style="color: #da8548; font-weight: bold;">6</span><span style="color: #4078f2;">)</span>
+<span style="color: #4078f2;">'</span><span style="color: #4078f2;">(</span><span style="color: #50a14f;">"3"</span> <span style="color: #50a14f;">"5"</span> <span style="color: #50a14f;">"0"</span><span style="color: #4078f2;">)</span>
+<span style="color: #4078f2;">'</span><span style="color: #4078f2;">(</span><span style="color: #b751b6;">#t</span><span style="color: #4078f2;">)</span>
+<span style="color: #4078f2;">'</span><span style="color: #4078f2;">(</span><span style="color: #b751b6;">#f</span><span style="color: #4078f2;">)</span>
 </pre>
 </div>
 </div>
 </li>
 </ol>
 </li>
-<li><a id="orgf440e7f"></a>More Examples<br />
+<li><a id="orgbe7e7dc"></a>More Examples<br />
 <div class="outline-text-4" id="text-4-2-19">
 <ul class="org-ul">
 <li>Demo: Dr. Racket (as time permits)
 <ul class="org-ul">
 <li>Duplicating each element of a list</li>
-<li>&ldquo;zipping&rdquo; two lists together</li>
 <li>Filtering out odd elements of a list</li>
 </ul></li>
 </ul>
@@ -2597,10 +2732,693 @@ This function is built into Flit as <code>append</code>
 </ol>
 </div>
 </div>
+<div id="outline-container-functional-programming-2-defining-data-types" class="outline-2">
+<h2 id="functional-programming-2-defining-data-types"><span class="section-number-2">5.</span> Defining Data Types</h2>
+<div class="outline-text-2" id="text-functional-programming-2-defining-data-types">
+</div>
+<div id="outline-container-warmup-pairs" class="outline-3">
+<h3 id="warmup-pairs"><span class="section-number-3">5.1.</span> Warmup: Pairs</h3>
+<div class="outline-text-3" id="text-warmup-pairs">
+</div>
+<ol class="org-ol">
+<li><a id="orga6a4007"></a>Pairs: &ldquo;AND&rdquo; for types<br />
+<div class="outline-text-4" id="text-5-1-1">
+<ul class="org-ul">
+<li><code>(Number * Boolean)</code>
+<ul class="org-ul">
+<li>Cartesian product
+<ul class="org-ul">
+<li>&ldquo;AND&rdquo; for types</li>
+</ul></li>
+<li>A value of this type contains a <code>Number</code> AND <code>a Boolean</code></li>
+<li>Why is it infix? Who knows
+<ul class="org-ul">
+<li>Maybe to help distinguish it from multiplication</li>
+</ul></li>
+</ul></li>
+<li>Projections
+<ul class="org-ul">
+<li>Get the data from the pairs</li>
+</ul></li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #6a1868;">myPair</span> <span style="color: #a626a4;">:</span> <span style="color: #a626a4;">(</span><span style="color: #986801;">Number</span> <span style="color: #a626a4;">*</span> <span style="color: #986801;">Boolean</span><span style="color: #a626a4;">)</span>
+&nbsp;  <span style="color: #a626a4;">(</span>pair <span style="color: #da8548; font-weight: bold;">2</span> <span style="color: #b751b6;">#t</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+<span style="color: #4078f2;">(</span>fst myPair<span style="color: #4078f2;">)</span> <span style="color: #9ca0a4;">;;</span><span style="color: #9ca0a4;">Number</span>
+<span style="color: #4078f2;">(</span>snd myPair<span style="color: #4078f2;">)</span> <span style="color: #9ca0a4;">;;</span><span style="color: #9ca0a4;">Boolean</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #da8548; font-weight: bold;">2</span>
+<span style="color: #b751b6;">#t</span>
+</pre>
+</div>
+</div>
+</li>
+<li><a id="org9487bda"></a>Pairs in General<br />
+<div class="outline-text-4" id="text-5-1-2">
+<ul class="org-ul">
+<li>For any types <code>'a</code> and <code>'b</code> there is a type <code>('a * 'b)</code></li>
+<li>Build with <code>pair : ('a 'b -&gt; ('a * 'b))</code>
+<ul class="org-ul">
+<li>Takes one argument of each type, produces the pair</li>
+</ul></li>
+<li>Projections
+<ul class="org-ul">
+<li><code>fst : (('a * 'b) -&gt; 'a)</code></li>
+<li><code>snd : (('a * 'b) -&gt; 'b)</code></li>
+</ul></li>
+<li>Used for functions that return multiple values
+<ul class="org-ul">
+<li>Or to pass two values as one to a function</li>
+</ul></li>
+</ul>
+</div>
+</li>
+<li><a id="orgecf9199"></a>Pairs as Anonymous Records<br />
+<div class="outline-text-4" id="text-5-1-3">
+<ul class="org-ul">
+<li>Pairs similar to two-field structs in C++
+<ul class="org-ul">
+<li>Main difference: no need to make a new name for pairs</li>
+<li>Can write generic code that works for all pairs</li>
+</ul></li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">flip</span> <span style="color: #50a14f;">[</span>pr <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #b751b6;">'a</span> <span style="color: #a626a4;">*</span> <span style="color: #b751b6;">'b</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> <span style="color: #a626a4;">(</span><span style="color: #b751b6;">'b</span> <span style="color: #a626a4;">*</span> <span style="color: #b751b6;">'a</span><span style="color: #a626a4;">)</span>
+&nbsp; <span style="color: #a626a4;">(</span>pair <span style="color: #50a14f;">(</span>snd pr<span style="color: #50a14f;">)</span> <span style="color: #50a14f;">(</span>fst pr<span style="color: #50a14f;">)</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+<span style="color: #4078f2;">(</span>flip <span style="color: #a626a4;">(</span>pair <span style="color: #da8548; font-weight: bold;">3</span> <span style="color: #da8548; font-weight: bold;">4</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+</pre>
+</div>
+
+<ul class="org-ul">
+<li>Python has pairs/tuples as a core datatype
+<ul class="org-ul">
+<li>Tuple: equivalent of pair, but with \(n\) elements for some \(n\)</li>
+<li><code>('a * b' * 'c * d' ...)</code></li>
+</ul></li>
+</ul>
+</div>
+</li>
+<li><a id="orgb7fe841"></a>Defining the Pair type<br />
+<div class="outline-text-4" id="text-5-1-4">
+<ul class="org-ul">
+<li>Pairs are built in, but we could define them like this:</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #a626a4;">define-type</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">Pair</span> <span style="color: #b751b6;">'a</span> <span style="color: #b751b6;">'b</span><span style="color: #a626a4;">)</span>
+&nbsp; <span style="color: #a626a4;">[</span>pair <span style="color: #50a14f;">[</span>elem1 <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">'a</span><span style="color: #50a14f;">]</span> <span style="color: #50a14f;">[</span>elem2 <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">'b</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">]</span><span style="color: #4078f2;">)</span>
+</pre>
+</div>
+
+<ul class="org-ul">
+<li><code>Pair</code> is the name of the type</li>
+<li><code>'a</code> and <code>'b</code> are the type parameters
+<ul class="org-ul">
+<li>e.g. the types of things in the pair</li>
+</ul></li>
+<li>There is one constructor, called <code>pair</code>
+<ul class="org-ul">
+<li>type name uppercase, constructor lowercase</li>
+</ul></li>
+<li>It has two fields
+<ul class="org-ul">
+<li><code>fst</code> and <code>snd</code> are just names we choose for the fields</li>
+</ul></li>
+<li>Fields have types <code>'a</code> and <code>'b</code>
+<ul class="org-ul">
+<li>e.g. the types of the things in the pair</li>
+</ul></li>
+</ul>
+</div>
+</li>
+<li><a id="org936715e"></a>Example: Odds and Evens<br />
+<div class="outline-text-4" id="text-5-1-5">
+<div class="org-src-container">
+<pre class="src src-racket" id="org053957d"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">splitOddsEvens</span> <span style="color: #50a14f;">[</span>nums <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> <span style="color: #986801;">Number</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
+&nbsp; <span style="color: #a626a4;">:</span> <span style="color: #a626a4;">(</span><span style="color: #50a14f;">(</span><span style="color: #986801;">Listof</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">)</span> <span style="color: #a626a4;">*</span> <span style="color: #50a14f;">(</span><span style="color: #986801;">Listof</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">)</span><span style="color: #a626a4;">)</span>
+&nbsp; <span style="color: #a626a4;">(</span>type-case <span style="color: #50a14f;">(</span><span style="color: #986801;">Listof</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">)</span> nums
+&nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">Empty list has no odds or evens</span>
+&nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span><span style="color: #a626a4;">empty</span><span style="color: #b751b6;">)</span>
+&nbsp;   &nbsp;   &nbsp;   &nbsp;   <span style="color: #b751b6;">(</span>pair <span style="color: #4078f2;">'</span><span style="color: #4078f2;">()</span> <span style="color: #4078f2;">'</span><span style="color: #4078f2;">()</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
+&nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span><span style="color: #a626a4;">cons</span> h t<span style="color: #b751b6;">)</span>
+&nbsp;   &nbsp;   &nbsp;   &nbsp; <span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">Recursion splits tail into odds/evens</span>
+&nbsp;   &nbsp;   &nbsp;   &nbsp; <span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">use fst and snd to get these two lists</span>
+&nbsp;   &nbsp;   &nbsp;   &nbsp;  <span style="color: #b751b6;">(</span><span style="color: #e45649;">let*</span> <span style="color: #4078f2;">(</span><span style="color: #a626a4;">[</span><span style="color: #6a1868;">splitTail</span> <span style="color: #50a14f;">(</span>splitOddsEvens t<span style="color: #50a14f;">)</span><span style="color: #a626a4;">]</span>
+&nbsp;   &nbsp;   &nbsp;   &nbsp;   &nbsp;   &nbsp; <span style="color: #a626a4;">[</span><span style="color: #6a1868;">tailOdds</span> <span style="color: #50a14f;">(</span>fst splitTail<span style="color: #50a14f;">)</span><span style="color: #a626a4;">]</span>
+&nbsp;   &nbsp;   &nbsp;   &nbsp;   &nbsp;   &nbsp; <span style="color: #a626a4;">[</span><span style="color: #6a1868;">tailEvens</span> <span style="color: #50a14f;">(</span>snd splitTail<span style="color: #50a14f;">)</span><span style="color: #a626a4;">]</span><span style="color: #4078f2;">)</span>
+&nbsp;   &nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">Now check if the head is odd or even</span>
+&nbsp;   &nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">and add head to correct list</span>
+&nbsp;   &nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #4078f2;">(</span><span style="color: #e45649;">if</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">=</span> <span style="color: #da8548; font-weight: bold;">0</span> <span style="color: #50a14f;">(</span><span style="color: #a626a4;">modulo</span> h <span style="color: #da8548; font-weight: bold;">2</span><span style="color: #50a14f;">)</span><span style="color: #a626a4;">)</span>
+&nbsp;   &nbsp;   &nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">If even, add head to the second list</span>
+&nbsp;   &nbsp;   &nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #a626a4;">(</span>pair tailOdds <span style="color: #50a14f;">(</span><span style="color: #a626a4;">cons</span> h tailEvens<span style="color: #50a14f;">)</span><span style="color: #a626a4;">)</span>
+&nbsp;   &nbsp;   &nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">If odd, add head to the first list</span>
+&nbsp;   &nbsp;   &nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #a626a4;">(</span>pair <span style="color: #50a14f;">(</span><span style="color: #a626a4;">cons</span> h tailOdds<span style="color: #50a14f;">)</span> tailEvens<span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-racket">
+</pre>
+</div>
+</div>
+</li>
+<li><a id="org974a6f3"></a>Example: Odds and Evens (ctd)<br />
+<div class="outline-text-4" id="text-5-1-6">
+<div class="org-src-container">
+<pre class="src src-racket">
+<span style="color: #4078f2;">(</span>splitOddsEvens <span style="color: #a626a4;">(</span><span style="color: #a626a4;">list</span> <span style="color: #da8548; font-weight: bold;">1</span> <span style="color: #da8548; font-weight: bold;">2</span> <span style="color: #da8548; font-weight: bold;">3</span> <span style="color: #da8548; font-weight: bold;">4</span> <span style="color: #da8548; font-weight: bold;">5</span> <span style="color: #da8548; font-weight: bold;">7</span> <span style="color: #da8548; font-weight: bold;">11</span> <span style="color: #da8548; font-weight: bold;">2</span> <span style="color: #da8548; font-weight: bold;">4</span> <span style="color: #da8548; font-weight: bold;">7</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #a626a4;">values</span> <span style="color: #4078f2;">'</span><span style="color: #a626a4;">(</span><span style="color: #da8548; font-weight: bold;">1</span> <span style="color: #da8548; font-weight: bold;">3</span> <span style="color: #da8548; font-weight: bold;">5</span> <span style="color: #da8548; font-weight: bold;">7</span> <span style="color: #da8548; font-weight: bold;">11</span> <span style="color: #da8548; font-weight: bold;">7</span><span style="color: #a626a4;">)</span> <span style="color: #4078f2;">'</span><span style="color: #a626a4;">(</span><span style="color: #da8548; font-weight: bold;">2</span> <span style="color: #da8548; font-weight: bold;">4</span> <span style="color: #da8548; font-weight: bold;">2</span> <span style="color: #da8548; font-weight: bold;">4</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-algebraic-data-types" class="outline-3">
+<h3 id="algebraic-data-types"><span class="section-number-3">5.2.</span> Algebraic Data Types</h3>
+<div class="outline-text-3" id="text-algebraic-data-types">
+</div>
+<ol class="org-ol">
+<li><a id="orge60644d"></a>&ldquo;OR&rdquo; for types<br />
+<div class="outline-text-4" id="text-5-2-1">
+<ul class="org-ul">
+<li>Pairs gave us &ldquo;AND&rdquo;</li>
+<li>What does &ldquo;OR&rdquo; look like for types?
+<ul class="org-ul">
+<li><code>(OR Number Boolean)</code> should be the type of values that are either a number or a boolean</li>
+<li>Want a tag so we can check which one it is
+<ul class="org-ul">
+<li>Called a &ldquo;constructor&rdquo;</li>
+<li>not the same as Java/OOP constructor</li>
+</ul></li>
+</ul></li>
+<li>Saw some examples like this already
+<ul class="org-ul">
+<li>A number is zero OR one plus another number</li>
+<li>A list is empty OR an element cons-ed to another list</li>
+</ul></li>
+<li>Racket lets us define our own types mixing AND and OR</li>
+</ul>
+</div>
+</li>
+<li><a id="org745528a"></a>First example<br />
+<div class="outline-text-4" id="text-5-2-2">
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #a626a4;">define-type</span> <span style="color: #6a1868;">Shape</span>
+&nbsp; <span style="color: #a626a4;">(</span>Rectangle <span style="color: #50a14f;">[</span><span style="color: #a626a4;">length</span> <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span>
+&nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #50a14f;">[</span>width <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
+&nbsp; <span style="color: #a626a4;">(</span>Circle <span style="color: #50a14f;">[</span>radius <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+
+</pre>
+</div>
+<ul class="org-ul">
+<li><code>Shape</code> is a <i>datatype</i></li>
+<li>It has two <i>constructors</i>, <code>Rectangle</code> and <code>Circle</code>
+<ul class="org-ul">
+<li>i.e. a Shape is a circle OR a rectangle</li>
+</ul></li>
+<li><code>Rectangle</code> has two fields, named <code>length</code> and <code>width</code>, with type Number
+<ul class="org-ul">
+<li><code>length</code> and <code>width</code> are just names we choose</li>
+</ul></li>
+<li><code>Circle</code> has one field named <code>radius</code> with type Number</li>
+</ul>
+</div>
+</li>
+<li><a id="org8956688"></a>Constructors<br />
+<div class="outline-text-4" id="text-5-2-3">
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #a626a4;">define-type</span> <span style="color: #6a1868;">Shape</span>
+&nbsp; <span style="color: #a626a4;">(</span>Rectangle <span style="color: #50a14f;">[</span><span style="color: #a626a4;">length</span> <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span>
+&nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #50a14f;">[</span>width <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
+&nbsp; <span style="color: #a626a4;">(</span>Circle <span style="color: #50a14f;">[</span>radius <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+
+</pre>
+</div>
+<ul class="org-ul">
+<li>A constructor for a datatype doesn&rsquo;t &ldquo;do&rdquo; anything
+<ul class="org-ul">
+<li>Functional language</li>
+</ul></li>
+<li>Gives the primitve way to create a value of that type</li>
+<li>Can use as functions
+<ul class="org-ul">
+<li>E.g. A rectangle contains two numbers</li>
+<li>Calling <code>Rectangle</code> on two numbers returns a value of type <code>Shape</code></li>
+<li><code>Rectangle : (Number Number -&gt; Shape)</code></li>
+<li><code>Circle : (Number -&gt; Shape)</code>
+<ul class="org-ul">
+<li>Because it only has 1 field</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+</li>
+<li><a id="org655b5d9"></a>Creating values of a datatype<br />
+<div class="outline-text-4" id="text-5-2-4">
+<div class="org-src-container">
+<pre class="src src-racket" id="orga511493"><span style="color: #4078f2;">(</span><span style="color: #a626a4;">define-type</span> <span style="color: #6a1868;">Shape</span>
+&nbsp; <span style="color: #a626a4;">(</span>Rectangle <span style="color: #50a14f;">[</span><span style="color: #a626a4;">length</span> <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span>
+&nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #50a14f;">[</span>width <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
+&nbsp; <span style="color: #a626a4;">(</span>Circle <span style="color: #50a14f;">[</span>radius <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+&nbsp;
+<span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #6a1868;">tv</span> <span style="color: #a626a4;">(</span>Rectangle <span style="color: #da8548; font-weight: bold;">16</span> <span style="color: #da8548; font-weight: bold;">9</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+<span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #6a1868;">loonie</span> <span style="color: #a626a4;">(</span>Circle <span style="color: #da8548; font-weight: bold;">1</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+</pre>
+</div>
+<ul class="org-ul">
+<li>A Shape either has two numbers OR one number
+<ul class="org-ul">
+<li>Flit keeps a tag on each value of type <code>Shape</code></li>
+<li>Tells us if it&rsquo;s a <code>Rectangle</code> or <code>Circle</code></li>
+</ul></li>
+</ul>
+</div>
+</li>
+<li><a id="orgbe33a88"></a>Auto-generated Functions<br />
+<div class="outline-text-4" id="text-5-2-5">
+<ul class="org-ul">
+<li>Flit makes &ldquo;checkers&rdquo; and &ldquo;getters&rdquo;
+<ul class="org-ul">
+<li>We won&rsquo;t use these very much</li>
+</ul></li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-racket">
+<span style="color: #4078f2;">(</span>Rectangle? tv<span style="color: #4078f2;">)</span>
+<span style="color: #4078f2;">(</span>Circle? tv<span style="color: #4078f2;">)</span>
+<span style="color: #4078f2;">(</span>Rectangle-length tv<span style="color: #4078f2;">)</span>
+<span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">(test/exn (Circle-radius tv) "")</span>
+&nbsp; <span style="color: #9ca0a4;">;;</span><span style="color: #9ca0a4;">raises an error, no such field present</span>
+</pre>
+</div>
+</div>
+</li>
+<li><a id="org7a763cb"></a>Pattern matching<br />
+<div class="outline-text-4" id="text-5-2-6">
+<ul class="org-ul">
+<li>Don&rsquo;t want to accidentally get a field that doesn&rsquo;t exist</li>
+<li>Almost always want to use the fields in the solution</li>
+<li>Solution: pattern-matching</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-racket">
+<span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">area</span> <span style="color: #50a14f;">[</span>shp <span style="color: #a626a4;">:</span> Shape<span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span>
+&nbsp; <span style="color: #a626a4;">(</span>type-case Shape shp
+&nbsp;   &nbsp;<span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span>Rectangle l w<span style="color: #b751b6;">)</span>
+&nbsp;   &nbsp;  <span style="color: #b751b6;">(</span><span style="color: #a626a4;">*</span> l w<span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
+&nbsp;   &nbsp;<span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span>Circle r<span style="color: #b751b6;">)</span>
+&nbsp;   &nbsp;  <span style="color: #b751b6;">(</span><span style="color: #a626a4;">*</span> <span style="color: #da8548; font-weight: bold;">3.14</span> <span style="color: #4078f2;">(</span><span style="color: #a626a4;">*</span> r r<span style="color: #4078f2;">)</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
+<span style="color: #4078f2;">)</span>
+<span style="color: #4078f2;">(</span>area tv<span style="color: #4078f2;">)</span>
+<span style="color: #4078f2;">(</span>area loonie<span style="color: #4078f2;">)</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #da8548; font-weight: bold;">144</span>
+<span style="color: #da8548; font-weight: bold;">3.14</span>
+</pre>
+</div>
+</div>
+</li>
+<li><a id="org64cae18"></a>Pattern Match Syntax<br />
+<div class="outline-text-4" id="text-5-2-7">
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">area</span> <span style="color: #50a14f;">[</span>shp <span style="color: #a626a4;">:</span> Shape<span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span>
+&nbsp; <span style="color: #a626a4;">(</span>type-case Shape shp
+&nbsp;   &nbsp;<span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span>Rectangle l w<span style="color: #b751b6;">)</span>
+&nbsp;   &nbsp;  <span style="color: #b751b6;">(</span><span style="color: #a626a4;">*</span> l w<span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
+&nbsp;   &nbsp;<span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span>Circle r<span style="color: #b751b6;">)</span>
+&nbsp;   &nbsp;  <span style="color: #b751b6;">(</span><span style="color: #a626a4;">*</span> <span style="color: #da8548; font-weight: bold;">3.14</span> <span style="color: #4078f2;">(</span><span style="color: #a626a4;">*</span> r r<span style="color: #4078f2;">)</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+</pre>
+</div>
+<ul class="org-ul">
+<li>Each branch starts with:
+<ul class="org-ul">
+<li><code>(constructorName variableNames ...)</code></li>
+<li>in brackets, even if constructor takes 0 arguments</li>
+</ul></li>
+<li>Expression after those brackets is the result to produce for that branch</li>
+<li><code>l</code>, <code>w</code>, and <code>r</code> are just the names we choose for the variables
+<ul class="org-ul">
+<li>If <code>shp</code> is a rectangle, they&rsquo;re assigned the values of its <code>length</code> and <code>width</code> fields
+<ul class="org-ul">
+<li>Order matters: based on order of fields when type was defined</li>
+</ul></li>
+<li>If <code>shp</code> is a circle, then <code>r</code> is gets value of <code>radius</code> field</li>
+</ul></li>
+</ul>
+</div>
+</li>
+<li><a id="org98d3b78"></a>General Syntax for Pattern Matching<br />
+<div class="outline-text-4" id="text-5-2-8">
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #a626a4;">define-type</span> <span style="color: #6a1868;">DataType</span>
+&nbsp; <span style="color: #a626a4;">(</span>ConstructorName1 <span style="color: #50a14f;">[</span>field1a <span style="color: #a626a4;">:</span> FieldType1a<span style="color: #50a14f;">]</span>
+&nbsp;   &nbsp;   &nbsp;   &nbsp;   <span style="color: #e45649;">...</span> <span style="color: #50a14f;">[</span>field1z <span style="color: #a626a4;">:</span> FieldType1x<span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
+&nbsp; <span style="color: #a626a4;">(</span>ConstructorName2 <span style="color: #50a14f;">[</span>field2a <span style="color: #a626a4;">:</span> FieldType2a<span style="color: #50a14f;">]</span>
+&nbsp;   &nbsp;   &nbsp;   &nbsp;   <span style="color: #e45649;">...</span> <span style="color: #50a14f;">[</span>field2z <span style="color: #a626a4;">:</span> FieldType2y<span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
+&nbsp; <span style="color: #e45649;">...</span>
+&nbsp; <span style="color: #a626a4;">(</span>ConstructorNameN <span style="color: #50a14f;">[</span>fieldNa <span style="color: #a626a4;">:</span> FieldTypeNa<span style="color: #50a14f;">]</span>
+&nbsp;   &nbsp;   &nbsp;   &nbsp;   <span style="color: #e45649;">...</span> <span style="color: #50a14f;">[</span>field1z <span style="color: #a626a4;">:</span> FieldTypeNz<span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+</pre>
+</div>
+<ul class="org-ul">
+<li>Can match on a value of that type as follows:</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #4078f2;">(</span>type-case DataType thingToMatchOn
+&nbsp; <span style="color: #a626a4;">[</span><span style="color: #50a14f;">(</span>ConstructorName1 var1a var1b <span style="color: #e45649;">...</span> var1x<span style="color: #50a14f;">)</span>
+&nbsp;   returnExprForCase1<span style="color: #a626a4;">]</span>
+&nbsp; <span style="color: #a626a4;">[</span><span style="color: #50a14f;">(</span>ConstructorName2 var2a var2b <span style="color: #e45649;">...</span> var2y<span style="color: #50a14f;">)</span>
+&nbsp;   returnExprForCase2<span style="color: #a626a4;">]</span>
+&nbsp; <span style="color: #e45649;">...</span>
+&nbsp; <span style="color: #a626a4;">[</span><span style="color: #50a14f;">(</span>ConstructorNameN varNa varNb <span style="color: #e45649;">...</span> varNz<span style="color: #50a14f;">)</span>
+&nbsp;   returnExprForCaseN<span style="color: #a626a4;">]</span><span style="color: #4078f2;">)</span>
+</pre>
+</div>
+</div>
+</li>
+<li><a id="org90bb88c"></a>Semantics of Pattern Matching<br />
+<div class="outline-text-4" id="text-5-2-9">
+<ul class="org-ul">
+<li><code>Ctor</code> is short for &ldquo;constructor&rdquo;</li>
+</ul>
+<div id="gls.7" class="admonition note">
+                        <p class="admonition-title note">Definition: Semantics of Pattern Matching</p>&nbsp;
+<p>
+A pattern match expression
+</p>
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #4078f2;">(</span>type-case TYPE <span style="color: #a626a4;">(</span>Ctor arg1 <span style="color: #e45649;">...</span> argn<span style="color: #a626a4;">)</span>
+&nbsp; <span style="color: #a626a4;">[</span><span style="color: #50a14f;">(</span>OtherCtor1 x1a <span style="color: #e45649;">...</span> x1z<span style="color: #50a14f;">)</span> otherResult1<span style="color: #a626a4;">]</span>
+&nbsp; <span style="color: #e45649;">...</span>
+&nbsp; <span style="color: #a626a4;">[</span><span style="color: #50a14f;">(</span>Ctor y1 <span style="color: #e45649;">...</span> yn<span style="color: #50a14f;">)</span> resultExpr<span style="color: #a626a4;">]</span>
+&nbsp; <span style="color: #e45649;">...</span>
+&nbsp; <span style="color: #a626a4;">[</span><span style="color: #50a14f;">(</span>OtherCtorM xMa <span style="color: #e45649;">...</span> xMz<span style="color: #50a14f;">)</span> otherResultM<span style="color: #a626a4;">]</span><span style="color: #4078f2;">)</span>
+</pre>
+</div>
+<p>
+is equal to: <code>[y1 =&gt; arg1]...[yn =&gt; argn]resultExpr</code>
+</p>
+<ul class="org-ul">
+<li>i.e. <code>result</code> with <code>y1</code> replaced by <code>arg1</code> and &#x2026; <code>yn</code> replaced by <code>argn</code></li>
+</ul>
+
+</div>
+</div>
+</li>
+<li><a id="org487b3d8"></a>Semantics ctd.<br />
+<div class="outline-text-4" id="text-5-2-10">
+<ul class="org-ul">
+<li>Once again, substitution is the key operation</li>
+<li>The value of a type-case is the result of whatever branch matches
+<ul class="org-ul">
+<li>with the concrete arguments used as values for the pattern variables <code>y1</code> &#x2026; <code>yn</code> in the matching branch</li>
+</ul></li>
+<li>We don&rsquo;t usually know which constructor is used
+<ul class="org-ul">
+<li>e.g. usually we match on a variable or result of function call</li>
+<li>Way of saying &ldquo;whatever the value is, this is how we&rsquo;ll handle it&rdquo;</li>
+</ul></li>
+<li>But, other equations will let us simplify the matched value</li>
+</ul>
+</div>
+</li>
+<li><a id="org5e6a6ce"></a>Semantics Example<br />
+<div class="outline-text-4" id="text-5-2-11">
+<pre class="example" id="orgd6a227e">
+  (area tv)
+= (area (Rectangle 16 9))
+= (type-case Shape (Rectangle 16 9)
+    [(Rectangle l w) (* l w)]
+    [(Circle r) (* 3.14 (* r r))])
+= [l =&gt; 16][w =&gt; 9](* l w)
+= (* 16 9)
+= 144
+</pre>
+</div>
+</li>
+<li><a id="orgbbe6886"></a>Total Matching<br />
+<div class="outline-text-4" id="text-5-2-12">
+<ul class="org-ul">
+<li>Missing a case in pattern matching is a <i>syntax error</i></li>
+<li>Lets us know we are safe
+<ul class="org-ul">
+<li>No &ldquo;null pointer&rdquo; or &ldquo;out of bounds&rdquo; errors</li>
+</ul></li>
+<li>If you write a pattern match, and each branch is correct, then your program is correct</li>
+<li>Can add an else clause to handle multiple cases
+<ul class="org-ul">
+<li>See Racket window</li>
+</ul></li>
+</ul>
+</div>
+</li>
+<li><a id="orga774064"></a>Most Languages are Unsafe<br />
+<div class="outline-text-4" id="text-5-2-13">
+<ul class="org-ul">
+<li>E.g. Imagine a C++ struct for a library
+<ul class="org-ul">
+<li>You might remember this from CS 115</li>
+</ul></li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #e45649;">enum</span> <span style="color: #986801;">ItemType</span> {
+&nbsp; <span style="color: #6a1868;">Book</span>,
+&nbsp; <span style="color: #6a1868;">DVD</span>
+}
+<span style="color: #e45649;">struct</span> <span style="color: #986801;">ItemInfo</span> {
+&nbsp; <span style="color: #986801;">string</span> <span style="color: #6a1868;">title</span>;
+&nbsp; <span style="color: #986801;">ItemType</span> <span style="color: #6a1868;">itemType</span>;
+&nbsp; <span style="color: #9ca0a4;">// </span><span style="color: #9ca0a4;">Only needed for books</span>
+&nbsp; <span style="color: #986801;">string</span> <span style="color: #6a1868;">author</span>;
+&nbsp; <span style="color: #9ca0a4;">// </span><span style="color: #9ca0a4;">Only needed for DVDs</span>
+&nbsp; <span style="color: #986801;">int</span> <span style="color: #6a1868;">runningTime</span>;
+}
+</pre>
+</div>
+<ul class="org-ul">
+<li>No way to enforce that we don&rsquo;t have running time for book</li>
+</ul>
+</div>
+</li>
+<li><a id="org7530e71"></a>The Type-Safe Motto<br />
+<div class="outline-text-4" id="text-5-2-14">
+<div class="org-center">
+<p>
+<b>Make Illegal States Unrepresentable</b>
+</p>
+</div>
+</div>
+</li>
+<li><a id="orge22c87c"></a>Alternative with Datatypes<br />
+<div class="outline-text-4" id="text-5-2-15">
+<ul class="org-ul">
+<li><p>
+Instead, Flit can do:
+</p>
+<div class="org-src-container">
+<pre class="src src-racket">&nbsp; <span style="color: #4078f2;">(</span><span style="color: #a626a4;">define-type</span> <span style="color: #6a1868;">ItemInfo</span>
+&nbsp;   <span style="color: #a626a4;">(</span>Book <span style="color: #50a14f;">[</span>title <span style="color: #a626a4;">:</span> <span style="color: #986801;">String</span><span style="color: #50a14f;">]</span> <span style="color: #50a14f;">[</span>author <span style="color: #a626a4;">:</span> <span style="color: #986801;">String</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
+&nbsp;   <span style="color: #a626a4;">(</span>DVD <span style="color: #50a14f;">[</span>title <span style="color: #a626a4;">:</span> <span style="color: #986801;">String</span><span style="color: #50a14f;">]</span> <span style="color: #50a14f;">[</span>runningTime <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+&nbsp;
+&nbsp; <span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">print-info</span> item<span style="color: #a626a4;">)</span>
+&nbsp;   <span style="color: #a626a4;">(</span>type-case ItemInfo item
+&nbsp;   &nbsp;   <span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span>Book title author<span style="color: #b751b6;">)</span>
+&nbsp;   &nbsp;   &nbsp;  <span style="color: #b751b6;">(</span><span style="color: #a626a4;">string-append</span> title
+&nbsp;   &nbsp;   &nbsp;   &nbsp;   <span style="color: #4078f2;">(</span><span style="color: #a626a4;">string-append</span> <span style="color: #50a14f;">", by "</span> author<span style="color: #4078f2;">)</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
+&nbsp;   &nbsp;   <span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span>Book title runningTime<span style="color: #b751b6;">)</span>
+&nbsp;   &nbsp;   &nbsp;  <span style="color: #b751b6;">(</span><span style="color: #a626a4;">string-append</span> title
+&nbsp;   &nbsp;   &nbsp;   &nbsp;   <span style="color: #4078f2;">(</span><span style="color: #a626a4;">string-append</span> <span style="color: #50a14f;">": runtime "</span>
+&nbsp;   &nbsp;   &nbsp;   &nbsp;   &nbsp;   &nbsp;   &nbsp;   &nbsp;  <span style="color: #a626a4;">(</span>to-string runningTime<span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+</pre>
+</div></li>
+<li>No way to give a DVD an author or Book a running time</li>
+<li>Can&rsquo;t accidentally e.g. print the author of a DVD, because there won&rsquo;t even be an author in scope</li>
+</ul>
+</div>
+</li>
+<li><a id="org85601dd"></a>Application: Representing Failure<br />
+<div class="outline-text-4" id="text-5-2-16">
+<ul class="org-ul">
+<li>In plait standard library</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #a626a4;">define-type</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">Optionof</span> <span style="color: #b751b6;">'a</span><span style="color: #a626a4;">)</span>
+&nbsp; <span style="color: #a626a4;">(</span>none<span style="color: #a626a4;">)</span>
+&nbsp; <span style="color: #a626a4;">(</span>some <span style="color: #50a14f;">[</span>v <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">'a</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+</pre>
+</div>
+<ul class="org-ul">
+<li>Alternative to using <code>NULL</code> to mark a value as absent</li>
+<li>Pattern matching guarantees no null pointer errors
+<ul class="org-ul">
+<li>We&rsquo;ll see a more detailed example</li>
+</ul></li>
+<li>Type system expresses whether can be empty or not
+<ul class="org-ul">
+<li>If it&rsquo;s not <code>Optionof</code>, then value can&rsquo;t be missing</li>
+</ul></li>
+</ul>
+</div>
+</li>
+<li><a id="org2f2c292"></a>Example: Safe Head<br />
+<div class="outline-text-4" id="text-5-2-17">
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">safeHead</span> <span style="color: #50a14f;">[</span>l <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> <span style="color: #b751b6;">'a</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> <span style="color: #a626a4;">(</span>Optionof <span style="color: #b751b6;">'a</span><span style="color: #a626a4;">)</span>
+&nbsp; <span style="color: #a626a4;">(</span>type-case <span style="color: #50a14f;">(</span><span style="color: #986801;">Listof</span> <span style="color: #b751b6;">'a</span><span style="color: #50a14f;">)</span> l
+&nbsp;   &nbsp;<span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span><span style="color: #a626a4;">empty</span><span style="color: #b751b6;">)</span>
+&nbsp;   &nbsp;   <span style="color: #b751b6;">(</span>none<span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
+&nbsp;   &nbsp;<span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span><span style="color: #a626a4;">cons</span> h t<span style="color: #b751b6;">)</span>
+&nbsp;   &nbsp;   <span style="color: #b751b6;">(</span>some h<span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+<span style="color: #4078f2;">(</span>safeHead <span style="color: #4078f2;">'</span><span style="color: #a626a4;">()</span><span style="color: #4078f2;">)</span>
+<span style="color: #4078f2;">(</span>safeHead <span style="color: #a626a4;">(</span><span style="color: #a626a4;">list</span> <span style="color: #da8548; font-weight: bold;">1</span> <span style="color: #da8548; font-weight: bold;">2</span> <span style="color: #da8548; font-weight: bold;">3</span> <span style="color: #da8548; font-weight: bold;">4</span> <span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+</pre>
+</div>
+</div>
+</li>
+<li><a id="org6cd5f2d"></a>Example: Optional Arguments<br />
+<div class="outline-text-4" id="text-5-2-18">
+<ul class="org-ul">
+<li>Option gives a way to say &ldquo;use a default value for this argument&rdquo;</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-racket">
+<span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">range</span> <span style="color: #50a14f;">[</span>start <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span> <span style="color: #50a14f;">[</span>end <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span>
+&nbsp;   &nbsp;   &nbsp;   &nbsp;  <span style="color: #50a14f;">[</span>maybeGap <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span>Optionof <span style="color: #986801;">Number</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
+&nbsp; <span style="color: #a626a4;">:</span> <span style="color: #a626a4;">(</span><span style="color: #986801;">Listof</span> <span style="color: #986801;">Number</span><span style="color: #a626a4;">)</span>
+&nbsp; <span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">Default gap of 1 if nothing is given</span>
+&nbsp; <span style="color: #a626a4;">(</span><span style="color: #e45649;">let*</span> <span style="color: #50a14f;">(</span><span style="color: #b751b6;">[</span><span style="color: #6a1868;">gap</span> <span style="color: #4078f2;">(</span>type-case <span style="color: #a626a4;">(</span>Optionof <span style="color: #986801;">Number</span><span style="color: #a626a4;">)</span> maybeGap
+&nbsp;   &nbsp;   &nbsp;   &nbsp;   <span style="color: #a626a4;">[</span><span style="color: #50a14f;">(</span>none<span style="color: #50a14f;">)</span> <span style="color: #da8548; font-weight: bold;">1</span><span style="color: #a626a4;">]</span>
+&nbsp;   &nbsp;   &nbsp;   &nbsp;   <span style="color: #a626a4;">[</span><span style="color: #50a14f;">(</span>some x<span style="color: #50a14f;">)</span> x<span style="color: #a626a4;">]</span><span style="color: #4078f2;">)</span><span style="color: #b751b6;">]</span><span style="color: #50a14f;">)</span>
+&nbsp;  <span style="color: #50a14f;">(</span><span style="color: #e45649;">if</span> <span style="color: #b751b6;">(</span><span style="color: #a626a4;">&lt;=</span> end start<span style="color: #b751b6;">)</span>
+&nbsp;   &nbsp;  <span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">Base case, nothing in range if end is before start</span>
+&nbsp;   &nbsp; <span style="color: #4078f2;">'</span><span style="color: #b751b6;">()</span>
+&nbsp;   &nbsp; <span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">Recursive case: include the start</span>
+&nbsp;   &nbsp; <span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">then add that to the range starting at the next number</span>
+&nbsp;   &nbsp; <span style="color: #b751b6;">(</span><span style="color: #a626a4;">cons</span> start <span style="color: #4078f2;">(</span><span style="color: #a626a4;">range</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">+</span> gap start<span style="color: #a626a4;">)</span> end maybeGap<span style="color: #4078f2;">)</span><span style="color: #b751b6;">)</span>
+&nbsp;   &nbsp; <span style="color: #50a14f;">)</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+<span style="color: #4078f2;">(</span><span style="color: #a626a4;">range</span> <span style="color: #da8548; font-weight: bold;">0</span> <span style="color: #da8548; font-weight: bold;">10</span> <span style="color: #a626a4;">(</span>none<span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+<span style="color: #4078f2;">(</span><span style="color: #a626a4;">range</span> <span style="color: #da8548; font-weight: bold;">0</span> <span style="color: #da8548; font-weight: bold;">100</span> <span style="color: #a626a4;">(</span>some <span style="color: #da8548; font-weight: bold;">5</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+</pre>
+</div>
+</div>
+</li>
+<li><a id="org86b3d03"></a>Example: Association Lists<br />
+<div class="outline-text-4" id="text-5-2-19">
+<ul class="org-ul">
+<li>Can use lists of pairs as a key-value store</li>
+<li>Want to search for element in the list whose key is present
+<ul class="org-ul">
+<li>What if it&rsquo;s not in the list?</li>
+</ul></li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">lookup</span> <span style="color: #50a14f;">[</span>key <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span>
+&nbsp;   &nbsp;   &nbsp;   &nbsp;   <span style="color: #50a14f;">[</span>pairs <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> <span style="color: #4078f2;">(</span><span style="color: #986801;">Number</span> <span style="color: #a626a4;">*</span> <span style="color: #b751b6;">'a</span><span style="color: #4078f2;">)</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
+&nbsp; <span style="color: #a626a4;">:</span> <span style="color: #a626a4;">(</span>Optionof <span style="color: #b751b6;">'a</span><span style="color: #a626a4;">)</span>
+&nbsp; <span style="color: #a626a4;">(</span>type-case <span style="color: #50a14f;">(</span><span style="color: #986801;">Listof</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Number</span> <span style="color: #a626a4;">*</span> <span style="color: #b751b6;">'a</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">)</span> pairs
+&nbsp;   <span style="color: #50a14f;">[</span><span style="color: #a626a4;">empty</span> <span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">If list is empty, then the key can't be present</span>
+&nbsp;   &nbsp;  <span style="color: #b751b6;">(</span>none<span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
+&nbsp;   <span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span><span style="color: #a626a4;">cons</span> h t<span style="color: #b751b6;">)</span>
+&nbsp;   &nbsp;  <span style="color: #b751b6;">(</span><span style="color: #e45649;">if</span> <span style="color: #4078f2;">(</span><span style="color: #a626a4;">=</span> key <span style="color: #a626a4;">(</span>fst h<span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span> <span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">If the key matches, we're done</span>
+&nbsp;   &nbsp;   &nbsp;  <span style="color: #4078f2;">(</span>some <span style="color: #a626a4;">(</span>snd h<span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+&nbsp;   &nbsp;   &nbsp;  <span style="color: #4078f2;">(</span>lookup key t<span style="color: #4078f2;">)</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+<span style="color: #4078f2;">(</span>lookup <span style="color: #da8548; font-weight: bold;">2</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">list</span> <span style="color: #50a14f;">(</span>pair <span style="color: #da8548; font-weight: bold;">1</span> <span style="color: #50a14f;">"one"</span><span style="color: #50a14f;">)</span> <span style="color: #50a14f;">(</span>pair <span style="color: #da8548; font-weight: bold;">2</span> <span style="color: #50a14f;">"two"</span><span style="color: #50a14f;">)</span> <span style="color: #50a14f;">(</span>pair <span style="color: #da8548; font-weight: bold;">4</span> <span style="color: #50a14f;">"four"</span><span style="color: #50a14f;">)</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+<span style="color: #4078f2;">(</span>lookup <span style="color: #da8548; font-weight: bold;">3</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">list</span> <span style="color: #50a14f;">(</span>pair <span style="color: #da8548; font-weight: bold;">1</span> <span style="color: #50a14f;">"one"</span><span style="color: #50a14f;">)</span> <span style="color: #50a14f;">(</span>pair <span style="color: #da8548; font-weight: bold;">2</span> <span style="color: #50a14f;">"two"</span><span style="color: #50a14f;">)</span> <span style="color: #50a14f;">(</span>pair <span style="color: #da8548; font-weight: bold;">4</span> <span style="color: #50a14f;">"four"</span><span style="color: #50a14f;">)</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #4078f2;">(</span>some <span style="color: #50a14f;">"two"</span><span style="color: #4078f2;">)</span>
+<span style="color: #4078f2;">(</span>none<span style="color: #4078f2;">)</span>
+</pre>
+</div>
+</div>
+</li>
+<li><a id="orga3b907e"></a>Options in the Real World<br />
+<div class="outline-text-4" id="text-5-2-20">
+<ul class="org-ul">
+<li><p>
+Swift (e.g. writing iPhone apps)
+</p>
+<div class="org-src-container">
+<pre class="src src-swift">enum Optional&lt;Wrapped&gt; {
+    case none
+    case some(Wrapped)
+}
+</pre>
+</div></li>
+
+<li><p>
+Rust (Safer alternative to C/C++)
+</p>
+<div class="org-src-container">
+<pre class="src src-rust"><span style="color: #e45649;">pub</span> <span style="color: #e45649;">enum</span> <span style="color: #986801;">Option</span><span style="color: #4078f2;">&lt;</span><span style="color: #986801;">T</span><span style="color: #4078f2;">&gt;</span> <span style="color: #4078f2;">{</span>
+&nbsp;   <span style="color: #986801;">None</span>,
+&nbsp;   <span style="color: #986801;">Some</span><span style="color: #a626a4;">(</span><span style="color: #986801;">T</span><span style="color: #a626a4;">)</span>,
+<span style="color: #4078f2;">}</span>
+</pre>
+</div></li>
+</ul>
+</div>
+</li>
+<li><a id="org09c2b78"></a>Datatype to End All Datatypes<br />
+<div class="outline-text-4" id="text-5-2-21">
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #a626a4;">define-type</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">Either</span> <span style="color: #b751b6;">'a</span> <span style="color: #b751b6;">'b</span><span style="color: #a626a4;">)</span>
+&nbsp; <span style="color: #a626a4;">(</span>Left <span style="color: #50a14f;">[</span>inLeft <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">'a</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
+&nbsp; <span style="color: #a626a4;">(</span>Right <span style="color: #50a14f;">[</span>inRight <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">'b</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
+<span style="color: #4078f2;">)</span>
+</pre>
+</div>
+<ul class="org-ul">
+<li>Can define all (non-recursive) datatypes  with this and pairs</li>
+<li>e.g. Shape is like <code>(Either (Number * Number) Number)</code></li>
+</ul>
+</div>
+</li>
+<li><a id="org0c3056b"></a>Either Example<br />
+<div class="outline-text-4" id="text-5-2-22">
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">Like lookup, but also errors if key occurs multiple times</span>
+<span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">Either lets us encode a message in the failure case</span>
+<span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">lookupUnique</span> <span style="color: #50a14f;">[</span>key <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span>
+&nbsp;   &nbsp;   &nbsp;  <span style="color: #50a14f;">[</span>pairs <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> <span style="color: #4078f2;">(</span><span style="color: #986801;">Number</span> <span style="color: #a626a4;">*</span> <span style="color: #b751b6;">'a</span><span style="color: #4078f2;">)</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
+&nbsp; <span style="color: #a626a4;">:</span> <span style="color: #a626a4;">(</span>Either <span style="color: #986801;">String</span> <span style="color: #b751b6;">'a</span><span style="color: #a626a4;">)</span>
+&nbsp; <span style="color: #a626a4;">(</span>type-case <span style="color: #50a14f;">(</span><span style="color: #986801;">Listof</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Number</span> <span style="color: #a626a4;">*</span> <span style="color: #b751b6;">'a</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">)</span> pairs
+&nbsp;   <span style="color: #50a14f;">[</span><span style="color: #a626a4;">empty</span> <span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">If list is empty, then the key can't be present</span>
+&nbsp;   &nbsp;  <span style="color: #b751b6;">(</span>Left <span style="color: #50a14f;">"Key not found!"</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
+&nbsp;   <span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span><span style="color: #a626a4;">cons</span> h t<span style="color: #b751b6;">)</span>
+&nbsp;   &nbsp;  <span style="color: #b751b6;">(</span><span style="color: #e45649;">let*</span> <span style="color: #4078f2;">(</span><span style="color: #a626a4;">[</span><span style="color: #6a1868;">rec</span> <span style="color: #50a14f;">(</span>lookupUnique key t<span style="color: #50a14f;">)</span><span style="color: #a626a4;">]</span><span style="color: #4078f2;">)</span><span style="color: #b751b6;">)</span>
+&nbsp;   &nbsp;  <span style="color: #b751b6;">(</span><span style="color: #e45649;">if</span> <span style="color: #4078f2;">(</span><span style="color: #a626a4;">=</span> key <span style="color: #a626a4;">(</span>fst h<span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span> <span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">Check for dupes</span>
+&nbsp;   &nbsp;   &nbsp;  <span style="color: #4078f2;">(</span>type-case <span style="color: #a626a4;">(</span>Either <span style="color: #986801;">String</span> <span style="color: #b751b6;">'a</span><span style="color: #a626a4;">)</span> rec
+&nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">If head has key but tail doesn't, success</span>
+&nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #a626a4;">[</span><span style="color: #50a14f;">(</span>Left msg<span style="color: #50a14f;">)</span> <span style="color: #50a14f;">(</span>Right <span style="color: #b751b6;">(</span>snd h<span style="color: #b751b6;">)</span><span style="color: #50a14f;">)</span><span style="color: #a626a4;">]</span>
+&nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #a626a4;">[</span><span style="color: #50a14f;">(</span>Right val<span style="color: #50a14f;">)</span> <span style="color: #50a14f;">(</span>Left <span style="color: #50a14f;">"Duplicate keys in list"</span><span style="color: #50a14f;">)</span><span style="color: #a626a4;">]</span><span style="color: #4078f2;">)</span>
+&nbsp;   &nbsp;   &nbsp;  <span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">If head didn't have key</span>
+&nbsp;   &nbsp;   &nbsp;  <span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">Then success/failure is what tail found</span>
+&nbsp;   &nbsp;   &nbsp;  rec<span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: Dr. Joseph Eremondi</p>
-<p class="date">Created: 2025-01-10 Fri 17:29</p>
+<p class="date">Created: 2025-01-16 Thu 15:19</p>
 </div>
 </body>
 </html>

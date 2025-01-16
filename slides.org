@@ -43,6 +43,8 @@
 #+BEAMER_HEADER: \AtBeginEnvironment{minted}{\pause}
 #+BEAMER_HEADER: \setminted[racket]{escapeinside=||,bgcolor=LightGray,beameroverlays=true,baselinestretch=1.2,fontsize=\scriptsize}
 #+BEAMER_HEADER: \setminted[c++]{escapeinside=||,bgcolor=LightGray,beameroverlays=true,baselinestretch=1.2,fontsize=\scriptsize}
+#+BEAMER_HEADER: \setminted[swift]{escapeinside=||,bgcolor=LightGray,beameroverlays=true,baselinestretch=1.2,fontsize=\scriptsize}
+#+BEAMER_HEADER: \setminted[rust]{escapeinside=||,bgcolor=LightGray,beameroverlays=true,baselinestretch=1.2,fontsize=\scriptsize}
 
 #+PROPERTY: header-args  :cache yes
 
@@ -1196,7 +1198,7 @@ good (factorial 5) at line 12
        TODO
         (let ([h (first xs)]
               [t (rest xs)]
-              [sumRest (list-template t)])
+              [recRest (list-template t)])
           TODO)
         ))
   #+end_src
@@ -1276,6 +1278,7 @@ good (factorial 5) at line 12
   + Not in-scope for ~emptyResult~
     - Can't get the head and tail of an empty list
 
+
 *** Why pattern matching?
 - Never perform an un-safe operation
   + Only extract head and tail of list when we know they exist
@@ -1298,13 +1301,14 @@ good (factorial 5) at line 12
   (define (increment [xs : (Listof Number)])
           : (Listof Number)
     (type-case (Listof Number) xs
-      [empty
+      [(empty)
          TODO]
       [(cons h t)
         (let* ([incrTail (increment t)])
          TODO)]))
   (increment '(2 3 4))
     #+end_src
+
 
 *** Example: Types
 - Empty Case
@@ -1334,20 +1338,25 @@ good (factorial 5) at line 12
    (define (increment [xs : (Listof Number)])
            : (Listof Number)
      (type-case (Listof Number) xs
-       [empty
+       [(empty)
           empty]
        [(cons h t)
           (let* ([incrTail (increment t)]
                  [incrHead (+ 1 h)])
             (cons incrHead incrTail))]))
+
+     (increment (list 1 2 3))
      #+end_src
 
-     #+RESULTS[8da26113077cfbea3146f3352f5dace91fae5a05]:
+     #+RESULTS[0cc4d73387fd1dcd26b031e109029226350b7352]: list-increment
      #+begin_src racket
+     '(2 3 4)
      #+end_src
+
 
 
 *** Generating is not Modifying
+
 - After ~increment~, the old list still exists
   #+begin_src racket :exports both :noweb strip-export
   <<list-increment>>
@@ -1385,7 +1394,7 @@ good (factorial 5) at line 12
   + We never do anything with the contents other than copy
   + This function is built into Flit as ~append~
     #+name: plait-concat-def
-    #+begin_src racket :exports both
+    #+begin_src racket
   (define (concat [xs : (Listof 'elem)]
                   [ys : (Listof 'elem)])
           : (Listof 'elem)
@@ -1423,13 +1432,12 @@ good (factorial 5) at line 12
 *** More Examples
 - Demo: Dr. Racket (as time permits)
   + Duplicating each element of a list
-  + "zipping" two lists together
   + Filtering out odd elements of a list
 
 
-* Defining Data Types :noexport:
+* Defining Data Types
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides003-datatypes.pdf
+:EXPORT_FILE_NAME: pdf/slides005-datatypes.pdf
 :header-args:racket: :results code :lang flit
 :CUSTOM_ID: functional-programming-2-defining-data-types
 :END:
@@ -1468,6 +1476,79 @@ good (factorial 5) at line 12
 - Projections
   + ~fst : (('a * 'b) -> 'a)~
   + ~snd : (('a * 'b) -> 'b)~
+- Used for functions that return multiple values
+  + Or to pass two values as one to a function
+*** Pairs as Anonymous Records
+- Pairs similar to two-field structs in C++
+  + Main difference: no need to make a new name for pairs
+  + Can write generic code that works for all pairs
+#+begin_src racket
+(define (flip [pr : ('a * 'b)]) : ('b * 'a)
+  (pair (snd pr) (fst pr)))
+(flip (pair 3 4))
+#+end_src
+
+#+RESULTS[984e46ec415816730d26cc8264c5eb0ad445e150]:
+#+begin_src racket
+(values 4 3)
+#+end_src
+
+- Python has pairs/tuples as a core datatype
+  + Tuple: equivalent of pair, but with $n$ elements for some $n$
+  + ~('a * b' * 'c * d' ...)~
+
+*** Defining the Pair type
+
+- Pairs are built in, but we could define them like this:
+
+#+begin_src racket
+(define-type (Pair 'a 'b)
+  [pair [elem1 : 'a] [elem2 : 'b]])
+#+end_src
+
+- ~Pair~ is the name of the type
+- ~'a~ and ~'b~ are the type parameters
+  + e.g. the types of things in the pair
+- There is one constructor, called ~pair~
+  + type name uppercase, constructor lowercase
+- It has two fields
+  + ~fst~ and ~snd~ are just names we choose for the fields
+- Fields have types ~'a~ and ~'b~
+    - e.g. the types of the things in the pair
+*** Example: Odds and Evens
+#+name: evensodds
+#+begin_src racket :exports both
+(define (splitOddsEvens [nums : (Listof Number)])
+  : ((Listof Number) * (Listof Number))
+  (type-case (Listof Number) nums
+             ;; Empty list has no odds or evens
+             [(empty)
+                (pair '() '())]
+             [(cons h t)
+              ;; Recursion splits tail into odds/evens
+              ;; use fst and snd to get these two lists
+               (let* ([splitTail (splitOddsEvens t)]
+                      [tailOdds (fst splitTail)]
+                      [tailEvens (snd splitTail)])
+                 ;; Now check if the head is odd or even
+                 ;; and add head to correct list
+                 (if (= 0 (modulo h 2))
+                     ;; If even, add head to the second list
+                     (pair tailOdds (cons h tailEvens))
+                     ;; If odd, add head to the first list
+                     (pair (cons h tailOdds) tailEvens)))]))
+#+end_src
+
+*** Example: Odds and Evens (ctd)
+#+begin_src racket :noweb strip-export :exports both
+<<evensodds>>
+(splitOddsEvens (list 1 2 3 4 5 7 11 2 4 7))
+#+end_src
+
+#+RESULTS[38106e14b26b141f8044e85d8f1d2fe75821dd1f]:
+#+begin_src racket
+(values '(1 3 5 7 11 7) '(2 4 2 4))
+#+end_src
 
 ** Algebraic Data Types
 :PROPERTIES:
@@ -1488,6 +1569,39 @@ good (factorial 5) at line 12
 
 *** First example
 
+#+begin_src racket
+(define-type Shape
+  (Rectangle [length : Number]
+             [width : Number])
+  (Circle [radius : Number]))
+
+#+end_src
+- ~Shape~ is a /datatype/
+- It has two /constructors/, ~Rectangle~ and ~Circle~
+  + i.e. a Shape is a circle OR a rectangle
+- ~Rectangle~ has two fields, named ~length~ and ~width~, with type Number
+  + ~length~ and ~width~ are just names we choose
+- ~Circle~ has one field named ~radius~ with type Number
+
+*** Constructors
+#+begin_src racket
+(define-type Shape
+  (Rectangle [length : Number]
+             [width : Number])
+  (Circle [radius : Number]))
+
+#+end_src
+- A constructor for a datatype doesn't "do" anything
+  + Functional language
+- Gives the primitve way to create a value of that type
+- Can use as functions
+  + E.g. A rectangle contains two numbers
+  + Calling ~Rectangle~ on two numbers returns a value of type ~Shape~
+  + ~Rectangle : (Number Number -> Shape)~
+  + ~Circle : (Number -> Shape)~
+    - Because it only has 1 field
+
+*** Creating values of a datatype
 #+name: shape-defn
 #+begin_src racket
 (define-type Shape
@@ -1498,27 +1612,13 @@ good (factorial 5) at line 12
 (define tv (Rectangle 16 9))
 (define loonie (Circle 1))
 #+end_src
-- ~Shape~ is a /datatype/
-- It has two /constructors/, ~Rectangle~ and ~Circle~
-  + i.e. a Shape is a circle or a rectangle
-- ~Rectangle~ has two fields with type Number, ~length~ and ~width~
-- ~Circle~ has one field with type Number
-
-*** Creating values of a datatype
-#+begin_src racket
-(define-type Shape
-  (Rectangle [length : Number]
-             [width : Number])
-  (Circle [radius : Number]))
-
-(define tv (Rectangle 16 9))
-(define loonie (Circle 1))
-#+end_src
-- We construct a Shape by calling a constructor
-  + Doesn't *do* anything except package the data together
 - A Shape either has two numbers OR one number
-  + Depending on the tag
+  + Flit keeps a tag on each value of type ~Shape~
+  + Tells us if it's a ~Rectangle~ or ~Circle~
+
 *** Auto-generated Functions
+- Flit makes "checkers" and "getters"
+  +  We won't use these very much
 #+begin_src racket :noweb strip-export
 <<shape-defn>>
 (Rectangle? tv)
@@ -1528,7 +1628,7 @@ good (factorial 5) at line 12
   ;;raises an error, no such field present
 #+end_src
 
-#+RESULTS:
+#+RESULTS[c9b1387816a0e0dbc19637078ecf002c4f27d7c3]:
 #+begin_src racket
 #t
 #f
@@ -1552,38 +1652,270 @@ good (factorial 5) at line 12
 (area loonie)
 #+end_src
 
-#+RESULTS:
+#+RESULTS[e3c3a2f9341f728b949d58a1f785648bb843c551]:
 #+begin_src racket
 144
 3.14
 #+end_src
 
+*** Pattern Match Syntax
+#+begin_src racket :noweb strip-export
+(define (area [shp : Shape]) : Number
+  (type-case Shape shp
+     [(Rectangle l w)
+       (* l w)]
+     [(Circle r)
+       (* 3.14 (* r r))]))
+#+end_src
+- Each branch starts with:
+  + ~(constructorName variableNames ...)~
+  + in brackets, even if constructor takes 0 arguments
+-  Expression after those brackets is the result to produce for that branch
+- ~l~, ~w~, and ~r~ are just the names we choose for the variables
+  + If ~shp~ is a rectangle, they're assigned the values of its ~length~ and ~width~ fields
+    - Order matters: based on order of fields when type was defined
+  + If ~shp~ is a circle, then ~r~ is gets value of ~radius~ field
+*** General Syntax for Pattern Matching
+#+begin_src racket
+(define-type DataType
+  (ConstructorName1 [field1a : FieldType1a]
+                ... [field1z : FieldType1x])
+  (ConstructorName2 [field2a : FieldType2a]
+                ... [field2z : FieldType2y])
+  ...
+  (ConstructorNameN [fieldNa : FieldTypeNa]
+                ... [field1z : FieldTypeNz]))
+#+end_src
+- Can match on a value of that type as follows:
+#+begin_src racket
+(type-case DataType thingToMatchOn
+  [(ConstructorName1 var1a var1b ... var1x)
+    returnExprForCase1]
+  [(ConstructorName2 var2a var2b ... var2y)
+    returnExprForCase2]
+  ...
+  [(ConstructorNameN varNa varNb ... varNz)
+    returnExprForCaseN])
+#+end_src
+*** Semantics of Pattern Matching
+- ~Ctor~ is short for "constructor"
+#+begin_definition Semantics of Pattern Matching
+A pattern match expression
+#+begin_src racket
+(type-case TYPE (Ctor arg1 ... argn)
+  [(OtherCtor1 x1a ... x1z) otherResult1]
+  ...
+  [(Ctor y1 ... yn) resultExpr]
+  ...
+  [(OtherCtorM xMa ... xMz) otherResultM])
+#+end_src
+is equal to: ~[y1 => arg1]...[yn => argn]resultExpr~
+  +  i.e. ~result~ with ~y1~ replaced by ~arg1~ and ... ~yn~ replaced by ~argn~
+#+end_definition
+
+*** Semantics ctd.
+- Once again, substitution is the key operation
+- The value of a type-case is the result of whatever branch matches
+  + with the concrete arguments used as values for the pattern variables ~y1~ ... ~yn~ in the matching branch
+- We don't usually know which constructor is used
+  + e.g. usually we match on a variable or result of function call
+  + Way of saying "whatever the value is, this is how we'll handle it"
+- But, other equations will let us simplify the matched value
+
+*** Semantics Example
+#+begin_example
+  (area tv)
+= (area (Rectangle 16 9))
+= (type-case Shape (Rectangle 16 9)
+    [(Rectangle l w) (* l w)]
+    [(Circle r) (* 3.14 (* r r))])
+= [l => 16][w => 9](* l w)
+= (* 16 9)
+= 144
+#+end_example
+
 *** Total Matching
 - Missing a case in pattern matching is a /syntax error/
 - Lets us know we are safe
+  +  No "null pointer" or "out of bounds" errors
+- If you write a pattern match, and each branch is correct, then your program is correct
 - Can add an else clause to handle multiple cases
   + See Racket window
-*** E.g. Representing Failure
+*** Most Languages are Unsafe
+- E.g. Imagine a C++ struct for a library
+  + You might remember this from CS 115
+#+begin_src C++
+enum ItemType {
+  Book,
+  DVD
+}
+struct ItemInfo {
+  string title;
+  ItemType itemType;
+  // Only needed for books
+  string author;
+  // Only needed for DVDs
+  int runningTime;
+}
+#+end_src
+- No way to enforce that we don't have running time for book
+*** The Type-Safe Motto
+
+#+BEGIN_CENTER
+*Make Illegal States Unrepresentable*
+#+end_CENTER
+
+*** Alternative with Datatypes
+- Instead, Flit can do:
+  #+begin_src racket
+  (define-type ItemInfo
+    (Book [title : String] [author : String])
+    (DVD [title : String] [runningTime : Number]))
+
+  (define (print-info item)
+    (type-case ItemInfo item
+        [(Book title author)
+           (string-append title
+                (string-append ", by " author))]
+        [(Book title runningTime)
+           (string-append title
+                (string-append ": runtime "
+                               (to-string runningTime)))]))
+  #+end_src
+- No way to give a DVD an author or Book a running time
+- Can't accidentally e.g. print the author of a DVD, because there won't even be an author in scope
+*** Application: Representing Failure
+
 + In plait standard library
 #+begin_src racket
 (define-type (Optionof 'a)
   (none)
   (some [v : 'a]))
 #+end_src
++ Alternative to using ~NULL~ to mark a value as absent
 + Pattern matching guarantees no null pointer errors
   - We'll see a more detailed example
++ Type system expresses whether can be empty or not
+  - If it's not ~Optionof~, then value can't be missing
+*** Example: Safe Head
+#+begin_src racket
+(define (safeHead [l : (Listof 'a)]) : (Optionof 'a)
+  (type-case (Listof 'a) l
+     [(empty)
+        (none)]
+     [(cons h t)
+        (some h)]))
+(safeHead '())
+(safeHead (list 1 2 3 4 ))
+#+end_src
 
-*** Most Generic Form
+#+RESULTS[34a9120b1731204f40440df53617187822dd3230]:
+#+begin_src racket
+(none)
+(some 1)
+#+end_src
+*** Example: Optional Arguments
+- Option gives a way to say "use a default value for this argument"
+#+begin_src racket
+
+(define (range [start : Number] [end : Number]
+               [maybeGap : (Optionof Number)])
+  : (Listof Number)
+  ;; Default gap of 1 if nothing is given
+  (let* ([gap (type-case (Optionof Number) maybeGap
+                [(none) 1]
+                [(some x) x])])
+   (if (<= end start)
+       ;; Base case, nothing in range if end is before start
+      '()
+      ;; Recursive case: include the start
+      ;; then add that to the range starting at the next number
+      (cons start (range (+ gap start) end maybeGap))
+      )))
+(range 0 10 (none))
+(range 0 100 (some 5))
+#+end_src
+
+#+RESULTS[11561d3cba166d43c4b10af1cc24070d4f4acf45]:
+#+begin_src racket
+'(0 1 2 3 4 5 6 7 8 9)
+'(0 5 10 15 20 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95)
+#+end_src
+*** Example: Association Lists
+- Can use lists of pairs as a key-value store
+- Want to search for element in the list whose key is present
+  + What if it's not in the list?
+#+begin_src racket :exports both
+(define (lookup [key : Number]
+                [pairs : (Listof (Number * 'a))])
+  : (Optionof 'a)
+  (type-case (Listof (Number * 'a)) pairs
+    [empty ;; If list is empty, then the key can't be present
+       (none)]
+    [(cons h t)
+       (if (= key (fst h)) ;; If the key matches, we're done
+           (some (snd h))
+           (lookup key t))]))
+(lookup 2 (list (pair 1 "one") (pair 2 "two") (pair 4 "four")))
+(lookup 3 (list (pair 1 "one") (pair 2 "two") (pair 4 "four")))
+#+end_src
+
+#+RESULTS[69c0e450ca8c8e2863c8f488dda09d4e7a57d640]:
+#+begin_src racket
+(some "two")
+(none)
+#+end_src
+
+*** Options in the Real World
+- Swift (e.g. writing iPhone apps)
+  #+begin_src swift
+enum Optional<Wrapped> {
+    case none
+    case some(Wrapped)
+}
+  #+end_src
+
+- Rust (Safer alternative to C/C++)
+  #+begin_src rust
+pub enum Option<T> {
+    None,
+    Some(T),
+}
+  #+end_src
+
+*** Datatype to End All Datatypes
 #+begin_src racket
 (define-type (Either 'a 'b)
   (Left [inLeft : 'a])
   (Right [inRight : 'b])
 )
 #+end_src
-- You can define all (non-recursive) datatypes  with this and pairs
-- e.g. Shape is ~(Either (Number * Number) Number)~
+- Can define all (non-recursive) datatypes  with this and pairs
+- e.g. Shape is like ~(Either (Number * Number) Number)~
 
-** Recursive Data
+*** Either Example
+#+begin_src racket
+;; Like lookup, but also errors if key occurs multiple times
+;; Either lets us encode a message in the failure case
+(define (lookupUnique [key : Number]
+           [pairs : (Listof (Number * 'a))])
+  : (Either String 'a)
+  (type-case (Listof (Number * 'a)) pairs
+    [empty ;; If list is empty, then the key can't be present
+       (Left "Key not found!")]
+    [(cons h t)
+       (let* ([rec (lookupUnique key t)]))
+       (if (= key (fst h)) ;; Check for dupes
+           (type-case (Either String 'a) rec
+             ;; If head has key but tail doesn't, success
+             [(Left msg) (Right (snd h))]
+             [(Right val) (Left "Duplicate keys in list")])
+           ;; If head didn't have key
+           ;; Then success/failure is what tail found
+           rec)]))
+#+end_src
+
+* Trees and Recursive Datatypes :noexport:
 :PROPERTIES:
 :CUSTOM_ID: recursive-data
 :END:
