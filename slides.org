@@ -2196,9 +2196,9 @@ pub enum Option<T> {
 #+end_src
 - We'll learn to evaluate these in the 2nd half of the course
 
-* First-Class Functions :noexport:
+* First-Class Functions
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides010-lambda.pdf
+:EXPORT_FILE_NAME: pdf/slides007-lambda.pdf
 :header-args:racket: :results code :lang flit
 :CUSTOM_ID: functional-programming-2-first-class-functions
 :END:
@@ -2323,11 +2323,21 @@ pub enum Option<T> {
 (mapNum (lambda (x) (* x 10)) '(1 2 3 4))
 #+end_src
 
+*** Semantics of Lambda Application
+
+#+begin_definition Semantics of Application (Lambda)
+For any terms EXPR1 and EXPR2, with x in scope for EXPR1, we have:
+- ~((lambda (x) EXPR1) EXPR2) = [x => EXPR2]EXPR1
+  + i.e. ~EXPR1~ with all non-shadowed occurrences of ~x~ replaced by ~EXPR2~
+#+end_definition
 
 *** Define as sugar
 - ~(define (f x) body)~
 - Same as ~(define f (lambda (x) body))~
-- Defining functions is /syntactic sugar/ for lambda in Plait
+- Defining functions is /syntactic sugar/ for lambda in Flit
+- Semantics of ~define~-ed function applications just a special case of the lambda rule
+
+
 
 *** Lambda in a context
 - Don't have to use lambda at the top level
@@ -2347,6 +2357,16 @@ pub enum Option<T> {
 - The lambda *captures* the variable ~numToAdd~
 - Dynamically creates the function that adds its argument to whatever ~numToAdd~ is
 
+
+*** Lambda and Types
+#+begin_definition
+If an expression ~~EXPR : T~, under the assumption that the variable ~x : S~,
+then ~(lambda (x) EXPR) : (S -> T)~
+#+end_definition
+- If we have a hole of type ~(S -> T)~, we can replace it with ~(lambda (x) TODO)~
+  + New hole will have type ~T~
+  + Can refer to variable ~x~
+
 *** Functions as return values
 - We can also make functions that produce other functions as a result
   + Just use ~lambda~ in the body of the function
@@ -2358,6 +2378,8 @@ pub enum Option<T> {
 (mapNum (makeAdderWith 3))
 #+end_src
 
+
+
 *** Combinators
 - Functions that take and return functions
 - Can "lift" operations to whole functions
@@ -2368,8 +2390,27 @@ pub enum Option<T> {
 (define (+fun [f : (Number -> Number)]
               [g : (Number -> Number)]) : (Number -> Number)
   (lambda (x) (+ (f x) (g x))))
-;; e.g. Make the function that computes
+;; e.g. Make the function that adds (f x) and (g x) for any x
 #+end_src
+
+
+*** Semantics of Passing and Returning Functions
+- There is no special equation for passing a function as a value
+- Just use the substitution rule to replace the variable name by the ~lambda~ that the function is equal to
+#+begin_example
+(define (negate x) (* x -1))
+
+(+fun negate negate)
+= (lambda (x) (+ (negate x) (negate x)))
+= (lambda (x) (+ (* x -1) (* x -1)))
+
+So:
+((+fun negate negate) 3)
+= ((lambda (x) (+ (* x -1) (* x -1))) 3)
+= (+ (* 3 -1) (* 3 -1))
+= (+ -3 -3)
+= -6
+#+end_example
 
 *** Example: Beyond Numbers
 #+begin_src racket :exports both
@@ -2389,6 +2430,46 @@ pub enum Option<T> {
 #+begin_src racket
 (some 4)
 (none)
+#+end_src
+
+*** Lambda IRL
+- Almost every language has added a form of lambda/higher-order function
+- Often called /callbacks/ or /closures/
+  + Used heavily in JavaScript
+  + e.g. "run this function when button is pressed"
+
+**** C++
+#+begin_src c++
+[](float a, float b) {
+            return (std::abs(a) < std::abs(b));
+#+end_src
+
+**** Python
+#+begin_src python
+f = lambda a, b : abs(a) < abs(b)
+f(3,-4)
+#+end_src
+
+**** JavaScript
+#+begin_src javascript
+var f = (a,b) => Math.abs(a) < Math.abs(b);
+console.log(f(3,-4));
+#+end_src
+
+*** Lambda IRL continued
+**** Swift
+#+begin_src swift
+let f = {a, b in return abs(a) < abs(b)}
+f(3,-4)
+#+end_src
+**** Rust
+#+begin_src rust
+    let f = |a : i32, b : i32| a.abs() < b.abs();
+    println!("{}", f(3,-4)); ;
+#+end_src
+**** Java
+#+begin_src java
+(a,b) -> Math.abs(a) < Math.abs(b)
 #+end_src
 
 * Polymorphic Higher-Order Functions :noexport:
