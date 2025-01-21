@@ -1915,17 +1915,31 @@ pub enum Option<T> {
            rec)]))
 #+end_src
 
-* Trees and Recursive Datatypes :noexport:
+* Trees and Recursive Datatypes
 :PROPERTIES:
+:EXPORT_FILE_NAME: pdf/slides006-trees.pdf
+:header-args:racket: :results code :lang flit
 :CUSTOM_ID: recursive-data
 :END:
+#+beamer: \beamerdefaultoverlayspecification{<+->}
+** Recursive Algebraic Data Types
 
 *** Self-reference in types
-- The real power of datatypes is the ability to have fields of the type being defined
+- Datatypes are made more powerful when we allow self reference
 - This allows us to define *trees*
   + of arbitrary depth
 - Data can be traversed using recursion
 
+
+*** Trees vs. Trees™
+- In other classes, you might have seen specific kinds of trees
+  + Binary search trees
+  + 2-3 Trees, BTrees, Red-Black trees
+- In this class, we will mean tree very generally
+  + Anything that has a hierarchical structure
+- Everything in a tree is either a leaf, or has 1 or more children
+  + That are also trees
+- What is in the tree depends on the kind of tree
 
 *** Example: Lists as a dataype
 #+name: num-list
@@ -1955,6 +1969,15 @@ pub enum Option<T> {
 123
 #+end_src
 
+*** Lists are Trees
+- A list is a tree where:
+  + Each node has 0 or 1 children (linear)
+  + 1-child nodes contain data: head of list
+- Similarly, a natural number is a tree where
+  + Each child has 0 or 1 nodes
+  + No data is stored in any nodes
+
+
 *** Example: Filesystem
 + Model of a file system
   - Not how is implemented on disk
@@ -1967,7 +1990,7 @@ pub enum Option<T> {
           [contents : (Listof Filesystem)]))
 #+end_src
 
-*** Linear Search using Recursion
+*** Linear-time Search using Recursion
 
 - Find the first matching file
 #+name: fs-search
@@ -2032,6 +2055,146 @@ pub enum Option<T> {
 (none)
 #+end_src
 
+*** Example: Binary Search Tree
+- Recall from CS 210
+- A Binary search tree (BST) stores data indexed by some key
+- Each node is empty, or has data and 2 (possibly empty) children
+- Finding a node in the BST is linear /in the depth of the tree/
+  + $O(\log n)$ time if it's balanced
+
+*** BST data definition
+
+#+name: bst-type
+#+begin_src racket
+;; A BST is either empty (with no data)
+;; or has a data, a binary search tree with smaller data
+(define-type (BST 'elem)
+  (leaf)
+  (node [left : (BST 'elem)]
+        [right : (BST 'elem)]
+        [index : Number]
+        [data : 'elem]))
+#+end_src
+
+
+
+*** BST Range Check
+- Make sure that a BST is well-formed, and that all its data is in the given range
+- Only use this in testing
+#+begin_src racket
+
+(define (BST-inrange [t : (BST 'elem)]
+                     [strict-lower-bound : Number]
+                     [upper-bound : Number]) : Boolean
+  (type-case (BST 'elem) t
+    ;; A tree with no data is always in range
+    [(leaf) #t]
+    ;; non-empty: check if index in range
+    ;; and that left/right are all smaller/bigger
+    [(node left right index data)
+     (and
+      (> index strict-lower-bound)
+      (<= index upper-bound)
+      ;; Left tree should be in range, and <= this node
+      (BST-inrange left strict-lower-bound index)
+      ;; Right tree should be in range, and > this node
+      (BST-inrange right index upper-bound))]))
+
+#+end_src
+
+*** Well Formed BSTs
+- Call our range-checker with default values
+
+    #+name: bst-wf
+#+begin_src racket
+
+(define (BST-wellformed [t : (BST 'elem)]) : Boolean
+  ;; We check if all nodes are in the correct range,
+  ;; with a starting range
+  ;; of -infinity to +infinity i.e. all numbers
+  (BST-inrange t -inf.0 +inf.0))
+
+#+end_src
+
+
+
+*** Adding a node
+- Make a new tree that contains the data under the given tree
+  + Kind of like cons, but for BSTs
+
+    #+name: bst-insert
+#+begin_src racket
+(define (BST-insert [index : Number]
+                    [data : 'elem]
+                    [t : (BST 'elem)]) : (BST 'elem)
+  (type-case (BST 'elem) t
+    ;; Inserting a node into the empty tree
+    ;; results in a 1-node tree
+    [(leaf) (node (leaf) (leaf) index data)]
+    ;; If the tree isn't empty, then either add to left or right,
+    ;; depending if new index is smaller/bigger than this node
+    [(node left right nodeIndex nodeData)
+       (let* ([newLR
+               (if (<= index nodeIndex)
+                   (pair (BST-insert index data left) right)
+                   (pair left (BST-insert index data right)))])
+       (node (fst newLR) (snd newLR) nodeIndex nodeData))]))
+#+end_src
+
+*** Looking up a node
+- Find the all the data for a given tree
+  +  Might have none or duplicates, so return a list
+
+    #+name: bst-lookup
+#+begin_src racket
+(define (BST-lookup [t : (BST 'elem)]
+                    [index : Number]) : (Listof 'elem)
+  (type-case (BST 'elem) t
+    [(leaf) '()]
+    [(node left right nodeIndex data)
+     ;; Look left or right,
+     ;; depending if target is less than this node
+     (let*
+         ([child-data
+            (if (<= index nodeIndex)
+                (BST-lookup left index)
+                (BST-lookup right index))])
+       ;; Finally, we check if this node contains the target,
+       ;; and if it does we include it in the results.
+       (if (= index nodeIndex)
+           (cons data child-data)
+           child-data))]))
+#+end_src
+
+
+
+*** Trying it out
+#+begin_src racket :noweb strip-export :exports both
+<<bst-type>>
+<<bst-insert>>
+<<bst-lookup>>
+(define t (BST-insert 3 "three"
+            (BST-insert 5 "five"
+              (BST-insert 99 "ninety-nine"
+                (BST-insert 0 "zero"
+                  (BST-insert 99 "NineNine" (leaf)))))))
+(BST-lookup t 99 )
+#+end_src
+
+#+RESULTS[b7bb43476f443737ab4e458f04b7b56daecd1bcf]:
+#+begin_src racket
+'("NineNine" "ninety-nine")
+#+end_src
+
+*** A Sneak Preview
+- Math expressions are trees
+#+begin_src racket
+(define-type Expr
+  (NumE)
+  (PlusE [x : Expr] [y : Expr])
+  (TimesE [x : Expr] [y : Expr]))
+#+end_src
+- We'll learn to evaluate these in the 2nd half of the course
 
 * First-Class Functions :noexport:
 :PROPERTIES:
