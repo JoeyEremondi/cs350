@@ -1786,7 +1786,7 @@ struct ItemInfo {
 - Can't accidentally e.g. print the author of a DVD, because there won't even be an author in scope
 *** Application: Representing Failure
 
-+ In plait standard library
++ In flit standard library
 #+begin_src racket
 (define-type (Optionof 'a)
   (none)
@@ -1798,7 +1798,7 @@ struct ItemInfo {
 + Type system expresses whether can be empty or not
   - If it's not ~Optionof~, then value can't be missing
 *** Example: Safe Head
-#+begin_src racket
+#+begin_src racket :exports both
 (define (safeHead [l : (Listof 'a)]) : (Optionof 'a)
   (type-case (Listof 'a) l
      [(empty)
