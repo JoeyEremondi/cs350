@@ -2472,9 +2472,9 @@ f(3,-4)
 (a,b) -> Math.abs(a) < Math.abs(b)
 #+end_src
 
-* Polymorphic Higher-Order Functions :noexport:
+* Polymorphic Higher-Order Functions
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides011-map.pdf
+:EXPORT_FILE_NAME: pdf/slides008-mapfilter.pdf
 :header-args:racket: :results code :lang flit
 :CUSTOM_ID: polymorphic-higher-order-functions
 :END:
@@ -2544,7 +2544,7 @@ f(3,-4)
 *** Filter
 - Another common function on lists
 - Takes a *predicate* for some type:
-  + Look at two values and return either true or false
+  + Look at a value and return either true or false
   + Defines a property on that type
 - Returns a new list containing only the elements satisfying the predicate
 #+begin_src racket
