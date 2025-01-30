@@ -2325,11 +2325,17 @@ pub enum Option<T> {
 
 *** Semantics of Lambda Application
 
+
+
 #+begin_definition Semantics of Application (Lambda)
-For any terms EXPR1 and EXPR2, with x in scope for EXPR1, we have:
-- ~((lambda (x) EXPR1) EXPR2) = [x => EXPR2]EXPR1
+For any terms ~EXPR1~ and ~EXPR2~, with x in scope for ~EXPR1~, we have:
+- ~((lambda (x) EXPR1) EXPR2)~ ~= [x => EXPR2]EXPR1~
   + i.e. ~EXPR1~ with all non-shadowed occurrences of ~x~ replaced by ~EXPR2~
 #+end_definition
+
+*** Function Application
+- /Applying/ a function is just functional programming talk for calling a function
+- We say we apply the function ~f~ to argument ~x~ when we write ~(f x)~
 
 *** Define as sugar
 - ~(define (f x) body)~
