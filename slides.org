@@ -2633,6 +2633,21 @@ f(3,-4)
 '("a" "hey" "hello" "goodbye" "arithmetic")
 #+end_src
 
+*** More Examples: All/Any
+- Check if some boolean property is true for
+  + All elements in a list
+  + At least one element in a list
+#+begin_src racket
+(define (all? [pred : ('a -> Boolean)]
+              [elems : (Listof 'a)]) : Boolean
+  (empty? (filter (lambda (x) (not (pred x))) elems)))
+
+
+(define (any? [pred : ('a -> Boolean)]
+              [elems : (Listof 'a)]) : Boolean
+  (not (empty? (filter pred elems))))
+#+end_src
+
 *** Polymorphic Combinators
 - Combinators that are polymorphic are highly general
   + Ways to build new functions out of old functions
@@ -2690,6 +2705,7 @@ f(3,-4)
   #+end_src
 
 *** Example
+
 #+begin_src racket :noweb strip-export :exports both
 <<curry>>
 <<flip>>
@@ -2703,6 +2719,55 @@ f(3,-4)
 '(1 0 1 0 1 0 1 0)
 #+end_src
 
+*** Optional Lifting
+- Take any operation, and make it work on ~Optionof~
+
+  #+begin_src racket :exports both
+  (define (liftOption [f : ('a -> 'b)])
+                      : ((Optionof 'a) -> (Optionof 'b))
+        (lambda (maybeX)
+          (type-case (Optionof 'a) maybeX
+            [(none)
+               (none)]
+            [(some x)
+               (some (f x))])))
+  ((liftOption add1) (some 3))
+  ((liftOption add1) (none))
+  #+end_src
+
+  #+RESULTS[5dbbffe8e76e32d700aa52893b2592959be522b3]:
+  #+begin_src racket
+  (some 4)
+  (none)
+  #+end_src
+
+*** Optionals With a Default
+
+- Take any operation, and make it work on Optionof
+  + Result is not an option, so we have to give a default to use when argument is ~none~
+  #+begin_src racket :exports both
+  (define (defaultOption [f : ('a -> 'b)]
+                         [default : 'b])
+                      : ((Optionof 'a) -> 'b)
+        (lambda (maybeX)
+          (type-case (Optionof 'a) maybeX
+            [(none)
+               default]
+            [(some x)
+               (f x)])))
+  ((defaultOption add1 0) (some 3))
+  ((defaultOption add1 0) (none))
+  #+end_src
+
+  #+RESULTS[06430ef3b53954f70bd4fba0181e92136839f363]:
+  #+begin_src racket
+  4
+  0
+  #+end_src
+
+
+
+
 *** Point Free Programming
 - When you build functions using combinators instead of lambda, it's called
   /point free programming/
@@ -2711,7 +2776,7 @@ f(3,-4)
   + Sometimes the lambda is just clearer
 - But can be easier to read in many cases
 
-* Generative Recursion and Tail Recursion :noexport:
+* Generative Recursion and Tail Recursion
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides015-tailrec.pdf
 :header-args:racket: :results code :lang flit
