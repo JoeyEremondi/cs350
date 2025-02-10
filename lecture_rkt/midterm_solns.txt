@@ -1,0 +1,101 @@
+Practice Midterm Solutions
+
+1. c) (Optionof 'b)
+
+2. d) (Optionof 'a) -> (Optionof 'b)
+
+3. a) Call to +
+
+4. b) String OR Number OR Boolean
+
+  Bar : String -> Foo
+  Baz : Number -> Foo
+  Boo : Boolean -> Foo
+
+5.  First pattern match has h = 1
+       and t = (cons 2 (cons 3 '()))
+             = '(2 3)
+        second pattern match gives
+        hOther is 2
+        tOther is (cons 3 (empty))
+          = '(3)
+    Return hOther, which is 2
+    So final result is 2
+
+
+6.
+
+(define (filterMap
+  [f : ('a -> (Optionof 'b))]
+  [xs : (Listof 'a)])
+  : (Listof 'b)
+;; Your implementation goes here.
+
+(type-case ... xs
+   [(empty)
+       (empty)]
+    [(cons hd tl)
+    ;; h : a
+    ;; t : (Listof 'a)
+    (let (fh (f hd)) ;; fh : Optionof b
+          (rec (filterMap f tl))
+                 ;; rec : (Listof b)
+    ;; Trying to make a (Listof 'b)
+    (type-case ... fh
+      [(none)
+         rec]
+      [(some x)  ;; x : b
+        (cons x rec))]
+    )
+         ])
+
+)
+
+;; Filter example
+
+(filter even? '(1 2 3 4))
+
+match1: is a cons
+x = 1
+rest (list 2 3 4)
+(even? x) is false
+so we return (filter even? 2 3 4)
+
+match2 : is a cons
+x = 2
+rest is (list 3 4)
+(even? 2) is #t
+(cons 2 (filter even? 3 4))
+
+Need to figure out what (filter even? '(3 4)) is, and
+(fitler even? (3 4))
+x is 3
+rest is (list 4)
+(even? 3 ) is #f
+(filter even? (list 4))
+
+match4
+x is 4
+rest is '()
+(even? 4) is #t
+(filter even? '(3 4))
+  is (cons 4 (filter even? empty))
+  = (cons 4 '())
+
+Going back up, we plug this in
+for a final result of
+(cons 2 (cons 4 '()))
+
+(list 2 4)
+
+
+This is the same as doing
+(filter (lambda (x) (= 0 (modulo x 2))) whateverList)
+
+(filter (lambda (x) someExpression))
+
+where someExpression can refer to x
+and returns a boolean
+
+(map add1 '(1 2 3 4))
+- (2 3 4 5)
