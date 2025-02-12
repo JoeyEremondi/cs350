@@ -1380,7 +1380,7 @@ good (factorial 5) at line 12
   - Work regardless of what type of elements there are
   - Types contain *type variables*, denoted with single quote ~'x~
     + Like symbols
-  - Plait type inference figures out solutions for type variables when you call a function
+  - Flit type inference figures out solutions for type variables when you call a function
   - E.g. ~first : ((Listof 'a) -> 'a)~
     + Input is list whose elements are some type ~'a~
     + Output has type ~'a~
@@ -1948,7 +1948,7 @@ pub enum Option<T> {
   (Nil)
   (Cons [head : Number] [tail : NumList]))
 #+end_src
-- Note: this is not quite how lists are defined in Racket/plait
+- Note: this is not quite how lists are defined in Racket/Flit
   + But they could be!
 - Recursive fields in datatype $\to$ recursive calls in template
 #+begin_src racket :noweb strip-export
@@ -2927,7 +2927,7 @@ f(3,-4)
   + We never needed ~x~ in the environment after making the call to ~g~
   + We never need the body of ~f~ after making the call to ~g~
     - All the body of ~f~ tells us is to compute the body of ~g~
-- The Racket/Plait interpreter can just change the body and env on the stack, /without pushing to it/
+- The Racket/Flit interpreter can just change the body and env on the stack, /without pushing to it/
   + Mutation $\to$ fast
 *** Tail Calls
 - An expression is in *tail position* if it is
@@ -3115,7 +3115,7 @@ return g(x);
   + Different keywords
   + Different operator names
   + Different order of expressions
-- E.g. plait vs shplait
+- E.g. flit/plait vs shplait
 
 
 ** Describing Syntax
@@ -3218,7 +3218,7 @@ return g(x);
 *** Parsing in this class
 - Parsing is an interesting problem
 - But it's not an interesting /programming languages/ problem
-- We will use Racket/plait features to do most of the parsing for us
+- We will use Racket/Flit features to do most of the parsing for us
   + Use  quoting to write s-expressions directly
     - Does the hard work of figuring out nested brackets
 
@@ -3318,7 +3318,7 @@ return g(x);
 
 *** Keeping it all straight
 - The implementation language is NOT the language you're interpreting
-- In this class, the implementation language is Racket/plait
+- In this class, the implementation language is Racket/Flit
 - We'll write interpreters for a bunch of small languages
   + We'll call them "Curly" because we write them with curly brackets
   + Write Curly programs in Racket files using quotation
@@ -3355,7 +3355,7 @@ return g(x);
 
 
 *** Our First Interpreter
-- Interpreting arithmetic, so values are just plait ~Number~
+- Interpreting arithmetic, so values are just Flit ~Number~
 
 #+name: arith-interp
 #+begin_src racket :noweb strip-export :exports both
@@ -3765,26 +3765,10 @@ return g(x);
 :CUSTOM_ID: environments-binding-and-scope
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
-** Overview
+# ** Overview
 :PROPERTIES:
 :CUSTOM_ID: overview-1
 :END:
-*** The Road So Far
-- Functional Programming (Plait Tutorial)
-- Parsing (PLAI ch2)
-- Interpreters (PLAI ch3)
-- Desugaring (PLAI ch4)
-- Functions (PLAI ch5)
-*** The Road to Midterm
-
-- Today: Environments in Curly (PLAI ch6)
-- Tues: Lambda and First-class Functions in Plait
-- Wed: Replacements for Recursion in Plait
-- Thurs: Implementing Lambda in Curly (PLAI ch7)
-- Mon: Closures and Environments in Curly (PLAI ch7)
-- Tues/Wed: lectures (not included on midterm)
-- Thurs: *MIDTERM*
-**** Everything up to and including Closures may appear on the midterm
 
 ** Environments
 :PROPERTIES:
@@ -3950,7 +3934,7 @@ emptyEnv
 - Curly-Fundef, but with one new feature
   + ~{letvar x e1 e2}~
     - Gives ~x~ the value ~e1~ in the expression ~e2~
-    - Called letvar so we don't confuse with plait
+    - Called letvar so we don't confuse with Flit
 - We'll implement with both substitution and environments
 
 *** Abstract Syntax
@@ -4021,7 +4005,7 @@ emptyEnv
 - Let /extends/ scope by adding a variable, while calls /transfer/
   scope to the function
 - Later we'll see more complex examples of scope
-  + e.g. in Plait, ~let~ and ~let*~ have different rules for what's in scope
+  + e.g. in vanilla Racket, ~let~ and ~let*~ have different rules for what's in scope
 
 *** The Stack
 
@@ -4036,8 +4020,8 @@ emptyEnv
   + Every time we call a function or define a variable we push onto the call stack
 - Curly-Let and others have an /implicit/ call stack
   + We don't keep the data structure ourselves
-  + Instead, call ~interp~ recursively to add to the /Plait/ call stack
-  + When finished eval, plait returns is to part waiting for the result
+  + Instead, call ~interp~ recursively to add to the /Flit/ call stack
+  + When finished eval, Flit returns is to part waiting for the result
 
 *** Shadowing Example
 - ~{letvar x 3 {letvar x 4 {+ 3 x}}}~
@@ -4076,7 +4060,7 @@ emptyEnv
 *** Syntax and Parsing
 - ~{fun {SYMBOL} <expr>}~
   + ~{fun {x} body}~ is anonymous function with argument ~x~ and body ~body~
-  + fun instead of lambda to distinguish Curly vs Plait
+  + fun instead of lambda to distinguish Curly vs Flit
 #+begin_src racket
 (define (parse s-expr)
   (cond
@@ -4157,7 +4141,7 @@ emptyEnv
 - Our previous interpreter assumed that ~interp~ always returned a number
 - We need to introduce *dynamic type checking* in Curly-Fun
 *** Aside: Type-Based Refactoring
-- We can use the plait type inference to help us write our implementation
+- We can use the Flit type inference to help us write our implementation
 - Change ~interp~ to produce ~Value~ instead of ~Number~
 - The type-checker sees an error
 - Repeat until there are no type errors:
@@ -4830,11 +4814,11 @@ myFunction().then(
 
 #+end_src
 *** A Word of Warning
-- Plait does /not/ use currying by default
+- Flit/Racket do /not/ use currying by default
   + Multiple argument functions are /not/ desugared into single-argument ones
 - We can convert between curried and uncurried functions with combinators
   + See lecture on Higher Order Functions
-- A 0-argument ~(lambda () e)~ is /NOT/ the same as ~e~ in Plait
+- A 0-argument ~(lambda () e)~ is /NOT/ the same as ~e~ in Flit
   + But it is in Curly, if we use this desugaring
 *** Another Desugaring: Let
 - Recall that ~letvar~ let us define a local variable to have the value of some expression, that we could then use to build another expression
@@ -5143,7 +5127,7 @@ myFunction().then(
 - Racket has /syntactic macros/
   + Actually lets you write functions that run at compile-time and inspect the syntax given
 - ~define-type~ and  ~type-case~ are both Racket macros
-- The entire ~plait~ type system is implemented with Racket macros
+- The entire ~Flit~ type system is implemented with Racket macros
 *** A Macro for Interpreting with Stores
 #+begin_src racket
 (define-syntax-rule
