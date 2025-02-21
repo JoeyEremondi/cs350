@@ -2778,7 +2778,7 @@ f(3,-4)
 
 * Generative Recursion and Tail Recursion
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides015-tailrec.pdf
+:EXPORT_FILE_NAME: pdf/slides009-tailrec.pdf
 :header-args:racket: :results code :lang flit
 :CUSTOM_ID: generative-recursion-and-tail-recursion
 :END:
@@ -2996,20 +2996,45 @@ return g(x);
 - The functional style means that no state is hidden
   + Easier to debug state problems
     - By hand, or with tools/linters
+* Folds: Recursion as a Function
+:PROPERTIES:
+:EXPORT_FILE_NAME: pdf/slides010-fold.pdf
+:header-args:racket: :results code :lang flit
+:CUSTOM_ID: generative-recursion-and-tail-recursion
+:END:
+#+beamer: \beamerdefaultoverlayspecification{<+->}
 ** Abstracting Generative Recursion
 :PROPERTIES:
 :CUSTOM_ID: abstracting-generative-recursion
 :END:
 *** Objective
 - Goals
-  + To see how the pattern of generative recursion on lists can be represented concretely as a higher order function
+  + To see how the patterns of normal and  generative recursion on lists can be represented concretely as a higher order function
 - Key Concepts
   + ~foldl~ and ~foldr~
 *** Higher-Order Genrative Recursion: Folds
 - Recall: higher-order polymorphic functions let us turn design patterns into functions
   + e.g. ~map~ for "do this to each element of a list"
-- Generative recursion is no exception
-*** Foldl
+  + ~filter~ for "Get rid of elements that fail some check"
+- We had a recipe/template for tail recursion
+  +  We can turn this into a function
+*** Recall: Tail-Recursion Template
+- Make a helper with an extra argument
+  + Extra arg called the /accumulator/
+- Pattern match on the input you're processing
+- Base case: return the accumulator
+- Cons case: just call ourselves tail-recursively
+  + With one less element in the input list
+  + With the updated accumulator
+*** Foldl: The Idea
+- We can make "update the accumulator" concrete as a function
+- Compute a new value for the accumulator based on:
+  + Old value of the accumulator
+  + Current element of the list
+- Take that function as an argument, then just use our template
+  +  All that's left is to give an initial value for the accumulator
+*** Foldl (Fold Left)
+
 #+name: foldl
 #+begin_src racket
 (define (foldl [f : ('a 'b -> 'b)]
@@ -3021,10 +3046,10 @@ return g(x);
     [(cons h t)
        (foldl f (f h accum) t)]))
 #+end_src
-- Generative recursion on a list as a function
-- Name ~foldl~ means "fold left"
-  + Processes elements in order
-- If list empty, gives whatever the initial ~accum~ was
+- Polymorphic over:
+  + List element type ~a~
+  + Result type ~b~
+- If list empty, gives whatever the current ~accum~ is
 - If not empty, uses ~f~ to update the ~accum~ based on the first element of the list
   + Then processes the rest of the list with a recursive call
 - Tail recursive, so fast and takes constant space
@@ -3043,11 +3068,12 @@ return g(x);
 '(3 2 1)
 #+end_src
 - ~'a~ is ~'elType~, ~'b~ is ~(Listof 'elType)~
-- Update function type is ~('elType (Listof 'elType) -> (Listof 'elType))~
+- Update function type:
+  + ~('elType (Listof 'elType) -> (Listof 'elType))~
 - Initial accumulator is empty list, since we start with nothing
 - Update function adds the current element to the front of the list we've built so far
 *** Reasoning with foldl
- - ~(foldl f init '(a b c d))~ gives:
+ - ~(foldl f init (list a b c d))~ gives:
    +  ~(f d (f c (f b (f a init))))~
  - Similar to normal recursion:
    + Assume that ~accum~ has the correct result so far
@@ -3056,7 +3082,35 @@ return g(x);
    + Assume that ~accum~ has the correct reversal of the list we've seen so far. How do we incorporate the next element?
      - We add it to the front, since it's the last of all elements we've seen so far, so the first in the reversed list
      - Recursive call says "keep processing for the rest of the list"
+*** Foldl is a for-loop
+#+begin_src C++
+int A[N];
+int x;
+// and some other variables
+for (int i = 0; i < N; i++){
+  int current = A[i]
+  // Do something with x
+ }
+#+end_src
+- C++ for-loop over array
+  + Get the array element for each ~i~ in 0 ... N
+  + Do some stuff
+    - e.g. Set the values of the other variables
+- Flit fold is this but with /explicit state/
+  + Accumulator captures all the variables that the loop can modify
+  + New variable value come from function
+  + Multiple variables? Use pair types
+*** Example: Fibonacci with Foldl
+- See Dr. Racket
+
 *** Non-tail Folds
+- Recall our pattern for normal (non-tail) recursion
+- Pattern match on the input:
+  + Base case: return simplest result
+  + Recursive case: call self on tail, then put together with head
+- Can make a higher-order function to generalize this
+  + Function parameter for the "put together" part
+*** Constructing Foldr (Fold Right)
 #+begin_src racket
 (define (foldr [f : ('a 'b -> 'b)]
                [init : 'b]
@@ -3072,6 +3126,63 @@ return g(x);
 - Reasoning the exact same, except we assume the argument to ~f~
   has the accumulator for all elements /after/ the current element
 - Generally ~foldl~ is faster
+*** Example: Map as a fold
+#+begin_src racket :exports both
+(define (map-via-fold [f : ('a -> 'b)]
+                      [xs : (Listof 'a)])
+  : (Listof 'b)
+  (foldr (lambda (elem mappedTail)
+           (cons (f elem) mappedTail))
+         '()
+         xs))
+(map-via-fold add1 (list 2 3 4 5))
+#+end_src
+
+#+RESULTS[bc9b7b228d64189ad0e715a62c53e3d36e1b02de]:
+#+begin_src racket
+'(3 4 5 6)
+#+end_src
+
+
+- We give a function that says how to combine head of a list with the result of recursively calling on the tail
+  + ~foldr~ does the recursive call for us
+- Mapping on empty list should produce empty list
+  + So we give ~'()~ as the base-case value
+*** Example: Filter as a fold
+#+begin_src racket
+(define (filter-via-fold [p : ('a -> Boolean)]
+                         [xs : (Listof 'a)])
+  : (Listof 'a)
+  (foldr (lambda (elem filteredTail)
+           (if (p elem)
+               (cons elem filteredTail)
+               filteredTail))
+         '()
+         xs))
+(filter-via-fold even? (list 1 2 3 4 5))
+#+end_src
+
+#+RESULTS[db01b16647fd56f6993326dd8151c5b271619517]:
+#+begin_src racket
+'(2 4)
+#+end_src
+- Use ~lambda~ to build a function that tells us what to do with the head of the list and the result of recursively processing the tail
+*** Example: ConcatAll as a fold
+#+begin_src racket
+(define (concatAll-via-fold [lists : (Listof (Listof 'a)) ])
+  : (Listof 'a)
+  (foldr (lambda (currentList mergedTail)
+           (append currentList mergedTail))
+         '()
+         lists))
+(concatAll-via-fold (list (list 1 2) (list 3 4 5) (list 99) (list )))
+#+end_src
+
+#+RESULTS[951ce96689f5cd53c22c2d3177fabdedbea06edc]:
+#+begin_src racket
+'(1 2 3 4 5 99)
+#+end_src
+
 *** List Recursion, Once And For All
 - ~foldr~ is the higher-order function version of pattern matching on lists
   + Give an empty case (initial value)
@@ -3081,10 +3192,16 @@ return g(x);
   + Give a way to update the accumulator for each element of the list
 - These two functions can replace (nearly) all pattern matching/recursion on lists
 - Examples (see lecture Racket file)
-
+*** Folds for other types
+- ~foldl~ only works with lists or list-like types
+  + If there's multiple recursive values (e.g. tree), then can't do only tail calls
+- Conversely, every datatype has a version of ~foldr~
+  + Take a function that tells how to put recursive results into a final result
+  + Could derive it automatically, but Flit doesn't do this.
+  + Pattern matching is usually easier for non-lists
 * Abstract Syntax and Parsing :noexport:
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides004-syntax.pdf
+:EXPORT_FILE_NAME: pdf/slides011-syntax.pdf
 :header-args:racket: :results code :lang flit
 :CUSTOM_ID: abstract-syntax-and-parsing
 :END:
@@ -3174,9 +3291,17 @@ return g(x);
 :CUSTOM_ID: parsing-and-abstract-syntax
 :END:
 
+*** This Looks Familiar
+- An expression was:
+  + A number
+  + OR, "+" with (an expression AND and expression)
+  + OR, "*" with (an expression AND an expression)
+- What tools do we have to model something like this?
+
 *** Parse Trees
 - Notice that the different replacements didn't affect each other
   + Can effectively replace them in parallel
+  + This is what "context free" means
 - Tree structure
   + Non-terminal is a node
   + Terminal is a leaf
@@ -3198,10 +3323,10 @@ return g(x);
 *** Abstract Syntax
 #+begin_src racket
 (define-type Expr
-  (NumLit [n : Number])
-  (Plus [left : Expr]
+  (num [n : Number])
+  (plus [left : Expr]
         [right : Expr])
-  (Times [left : Expr]
+  (times [left : Expr]
          [right : Expr]))
 #+end_src
 - This is called the /abstract syntax/ for the programming language
@@ -3222,60 +3347,111 @@ return g(x);
   + Use  quoting to write s-expressions directly
     - Does the hard work of figuring out nested brackets
 
-*** S-expressions
+*** The S-Expression Type
 - Symbolic expressions
   + Goes back to John McCarthy, LISP, early days of AI at MIT
   + s-exp for short
-- An S-expression is either
-  + A symbol
-  + A literal (number, boolean, string, etc.)
-  + A bracketed list of S-expressions
+- In Flit, ~`(foo bar ...)~ always has type ~S-Exp~
+- We can imagine it as being something like:
+
+ #+begin_src racket
+(define-type S-Expr
+  (Identifier [x : Symbol])
+  (NumLit [n : Number]
+  (BoolLit [b : Boolean]))
+  ...
+  (List [s-exps : (Listof S-Expr)]))
+ #+end_src
+
+
+*** The Symbol Type
+- A useful built-in Flit type for names of things
+  + e.g. variables in a programming language we're interpreting
+- Symbol literals:
+  #+begin_src racket
+  'x
+  'hello
+  'foobar
+  'cheese
+  #+end_src
+- Only relevant operation is:
+  #+begin_src racket
+  symbol=? : (Symbol Symbol -> Boolean)
+  #+end_src
+  + Checks if two symbols are equal
+- Kind of like strings, but there's no concept of "substring"
+  + Just a tag that we can create and check if two are the same
+
+*** S-Expression in Flit
 - The backtick ~`~ in Racket says "interpret the next thing as an s-exp"
-  + Single-quote ~'~ does the same but doesn't handle literals, just symbols
+
   #+begin_src racket
     `a
     `(+ 2 3)
     `(a b c d (+ 2 3) #t (#f #f))
   #+end_src
 
-  #+RESULTS:
-  #+begin_src racket
-  `a
-  `(+ 2 3)
-  ~(a b c d (+ 2 3) #t (#f #f))
-  #+end_src
 - We'll use backtick as the first half of our parser
   + Easier to deal with s-expressions than strings
+
+*** S-Expression Operations
+- Many useful built-in functions
+  #+begin_src racket :exports both
+  (s-exp->list `(a b (+ 1 2) #f))
+  (s-exp-number? `x )
+  (s-exp-number? `3 )
+  (s-exp-symbol? `x )
+  (s-exp-symbol?  `(+ 2 3))
+  (symbol=? '+
+            (s-exp->symbol (first (s-exp->list `(+ 2 3)))))
+  #+end_src
+
+  #+RESULTS[65f762564779a8dc682c30b63f565bdf65cc843f]:
+  #+begin_src racket
+  (list `a `b `(+ 1 2) `#f)
+  #f
+  #t
+  #t
+  #f
+  #t
+  #+end_src
+
 *** From S-exp to AST
 - S-expression is a tree
   + Might not be a tree representing anything in our language
 - If s-exp is literal
+  + e.g. a number
   + Generate the literal in our AST
   + Error if it's unsupported
 - If it's a list
   + Check the first thing in the list
-  + If it's an operation, check that we have the right number of arguments
+  + If it's a keyword, check that we have the right number of arguments
   + If we do, (try to) parse each argument
 - Otherwise, fail
 - Uses the ~s-exp-match?~ function
-  + Don't need to memorize how it works, we'll give you the parsers for the most part
+  + Don't need to memorize how it works, we'll give you the parsers in this class
 *** Example Parser
 #+name: arith-parse
 #+begin_src racket
-(define (parse [s : S-Exp]) : Expr
+(define (parse [s : S-Exp]) : Exp
   (cond
-    [(s-exp-match? `NUMBER s) (NumLit (s-exp->number s))]
+    [(s-exp-match? `NUMBER s) (num (s-exp->number s))]
     [(s-exp-match? `{+ ANY ANY} s)
-     (Plus (parse (second (s-exp->list s)))
+       (plus (parse (second (s-exp->list s)))
             (parse (third (s-exp->list s))))]
     [(s-exp-match? `{* ANY ANY} s)
-     (Times (parse (second (s-exp->list s)))
+       (times (parse (second (s-exp->list s)))
             (parse (third (s-exp->list s))))]
     [else (error 'parse "invalid input")]))
 #+end_src
+
+#+RESULTS[563e8dad43c0e9a51bca411e53e88ea99b830f91]: arith-parse
+#+begin_src racket
+#+end_src
+
 * Arithmetic: Our First Interpreter :noexport:
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides005-arith.pdf
+:EXPORT_FILE_NAME: pdf/slides012-arith.pdf
 :header-args:racket: :results code :lang flit
 :CUSTOM_ID: arithmetic-our-first-interpreter
 :END:
@@ -3322,6 +3498,7 @@ return g(x);
 - We'll write interpreters for a bunch of small languages
   + We'll call them "Curly" because we write them with curly brackets
   + Write Curly programs in Racket files using quotation
+    -  Backtick turns them into S-Expressions for easy parsing
 
 *** General Form of an Interpreter
 #+begin_src racket
@@ -3337,49 +3514,67 @@ return g(x);
   + Initially we have no context arguments, and ~Value~ is very simple
   + Will get more complicated as we go through the course
 
-*** Our First Interpreter
+*** Our First AST Type
+- ~Exp~ is:
+  + Output of parsing
+  + Input to ~interp~
+  + Tree representation of the term to evaluate
+- ~Value~ is the result of running a program
+  + Output of ~interp~
+  + For now, just numbers
 #+name: arith-ast
 #+begin_src racket
-(define-type Expr
-  (NumLit [n : Number])
-  (Plus [left : Expr]
-        [right : Expr])
-  (Times [left : Expr]
-         [right : Expr]))
+(define-type-alias Value Number)
+(define-type Exp
+  (num [n : Number])
+  (plus [left : Exp]
+        [right : Exp])
+  (times [left : Exp]
+         [right : Exp]))
 #+end_src
-- Recursive function on structure of syntax
+
+
+*** Structure of Interpreter
+- Idea: if we know what the values of sub-expressions are, we can then look at what kind of AST node we have to determine what to do with those values
+  + How to get values from sub-expressions?
+  + Recursion!
+- ~interp~ is a recursive function on structure of syntax
   + Base cases are literals, translate directly into values
   + Recursive cases are operations
     - Interpret sub-expressions recursively
     - Combine according to value version of the operation
 
-
 *** Our First Interpreter
 - Interpreting arithmetic, so values are just Flit ~Number~
+  +  See Curly-Arith on URCourses
 
 #+name: arith-interp
 #+begin_src racket :noweb strip-export :exports both
 <<arith-ast>>
 <<arith-parse>>
-(define (interp [e : Expr] ) : Number
-  (type-case Expr e
-             [(NumLit n) n]
-             [(Plus l r)
+(define (interp [e : Exp] )
+        : Value
+  (type-case Exp e
+             [(num n) n]
+             [(plus l r)
                 (+ (interp l) (interp r))]
-             [(Times l r)
+             [(times l r)
                 (* (interp l) (interp r))]))
-(define (eval s-exp) (interp (parse s-exp)))
-(eval `3)
-(eval `{+ 2 5})
-(eval `{+ {* 1 {+ 2 1}} {+ {* 3 4} {* 0 1000000}}})
+(define (run s-exp) (interp (parse s-exp)))
+(run `3)
+(run `{+ 2 5})
+(run `{+ {* 1 {+ 2 1}} {+ {* 3 4} {* 0 1000000}}})
 #+end_src
 
-#+RESULTS: arith-interp
+#+RESULTS[bc33a595b5c6f23726e47316cf92ff97a8dfe189]: arith-interp
 #+begin_src racket
 3
 7
 15
 #+end_src
+
+
+** Extending Curly-Arith to Curly-Cond
 
 *** Adding features
 - Need to update
@@ -3391,18 +3586,18 @@ return g(x);
   + Evaluates to ~y~ if ~cond~ evaluates to anything else
 
 *** Updating the dataype
-#+name: arith-ast
+#+name: cond-ast
 #+begin_src racket
 (define-type Expr
   (NumLit [n : Number])
-  (Plus [left : Expr]
-        [right : Expr])
-  (Times [left : Expr]
-         [right : Expr]))
+  (Plus [left : Exp]
+        [right : Exp])
+  (Times [left : Exp]
+         [right : Exp]))
   ;;NEW
-  (If0 [test : Expr]
-       [thenBranch : Expr]
-       [elseBranch : Expr])
+  (If0 [test : Exp]
+       [thenBranch : Exp]
+       [elseBranch : Exp])
 #+end_src
 
 *** Updating the parser
@@ -3415,7 +3610,7 @@ return g(x);
 
 *** Updating the interpreter
 #+begin_src racket :noweb strip-export :exports both
-(define (interp [e : Expr] ) : Number
+(define (interp [e : Exp] ) : Number
   (type-case Expr e
              [(NumLit n) n]
              [(Plus l r)
@@ -3431,7 +3626,7 @@ return g(x);
 #+end_src
 * Desugaring: Our First Elaborator :noexport:
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides006-desugar.pdf
+:EXPORT_FILE_NAME: pdf/slides013-desugar.pdf
 :header-args:racket: :results code :lang flit
 :CUSTOM_ID: desugaring-our-first-elaborator
 :END:
@@ -3464,31 +3659,31 @@ return g(x);
 *** Subtraction: Datatype
 - First need the surface AST
 #+begin_src racket
-(define-type SurfaceExpr
+(define-type SurfExp
   (SurfNumLit [n : Number])
-  (SurfPlus [left : SurfaceExpr]
-        [right : SurfaceExpr])
-  (SurfTimes [left : SurfaceExpr]
-         [right : SurfaceExpr])
-  (SurfIf0 [test : SurfaceExpr]
-       [thenBranch : SurfaceExpr]
-       [elseBranch : SurfaceExpr])
-  (SurfSub [left : SurfaceExpr]
-       [right : SurfaceExpr]))
+  (SurfPlus [left : SurfExp]
+        [right : SurfExp])
+  (SurfTimes [left : SurfExp]
+         [right : SurfExp])
+  (SurfIf0 [test : SurfExp]
+       [thenBranch : SurfExp]
+       [elseBranch : SurfExp])
+  (SurfSub [left : SurfExp]
+       [right : SurfExp]))
 #+end_src
 *** Subtraction: Parser Case
 #+begin_src racket
-(define (parse [s : S-Exp]) : SurfaceExpr
+(define (parse [s : S-Exp]) : SurfExp
   ...
     [(s-exp-match? `{- ANY ANY} s)
      (SurfSub (parse (second (s-exp->list s)))
             (parse (third (s-exp->list s))))])
 #+end_src
 *** Subtraction: Elaborator
-- Define function that translates from ~SurfaceExpr~ to ~Expr~
+- Define function that translates from ~SurfExp~ to ~Expr~
 #+begin_src racket
-(define (elab [surf : SurfaceExpr]) : Expr
-  (type-case SurfaceExpr surf
+(define (elab [surf : SurfExp]) : Expr
+  (type-case SurfExp surf
              [(SurfNumLit n) (NumLit n)]
              [(SurfPlus x y) (Plus x y)]
              [(SurfTimes x y) (Times x y)]
@@ -3509,7 +3704,7 @@ return g(x);
 
 * Functions, Variables and Substitution :noexport:
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides007-subst.pdf
+:EXPORT_FILE_NAME: pdf/slides014-subst.pdf
 :header-args:racket: :results code :lang flit
 :CUSTOM_ID: functions-variables-and-substitution
 :END:
@@ -3746,7 +3941,7 @@ return g(x);
   + Translate away certain features
   + Also called /elaboration/
 - ~{- x y}~ is the same as ~{+ x {* -1 y}}~
-- String $\to_\text{backtick}$ S-Exp $\to_\text{parse}$ SurfaceExpr $\\ \qquad\qquad \to_{elab}$ Expr $\to_\text{interp}$ Number
+- String $\to_\text{backtick}$ S-Exp $\to_\text{parse}$ SurfExp $\\ \qquad\qquad \to_{elab}$ Expr $\to_\text{interp}$ Number
 *** Curly-Fun
 - Adds function definitions and function calls
   + Single parameter functions, number in, number out
@@ -3760,7 +3955,7 @@ return g(x);
 
 * Environments, Binding, and Scope :noexport:
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides009-environments.pdf
+:EXPORT_FILE_NAME: pdf/slides015-environments.pdf
 :header-args:racket: :results code :lang flit
 :CUSTOM_ID: environments-binding-and-scope
 :END:
@@ -4329,7 +4524,7 @@ emptyEnv
 :PROPERTIES:
 :CUSTOM_ID: the-details
 :END:
-*** Substitution to Environmenst, Review
+*** Substitution to Environments, Review
 - Interpreter takes environment argument
   #+begin_src racket
   (define (interp [env : Env]
@@ -4711,7 +4906,7 @@ myFunction().then(
 
 * Currying and the Lambda Calculus :noexport:
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides016-currying.pdf
+:EXPORT_FILE_NAME: pdf/slides014-currying.pdf
 :header-args:racket: :results code :lang flit
 :CUSTOM_ID: currying-and-the-lambda-calculus
 :END:
@@ -4934,7 +5129,7 @@ myFunction().then(
 - Once we have recursion, we have loops
 * Store Passing and Boxes :noexport:
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides017-box.pdf
+:EXPORT_FILE_NAME: pdf/slides015-box.pdf
 :header-args:racket: :results code :lang flit
 :CUSTOM_ID: store-passing-and-boxes
 :END:
@@ -5234,7 +5429,7 @@ myFunction().then(
     - ... until we implement more advanced features e.g. undo, backtracking
 * Mutable Variables :noexport:
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides018-mutvar.pdf
+:EXPORT_FILE_NAME: pdf/slides016-mutvar.pdf
 :header-args:racket: :results code :lang flit
 :CUSTOM_ID: mutable-variables
 :END:
@@ -5411,7 +5606,7 @@ myFunction().then(
 - The final result is 6, since the value of ~y~ was changed
 * Implementing Recursion via State :noexport:
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides019-recursion.pdf
+:EXPORT_FILE_NAME: pdf/slides017-recursion.pdf
 :header-args:racket: :results code :lang flit
 :CUSTOM_ID: implementing-recursion-via-state
 :END:
@@ -5566,7 +5761,7 @@ myFunction().then(
 - Useful in typed languages that can't give the Y-combinator a type
 * Objects and OOP :noexport:
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides020-oop.pdf
+:EXPORT_FILE_NAME: pdf/slides018-oop.pdf
 :header-args:racket: :results code :lang flit
 :CUSTOM_ID: objects-and-oop
 :END:
@@ -5818,7 +6013,7 @@ myFunction().then(
 #+end_src
 * Lazy Evaluation :noexport:
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides021-lazy.pdf
+:EXPORT_FILE_NAME: pdf/slides019-lazy.pdf
 :header-args:racket: :results code :lang flit
 :CUSTOM_ID: lazy-evaluation
 :END:
