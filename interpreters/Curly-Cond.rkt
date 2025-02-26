@@ -1,4 +1,4 @@
-#lang plait
+#lang flit
 
 ;; Curly-Cond: A programming language with conditionals
 
@@ -15,63 +15,65 @@
 
 ;; Abstract syntax for Curly-Cond
 ;; Represents expressions in our interpreter
-(define-type Expr
+(define-type Exp
   ;; Constant numbers
-  (NumLit [n : Number])
+  (num [n : Number])
   ;; {+ e1 e2}
-  (Plus [left : Expr]
-        [right : Expr])
+  (plus [left : Exp]
+        [right : Exp])
   ;; {* e1 e2}
-  (Times [left : Expr]
-         [right : Expr])
+  (times [left : Exp]
+         [right : Exp])
   ;; NEW
   ;; {if0 e1 e2 e3}
-  (If0 [test : Expr]
-       [thenCase : Expr]
-       [elseCase : Expr]))
+  (cnd [test : Exp]
+       [thenCase : Exp]
+       [elseCase : Exp]))
+
+(define-type-alias Value Number)
 
 ;; Parse
-;; Takes an S-expression and turns it into an Expr
+;; Takes an S-expression and turns it into an Exp
 ;; Raises an error if it doesn't represent a valid program
-(define (parse [s : S-Exp]) : Expr
+(define (parse [s : S-Exp]) : Exp
   (cond
     ;; Constant number e.g. 5
-    [(s-exp-match? `NUMBER s) (NumLit (s-exp->number s))]
+    [(s-exp-match? `NUMBER s) (num (s-exp->number s))]
     ;; {+ s1 s2}
     [(s-exp-match? `{+ ANY ANY} s)
-     (Plus (parse (second (s-exp->list s)))
+     (plus (parse (second (s-exp->list s)))
            (parse (third (s-exp->list s))))]
     ;; {* s1 s2}
     [(s-exp-match? `{* ANY ANY} s)
-     (Times (parse (second (s-exp->list s)))
+     (times (parse (second (s-exp->list s)))
             (parse (third (s-exp->list s))))]
     ;; NEW
     ;; Same idea as above, but we're looking for 3 arguments, not 2, for if0
     [(s-exp-match? `{if0 ANY ANY ANY} s)
-     (If0 (parse (second (s-exp->list s)))
-            (parse (third (s-exp->list s)))
-            (parse (fourth (s-exp->list s))))]
+     (cnd (parse (second (s-exp->list s)))
+          (parse (third (s-exp->list s)))
+          (parse (fourth (s-exp->list s))))]
     [else (error 'parse "invalid input")]))
 
 ;; Evaluate Expressions
-(define (interp [e : Expr] ) : Number
-  (type-case Expr e
+(define (interp [e : Exp] ) : Value
+  (type-case Exp e
     ;; A number evaluates to itself
-    [(NumLit n) n]
+    [(num n) n]
     ;; {+ e1 e2} evaluates e1 and e2, then adds the results together
-    [(Plus l r)
+    [(plus l r)
      (+ (interp l) (interp r))]
     ;; Works the same but for times
-    [(Times l r)
+    [(times l r)
      (* (interp l) (interp r))]
     ;; NEW
     ;; {if0 test thn els} evaluates test and checks if it's zero
     ;; if it is, then we evaluate thn
     ;; otherwise we evaluate els
-    [(If0 test thn els)
-       (if (= 0 (interp test))
-           (interp thn)
-           (interp els))]))
+    [(cnd test thn els)
+     (if (= 0 (interp test))
+         (interp thn)
+         (interp els))]))
 
 ;; The Language Pipeline
 ;; We run  program by parsing an s-expression into an expression
