@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2025-02-26 Wed 12:33 -->
+<!-- 2025-02-28 Fri 17:22 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Lecture Slides for CS 350, URegina Winter 2025</title>
@@ -334,7 +334,7 @@ $(function() {    $('.definition').before("<p class='admonition-title note'>Defi
 <li><a href="#generative-recursion-and-tail-recursion">10. Folds: Recursion as a Function</a></li>
 <li><a href="#abstract-syntax-and-parsing">11. Abstract Syntax and Parsing</a></li>
 <li><a href="#arithmetic-our-first-interpreter">12. Arithmetic: Our First Interpreter</a></li>
-<li><a href="#desugaring-our-first-elaborator">13. Desugaring: Our First Elaborator</a></li>
+<li><a href="#values-dyntype">13. Values, Dynamic Typing and Desugaring</a></li>
 </ul>
 </div>
 </div>
@@ -347,7 +347,7 @@ $(function() {    $('.definition').before("<p class='admonition-title note'>Defi
 <div class="outline-text-3" id="text-course-overview">
 </div>
 <ol class="org-ol">
-<li><a id="org59499cc"></a>Course Objectives<br />
+<li><a id="org97a6b94"></a>Course Objectives<br />
 <div class="outline-text-4" id="text-1-1-1">
 <p>
 To learn:
@@ -369,10 +369,10 @@ To learn:
 </ul>
 </div>
 <ol class="org-ol">
-<li><a id="orge6bf446"></a><span class="underline">To change how you <i>think</i> about programming</span><br /></li>
+<li><a id="org4277b4a"></a><span class="underline">To change how you <i>think</i> about programming</span><br /></li>
 </ol>
 </li>
-<li><a id="orgea1b4cd"></a>Course Notes / Textbook<br />
+<li><a id="orga49d3e9"></a>Course Notes / Textbook<br />
 <div class="outline-text-4" id="text-1-1-2">
 <ul class="org-ul">
 <li>Course Notes: <i>Functional Languages, Interpreters and Types</i>
@@ -393,7 +393,7 @@ To learn:
 </ul>
 </div>
 </li>
-<li><a id="orgd22569b"></a>Course Communication<br />
+<li><a id="org6ea725d"></a>Course Communication<br />
 <div class="outline-text-4" id="text-1-1-3">
 <ul class="org-ul">
 <li>Everything on URCourses
@@ -415,7 +415,7 @@ your solution to the assignment</li>
 </ul>
 </div>
 </li>
-<li><a id="org04dfc7a"></a>Office Hours<br />
+<li><a id="orgcd5b3d7"></a>Office Hours<br />
 <div class="outline-text-4" id="text-1-1-4">
 <ul class="org-ul">
 <li>Location: RIC 317
@@ -429,7 +429,7 @@ your solution to the assignment</li>
 </ul>
 </div>
 </li>
-<li><a id="org27f8d9b"></a>Grading Scheme<br />
+<li><a id="org4012eec"></a>Grading Scheme<br />
 <div class="outline-text-4" id="text-1-1-5">
 <ul class="org-ul">
 <li>35% assignments</li>
@@ -443,7 +443,7 @@ your solution to the assignment</li>
 </ul>
 </div>
 </li>
-<li><a id="org9d73324"></a>Participation<br />
+<li><a id="org5881e29"></a>Participation<br />
 <div class="outline-text-4" id="text-1-1-6">
 <ul class="org-ul">
 <li>You get marks just for showing up</li>
@@ -456,7 +456,7 @@ your solution to the assignment</li>
 </ul>
 </div>
 </li>
-<li><a id="org912bd95"></a>Assignment 0<br />
+<li><a id="org2a5a603"></a>Assignment 0<br />
 <div class="outline-text-4" id="text-1-1-7">
 <ul class="org-ul">
 <li>Due Monday, On URCourses</li>
@@ -474,7 +474,7 @@ your solution to the assignment</li>
 </ul>
 </div>
 </li>
-<li><a id="org82e6425"></a>Assignments 1-6<br />
+<li><a id="org2ed820b"></a>Assignments 1-6<br />
 <div class="outline-text-4" id="text-1-1-8">
 <ul class="org-ul">
 <li>Six bi-weekly assignments</li>
@@ -489,7 +489,7 @@ your solution to the assignment</li>
 </ul>
 </div>
 </li>
-<li><a id="orgf34b74d"></a>Assignments (ctd.)<br />
+<li><a id="org31e1cd6"></a>Assignments (ctd.)<br />
 <div class="outline-text-4" id="text-1-1-9">
 <ul class="org-ul">
 <li>Mostly programming
@@ -509,7 +509,7 @@ your solution to the assignment</li>
 </ul>
 </div>
 </li>
-<li><a id="org112f0b6"></a>Submitting Assignments via Handin<br />
+<li><a id="orgf1b978a"></a>Submitting Assignments via Handin<br />
 <div class="outline-text-4" id="text-1-1-10">
 <ul class="org-ul">
 <li>Unlimited submissions before deadline</li>
@@ -522,7 +522,7 @@ your solution to the assignment</li>
 </ul>
 </div>
 </li>
-<li><a id="org33e40bc"></a>Syntax and Type Errors<br />
+<li><a id="orgc7d3ed0"></a>Syntax and Type Errors<br />
 <div class="outline-text-4" id="text-1-1-11">
 <ul class="org-ul">
 <li><b>ALL CODE CONTAINING SYNTAX OR TYPE ERRORS WILL GET A GRADE OF ZERO</b>
@@ -534,7 +534,7 @@ your solution to the assignment</li>
 </ul>
 </div>
 </li>
-<li><a id="orgf1f4bc1"></a>Resources for This Course<br />
+<li><a id="orgab681fd"></a>Resources for This Course<br />
 <div class="outline-text-4" id="text-1-1-12">
 <ul class="org-ul">
 <li>There are few resources available for you to learn about <code>flit</code>
@@ -557,7 +557,7 @@ your solution to the assignment</li>
 </ul>
 </div>
 </li>
-<li><a id="org7c90a74"></a>Academic Integrity<br />
+<li><a id="orgc659094"></a>Academic Integrity<br />
 <div class="outline-text-4" id="text-1-1-13">
 <ul class="org-ul">
 <li>You are to complete all assignments <b>individually</b></li>
@@ -575,17 +575,17 @@ your solution to the assignment</li>
 </ul>
 </div>
 <ol class="org-ol">
-<li><a id="org6dec5a8"></a>Don&rsquo;t set yourself up for failure on the exams<br /></li>
+<li><a id="orgc59e159"></a>Don&rsquo;t set yourself up for failure on the exams<br /></li>
 </ol>
 </li>
 </ol>
 </div>
-<div id="outline-container-orgea5d8db" class="outline-3">
-<h3 id="orgea5d8db"><span class="section-number-3">1.2.</span> Course Content</h3>
+<div id="outline-container-org43f9232" class="outline-3">
+<h3 id="org43f9232"><span class="section-number-3">1.2.</span> Course Content</h3>
 <div class="outline-text-3" id="text-1-2">
 </div>
 <ol class="org-ol">
-<li><a id="org6b0c6e7"></a>Course Objectives<br />
+<li><a id="orgf50b7c3"></a>Course Objectives<br />
 <div class="outline-text-4" id="text-1-2-1">
 <p>
 Programming language genealogy and design.
@@ -620,7 +620,7 @@ Parallel programming.
 </p>
 </div>
 </li>
-<li><a id="org1df4e4e"></a>Course Objectives<br />
+<li><a id="org4a30ef0"></a>Course Objectives<br />
 <div class="outline-text-4" id="text-1-2-2">
 <p>
 Programming language genealogy and design.
@@ -655,7 +655,7 @@ Parallel programming.
 </ul>
 </div>
 </li>
-<li><a id="org40cb221"></a>Course Objectives<br />
+<li><a id="orgc4bad0f"></a>Course Objectives<br />
 <div class="outline-text-4" id="text-1-2-3">
 <p>
 <b>Programming language genealogy and design.</b>
@@ -690,7 +690,7 @@ Parallel programming.
 </ul>
 </div>
 </li>
-<li><a id="orga2e97b6"></a>Common Questions<br />
+<li><a id="orga0f7893"></a>Common Questions<br />
 <div class="outline-text-4" id="text-1-2-4">
 <ul class="org-ul">
 <li>Am I going to use Racket in Industry?
@@ -700,7 +700,7 @@ Parallel programming.
 </ul>
 </div>
 </li>
-<li><a id="org25c9fdc"></a>Common Questions<br />
+<li><a id="org71367b6"></a>Common Questions<br />
 <div class="outline-text-4" id="text-1-2-5">
 <ul class="org-ul">
 <li>Then why are we learning it
@@ -717,7 +717,7 @@ Parallel programming.
 </ul>
 </div>
 </li>
-<li><a id="org1410d4d"></a>Common Questions<br />
+<li><a id="org1f5764e"></a>Common Questions<br />
 <div class="outline-text-4" id="text-1-2-6">
 <ul class="org-ul">
 <li>Do you really expect me to learn a new language in just one term?
@@ -728,7 +728,7 @@ Parallel programming.
 </ul>
 </div>
 </li>
-<li><a id="orga306a0c"></a>When might this course be useful?<br />
+<li><a id="org0c1018c"></a>When might this course be useful?<br />
 <div class="outline-text-4" id="text-1-2-7">
 <ul class="org-ul">
 <li><p>
@@ -751,7 +751,7 @@ You might get hired to
 </ul>
 </div>
 </li>
-<li><a id="org6f6f1e4"></a>The Science of Computer Science<br />
+<li><a id="org1f70944"></a>The Science of Computer Science<br />
 <div class="outline-text-4" id="text-1-2-8">
 <ul class="org-ul">
 <li>How to think about programs in a rigorous way
@@ -779,17 +779,17 @@ You might get hired to
 <h2 id="functional-programming-1-recursion-and-immutable-data"><span class="section-number-2">2.</span> Expressions and Immutable Data</h2>
 <div class="outline-text-2" id="text-functional-programming-1-recursion-and-immutable-data">
 
-<div id="org3a12179" class="figure">
+<div id="orgb410a6f" class="figure">
 <p><img src="./img/xkcd_parens.png" alt="xkcd_parens.png" />
 </p>
 </div>
 </div>
-<div id="outline-container-org74c1df2" class="outline-3">
-<h3 id="org74c1df2"><span class="section-number-3">2.1.</span> Overview</h3>
+<div id="outline-container-org41fdcea" class="outline-3">
+<h3 id="org41fdcea"><span class="section-number-3">2.1.</span> Overview</h3>
 <div class="outline-text-3" id="text-2-1">
 </div>
 <ol class="org-ol">
-<li><a id="org4a59aeb"></a>Objectives<br />
+<li><a id="org877148d"></a>Objectives<br />
 <div class="outline-text-4" id="text-2-1-1">
 <ul class="org-ul">
 <li>To learn how to use Dr. Racket</li>
@@ -799,12 +799,12 @@ You might get hired to
 </li>
 </ol>
 </div>
-<div id="outline-container-orgab367dc" class="outline-3">
-<h3 id="orgab367dc"><span class="section-number-3">2.2.</span> Programming in CS 350</h3>
+<div id="outline-container-org5e3d864" class="outline-3">
+<h3 id="org5e3d864"><span class="section-number-3">2.2.</span> Programming in CS 350</h3>
 <div class="outline-text-3" id="text-2-2">
 </div>
 <ol class="org-ol">
-<li><a id="org53f7b5b"></a>All coding for this class uses:<br />
+<li><a id="orgdfaf9b8"></a>All coding for this class uses:<br />
 <div class="outline-text-4" id="text-2-2-1">
 <ul class="org-ul">
 <li>The Racket Programming Language</li>
@@ -821,12 +821,12 @@ You might get hired to
 </li>
 </ol>
 </div>
-<div id="outline-container-org64bb767" class="outline-3">
-<h3 id="org64bb767"><span class="section-number-3">2.3.</span> Racket</h3>
+<div id="outline-container-org8cba61a" class="outline-3">
+<h3 id="org8cba61a"><span class="section-number-3">2.3.</span> Racket</h3>
 <div class="outline-text-3" id="text-2-3">
 </div>
 <ol class="org-ol">
-<li><a id="org07de505"></a>What is Racket?<br />
+<li><a id="org8948741"></a>What is Racket?<br />
 <div class="outline-text-4" id="text-2-3-1">
 <ul class="org-ul">
 <li>Lisp-style language
@@ -841,7 +841,7 @@ You might get hired to
 </ul>
 </div>
 </li>
-<li><a id="orgf338c5e"></a>What is Dr. Racket?<br />
+<li><a id="orge6930fd"></a>What is Dr. Racket?<br />
 <div class="outline-text-4" id="text-2-3-2">
 <ul class="org-ul">
 <li>IDE for Racket
@@ -863,12 +863,12 @@ You might get hired to
 </li>
 </ol>
 </div>
-<div id="outline-container-orga5b1b2d" class="outline-3">
-<h3 id="orga5b1b2d"><span class="section-number-3">2.4.</span> Flit</h3>
+<div id="outline-container-org159d379" class="outline-3">
+<h3 id="org159d379"><span class="section-number-3">2.4.</span> Flit</h3>
 <div class="outline-text-3" id="text-2-4">
 </div>
 <ol class="org-ol">
-<li><a id="org0e3f5d1"></a>Objectives<br />
+<li><a id="org506da81"></a>Objectives<br />
 <div class="outline-text-4" id="text-2-4-1">
 <ul class="org-ul">
 <li>Learn the syntax of core flit features
@@ -883,7 +883,7 @@ You might get hired to
 </ul>
 </div>
 </li>
-<li><a id="org26b8ca4"></a>What is Flit?<br />
+<li><a id="org5e19a8a"></a>What is Flit?<br />
 <div class="outline-text-4" id="text-2-4-2">
 <ul class="org-ul">
 <li>&ldquo;Functional Languages, Interpreters and Types&rdquo;</li>
@@ -905,7 +905,7 @@ You might get hired to
 </ul>
 </div>
 </li>
-<li><a id="org4225855"></a>Flit features:<br />
+<li><a id="org5dc9245"></a>Flit features:<br />
 <div class="outline-text-4" id="text-2-4-3">
 <ul class="org-ul">
 <li>Purely functional
@@ -931,7 +931,7 @@ You might get hired to
 </ul>
 </div>
 </li>
-<li><a id="org4a8d061"></a>Syntax in Flit<br />
+<li><a id="org2a03685"></a>Syntax in Flit<br />
 <div class="outline-text-4" id="text-2-4-4">
 <ul class="org-ul">
 <li>Expression: something that we run to compute a value</li>
@@ -957,7 +957,7 @@ the meaning of the expression
 </ul>
 </div>
 </li>
-<li><a id="orgd623295"></a>Infix vs. Prefix<br />
+<li><a id="orgc613cda"></a>Infix vs. Prefix<br />
 <div class="outline-text-4" id="text-2-4-5">
 <ul class="org-ul">
 <li>All operations in Flit are written using &ldquo;prefix notation&rdquo;
@@ -969,7 +969,7 @@ the meaning of the expression
 </ul>
 </div>
 </li>
-<li><a id="org6818da0"></a>Function calls<br />
+<li><a id="org2c524c1"></a>Function calls<br />
 <div class="outline-text-4" id="text-2-4-6">
 <ul class="org-ul">
 <li>In C++ you write <code>f(x,y,z)</code></li>
@@ -978,7 +978,7 @@ the meaning of the expression
 </ul>
 </div>
 </li>
-<li><a id="org4779def"></a>Why Parentheses?<br />
+<li><a id="org8e56ed1"></a>Why Parentheses?<br />
 <div class="outline-text-4" id="text-2-4-7">
 <ul class="org-ul">
 <li>They&rsquo;re different from what you&rsquo;re used to
@@ -998,7 +998,7 @@ the meaning of the expression
 </ul>
 </div>
 </li>
-<li><a id="orgf021590"></a>Square vs. Round vs. Curly<br />
+<li><a id="org76fcbe7"></a>Square vs. Round vs. Curly<br />
 <div class="outline-text-4" id="text-2-4-8">
 <ul class="org-ul">
 <li>Racket treats all parentheses as the same</li>
@@ -1025,7 +1025,7 @@ the meaning of the expression
 </ul>
 </div>
 </li>
-<li><a id="org57a53f4"></a>Parentheses in the real world<br />
+<li><a id="org6ca5234"></a>Parentheses in the real world<br />
 <div class="outline-text-4" id="text-2-4-9">
 <ul class="org-ul">
 <li>e.g. Clojure, uses parentheses</li>
@@ -1034,7 +1034,7 @@ the meaning of the expression
 </ul>
 </div>
 </li>
-<li><a id="org58566a8"></a>Numbers<br />
+<li><a id="org569d0f9"></a>Numbers<br />
 <div class="outline-text-4" id="text-2-4-10">
 <ul class="org-ul">
 <li>Most operations prefix version of what you&rsquo;ve seen in C++/python</li>
@@ -1061,7 +1061,7 @@ the meaning of the expression
 </div>
 </div>
 </li>
-<li><a id="orgd49cc51"></a>Booleans<br />
+<li><a id="org2f499c2"></a>Booleans<br />
 <div class="outline-text-4" id="text-2-4-11">
 <ul class="org-ul">
 <li>Literals written #t and #f</li>
@@ -1087,7 +1087,7 @@ the meaning of the expression
 </div>
 </div>
 </li>
-<li><a id="org37f8063"></a>Imperative Languages<br />
+<li><a id="orgd206ded"></a>Imperative Languages<br />
 <div class="outline-text-4" id="text-2-4-12">
 <ul class="org-ul">
 <li>C, C++, and Python are <i>imperative languages</i>
@@ -1105,7 +1105,7 @@ the meaning of the expression
 </ul>
 </div>
 </li>
-<li><a id="org07afbf5"></a>Functional Language<br />
+<li><a id="orgb7bdbf5"></a>Functional Language<br />
 <div class="outline-text-4" id="text-2-4-13">
 <ul class="org-ul">
 <li>Flit is <i>purely functional</i></li>
@@ -1122,7 +1122,7 @@ the meaning of the expression
 </ul>
 </div>
 </li>
-<li><a id="org4f2a90d"></a>Example: Imperative Conditionals<br />
+<li><a id="orgab672d0"></a>Example: Imperative Conditionals<br />
 <div class="outline-text-4" id="text-2-4-14">
 <ul class="org-ul">
 <li>Conditionals in C++/Python tell what to <i>do</i></li>
@@ -1139,7 +1139,7 @@ the meaning of the expression
 </ul>
 </div>
 </li>
-<li><a id="org5dcb050"></a>Conditional Expressions<br />
+<li><a id="org8506ed3"></a>Conditional Expressions<br />
 <div class="outline-text-4" id="text-2-4-15">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">if</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">&lt;</span> <span style="color: #da8548; font-weight: bold;">2</span> <span style="color: #da8548; font-weight: bold;">3</span><span style="color: #a626a4;">)</span> <span style="color: #50a14f;">"hello"</span> <span style="color: #50a14f;">"goodbye"</span><span style="color: #4078f2;">)</span>
@@ -1170,7 +1170,7 @@ the meaning of the expression
 </ul>
 </div>
 </li>
-<li><a id="org2834830"></a>Equational Reasoning<br />
+<li><a id="org7fef040"></a>Equational Reasoning<br />
 <div class="outline-text-4" id="text-2-4-16">
 <ul class="org-ul">
 <li>When all variables are immutable, we can treat programs as mathematical objects</li>
@@ -1189,7 +1189,7 @@ Example:
 </ul>
 </div>
 </li>
-<li><a id="org4b552c9"></a>Imperative Breaks Equational Reasoning<br />
+<li><a id="orgca6d82a"></a>Imperative Breaks Equational Reasoning<br />
 <div class="outline-text-4" id="text-2-4-17">
 <ul class="org-ul">
 <li><p>
@@ -1207,7 +1207,7 @@ In C++, the equals sign is a LIE
 </ul>
 </div>
 </li>
-<li><a id="org29f6eb7"></a>Equations for IF<br />
+<li><a id="orgdcca544"></a>Equations for IF<br />
 <div class="outline-text-4" id="text-2-4-18">
 <ul class="org-ul">
 <li>We can describe the behaviour of if-expressions with the following two equations:</li>
@@ -1234,7 +1234,7 @@ For any expressions <code>EXPR1</code> and <code>EXPR2</code>
 </ul>
 </div>
 </li>
-<li><a id="orgde02fe0"></a>Functions<br />
+<li><a id="org382cc57"></a>Functions<br />
 <div class="outline-text-4" id="text-2-4-19">
 <ul class="org-ul">
 <li>Calling a function replaces variable with concrete argument</li>
@@ -1255,7 +1255,7 @@ For any expressions <code>EXPR1</code> and <code>EXPR2</code>
 </div>
 </div>
 </li>
-<li><a id="org50b375e"></a>Calling Functions<br />
+<li><a id="org2af6111"></a>Calling Functions<br />
 <div class="outline-text-4" id="text-2-4-20">
 <ul class="org-ul">
 <li>Syntax for calling a function is
@@ -1276,7 +1276,7 @@ For any expressions <code>EXPR1</code> and <code>EXPR2</code>
 </ul>
 </div>
 </li>
-<li><a id="orgfc7103e"></a>Defining Multi-Argument Functions<br />
+<li><a id="org3b9d632"></a>Defining Multi-Argument Functions<br />
 <div class="outline-text-4" id="text-2-4-21">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">isRemainder</span> <span style="color: #50a14f;">[</span>x <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span>
@@ -1296,7 +1296,7 @@ For any expressions <code>EXPR1</code> and <code>EXPR2</code>
 </div>
 </div>
 </li>
-<li><a id="org3d8182c"></a>General Form Defining Functions<br />
+<li><a id="org81eae20"></a>General Form Defining Functions<br />
 <div class="outline-text-4" id="text-2-4-22">
 <ul class="org-ul">
 <li>General form:</li>
@@ -1325,7 +1325,7 @@ For any expressions <code>EXPR1</code> and <code>EXPR2</code>
 </ul>
 </div>
 </li>
-<li><a id="org0341747"></a>Type Inference<br />
+<li><a id="orgaa1825d"></a>Type Inference<br />
 <div class="outline-text-4" id="text-2-4-23">
 <ul class="org-ul">
 <li>We can leave types off function arguments and return type</li>
@@ -1345,7 +1345,7 @@ Compiler is <i>usually</i> smart enough to figure out the types
 </ul>
 </div>
 </li>
-<li><a id="org83f9e84"></a>Semantics of Function Calls<br />
+<li><a id="org8657380"></a>Semantics of Function Calls<br />
 <div class="outline-text-4" id="text-2-4-24">
 <ul class="org-ul">
 <li>Functions are about <i>substitution</i>:</li>
@@ -1371,7 +1371,7 @@ where <code>[x =&gt; EXPR]body</code> is <code>body</code>, with all non-shadowe
 </div>
 </div>
 </li>
-<li><a id="org76f46d3"></a>Intermediate definitions<br />
+<li><a id="org82ffbeb"></a>Intermediate definitions<br />
 <div class="outline-text-4" id="text-2-4-25">
 <ul class="org-ul">
 <li>Can still define variables
@@ -1398,9 +1398,9 @@ where <code>[x =&gt; EXPR]body</code> is <code>body</code>, with all non-shadowe
 </div>
 </div>
 </li>
-<li><a id="org40e2cdd"></a>Understanding Definitions<br />
+<li><a id="orge6faa78"></a>Understanding Definitions<br />
 <ol class="org-ol">
-<li><a id="org351e726"></a>In C++, you might write<br />
+<li><a id="orgdfb830e"></a>In C++, you might write<br />
 <div class="outline-text-5" id="text-2-4-26-1">
 <div class="org-src-container">
 <pre class="src src-C++">&nbsp; &nbsp; &nbsp; &nbsp; <span style="color: #e45649;">while</span> (someCond){
@@ -1426,7 +1426,7 @@ where <code>[x =&gt; EXPR]body</code> is <code>body</code>, with all non-shadowe
 </li>
 </ol>
 </li>
-<li><a id="orgdf8e2ac"></a>General Syntax<br />
+<li><a id="org6235694"></a>General Syntax<br />
 <div class="outline-text-4" id="text-2-4-27">
 <ul class="org-ul">
 <li>In general:</li>
@@ -1455,7 +1455,7 @@ where <code>[x =&gt; EXPR]body</code> is <code>body</code>, with all non-shadowe
 </ul>
 </div>
 </li>
-<li><a id="orgcc1fc5c"></a>Semantics of Let<br />
+<li><a id="org5c9d105"></a>Semantics of Let<br />
 <div class="outline-text-4" id="text-2-4-28">
 <div id="gls.3" class="admonition note">
                         <p class="admonition-title note">Definition: Semantics of Let for Single Variables</p>&nbsp;
@@ -1479,7 +1479,7 @@ where <code>[x =&gt; EXPR]body</code> is <code>body</code> with all non-shadowed
 </ul>
 </div>
 </li>
-<li><a id="org6d0e715"></a>Alternate versions of Let<br />
+<li><a id="org198e62e"></a>Alternate versions of Let<br />
 <div class="outline-text-4" id="text-2-4-29">
 <ul class="org-ul">
 <li>There&rsquo;s also <code>let</code>
@@ -1504,12 +1504,12 @@ where <code>[x =&gt; EXPR]body</code> is <code>body</code> with all non-shadowed
 <h2 id="functional-programming-1-recursion-and-immutable-data"><span class="section-number-2">3.</span> Types in Flit</h2>
 <div class="outline-text-2" id="text-functional-programming-1-recursion-and-immutable-data">
 </div>
-<div id="outline-container-org16c8733" class="outline-3">
-<h3 id="org16c8733"><span class="section-number-3">3.1.</span> Programming with Holes</h3>
+<div id="outline-container-org897b6ba" class="outline-3">
+<h3 id="org897b6ba"><span class="section-number-3">3.1.</span> Programming with Holes</h3>
 <div class="outline-text-3" id="text-3-1">
 </div>
 <ol class="org-ol">
-<li><a id="org119e4fe"></a>Why write down types?<br />
+<li><a id="orgc83fab8"></a>Why write down types?<br />
 <div class="outline-text-4" id="text-3-1-1">
 <ul class="org-ul">
 <li>With type inference, we don&rsquo;t <i>need</i> to write down types</li>
@@ -1529,7 +1529,7 @@ where <code>[x =&gt; EXPR]body</code> is <code>body</code> with all non-shadowed
 </ul>
 </div>
 </li>
-<li><a id="org23510c4"></a>Checking Types<br />
+<li><a id="org0c22872"></a>Checking Types<br />
 <div class="outline-text-4" id="text-3-1-2">
 <ul class="org-ul">
 <li>Can annotate any expression to confirm its type</li>
@@ -1549,7 +1549,7 @@ where <code>[x =&gt; EXPR]body</code> is <code>body</code> with all non-shadowed
 </div>
 </div>
 </li>
-<li><a id="orgd452fb8"></a>Strong Typing<br />
+<li><a id="org7cd3fc8"></a>Strong Typing<br />
 <div class="outline-text-4" id="text-3-1-3">
 <ul class="org-ul">
 <li>Flit is <i>strongly typed</i>
@@ -1568,7 +1568,7 @@ where <code>[x =&gt; EXPR]body</code> is <code>body</code> with all non-shadowed
 </ul>
 </div>
 </li>
-<li><a id="org95522b6"></a>Thinking About Types<br />
+<li><a id="org1cf2f09"></a>Thinking About Types<br />
 <div class="outline-text-4" id="text-3-1-4">
 <ul class="org-ul">
 <li>With any type, there are two things we care about
@@ -1583,7 +1583,7 @@ where <code>[x =&gt; EXPR]body</code> is <code>body</code> with all non-shadowed
 </ul>
 </div>
 </li>
-<li><a id="org3de1c41"></a>Numbers<br />
+<li><a id="org3bc3997"></a>Numbers<br />
 <div class="outline-text-4" id="text-3-1-5">
 <ul class="org-ul">
 <li>To create: literals <code>3</code>, <code>22</code>, <code>0.00001</code></li>
@@ -1596,7 +1596,7 @@ where <code>[x =&gt; EXPR]body</code> is <code>body</code> with all non-shadowed
 </ul>
 </div>
 </li>
-<li><a id="orgd563293"></a>Strings<br />
+<li><a id="orged5a3a3"></a>Strings<br />
 <div class="outline-text-4" id="text-3-1-6">
 <ul class="org-ul">
 <li>To create: string literals
@@ -1612,7 +1612,7 @@ where <code>[x =&gt; EXPR]body</code> is <code>body</code> with all non-shadowed
 </ul>
 </div>
 </li>
-<li><a id="org89bb38a"></a>Booleans<br />
+<li><a id="org7b8371b"></a>Booleans<br />
 <div class="outline-text-4" id="text-3-1-7">
 <ul class="org-ul">
 <li>To create: literals <code>#t</code>, <code>#f</code></li>
@@ -1621,7 +1621,7 @@ where <code>[x =&gt; EXPR]body</code> is <code>body</code> with all non-shadowed
 </ul>
 </div>
 </li>
-<li><a id="orgdfdd48b"></a>Types for If<br />
+<li><a id="org2b41752"></a>Types for If<br />
 <div class="outline-text-4" id="text-3-1-8">
 <ul class="org-ul">
 <li><code>if</code> is not a function
@@ -1636,7 +1636,7 @@ where <code>[x =&gt; EXPR]body</code> is <code>body</code> with all non-shadowed
 </ul>
 </div>
 </li>
-<li><a id="orgce122fa"></a>Typing Rule for If<br />
+<li><a id="org59f4d44"></a>Typing Rule for If<br />
 <div class="outline-text-4" id="text-3-1-9">
 <div id="gls.4" class="admonition note">
                         <p class="admonition-title note">Definition: Typing for If</p>&nbsp;
@@ -1666,7 +1666,7 @@ then:
 </ul>
 </div>
 </li>
-<li><a id="orgd65e919"></a>Function Calls<br />
+<li><a id="orga176945"></a>Function Calls<br />
 <div class="outline-text-4" id="text-3-1-10">
 <div id="gls.5" class="admonition note">
                         <p class="admonition-title note">Definition: Typing for Function Calls</p>&nbsp;
@@ -1694,7 +1694,7 @@ For any expressions <code>EXPR_f</code> and <code>EXPR_arg</code>
 </ul>
 </div>
 </li>
-<li><a id="orgfc30607"></a>Function Definitions<br />
+<li><a id="org1f4187e"></a>Function Definitions<br />
 <div class="outline-text-4" id="text-3-1-11">
 <div id="gls.6" class="admonition note">
                         <p class="admonition-title note">Definition: Typing for Function Definitions</p>&nbsp;
@@ -1727,7 +1727,7 @@ For a definition <code>(define (f x1 ... xN) body)</code>
 </ul>
 </div>
 </li>
-<li><a id="org6cf7660"></a>Programming Via Holes<br />
+<li><a id="orgd89667c"></a>Programming Via Holes<br />
 <div class="outline-text-4" id="text-3-1-12">
 <ul class="org-ul">
 <li>Figure out the type of the thing you&rsquo;re trying to write
@@ -1747,7 +1747,7 @@ For a definition <code>(define (f x1 ... xN) body)</code>
 </ul>
 </div>
 </li>
-<li><a id="org027c0bb"></a>Functions for Filling Holes<br />
+<li><a id="orgc5c4b96"></a>Functions for Filling Holes<br />
 <div class="outline-text-4" id="text-3-1-13">
 <ul class="org-ul">
 <li>Can always fill a hole of type <code>T</code> by applying a function that returns type <code>T</code>
@@ -1764,14 +1764,14 @@ For a definition <code>(define (f x1 ... xN) body)</code>
 </ul>
 </div>
 </li>
-<li><a id="org1f99f58"></a>Example: Max<br />
+<li><a id="org18d4886"></a>Example: Max<br />
 <div class="outline-text-4" id="text-3-1-14">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">max</span> <span style="color: #50a14f;">[</span>x <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span> <span style="color: #50a14f;">[</span> y <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span>
 &nbsp; TODO<span style="color: #4078f2;">)</span>
 </pre>
 </div>
-<pre class="example" id="org1ff225a">
+<pre class="example" id="org4336763">
 x : Number
 y : Number
 ---------------
@@ -1783,7 +1783,7 @@ TODO : Number
 </ul>
 </div>
 </li>
-<li><a id="orgf7b9b22"></a>Example: Max (ctd.)<br />
+<li><a id="org394987d"></a>Example: Max (ctd.)<br />
 <div class="outline-text-4" id="text-3-1-15">
 <ul class="org-ul">
 <li>Try putting in an <code>if</code></li>
@@ -1793,7 +1793,7 @@ TODO : Number
 &nbsp; <span style="color: #a626a4;">(</span><span style="color: #e45649;">if</span> TODO TODO TODO<span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
 </pre>
 </div>
-<pre class="example" id="org6823340">
+<pre class="example" id="org3c8f53f">
 x : Number
 y : Number
 ---------------
@@ -1806,7 +1806,7 @@ TODO3 : Number
 </ul>
 </div>
 </li>
-<li><a id="org05c1b23"></a>Finishing Max<br />
+<li><a id="org63c1c86"></a>Finishing Max<br />
 <div class="outline-text-4" id="text-3-1-16">
 <ul class="org-ul">
 <li>Try putting in an <code>if</code></li>
@@ -1825,7 +1825,7 @@ TODO3 : Number
 </ul>
 </div>
 </li>
-<li><a id="org52ed614"></a>Calling Max<br />
+<li><a id="orge6b9908"></a>Calling Max<br />
 <div class="outline-text-4" id="text-3-1-17">
 <ul class="org-ul">
 <li><p>
@@ -1876,12 +1876,12 @@ Can use equations to determine the result
 <h2 id="fun-prog-recursion"><span class="section-number-2">4.</span> Recursion and Lists</h2>
 <div class="outline-text-2" id="text-fun-prog-recursion">
 </div>
-<div id="outline-container-orgdb17d4e" class="outline-3">
-<h3 id="orgdb17d4e"><span class="section-number-3">4.1.</span> Functional Thinking and Recursion</h3>
+<div id="outline-container-orgb6d2759" class="outline-3">
+<h3 id="orgb6d2759"><span class="section-number-3">4.1.</span> Functional Thinking and Recursion</h3>
 <div class="outline-text-3" id="text-4-1">
 </div>
 <ol class="org-ol">
-<li><a id="org7abea29"></a>Trees and Recursion<br />
+<li><a id="org387cfca"></a>Trees and Recursion<br />
 <div class="outline-text-4" id="text-4-1-1">
 <ul class="org-ul">
 <li>A lot of data has tree-like structure</li>
@@ -1893,7 +1893,7 @@ Can use equations to determine the result
 </ul>
 </div>
 </li>
-<li><a id="org2fe4986"></a>Example: Natural Numbers<br />
+<li><a id="org44d837c"></a>Example: Natural Numbers<br />
 <div class="outline-text-4" id="text-4-1-2">
 <ul class="org-ul">
 <li>Any whole, non-negative number is either:
@@ -1904,7 +1904,7 @@ Can use equations to determine the result
 </ul>
 </div>
 </li>
-<li><a id="org2510d0b"></a>The Magic of Recursion<br />
+<li><a id="org0560408"></a>The Magic of Recursion<br />
 <div class="outline-text-4" id="text-4-1-3">
 <ul class="org-ul">
 <li>When writing a function, you can pretend:
@@ -1930,7 +1930,7 @@ Can use equations to determine the result
 </ul>
 </div>
 </li>
-<li><a id="orgaa74d8b"></a>Writing Recursion Functions Using Holes<br />
+<li><a id="org2023362"></a>Writing Recursion Functions Using Holes<br />
 <div class="outline-text-4" id="text-4-1-4">
 <ul class="org-ul">
 <li>Write the type of the function you&rsquo;re trying to make</li>
@@ -1955,7 +1955,7 @@ Can use equations to determine the result
 </ul>
 </div>
 </li>
-<li><a id="org5bb0d02"></a>Factorial - Types<br />
+<li><a id="orgf47dd0e"></a>Factorial - Types<br />
 <div class="outline-text-4" id="text-4-1-5">
 <ul class="org-ul">
 <li>\(n! = 1 \times 2 \times \ldots n\)</li>
@@ -1970,7 +1970,7 @@ Takes in a (natural) number, outputs a number
 </ul>
 </div>
 </li>
-<li><a id="org9277117"></a>Factorial - Tests<br />
+<li><a id="org60b00dd"></a>Factorial - Tests<br />
 <div class="outline-text-4" id="text-4-1-6">
 <div class="org-src-container">
 <pre class="src src-racket">&nbsp;
@@ -1987,7 +1987,7 @@ Takes in a (natural) number, outputs a number
 </ul>
 </div>
 </li>
-<li><a id="org30ec90d"></a>Factorial - Template<br />
+<li><a id="orgbbe8514"></a>Factorial - Template<br />
 <div class="outline-text-4" id="text-4-1-7">
 <ul class="org-ul">
 <li>A natural number is either
@@ -2014,7 +2014,7 @@ Takes in a (natural) number, outputs a number
 </div>
 </div>
 </li>
-<li><a id="org7004d46"></a>Factorial - Decomposing the Input<br />
+<li><a id="orge7d7ef3"></a>Factorial - Decomposing the Input<br />
 <div class="outline-text-4" id="text-4-1-8">
 <ul class="org-ul">
 <li>No &ldquo;parts&rdquo; of zero
@@ -2044,7 +2044,7 @@ Takes in a (natural) number, outputs a number
 </div>
 </div>
 </li>
-<li><a id="orgf9ae95d"></a>Factorial - Recursion<br />
+<li><a id="orgb2ed1ef"></a>Factorial - Recursion<br />
 <div class="outline-text-4" id="text-4-1-9">
 <ul class="org-ul">
 <li>Input to <code>factorial</code> is a number</li>
@@ -2066,7 +2066,7 @@ Takes in a (natural) number, outputs a number
 </div>
 </div>
 </li>
-<li><a id="orga3901ec"></a>Factorial - Filling holes<br />
+<li><a id="org2ef7108"></a>Factorial - Filling holes<br />
 <div class="outline-text-4" id="text-4-1-10">
 <ul class="org-ul">
 <li>Base case: factorial of 0 is 1
@@ -2080,7 +2080,7 @@ Takes in a (natural) number, outputs a number
 </ul></li>
 </ul>
 <div class="org-src-container">
-<pre class="src src-racket" id="org9eed6e8"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">factorial</span> <span style="color: #50a14f;">[</span>n <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span>
+<pre class="src src-racket" id="orge6d776e"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">factorial</span> <span style="color: #50a14f;">[</span>n <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span>
 &nbsp; <span style="color: #a626a4;">(</span><span style="color: #e45649;">if</span> <span style="color: #50a14f;">(</span><span style="color: #a626a4;">zero?</span> n<span style="color: #50a14f;">)</span>
 &nbsp;   &nbsp; <span style="color: #da8548; font-weight: bold;">1</span>
 &nbsp;   &nbsp; <span style="color: #50a14f;">(</span><span style="color: #e45649;">let*</span>
@@ -2092,7 +2092,7 @@ Takes in a (natural) number, outputs a number
 </div>
 </div>
 </li>
-<li><a id="org00b46fc"></a>Run Tests<br />
+<li><a id="orgd728058"></a>Run Tests<br />
 <div class="outline-text-4" id="text-4-1-11">
 <div class="org-src-container">
 <pre class="src src-racket">
@@ -2114,7 +2114,7 @@ good <span style="color: #4078f2;">(</span>factorial <span style="color: #da8548
 </div>
 </div>
 </li>
-<li><a id="orgc13ff1e"></a>Preconditions<br />
+<li><a id="orgd03a683"></a>Preconditions<br />
 <div class="outline-text-4" id="text-4-1-12">
 <ul class="org-ul">
 <li>Note: types not quite precise enough
@@ -2133,7 +2133,7 @@ good <span style="color: #4078f2;">(</span>factorial <span style="color: #da8548
 </ul>
 </div>
 </li>
-<li><a id="org60e7467"></a>Postcondition<br />
+<li><a id="org3c9d963"></a>Postcondition<br />
 <div class="outline-text-4" id="text-4-1-13">
 <ul class="org-ul">
 <li>Something true about the return of the function
@@ -2144,7 +2144,7 @@ good <span style="color: #4078f2;">(</span>factorial <span style="color: #da8548
 </ul>
 </div>
 </li>
-<li><a id="org99bc961"></a>Another Example: Exponentiation<br />
+<li><a id="orgce3f446"></a>Another Example: Exponentiation<br />
 <div class="outline-text-4" id="text-4-1-14">
 <ul class="org-ul">
 <li>Live coding in Dr. Racket</li>
@@ -2153,12 +2153,12 @@ good <span style="color: #4078f2;">(</span>factorial <span style="color: #da8548
 </li>
 </ol>
 </div>
-<div id="outline-container-orgd896da3" class="outline-3">
-<h3 id="orgd896da3"><span class="section-number-3">4.2.</span> Unbounded Data: Lists</h3>
+<div id="outline-container-org310a561" class="outline-3">
+<h3 id="org310a561"><span class="section-number-3">4.2.</span> Unbounded Data: Lists</h3>
 <div class="outline-text-3" id="text-4-2">
 </div>
 <ol class="org-ol">
-<li><a id="org6f1377c"></a>Lists Abstractly<br />
+<li><a id="org4a27e53"></a>Lists Abstractly<br />
 <div class="outline-text-4" id="text-4-2-1">
 <ul class="org-ul">
 <li>Sometimes you want a bunch of things</li>
@@ -2176,7 +2176,7 @@ good <span style="color: #4078f2;">(</span>factorial <span style="color: #da8548
 </ul>
 </div>
 </li>
-<li><a id="orge87e557"></a>Functional Linked Lists<br />
+<li><a id="org0996a2c"></a>Functional Linked Lists<br />
 <div class="outline-text-4" id="text-4-2-2">
 <ul class="org-ul">
 <li>Every linked list is one of:
@@ -2199,7 +2199,7 @@ good <span style="color: #4078f2;">(</span>factorial <span style="color: #da8548
 </ul>
 </div>
 </li>
-<li><a id="orgf6d66a5"></a>Lists in Flit<br />
+<li><a id="org8ba53cd"></a>Lists in Flit<br />
 <div class="outline-text-4" id="text-4-2-3">
 <ul class="org-ul">
 <li>Multiple ways to write lists</li>
@@ -2218,7 +2218,7 @@ good <span style="color: #4078f2;">(</span>factorial <span style="color: #da8548
 </ul>
 </div>
 </li>
-<li><a id="org0a9eb5b"></a>Types for Lists<br />
+<li><a id="org10e8486"></a>Types for Lists<br />
 <div class="outline-text-4" id="text-4-2-4">
 <ul class="org-ul">
 <li>Lists are a <i>parameterized type</i>
@@ -2241,7 +2241,7 @@ good <span style="color: #4078f2;">(</span>factorial <span style="color: #da8548
 </ul>
 </div>
 </li>
-<li><a id="orgcdd674c"></a>Template for Lists<br />
+<li><a id="org306118a"></a>Template for Lists<br />
 <div class="outline-text-4" id="text-4-2-5">
 <ul class="org-ul">
 <li>Two cases: list is empty or cons</li>
@@ -2268,7 +2268,7 @@ Can make a recursive call on tail of cons case
 </ul>
 </div>
 </li>
-<li><a id="orgc75620c"></a>Example: Sum Template<br />
+<li><a id="org2025b71"></a>Example: Sum Template<br />
 <div class="outline-text-4" id="text-4-2-6">
 <div class="org-src-container">
 <pre class="src src-racket">&nbsp; <span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">sum</span> <span style="color: #50a14f;">[</span>xs <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> <span style="color: #986801;">Number</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
@@ -2288,7 +2288,7 @@ Can make a recursive call on tail of cons case
 </div>
 </div>
 </li>
-<li><a id="orge198990"></a>Example: Sum<br />
+<li><a id="org9bb4cb7"></a>Example: Sum<br />
 <div class="outline-text-4" id="text-4-2-7">
 <ul class="org-ul">
 <li>Have the first number</li>
@@ -2318,7 +2318,7 @@ Can make a recursive call on tail of cons case
 </div>
 </div>
 </li>
-<li><a id="org4244ca0"></a>Pattern Matching: Intuition<br />
+<li><a id="org1266214"></a>Pattern Matching: Intuition<br />
 <div class="outline-text-4" id="text-4-2-8">
 <ul class="org-ul">
 <li>Recursive case: used &ldquo;getter&rdquo; function to get the sub-data in the recursive case
@@ -2334,7 +2334,7 @@ Can make a recursive call on tail of cons case
 </ul>
 </div>
 </li>
-<li><a id="org4563979"></a>Pattern Matching<br />
+<li><a id="org1f61eec"></a>Pattern Matching<br />
 <div class="outline-text-4" id="text-4-2-9">
 <div class="org-src-container">
 <pre class="src src-racket">&nbsp; <span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">sum</span> <span style="color: #50a14f;">[</span>xs <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> <span style="color: #986801;">Number</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
@@ -2349,7 +2349,7 @@ Can make a recursive call on tail of cons case
 </div>
 </div>
 </li>
-<li><a id="orgb845b80"></a>General Syntax for List Matching<br />
+<li><a id="orgd933eae"></a>General Syntax for List Matching<br />
 <div class="outline-text-4" id="text-4-2-10">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #4078f2;">(</span>type-case <span style="color: #a626a4;">(</span><span style="color: #986801;">Listof</span> SOME_TYPE<span style="color: #a626a4;">)</span> listToExamine
@@ -2378,7 +2378,7 @@ Can make a recursive call on tail of cons case
 </ul>
 </div>
 </li>
-<li><a id="org70bd8d4"></a>Why pattern matching?<br />
+<li><a id="org5396705"></a>Why pattern matching?<br />
 <div class="outline-text-4" id="text-4-2-11">
 <ul class="org-ul">
 <li>Never perform an un-safe operation
@@ -2397,7 +2397,7 @@ Can make a recursive call on tail of cons case
 </ul>
 </div>
 </li>
-<li><a id="org60d1690"></a>Example: Generating a Modified List<br />
+<li><a id="org54fce97"></a>Example: Generating a Modified List<br />
 <div class="outline-text-4" id="text-4-2-12">
 <ul class="org-ul">
 <li>Can also generate lists</li>
@@ -2428,13 +2428,13 @@ Shows how to create lists recursively
 </ul>
 </div>
 </li>
-<li><a id="org7eefe57"></a>Example: Types<br />
+<li><a id="org3ef0ff5"></a>Example: Types<br />
 <div class="outline-text-4" id="text-4-2-13">
 <ul class="org-ul">
 <li><p>
 Empty Case
 </p>
-<pre class="example" id="org69ec5de">
+<pre class="example" id="org5617e84">
  xs : (Listof Number)
  --------------
  TODO : (Listof Number)
@@ -2443,7 +2443,7 @@ Empty Case
 <li><p>
 Cons Case
 </p>
-<pre class="example" id="org9cd8f63">
+<pre class="example" id="org4e9306f">
  xs : (Listof Number)
  h : Number
  t : (Listof Number)
@@ -2454,7 +2454,7 @@ Cons Case
 </ul>
 </div>
 </li>
-<li><a id="org24f653c"></a>Example: Generating a Modified List<br />
+<li><a id="org9824342"></a>Example: Generating a Modified List<br />
 <div class="outline-text-4" id="text-4-2-14">
 <ul class="org-ul">
 <li>If we&rsquo;ve got a list that is the tail, but with each number incremented
@@ -2466,7 +2466,7 @@ Use <code>cons</code> to make a result list containing the new head and new tail
 </p>
 
 <div class="org-src-container">
-<pre class="src src-racket" id="orgb3a392f">&nbsp;  <span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">increment</span> <span style="color: #50a14f;">[</span>xs <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> <span style="color: #986801;">Number</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
+<pre class="src src-racket" id="org4ac3380">&nbsp;  <span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">increment</span> <span style="color: #50a14f;">[</span>xs <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> <span style="color: #986801;">Number</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
 &nbsp;   &nbsp;   &nbsp;  <span style="color: #a626a4;">:</span> <span style="color: #a626a4;">(</span><span style="color: #986801;">Listof</span> <span style="color: #986801;">Number</span><span style="color: #a626a4;">)</span>
 &nbsp;   &nbsp;<span style="color: #a626a4;">(</span>type-case <span style="color: #50a14f;">(</span><span style="color: #986801;">Listof</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">)</span> xs
 &nbsp;   &nbsp;  <span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span><span style="color: #a626a4;">empty</span><span style="color: #b751b6;">)</span>
@@ -2487,7 +2487,7 @@ Use <code>cons</code> to make a result list containing the new head and new tail
 </ul>
 </div>
 </li>
-<li><a id="org2e71c8b"></a>Generating is not Modifying<br />
+<li><a id="org99906df"></a>Generating is not Modifying<br />
 <div class="outline-text-4" id="text-4-2-15">
 <ul class="org-ul">
 <li><p>
@@ -2512,7 +2512,7 @@ After <code>increment</code>, the old list still exists
 </ul>
 </div>
 </li>
-<li><a id="orgf2f3236"></a>Parametric Polymorphism<br />
+<li><a id="org0139e4a"></a>Parametric Polymorphism<br />
 <div class="outline-text-4" id="text-4-2-16">
 <ul class="org-ul">
 <li>Lists are a <b>parameterized type</b>
@@ -2538,7 +2538,7 @@ After <code>increment</code>, the old list still exists
 </ul>
 </div>
 </li>
-<li><a id="org8615fdb"></a>Example: List Concatenation<br />
+<li><a id="org9521302"></a>Example: List Concatenation<br />
 <div class="outline-text-4" id="text-4-2-17">
 <ul class="org-ul">
 <li>We can combine two lists into a single list</li>
@@ -2550,7 +2550,7 @@ After <code>increment</code>, the old list still exists
 This function is built into Flit as <code>append</code>
 </p>
 <div class="org-src-container">
-<pre class="src src-racket" id="orgc4ccc06">&nbsp; <span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">concat</span> <span style="color: #50a14f;">[</span>xs <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> <span style="color: #b751b6;">'elem</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
+<pre class="src src-racket" id="org36a2ff5">&nbsp; <span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">concat</span> <span style="color: #50a14f;">[</span>xs <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> <span style="color: #b751b6;">'elem</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
 &nbsp;   &nbsp;   &nbsp;   &nbsp;   &nbsp; <span style="color: #50a14f;">[</span>ys <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> <span style="color: #b751b6;">'elem</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
 &nbsp;   &nbsp;   &nbsp; <span style="color: #a626a4;">:</span> <span style="color: #a626a4;">(</span><span style="color: #986801;">Listof</span> <span style="color: #b751b6;">'elem</span><span style="color: #a626a4;">)</span>
 &nbsp;   <span style="color: #a626a4;">(</span>type-case <span style="color: #50a14f;">(</span><span style="color: #986801;">Listof</span> <span style="color: #b751b6;">'elem</span><span style="color: #50a14f;">)</span> xs
@@ -2564,12 +2564,12 @@ This function is built into Flit as <code>append</code>
 </ul>
 </div>
 </li>
-<li><a id="org2f8155f"></a>Example: List Concatenation (ctd.)<br />
+<li><a id="orgb24c464"></a>Example: List Concatenation (ctd.)<br />
 <ol class="org-ol">
-<li><a id="orgf6e8457"></a>Example<br />
+<li><a id="org2c3c04b"></a>Example<br />
 <div class="outline-text-5" id="text-4-2-18-1">
 <div class="org-src-container">
-<pre class="src src-racket" id="orgfd416c8">&nbsp; 
+<pre class="src src-racket" id="org5658965">&nbsp; 
 &nbsp;
 &nbsp; <span style="color: #4078f2;">(</span>concat <span style="color: #4078f2;">'</span><span style="color: #a626a4;">(</span><span style="color: #da8548; font-weight: bold;">1</span> <span style="color: #da8548; font-weight: bold;">2</span> <span style="color: #da8548; font-weight: bold;">3</span><span style="color: #a626a4;">)</span> <span style="color: #4078f2;">'</span><span style="color: #a626a4;">(</span><span style="color: #da8548; font-weight: bold;">4</span> <span style="color: #da8548; font-weight: bold;">5</span> <span style="color: #da8548; font-weight: bold;">6</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
 &nbsp; <span style="color: #4078f2;">(</span>concat <span style="color: #4078f2;">'</span><span style="color: #a626a4;">(</span><span style="color: #50a14f;">"3"</span> <span style="color: #50a14f;">"5"</span><span style="color: #a626a4;">)</span> <span style="color: #4078f2;">'</span><span style="color: #a626a4;">(</span><span style="color: #50a14f;">"0"</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
@@ -2579,7 +2579,7 @@ This function is built into Flit as <code>append</code>
 </div>
 </div>
 </li>
-<li><a id="orgd5c07ae"></a>Results<br />
+<li><a id="orgd70ac4c"></a>Results<br />
 <div class="outline-text-5" id="text-4-2-18-2">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #4078f2;">'</span><span style="color: #4078f2;">(</span><span style="color: #da8548; font-weight: bold;">1</span> <span style="color: #da8548; font-weight: bold;">2</span> <span style="color: #da8548; font-weight: bold;">3</span> <span style="color: #da8548; font-weight: bold;">4</span> <span style="color: #da8548; font-weight: bold;">5</span> <span style="color: #da8548; font-weight: bold;">6</span><span style="color: #4078f2;">)</span>
@@ -2592,7 +2592,7 @@ This function is built into Flit as <code>append</code>
 </li>
 </ol>
 </li>
-<li><a id="orgc49a6a3"></a>More Examples<br />
+<li><a id="org0441a4e"></a>More Examples<br />
 <div class="outline-text-4" id="text-4-2-19">
 <ul class="org-ul">
 <li>Demo: Dr. Racket (as time permits)
@@ -2615,7 +2615,7 @@ This function is built into Flit as <code>append</code>
 <div class="outline-text-3" id="text-warmup-pairs">
 </div>
 <ol class="org-ol">
-<li><a id="org6df7f0d"></a>Pairs: &ldquo;AND&rdquo; for types<br />
+<li><a id="org76c4d8b"></a>Pairs: &ldquo;AND&rdquo; for types<br />
 <div class="outline-text-4" id="text-5-1-1">
 <ul class="org-ul">
 <li><code>(Number * Boolean)</code>
@@ -2650,7 +2650,7 @@ This function is built into Flit as <code>append</code>
 </div>
 </div>
 </li>
-<li><a id="org965a1ec"></a>Pairs in General<br />
+<li><a id="org8c524a7"></a>Pairs in General<br />
 <div class="outline-text-4" id="text-5-1-2">
 <ul class="org-ul">
 <li>For any types <code>'a</code> and <code>'b</code> there is a type <code>('a * 'b)</code></li>
@@ -2670,7 +2670,7 @@ This function is built into Flit as <code>append</code>
 </ul>
 </div>
 </li>
-<li><a id="org769abb0"></a>Pairs as Anonymous Records<br />
+<li><a id="orge410f87"></a>Pairs as Anonymous Records<br />
 <div class="outline-text-4" id="text-5-1-3">
 <ul class="org-ul">
 <li>Pairs similar to two-field structs in C++
@@ -2695,7 +2695,7 @@ This function is built into Flit as <code>append</code>
 </ul>
 </div>
 </li>
-<li><a id="orgc543a1b"></a>Defining the Pair type<br />
+<li><a id="orgc9193c7"></a>Defining the Pair type<br />
 <div class="outline-text-4" id="text-5-1-4">
 <ul class="org-ul">
 <li>Pairs are built in, but we could define them like this:</li>
@@ -2728,10 +2728,10 @@ This function is built into Flit as <code>append</code>
 </ul>
 </div>
 </li>
-<li><a id="orgd5a0f4c"></a>Example: Odds and Evens<br />
+<li><a id="orgc84ee32"></a>Example: Odds and Evens<br />
 <div class="outline-text-4" id="text-5-1-5">
 <div class="org-src-container">
-<pre class="src src-racket" id="org4142326"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">splitOddsEvens</span> <span style="color: #50a14f;">[</span>nums <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> <span style="color: #986801;">Number</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
+<pre class="src src-racket" id="org286e6d7"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">splitOddsEvens</span> <span style="color: #50a14f;">[</span>nums <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> <span style="color: #986801;">Number</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
 &nbsp; <span style="color: #a626a4;">:</span> <span style="color: #a626a4;">(</span><span style="color: #50a14f;">(</span><span style="color: #986801;">Listof</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">)</span> <span style="color: #a626a4;">*</span> <span style="color: #50a14f;">(</span><span style="color: #986801;">Listof</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">)</span><span style="color: #a626a4;">)</span>
 &nbsp; <span style="color: #a626a4;">(</span>type-case <span style="color: #50a14f;">(</span><span style="color: #986801;">Listof</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">)</span> nums
 &nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">Empty list has no odds or evens</span>
@@ -2759,7 +2759,7 @@ This function is built into Flit as <code>append</code>
 </div>
 </div>
 </li>
-<li><a id="org0052cfc"></a>Example: Odds and Evens (ctd)<br />
+<li><a id="orga8391e1"></a>Example: Odds and Evens (ctd)<br />
 <div class="outline-text-4" id="text-5-1-6">
 <div class="org-src-container">
 <pre class="src src-racket">
@@ -2780,7 +2780,7 @@ This function is built into Flit as <code>append</code>
 <div class="outline-text-3" id="text-algebraic-data-types">
 </div>
 <ol class="org-ol">
-<li><a id="orgfc04af3"></a>&ldquo;OR&rdquo; for types<br />
+<li><a id="orgb7b3b42"></a>&ldquo;OR&rdquo; for types<br />
 <div class="outline-text-4" id="text-5-2-1">
 <ul class="org-ul">
 <li>Pairs gave us &ldquo;AND&rdquo;</li>
@@ -2802,7 +2802,7 @@ This function is built into Flit as <code>append</code>
 </ul>
 </div>
 </li>
-<li><a id="org7b0c859"></a>First example<br />
+<li><a id="orge84179d"></a>First example<br />
 <div class="outline-text-4" id="text-5-2-2">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #a626a4;">define-type</span> <span style="color: #6a1868;">Shape</span>
@@ -2826,7 +2826,7 @@ This function is built into Flit as <code>append</code>
 </ul>
 </div>
 </li>
-<li><a id="orgce84314"></a>Constructors<br />
+<li><a id="org83bb270"></a>Constructors<br />
 <div class="outline-text-4" id="text-5-2-3">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #a626a4;">define-type</span> <span style="color: #6a1868;">Shape</span>
@@ -2855,10 +2855,10 @@ This function is built into Flit as <code>append</code>
 </ul>
 </div>
 </li>
-<li><a id="orgb41e1dc"></a>Creating values of a datatype<br />
+<li><a id="org1e1a844"></a>Creating values of a datatype<br />
 <div class="outline-text-4" id="text-5-2-4">
 <div class="org-src-container">
-<pre class="src src-racket" id="org7a5655a"><span style="color: #4078f2;">(</span><span style="color: #a626a4;">define-type</span> <span style="color: #6a1868;">Shape</span>
+<pre class="src src-racket" id="org277eb38"><span style="color: #4078f2;">(</span><span style="color: #a626a4;">define-type</span> <span style="color: #6a1868;">Shape</span>
 &nbsp; <span style="color: #a626a4;">(</span>Rectangle <span style="color: #50a14f;">[</span><span style="color: #a626a4;">length</span> <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span>
 &nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #50a14f;">[</span>width <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
 &nbsp; <span style="color: #a626a4;">(</span>Circle <span style="color: #50a14f;">[</span>radius <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
@@ -2876,7 +2876,7 @@ This function is built into Flit as <code>append</code>
 </ul>
 </div>
 </li>
-<li><a id="org6d2ba7b"></a>Auto-generated Functions<br />
+<li><a id="org2d2a6fa"></a>Auto-generated Functions<br />
 <div class="outline-text-4" id="text-5-2-5">
 <ul class="org-ul">
 <li>Flit makes &ldquo;checkers&rdquo; and &ldquo;getters&rdquo;
@@ -2895,7 +2895,7 @@ This function is built into Flit as <code>append</code>
 </div>
 </div>
 </li>
-<li><a id="orge0c2988"></a>Pattern matching<br />
+<li><a id="org470963f"></a>Pattern matching<br />
 <div class="outline-text-4" id="text-5-2-6">
 <ul class="org-ul">
 <li>Don&rsquo;t want to accidentally get a field that doesn&rsquo;t exist</li>
@@ -2923,7 +2923,7 @@ This function is built into Flit as <code>append</code>
 </div>
 </div>
 </li>
-<li><a id="orgf0d1fd9"></a>Pattern Match Syntax<br />
+<li><a id="orge1f8144"></a>Pattern Match Syntax<br />
 <div class="outline-text-4" id="text-5-2-7">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">area</span> <span style="color: #50a14f;">[</span>shp <span style="color: #a626a4;">:</span> Shape<span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span>
@@ -2952,7 +2952,7 @@ This function is built into Flit as <code>append</code>
 </ul>
 </div>
 </li>
-<li><a id="org108851b"></a>General Syntax for Pattern Matching<br />
+<li><a id="org60fc5f0"></a>General Syntax for Pattern Matching<br />
 <div class="outline-text-4" id="text-5-2-8">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #a626a4;">define-type</span> <span style="color: #6a1868;">DataType</span>
@@ -2981,7 +2981,7 @@ This function is built into Flit as <code>append</code>
 </div>
 </div>
 </li>
-<li><a id="org3d6e611"></a>Semantics of Pattern Matching<br />
+<li><a id="org7ba93de"></a>Semantics of Pattern Matching<br />
 <div class="outline-text-4" id="text-5-2-9">
 <ul class="org-ul">
 <li><code>Ctor</code> is short for &ldquo;constructor&rdquo;</li>
@@ -3010,7 +3010,7 @@ is equal to: <code>[y1 =&gt; arg1]...[yn =&gt; argn]resultExpr</code>
 </div>
 </div>
 </li>
-<li><a id="org699fa59"></a>Semantics ctd.<br />
+<li><a id="org8d384a2"></a>Semantics ctd.<br />
 <div class="outline-text-4" id="text-5-2-10">
 <ul class="org-ul">
 <li>Once again, substitution is the key operation</li>
@@ -3027,9 +3027,9 @@ is equal to: <code>[y1 =&gt; arg1]...[yn =&gt; argn]resultExpr</code>
 </ul>
 </div>
 </li>
-<li><a id="org781a98d"></a>Semantics Example<br />
+<li><a id="orga115800"></a>Semantics Example<br />
 <div class="outline-text-4" id="text-5-2-11">
-<pre class="example" id="org36a1e78">
+<pre class="example" id="org312f639">
   (area tv)
 = (area (Rectangle 16 9))
 = (type-case Shape (Rectangle 16 9)
@@ -3041,7 +3041,7 @@ is equal to: <code>[y1 =&gt; arg1]...[yn =&gt; argn]resultExpr</code>
 </pre>
 </div>
 </li>
-<li><a id="org17e7027"></a>Total Matching<br />
+<li><a id="orgb7ec109"></a>Total Matching<br />
 <div class="outline-text-4" id="text-5-2-12">
 <ul class="org-ul">
 <li>Missing a case in pattern matching is a <i>syntax error</i></li>
@@ -3057,7 +3057,7 @@ is equal to: <code>[y1 =&gt; arg1]...[yn =&gt; argn]resultExpr</code>
 </ul>
 </div>
 </li>
-<li><a id="org4fc6330"></a>Most Languages are Unsafe<br />
+<li><a id="orgcf0a69c"></a>Most Languages are Unsafe<br />
 <div class="outline-text-4" id="text-5-2-13">
 <ul class="org-ul">
 <li>E.g. Imagine a C++ struct for a library
@@ -3085,7 +3085,7 @@ is equal to: <code>[y1 =&gt; arg1]...[yn =&gt; argn]resultExpr</code>
 </ul>
 </div>
 </li>
-<li><a id="org61c1b65"></a>The Type-Safe Motto<br />
+<li><a id="org22420a5"></a>The Type-Safe Motto<br />
 <div class="outline-text-4" id="text-5-2-14">
 <div class="org-center">
 <p>
@@ -3094,7 +3094,7 @@ is equal to: <code>[y1 =&gt; arg1]...[yn =&gt; argn]resultExpr</code>
 </div>
 </div>
 </li>
-<li><a id="org49e810c"></a>Alternative with Datatypes<br />
+<li><a id="org7d0fa3a"></a>Alternative with Datatypes<br />
 <div class="outline-text-4" id="text-5-2-15">
 <ul class="org-ul">
 <li><p>
@@ -3121,7 +3121,7 @@ Instead, Flit can do:
 </ul>
 </div>
 </li>
-<li><a id="orgf94b161"></a>Application: Representing Failure<br />
+<li><a id="org2a8c9a9"></a>Application: Representing Failure<br />
 <div class="outline-text-4" id="text-5-2-16">
 <ul class="org-ul">
 <li>In flit standard library</li>
@@ -3145,7 +3145,7 @@ Instead, Flit can do:
 </ul>
 </div>
 </li>
-<li><a id="org10bf9c0"></a>Example: Safe Head<br />
+<li><a id="orgfb0fbd7"></a>Example: Safe Head<br />
 <div class="outline-text-4" id="text-5-2-17">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">safeHead</span> <span style="color: #50a14f;">[</span>l <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> <span style="color: #b751b6;">'a</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> <span style="color: #a626a4;">(</span>Optionof <span style="color: #b751b6;">'a</span><span style="color: #a626a4;">)</span>
@@ -3166,7 +3166,7 @@ Instead, Flit can do:
 </div>
 </div>
 </li>
-<li><a id="org3e6a930"></a>Example: Optional Arguments<br />
+<li><a id="org2a2a5bf"></a>Example: Optional Arguments<br />
 <div class="outline-text-4" id="text-5-2-18">
 <ul class="org-ul">
 <li>Option gives a way to say &ldquo;use a default value for this argument&rdquo;</li>
@@ -3193,7 +3193,7 @@ Instead, Flit can do:
 </div>
 </div>
 </li>
-<li><a id="org61162e1"></a>Example: Association Lists<br />
+<li><a id="org0f6cf8d"></a>Example: Association Lists<br />
 <div class="outline-text-4" id="text-5-2-19">
 <ul class="org-ul">
 <li>Can use lists of pairs as a key-value store</li>
@@ -3225,7 +3225,7 @@ Instead, Flit can do:
 </div>
 </div>
 </li>
-<li><a id="org133bc75"></a>Options in the Real World<br />
+<li><a id="org1b9ce93"></a>Options in the Real World<br />
 <div class="outline-text-4" id="text-5-2-20">
 <ul class="org-ul">
 <li><p>
@@ -3252,7 +3252,7 @@ Rust (Safer alternative to C/C++)
 </ul>
 </div>
 </li>
-<li><a id="org50b819a"></a>Datatype to End All Datatypes<br />
+<li><a id="orgeea3184"></a>Datatype to End All Datatypes<br />
 <div class="outline-text-4" id="text-5-2-21">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #a626a4;">define-type</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">Either</span> <span style="color: #b751b6;">'a</span> <span style="color: #b751b6;">'b</span><span style="color: #a626a4;">)</span>
@@ -3267,7 +3267,7 @@ Rust (Safer alternative to C/C++)
 </ul>
 </div>
 </li>
-<li><a id="orgbd5c1df"></a>Either Example<br />
+<li><a id="orgb191414"></a>Either Example<br />
 <div class="outline-text-4" id="text-5-2-22">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">Like lookup, but also errors if key occurs multiple times</span>
@@ -3299,12 +3299,12 @@ Rust (Safer alternative to C/C++)
 <h2 id="recursive-data"><span class="section-number-2">6.</span> Trees and Recursive Datatypes</h2>
 <div class="outline-text-2" id="text-recursive-data">
 </div>
-<div id="outline-container-org389e6af" class="outline-3">
-<h3 id="org389e6af"><span class="section-number-3">6.1.</span> Recursive Algebraic Data Types</h3>
+<div id="outline-container-org33f1e2f" class="outline-3">
+<h3 id="org33f1e2f"><span class="section-number-3">6.1.</span> Recursive Algebraic Data Types</h3>
 <div class="outline-text-3" id="text-6-1">
 </div>
 <ol class="org-ol">
-<li><a id="org905d367"></a>Self-reference in types<br />
+<li><a id="org9567b83"></a>Self-reference in types<br />
 <div class="outline-text-4" id="text-6-1-1">
 <ul class="org-ul">
 <li>Datatypes are made more powerful when we allow self reference</li>
@@ -3316,7 +3316,7 @@ Rust (Safer alternative to C/C++)
 </ul>
 </div>
 </li>
-<li><a id="org37fbc43"></a>Trees vs. Trees™<br />
+<li><a id="orgd50f771"></a>Trees vs. Trees™<br />
 <div class="outline-text-4" id="text-6-1-2">
 <ul class="org-ul">
 <li>In other classes, you might have seen specific kinds of trees
@@ -3336,10 +3336,10 @@ Rust (Safer alternative to C/C++)
 </ul>
 </div>
 </li>
-<li><a id="org31ea49b"></a>Example: Lists as a dataype<br />
+<li><a id="orgbfd5f51"></a>Example: Lists as a dataype<br />
 <div class="outline-text-4" id="text-6-1-3">
 <div class="org-src-container">
-<pre class="src src-racket" id="org0f85941"><span style="color: #4078f2;">(</span><span style="color: #a626a4;">define-type</span> <span style="color: #6a1868;">NumList</span>
+<pre class="src src-racket" id="orgdcbd874"><span style="color: #4078f2;">(</span><span style="color: #a626a4;">define-type</span> <span style="color: #6a1868;">NumList</span>
 &nbsp; <span style="color: #a626a4;">(</span>Nil<span style="color: #a626a4;">)</span>
 &nbsp; <span style="color: #a626a4;">(</span>Cons <span style="color: #50a14f;">[</span>head <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span> <span style="color: #50a14f;">[</span>tail <span style="color: #a626a4;">:</span> NumList<span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
 </pre>
@@ -3366,7 +3366,7 @@ Rust (Safer alternative to C/C++)
 </div>
 </div>
 </li>
-<li><a id="orge533459"></a>Lists are Trees<br />
+<li><a id="orge605f29"></a>Lists are Trees<br />
 <div class="outline-text-4" id="text-6-1-4">
 <ul class="org-ul">
 <li>A list is a tree where:
@@ -3382,7 +3382,7 @@ Rust (Safer alternative to C/C++)
 </ul>
 </div>
 </li>
-<li><a id="org5af6664"></a>Example: Filesystem<br />
+<li><a id="org718b219"></a>Example: Filesystem<br />
 <div class="outline-text-4" id="text-6-1-5">
 <ul class="org-ul">
 <li>Model of a file system
@@ -3391,7 +3391,7 @@ Rust (Safer alternative to C/C++)
 </ul></li>
 </ul>
 <div class="org-src-container">
-<pre class="src src-racket" id="orge308bb8"><span style="color: #4078f2;">(</span><span style="color: #a626a4;">define-type</span> <span style="color: #6a1868;">Filesystem</span>
+<pre class="src src-racket" id="org0bf3da3"><span style="color: #4078f2;">(</span><span style="color: #a626a4;">define-type</span> <span style="color: #6a1868;">Filesystem</span>
 &nbsp; <span style="color: #a626a4;">(</span>File <span style="color: #50a14f;">[</span>name <span style="color: #a626a4;">:</span> <span style="color: #986801;">String</span><span style="color: #50a14f;">]</span>
 &nbsp;   &nbsp;   <span style="color: #50a14f;">[</span>data <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
 &nbsp; <span style="color: #a626a4;">(</span>Folder <span style="color: #50a14f;">[</span>name <span style="color: #a626a4;">:</span> <span style="color: #986801;">String</span><span style="color: #50a14f;">]</span>
@@ -3400,13 +3400,13 @@ Rust (Safer alternative to C/C++)
 </div>
 </div>
 </li>
-<li><a id="org1e2c183"></a>Linear-time Search using Recursion<br />
+<li><a id="org3d1eb66"></a>Linear-time Search using Recursion<br />
 <div class="outline-text-4" id="text-6-1-6">
 <ul class="org-ul">
 <li>Find the first matching file</li>
 </ul>
 <div class="org-src-container">
-<pre class="src src-racket" id="orgd630de1">
+<pre class="src src-racket" id="org3ed4b8b">
 <span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">search</span> <span style="color: #50a14f;">[</span>target <span style="color: #a626a4;">:</span> <span style="color: #986801;">String</span><span style="color: #50a14f;">]</span>
 &nbsp;   &nbsp;   &nbsp;   &nbsp;   <span style="color: #50a14f;">[</span>fs <span style="color: #a626a4;">:</span> Filesystem<span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> <span style="color: #a626a4;">(</span>Optionof <span style="color: #986801;">Number</span><span style="color: #a626a4;">)</span>
 &nbsp; <span style="color: #a626a4;">(</span>type-case Filesystem fs
@@ -3420,7 +3420,7 @@ Rust (Safer alternative to C/C++)
 </div>
 </div>
 </li>
-<li><a id="org92815a9"></a>Helper Function: Searching the list<br />
+<li><a id="org5f1777f"></a>Helper Function: Searching the list<br />
 <div class="outline-text-4" id="text-6-1-7">
 <ul class="org-ul">
 <li>We have mutually recursive types
@@ -3432,7 +3432,7 @@ Rust (Safer alternative to C/C++)
 </ul>
 
 <div class="org-src-container">
-<pre class="src src-racket" id="org9d0f292">
+<pre class="src src-racket" id="org0d95f86">
 <span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">searchList</span> <span style="color: #50a14f;">[</span>target <span style="color: #a626a4;">:</span> <span style="color: #986801;">String</span><span style="color: #50a14f;">]</span>
 &nbsp;   &nbsp;   &nbsp;   &nbsp;   &nbsp;   <span style="color: #50a14f;">[</span>files <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> Filesystem<span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
 &nbsp;   &nbsp;   <span style="color: #a626a4;">:</span> <span style="color: #a626a4;">(</span>Optionof <span style="color: #986801;">Number</span><span style="color: #a626a4;">)</span>
@@ -3448,7 +3448,7 @@ Rust (Safer alternative to C/C++)
 </div>
 </div>
 </li>
-<li><a id="org02a030f"></a>Testing the search<br />
+<li><a id="org86de0b2"></a>Testing the search<br />
 <div class="outline-text-4" id="text-6-1-8">
 <div class="org-src-container">
 <pre class="src src-racket">
@@ -3478,7 +3478,7 @@ Rust (Safer alternative to C/C++)
 </div>
 </div>
 </li>
-<li><a id="orgcf21e08"></a>Example: Binary Search Tree<br />
+<li><a id="orge6478a8"></a>Example: Binary Search Tree<br />
 <div class="outline-text-4" id="text-6-1-9">
 <ul class="org-ul">
 <li>Recall from CS 210</li>
@@ -3491,10 +3491,10 @@ Rust (Safer alternative to C/C++)
 </ul>
 </div>
 </li>
-<li><a id="org732b16f"></a>BST data definition<br />
+<li><a id="org284dd26"></a>BST data definition<br />
 <div class="outline-text-4" id="text-6-1-10">
 <div class="org-src-container">
-<pre class="src src-racket" id="org79bdff7"><span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">A BST is either empty (with no data)</span>
+<pre class="src src-racket" id="org78608ef"><span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">A BST is either empty (with no data)</span>
 <span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">or has a data, a binary search tree with smaller data</span>
 <span style="color: #4078f2;">(</span><span style="color: #a626a4;">define-type</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">BST</span> <span style="color: #b751b6;">'elem</span><span style="color: #a626a4;">)</span>
 &nbsp; <span style="color: #a626a4;">(</span>leaf<span style="color: #a626a4;">)</span>
@@ -3506,7 +3506,7 @@ Rust (Safer alternative to C/C++)
 </div>
 </div>
 </li>
-<li><a id="org346433d"></a>BST Range Check<br />
+<li><a id="org92c4aaf"></a>BST Range Check<br />
 <div class="outline-text-4" id="text-6-1-11">
 <ul class="org-ul">
 <li>Make sure that a BST is well-formed, and that all its data is in the given range</li>
@@ -3535,7 +3535,7 @@ Rust (Safer alternative to C/C++)
 </div>
 </div>
 </li>
-<li><a id="org07463ee"></a>Well Formed BSTs<br />
+<li><a id="org06737f4"></a>Well Formed BSTs<br />
 <div class="outline-text-4" id="text-6-1-12">
 <ul class="org-ul">
 <li><p>
@@ -3554,7 +3554,7 @@ Call our range-checker with default values
 </div>
 </div>
 </li>
-<li><a id="orgb1682d0"></a>Adding a node<br />
+<li><a id="org2dd04b3"></a>Adding a node<br />
 <div class="outline-text-4" id="text-6-1-13">
 <ul class="org-ul">
 <li>Make a new tree that contains the data under the given tree
@@ -3584,7 +3584,7 @@ Kind of like cons, but for BSTs
 </div>
 </div>
 </li>
-<li><a id="org54f6064"></a>Looking up a node<br />
+<li><a id="org88338e4"></a>Looking up a node<br />
 <div class="outline-text-4" id="text-6-1-14">
 <ul class="org-ul">
 <li>Find the all the data for a given tree
@@ -3616,7 +3616,7 @@ Might have none or duplicates, so return a list
 </div>
 </div>
 </li>
-<li><a id="orgd62c59e"></a>Trying it out<br />
+<li><a id="org778daed"></a>Trying it out<br />
 <div class="outline-text-4" id="text-6-1-15">
 <div class="org-src-container">
 <pre class="src src-racket">
@@ -3637,7 +3637,7 @@ Might have none or duplicates, so return a list
 </div>
 </div>
 </li>
-<li><a id="orgf1b782d"></a>A Sneak Preview<br />
+<li><a id="orgec068f2"></a>A Sneak Preview<br />
 <div class="outline-text-4" id="text-6-1-16">
 <ul class="org-ul">
 <li>Math expressions are trees</li>
@@ -3666,7 +3666,7 @@ Might have none or duplicates, so return a list
 <div class="outline-text-3" id="text-higher-order-functions">
 </div>
 <ol class="org-ol">
-<li><a id="orgf2f1c75"></a>Functions on Functions<br />
+<li><a id="org629a186"></a>Functions on Functions<br />
 <div class="outline-text-4" id="text-7-1-1">
 <ul class="org-ul">
 <li>Functions let us be abstract over the data they work on</li>
@@ -3690,7 +3690,7 @@ or returns functions as a value.</li>
 </ul>
 </div>
 </li>
-<li><a id="org152ebb2"></a>Function types<br />
+<li><a id="orgbc1084b"></a>Function types<br />
 <div class="outline-text-4" id="text-7-1-2">
 <ul class="org-ul">
 <li>Type <code>(T1 T2 ... Tn -&gt; S)</code>
@@ -3706,7 +3706,7 @@ or returns functions as a value.</li>
 </ul>
 </div>
 </li>
-<li><a id="orgf93271e"></a>First Class Functions<br />
+<li><a id="org49b17c9"></a>First Class Functions<br />
 <div class="outline-text-4" id="text-7-1-3">
 <ul class="org-ul">
 <li>We say a language has <i>first class functions</i> if functions are treated like any
@@ -3719,10 +3719,10 @@ other expression/value in a language
 </ul>
 </div>
 </li>
-<li><a id="orgabe1fff"></a>Example: Repeatedly apply a function<br />
+<li><a id="orga9a595e"></a>Example: Repeatedly apply a function<br />
 <div class="outline-text-4" id="text-7-1-4">
 <div class="org-src-container">
-<pre class="src src-racket" id="orgf9f58d9"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">applyNTimes</span> <span style="color: #50a14f;">[</span>f <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Number</span> <span style="color: #a626a4;">-&gt;</span> <span style="color: #986801;">Number</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
+<pre class="src src-racket" id="org16355f7"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">applyNTimes</span> <span style="color: #50a14f;">[</span>f <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Number</span> <span style="color: #a626a4;">-&gt;</span> <span style="color: #986801;">Number</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
 &nbsp;   &nbsp;   &nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #50a14f;">[</span>x <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span>
 &nbsp;   &nbsp;   &nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #50a14f;">[</span>nTimes <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span>
 &nbsp; <span style="color: #a626a4;">(</span><span style="color: #e45649;">if</span> <span style="color: #50a14f;">(</span><span style="color: #a626a4;">&lt;=</span> nTimes <span style="color: #da8548; font-weight: bold;">0</span><span style="color: #50a14f;">)</span>
@@ -3747,7 +3747,7 @@ other expression/value in a language
 </ul>
 </div>
 </li>
-<li><a id="orgbba48b8"></a>ctd<br />
+<li><a id="org2168a28"></a>ctd<br />
 <div class="outline-text-4" id="text-7-1-5">
 <div class="org-src-container">
 <pre class="src src-racket">
@@ -3772,10 +3772,10 @@ other expression/value in a language
 </ul>
 </div>
 </li>
-<li><a id="org9c2218d"></a>Example: apply an operation to each number in a list<br />
+<li><a id="orgb92c444"></a>Example: apply an operation to each number in a list<br />
 <div class="outline-text-4" id="text-7-1-6">
 <div class="org-src-container">
-<pre class="src src-racket" id="org15ddd50"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">mapNum</span> <span style="color: #50a14f;">[</span>f <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Number</span> <span style="color: #a626a4;">-&gt;</span> <span style="color: #986801;">Number</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
+<pre class="src src-racket" id="org46e6d51"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">mapNum</span> <span style="color: #50a14f;">[</span>f <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Number</span> <span style="color: #a626a4;">-&gt;</span> <span style="color: #986801;">Number</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
 &nbsp;   &nbsp;   &nbsp;   &nbsp;   <span style="color: #50a14f;">[</span>xs <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> <span style="color: #986801;">Number</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> <span style="color: #a626a4;">(</span><span style="color: #986801;">Listof</span> <span style="color: #986801;">Number</span><span style="color: #a626a4;">)</span>
 &nbsp; <span style="color: #a626a4;">(</span>type-case <span style="color: #50a14f;">(</span><span style="color: #986801;">Listof</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">)</span> xs
 &nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #50a14f;">[</span><span style="color: #a626a4;">empty</span> <span style="color: #a626a4;">empty</span><span style="color: #50a14f;">]</span>
@@ -3800,7 +3800,7 @@ other expression/value in a language
 </ul>
 </div>
 </li>
-<li><a id="org152a7bc"></a>ctd<br />
+<li><a id="org4067ff1"></a>ctd<br />
 <div class="outline-text-4" id="text-7-1-7">
 <div class="org-src-container">
 <pre class="src src-racket">
@@ -3817,7 +3817,7 @@ other expression/value in a language
 </div>
 </div>
 </li>
-<li><a id="orgcf0f841"></a>Creating Anonymous Functions<br />
+<li><a id="org78b4dae"></a>Creating Anonymous Functions<br />
 <div class="outline-text-4" id="text-7-1-8">
 <ul class="org-ul">
 <li>So far, have only given functions that we defined with <code>define</code> as arguments to other functions</li>
@@ -3826,7 +3826,7 @@ other expression/value in a language
 </ul>
 </div>
 </li>
-<li><a id="org5ab6284"></a>Lambda<br />
+<li><a id="org858e103"></a>Lambda<br />
 <div class="outline-text-4" id="text-7-1-9">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">lambda</span> <span style="color: #a626a4;">(</span>x<span style="color: #a626a4;">)</span> body<span style="color: #4078f2;">)</span>
@@ -3842,7 +3842,7 @@ other expression/value in a language
 </ul>
 </div>
 </li>
-<li><a id="org293e27f"></a>Lambda variations<br />
+<li><a id="orga239fce"></a>Lambda variations<br />
 <div class="outline-text-4" id="text-7-1-10">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">Type annotation</span>
@@ -3863,7 +3863,7 @@ other expression/value in a language
 </div>
 </div>
 </li>
-<li><a id="org1b35835"></a>Example<br />
+<li><a id="orga3fbbb3"></a>Example<br />
 <div class="outline-text-4" id="text-7-1-11">
 <div class="org-src-container">
 <pre class="src src-racket">
@@ -3880,7 +3880,7 @@ other expression/value in a language
 </div>
 </div>
 </li>
-<li><a id="org044db16"></a>Semantics of Lambda Application<br />
+<li><a id="org4624c32"></a>Semantics of Lambda Application<br />
 <div class="outline-text-4" id="text-7-1-12">
 <div id="gls.8" class="admonition note">
                         <p class="admonition-title note">Definition: Semantics of Application (Lambda)</p>&nbsp;
@@ -3897,7 +3897,7 @@ For any terms <code>EXPR1</code> and <code>EXPR2</code>, with x in scope for <co
 </div>
 </div>
 </li>
-<li><a id="org04a40e4"></a>Function Application<br />
+<li><a id="org02a9be2"></a>Function Application<br />
 <div class="outline-text-4" id="text-7-1-13">
 <ul class="org-ul">
 <li><i>Applying</i> a function is just functional programming talk for calling a function</li>
@@ -3905,7 +3905,7 @@ For any terms <code>EXPR1</code> and <code>EXPR2</code>, with x in scope for <co
 </ul>
 </div>
 </li>
-<li><a id="org6cac30d"></a>Define as sugar<br />
+<li><a id="org1bdb3ea"></a>Define as sugar<br />
 <div class="outline-text-4" id="text-7-1-14">
 <ul class="org-ul">
 <li><code>(define (f x) body)</code></li>
@@ -3915,7 +3915,7 @@ For any terms <code>EXPR1</code> and <code>EXPR2</code>, with x in scope for <co
 </ul>
 </div>
 </li>
-<li><a id="org9743489"></a>Lambda in a context<br />
+<li><a id="org6b7e330"></a>Lambda in a context<br />
 <div class="outline-text-4" id="text-7-1-15">
 <ul class="org-ul">
 <li>Don&rsquo;t have to use lambda at the top level</li>
@@ -3941,7 +3941,7 @@ For any terms <code>EXPR1</code> and <code>EXPR2</code>, with x in scope for <co
 </ul>
 </div>
 </li>
-<li><a id="orgaeee988"></a>Lambda and Types<br />
+<li><a id="org74b0684"></a>Lambda and Types<br />
 <div class="outline-text-4" id="text-7-1-16">
 <div id="gls.9" class="admonition note">
                         <p class="admonition-title note">Definition </p>&nbsp;
@@ -3960,7 +3960,7 @@ then <code>(lambda (x) EXPR) : (S -&gt; T)</code>
 </ul>
 </div>
 </li>
-<li><a id="org19a8bf1"></a>Functions as return values<br />
+<li><a id="orge2bb4a1"></a>Functions as return values<br />
 <div class="outline-text-4" id="text-7-1-17">
 <ul class="org-ul">
 <li>We can also make functions that produce other functions as a result
@@ -3983,7 +3983,7 @@ then <code>(lambda (x) EXPR) : (S -&gt; T)</code>
 </div>
 </div>
 </li>
-<li><a id="orgc1e8d22"></a>Combinators<br />
+<li><a id="org7a7bcc0"></a>Combinators<br />
 <div class="outline-text-4" id="text-7-1-18">
 <ul class="org-ul">
 <li>Functions that take and return functions</li>
@@ -4008,13 +4008,13 @@ then <code>(lambda (x) EXPR) : (S -&gt; T)</code>
 </div>
 </div>
 </li>
-<li><a id="org88ee045"></a>Semantics of Passing and Returning Functions<br />
+<li><a id="org3581cd7"></a>Semantics of Passing and Returning Functions<br />
 <div class="outline-text-4" id="text-7-1-19">
 <ul class="org-ul">
 <li>There is no special equation for passing a function as a value</li>
 <li>Just use the substitution rule to replace the variable name by the <code>lambda</code> that the function is equal to</li>
 </ul>
-<pre class="example" id="org0971798">
+<pre class="example" id="org649b758">
 (define (negate x) (* x -1))
 
 (+fun negate negate)
@@ -4030,7 +4030,7 @@ So:
 </pre>
 </div>
 </li>
-<li><a id="org4dc450b"></a>Example: Beyond Numbers<br />
+<li><a id="orga6bb8c7"></a>Example: Beyond Numbers<br />
 <div class="outline-text-4" id="text-7-1-20">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">liftOption</span> <span style="color: #50a14f;">[</span>f <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Number</span> <span style="color: #a626a4;">-&gt;</span> <span style="color: #986801;">Number</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
@@ -4053,7 +4053,7 @@ So:
 </div>
 </div>
 </li>
-<li><a id="org3f738b3"></a>Lambda IRL<br />
+<li><a id="org9660874"></a>Lambda IRL<br />
 <div class="outline-text-4" id="text-7-1-21">
 <ul class="org-ul">
 <li>Almost every language has added a form of lambda/higher-order function</li>
@@ -4065,7 +4065,7 @@ So:
 </ul>
 </div>
 <ol class="org-ol">
-<li><a id="orge3b2142"></a>C++<br />
+<li><a id="orga1a8863"></a>C++<br />
 <div class="outline-text-5" id="text-7-1-21-1">
 <div class="org-src-container">
 <pre class="src src-c++">[](<span style="color: #986801;">float</span> <span style="color: #6a1868;">a</span>, <span style="color: #986801;">float</span> <span style="color: #6a1868;">b</span>) {
@@ -4074,7 +4074,7 @@ So:
 </div>
 </div>
 </li>
-<li><a id="org030436d"></a>Python<br />
+<li><a id="orgd6c68b1"></a>Python<br />
 <div class="outline-text-5" id="text-7-1-21-2">
 <div class="org-src-container">
 <pre class="src src-python"><span style="color: #6a1868;">f</span> = <span style="color: #e45649;">lambda</span> a, b : <span style="color: #a626a4;">abs</span>(a) &lt; <span style="color: #a626a4;">abs</span>(b)
@@ -4083,7 +4083,7 @@ f(<span style="color: #da8548; font-weight: bold;">3</span>,-<span style="color:
 </div>
 </div>
 </li>
-<li><a id="org4803aa2"></a>JavaScript<br />
+<li><a id="org3b6c548"></a>JavaScript<br />
 <div class="outline-text-5" id="text-7-1-21-3">
 <div class="org-src-container">
 <pre class="src src-javascript"><span style="color: #e45649;">var</span> <span style="color: #6a1868;">f</span> = (a,b) =&gt; Math.abs(a) &lt; Math.abs(b);
@@ -4094,9 +4094,9 @@ console.log(f(<span style="color: #da8548; font-weight: bold;">3</span>,-<span s
 </li>
 </ol>
 </li>
-<li><a id="org2794561"></a>Lambda IRL continued<br />
+<li><a id="orgb1f89cd"></a>Lambda IRL continued<br />
 <ol class="org-ol">
-<li><a id="org5842367"></a>Swift<br />
+<li><a id="org6cfd09b"></a>Swift<br />
 <div class="outline-text-5" id="text-7-1-22-1">
 <div class="org-src-container">
 <pre class="src src-swift">let f = {a, b in return abs(a) &lt; abs(b)}
@@ -4105,7 +4105,7 @@ f(3,-4)
 </div>
 </div>
 </li>
-<li><a id="org8aaa186"></a>Rust<br />
+<li><a id="org315fd55"></a>Rust<br />
 <div class="outline-text-5" id="text-7-1-22-2">
 <div class="org-src-container">
 <pre class="src src-rust">&nbsp;   <span style="color: #e45649;">let</span> <span style="color: #6a1868;">f</span> = |<span style="color: #6a1868;">a</span> : <span style="color: #986801;">i32</span>, <span style="color: #6a1868;">b</span> : <span style="color: #986801;">i32</span>| a.abs<span style="color: #4078f2;">()</span> &lt; b.abs<span style="color: #4078f2;">()</span>;
@@ -4114,7 +4114,7 @@ f(3,-4)
 </div>
 </div>
 </li>
-<li><a id="org56c0700"></a>Java<br />
+<li><a id="org038a1b4"></a>Java<br />
 <div class="outline-text-5" id="text-7-1-22-3">
 <div class="org-src-container">
 <pre class="src src-java">(a,b) -&gt; Math.abs(a) &lt; Math.abs(b)
@@ -4136,7 +4136,7 @@ f(3,-4)
 <div class="outline-text-3" id="text-highly-generic-programming">
 </div>
 <ol class="org-ol">
-<li><a id="org7988b12"></a>Polymorphic Functions<br />
+<li><a id="orgd473bcd"></a>Polymorphic Functions<br />
 <div class="outline-text-4" id="text-8-1-1">
 <ul class="org-ul">
 <li>Higher-order functions are even more powerful when combined with type variables</li>
@@ -4145,7 +4145,7 @@ f(3,-4)
 </ul>
 </div>
 </li>
-<li><a id="org74effb1"></a>Example: Sorting<br />
+<li><a id="orgaacee45"></a>Example: Sorting<br />
 <div class="outline-text-4" id="text-8-1-2">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">sortNumbers</span> <span style="color: #50a14f;">[</span>xs <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> <span style="color: #986801;">Number</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> <span style="color: #a626a4;">(</span><span style="color: #986801;">Listof</span> <span style="color: #986801;">Number</span><span style="color: #a626a4;">)</span>
@@ -4172,7 +4172,7 @@ f(3,-4)
 </ul>
 </div>
 </li>
-<li><a id="orgcbe3701"></a>Map<br />
+<li><a id="orgc9410cf"></a>Map<br />
 <div class="outline-text-4" id="text-8-1-3">
 <ul class="org-ul">
 <li>One of the most essential functions on list</li>
@@ -4195,7 +4195,7 @@ f(3,-4)
 </div>
 </div>
 </li>
-<li><a id="org6dcf7ee"></a>Examples<br />
+<li><a id="org9a47e30"></a>Examples<br />
 <div class="outline-text-4" id="text-8-1-4">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #a626a4;">map</span> <span style="color: #a626a4;">(</span><span style="color: #e45649;">lambda</span> <span style="color: #50a14f;">(</span>x<span style="color: #50a14f;">)</span> <span style="color: #50a14f;">(</span><span style="color: #a626a4;">*</span> x <span style="color: #da8548; font-weight: bold;">1001</span><span style="color: #50a14f;">)</span><span style="color: #a626a4;">)</span> <span style="color: #4078f2;">'</span><span style="color: #a626a4;">(</span><span style="color: #da8548; font-weight: bold;">1</span> <span style="color: #da8548; font-weight: bold;">2</span> <span style="color: #da8548; font-weight: bold;">3</span> <span style="color: #da8548; font-weight: bold;">4</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
@@ -4213,7 +4213,7 @@ f(3,-4)
 </div>
 </div>
 </li>
-<li><a id="org325768f"></a>Map does recursion so you don&rsquo;t have to<br />
+<li><a id="org34d70e5"></a>Map does recursion so you don&rsquo;t have to<br />
 <div class="outline-text-4" id="text-8-1-5">
 <ul class="org-ul">
 <li>Lots of times, we were writing code that looked exactly the same</li>
@@ -4221,7 +4221,7 @@ f(3,-4)
 </ul>
 </div>
 </li>
-<li><a id="org7d255c1"></a>Filter<br />
+<li><a id="orgcf14fed"></a>Filter<br />
 <div class="outline-text-4" id="text-8-1-6">
 <ul class="org-ul">
 <li>Another common function on lists</li>
@@ -4249,7 +4249,7 @@ f(3,-4)
 </div>
 </div>
 </li>
-<li><a id="orga8e8fca"></a>Filter examples<br />
+<li><a id="org33e55e4"></a>Filter examples<br />
 <div class="outline-text-4" id="text-8-1-7">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #a626a4;">filter</span> <span style="color: #a626a4;">(</span><span style="color: #e45649;">lambda</span> <span style="color: #50a14f;">(</span>x<span style="color: #50a14f;">)</span> <span style="color: #50a14f;">(</span><span style="color: #a626a4;">zero?</span> <span style="color: #b751b6;">(</span><span style="color: #a626a4;">modulo</span> x <span style="color: #da8548; font-weight: bold;">2</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">)</span><span style="color: #a626a4;">)</span>
@@ -4272,10 +4272,10 @@ f(3,-4)
 </div>
 </div>
 </li>
-<li><a id="org472bba7"></a>Using Filter: The Functional Quicksort<br />
+<li><a id="org153da55"></a>Using Filter: The Functional Quicksort<br />
 <div class="outline-text-4" id="text-8-1-8">
 <div class="org-src-container">
-<pre class="src src-racket" id="orgcc6c46e"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">sortBy</span> <span style="color: #50a14f;">[</span>compare <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #b751b6;">'a</span> <span style="color: #b751b6;">'a</span> <span style="color: #a626a4;">-&gt;</span> <span style="color: #986801;">Boolean</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
+<pre class="src src-racket" id="orgcd90348"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">sortBy</span> <span style="color: #50a14f;">[</span>compare <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #b751b6;">'a</span> <span style="color: #b751b6;">'a</span> <span style="color: #a626a4;">-&gt;</span> <span style="color: #986801;">Boolean</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
 &nbsp;   &nbsp;   &nbsp;   &nbsp;   <span style="color: #50a14f;">[</span>xs <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> <span style="color: #b751b6;">'a</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> <span style="color: #a626a4;">(</span><span style="color: #986801;">Listof</span> <span style="color: #b751b6;">'a</span><span style="color: #a626a4;">)</span>
 &nbsp; <span style="color: #a626a4;">(</span>type-case <span style="color: #50a14f;">(</span><span style="color: #986801;">Listof</span> <span style="color: #b751b6;">'a</span><span style="color: #50a14f;">)</span> xs
 &nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #50a14f;">[</span><span style="color: #a626a4;">empty</span>
@@ -4296,7 +4296,7 @@ f(3,-4)
 </div>
 </div>
 </li>
-<li><a id="orga89e9c4"></a>How Quicksort works<br />
+<li><a id="orgeeb5f96"></a>How Quicksort works<br />
 <div class="outline-text-4" id="text-8-1-9">
 <ul class="org-ul">
 <li>An empty list is already sorted</li>
@@ -4315,7 +4315,7 @@ f(3,-4)
 </ul>
 </div>
 </li>
-<li><a id="orgbab6265"></a>Quicksort Examples<br />
+<li><a id="org0519d78"></a>Quicksort Examples<br />
 <div class="outline-text-4" id="text-8-1-10">
 <div class="org-src-container">
 <pre class="src src-racket">
@@ -4337,7 +4337,7 @@ f(3,-4)
 </div>
 </div>
 </li>
-<li><a id="org9068232"></a>More Examples: All/Any<br />
+<li><a id="orgc5a4d48"></a>More Examples: All/Any<br />
 <div class="outline-text-4" id="text-8-1-11">
 <ul class="org-ul">
 <li>Check if some boolean property is true for
@@ -4359,7 +4359,7 @@ f(3,-4)
 </div>
 </div>
 </li>
-<li><a id="org60a7973"></a>Polymorphic Combinators<br />
+<li><a id="org97192a7"></a>Polymorphic Combinators<br />
 <div class="outline-text-4" id="text-8-1-12">
 <ul class="org-ul">
 <li>Combinators that are polymorphic are highly general
@@ -4370,7 +4370,7 @@ f(3,-4)
 </ul>
 </div>
 </li>
-<li><a id="org56b5030"></a>Function Composition<br />
+<li><a id="orgb48aa64"></a>Function Composition<br />
 <div class="outline-text-4" id="text-8-1-13">
 <ul class="org-ul">
 <li>For any two functions, we can chain them together
@@ -4379,7 +4379,7 @@ f(3,-4)
 </ul></li>
 </ul>
 <div class="org-src-container">
-<pre class="src src-racket" id="orgee9e545"><span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">Written that way to match the symbol in math</span>
+<pre class="src src-racket" id="org3e00721"><span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">Written that way to match the symbol in math</span>
 <span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">o</span> <span style="color: #50a14f;">[</span>g <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #b751b6;">'b</span> <span style="color: #a626a4;">-&gt;</span> <span style="color: #b751b6;">'c</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
 &nbsp;   &nbsp;   &nbsp;  <span style="color: #50a14f;">[</span>f <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #b751b6;">'a</span> <span style="color: #a626a4;">-&gt;</span> <span style="color: #b751b6;">'b</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> <span style="color: #a626a4;">(</span><span style="color: #b751b6;">'a</span> <span style="color: #a626a4;">-&gt;</span> <span style="color: #b751b6;">'c</span><span style="color: #a626a4;">)</span>
 &nbsp; <span style="color: #a626a4;">(</span><span style="color: #e45649;">lambda</span> <span style="color: #50a14f;">(</span>x<span style="color: #50a14f;">)</span>
@@ -4390,7 +4390,7 @@ f(3,-4)
 </div>
 </div>
 </li>
-<li><a id="org7c2a82e"></a>Example<br />
+<li><a id="org1bfc68c"></a>Example<br />
 <div class="outline-text-4" id="text-8-1-14">
 <div class="org-src-container">
 <pre class="src src-racket">
@@ -4413,14 +4413,14 @@ f(3,-4)
 </ul>
 </div>
 </li>
-<li><a id="orgee06cfe"></a>Partial Application<br />
+<li><a id="org5b04b45"></a>Partial Application<br />
 <div class="outline-text-4" id="text-8-1-15">
 <ul class="org-ul">
 <li><p>
 For functions that take multiple arguments, we can get a new function by providing only one argument
 </p>
 <div class="org-src-container">
-<pre class="src src-racket" id="orgc80bc34">&nbsp; <span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">curry</span> <span style="color: #50a14f;">[</span>f <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #b751b6;">'a</span> <span style="color: #b751b6;">'b</span> <span style="color: #a626a4;">-&gt;</span> <span style="color: #b751b6;">'c</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
+<pre class="src src-racket" id="org082ebf8">&nbsp; <span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">curry</span> <span style="color: #50a14f;">[</span>f <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #b751b6;">'a</span> <span style="color: #b751b6;">'b</span> <span style="color: #a626a4;">-&gt;</span> <span style="color: #b751b6;">'c</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
 &nbsp;   &nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #50a14f;">[</span>x <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">'a</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
 &nbsp;   &nbsp;   &nbsp; <span style="color: #a626a4;">:</span> <span style="color: #a626a4;">(</span><span style="color: #b751b6;">'b</span> <span style="color: #a626a4;">-&gt;</span> <span style="color: #b751b6;">'c</span><span style="color: #a626a4;">)</span>
 &nbsp;   <span style="color: #a626a4;">(</span><span style="color: #e45649;">lambda</span> <span style="color: #50a14f;">(</span>y<span style="color: #50a14f;">)</span> <span style="color: #50a14f;">(</span>f x y<span style="color: #50a14f;">)</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
@@ -4432,7 +4432,7 @@ Can reverse order of arguments
 </p>
 
 <div class="org-src-container">
-<pre class="src src-racket" id="orgb240774">&nbsp; <span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">flip</span> <span style="color: #50a14f;">[</span>f <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #b751b6;">'a</span> <span style="color: #b751b6;">'b</span> <span style="color: #a626a4;">-&gt;</span> <span style="color: #b751b6;">'c</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
+<pre class="src src-racket" id="orgc5449ef">&nbsp; <span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">flip</span> <span style="color: #50a14f;">[</span>f <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #b751b6;">'a</span> <span style="color: #b751b6;">'b</span> <span style="color: #a626a4;">-&gt;</span> <span style="color: #b751b6;">'c</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
 &nbsp;   <span style="color: #a626a4;">:</span> <span style="color: #a626a4;">(</span><span style="color: #b751b6;">'b</span> <span style="color: #b751b6;">'a</span> <span style="color: #a626a4;">-&gt;</span> <span style="color: #b751b6;">'c</span><span style="color: #a626a4;">)</span>
 &nbsp;   <span style="color: #a626a4;">(</span><span style="color: #e45649;">lambda</span> <span style="color: #50a14f;">(</span>bVal aVal<span style="color: #50a14f;">)</span> <span style="color: #50a14f;">(</span>f aVal bVal<span style="color: #50a14f;">)</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
 
@@ -4441,7 +4441,7 @@ Can reverse order of arguments
 </ul>
 </div>
 </li>
-<li><a id="orgd37ee73"></a>Example<br />
+<li><a id="org74d4eb7"></a>Example<br />
 <div class="outline-text-4" id="text-8-1-16">
 <div class="org-src-container">
 <pre class="src src-racket">
@@ -4458,7 +4458,7 @@ Can reverse order of arguments
 </div>
 </div>
 </li>
-<li><a id="org9f4c033"></a>Optional Lifting<br />
+<li><a id="orgde4dba5"></a>Optional Lifting<br />
 <div class="outline-text-4" id="text-8-1-17">
 <ul class="org-ul">
 <li><p>
@@ -4487,7 +4487,7 @@ Take any operation, and make it work on <code>Optionof</code>
 </ul>
 </div>
 </li>
-<li><a id="org2005549"></a>Optionals With a Default<br />
+<li><a id="orgad4f1fc"></a>Optionals With a Default<br />
 <div class="outline-text-4" id="text-8-1-18">
 <ul class="org-ul">
 <li><p>
@@ -4519,7 +4519,7 @@ Take any operation, and make it work on Optionof
 </ul>
 </div>
 </li>
-<li><a id="org96c28d0"></a>Point Free Programming<br />
+<li><a id="org59dbaf9"></a>Point Free Programming<br />
 <div class="outline-text-4" id="text-8-1-19">
 <ul class="org-ul">
 <li>When you build functions using combinators instead of lambda, it&rsquo;s called
@@ -4545,7 +4545,7 @@ Take any operation, and make it work on Optionof
 <div class="outline-text-3" id="text-broad-goals-0">
 </div>
 <ol class="org-ol">
-<li><a id="org2356690"></a>Overview<br />
+<li><a id="orgc22586f"></a>Overview<br />
 <div class="outline-text-4" id="text-9-1-1">
 <ul class="org-ul">
 <li>Objectives
@@ -4571,7 +4571,7 @@ Take any operation, and make it work on Optionof
 <div class="outline-text-3" id="text-generative-recursion">
 </div>
 <ol class="org-ol">
-<li><a id="org19b9301"></a>The Problem<br />
+<li><a id="org81f7f44"></a>The Problem<br />
 <div class="outline-text-4" id="text-9-2-1">
 <ul class="org-ul">
 <li>Some problems don&rsquo;t obviously map to the style of recursion we&rsquo;ve seen so far
@@ -4596,10 +4596,10 @@ e.g. What&rsquo;s the recursive version of:
 </ul>
 </div>
 </li>
-<li><a id="org3150339"></a>Example: Reversing a List The Naive Way<br />
+<li><a id="org89a7a8f"></a>Example: Reversing a List The Naive Way<br />
 <div class="outline-text-4" id="text-9-2-2">
 <div class="org-src-container">
-<pre class="src src-racket" id="orge74582d"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">reverse</span> <span style="color: #50a14f;">[</span>xs <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> <span style="color: #b751b6;">'a</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> <span style="color: #a626a4;">(</span><span style="color: #986801;">Listof</span> <span style="color: #b751b6;">'a</span><span style="color: #a626a4;">)</span>
+<pre class="src src-racket" id="org8ec8c04"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">reverse</span> <span style="color: #50a14f;">[</span>xs <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> <span style="color: #b751b6;">'a</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> <span style="color: #a626a4;">(</span><span style="color: #986801;">Listof</span> <span style="color: #b751b6;">'a</span><span style="color: #a626a4;">)</span>
 &nbsp; <span style="color: #a626a4;">(</span>type-case <span style="color: #50a14f;">(</span><span style="color: #986801;">Listof</span> <span style="color: #b751b6;">'a</span><span style="color: #50a14f;">)</span> xs
 &nbsp;   <span style="color: #50a14f;">[</span><span style="color: #a626a4;">empty</span> <span style="color: #a626a4;">empty</span><span style="color: #50a14f;">]</span>
 &nbsp;   <span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span><span style="color: #a626a4;">cons</span> h t<span style="color: #b751b6;">)</span>
@@ -4626,7 +4626,7 @@ e.g. What&rsquo;s the recursive version of:
 </ul>
 </div>
 </li>
-<li><a id="org5c7f0de"></a>Reverse: What we want (conceptually)<br />
+<li><a id="orgf082c69"></a>Reverse: What we want (conceptually)<br />
 <div class="outline-text-4" id="text-9-2-3">
 <ul class="org-ul">
 <li>Start with an empty list</li>
@@ -4635,7 +4635,7 @@ e.g. What&rsquo;s the recursive version of:
 </ul>
 </div>
 </li>
-<li><a id="org868121b"></a>An efficient reverse<br />
+<li><a id="org100b01f"></a>An efficient reverse<br />
 <div class="outline-text-4" id="text-9-2-4">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">reverseHelper</span> <span style="color: #50a14f;">[</span>xs <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> <span style="color: #b751b6;">'a</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
@@ -4665,9 +4665,9 @@ e.g. What&rsquo;s the recursive version of:
 </ul>
 </div>
 </li>
-<li><a id="org50e9132"></a>General Template<br />
+<li><a id="org535dcc6"></a>General Template<br />
 <ol class="org-ol">
-<li><a id="org72abb7c"></a>To write <code>f : (Ty1 Ty2 ... TyN -&gt; ReturnTy)</code><br />
+<li><a id="org7fd8f79"></a>To write <code>f : (Ty1 Ty2 ... TyN -&gt; ReturnTy)</code><br />
 <div class="outline-text-5" id="text-9-2-5-1">
 <ul class="org-ul">
 <li>Write a helper function with one extra argument
@@ -4696,7 +4696,7 @@ e.g. What&rsquo;s the recursive version of:
 </li>
 </ol>
 </li>
-<li><a id="org2a06395"></a>The Call Stack<br />
+<li><a id="org046a8eb"></a>The Call Stack<br />
 <div class="outline-text-4" id="text-9-2-6">
 <ul class="org-ul">
 <li>In Racket (or any language), when we make a function call, we need to know what to do with the result
@@ -4723,7 +4723,7 @@ e.g. What&rsquo;s the recursive version of:
 </ul>
 </div>
 </li>
-<li><a id="orgf80fdf9"></a>Stack Overflow<br />
+<li><a id="org741d40c"></a>Stack Overflow<br />
 <div class="outline-text-4" id="text-9-2-7">
 <ul class="org-ul">
 <li>If the call stack gets too large, a <i>stack overflow</i> can be triggered
@@ -4737,7 +4737,7 @@ e.g. What&rsquo;s the recursive version of:
 </ul>
 </div>
 </li>
-<li><a id="orgfb3f9c1"></a>Example<br />
+<li><a id="orgbe3aeda"></a>Example<br />
 <div class="outline-text-4" id="text-9-2-8">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">g</span> y z<span style="color: #a626a4;">)</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">+</span> y z<span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
@@ -4764,7 +4764,7 @@ e.g. What&rsquo;s the recursive version of:
 </ul>
 </div>
 </li>
-<li><a id="org66e12eb"></a>Returning a Function Call<br />
+<li><a id="orgd8bb6cb"></a>Returning a Function Call<br />
 <div class="outline-text-4" id="text-9-2-9">
 <ul class="org-ul">
 <li>Slightly different example</li>
@@ -4794,7 +4794,7 @@ e.g. What&rsquo;s the recursive version of:
 </ul>
 </div>
 </li>
-<li><a id="orgb3fb6f6"></a>What&rsquo;s The Difference?<br />
+<li><a id="org01e37c1"></a>What&rsquo;s The Difference?<br />
 <div class="outline-text-4" id="text-9-2-10">
 <ul class="org-ul">
 <li>In the first example, we had to take the result of the call to <code>g</code> and incorporate it into the result of <code>f</code>
@@ -4816,7 +4816,7 @@ e.g. What&rsquo;s the recursive version of:
 </ul>
 </div>
 </li>
-<li><a id="orgbe75b17"></a>Tail Calls<br />
+<li><a id="org5a8c864"></a>Tail Calls<br />
 <div class="outline-text-4" id="text-9-2-11">
 <ul class="org-ul">
 <li>An expression is in <b>tail position</b> if it is
@@ -4836,7 +4836,7 @@ e.g. What&rsquo;s the recursive version of:
 </ul>
 </div>
 </li>
-<li><a id="org3baedd6"></a>Tail Recursion<br />
+<li><a id="orgb54bee8"></a>Tail Recursion<br />
 <div class="outline-text-4" id="text-9-2-12">
 <ul class="org-ul">
 <li>Tail recursion: when <b>all recursive calls in a function definition are tail calls</b></li>
@@ -4851,7 +4851,7 @@ e.g. What&rsquo;s the recursive version of:
 </ul>
 </div>
 </li>
-<li><a id="orgba9e3d4"></a>Example: List Length in Constant Space<br />
+<li><a id="org37489d1"></a>Example: List Length in Constant Space<br />
 <div class="outline-text-4" id="text-9-2-13">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">fast-length-helper</span> <span style="color: #50a14f;">[</span>xs <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> <span style="color: #b751b6;">'a</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
@@ -4875,14 +4875,14 @@ e.g. What&rsquo;s the recursive version of:
 </ul>
 </div>
 </li>
-<li><a id="org819d01f"></a>Live Example: Slow and Fast Factorial<br />
+<li><a id="orgee96abd"></a>Live Example: Slow and Fast Factorial<br />
 <div class="outline-text-4" id="text-9-2-14">
 <ul class="org-ul">
 <li>See Racket in lecture</li>
 </ul>
 </div>
 </li>
-<li><a id="orgc354a73"></a>A Note On Terminology<br />
+<li><a id="orgaa70551"></a>A Note On Terminology<br />
 <div class="outline-text-4" id="text-9-2-15">
 <ul class="org-ul">
 <li><b>Generative recursion</b> is when recursion works by building up (generating) a solution as an extra parameter, and returning that parameter in the base case</li>
@@ -4894,7 +4894,7 @@ e.g. What&rsquo;s the recursive version of:
 </ul>
 </div>
 </li>
-<li><a id="orgcb6871e"></a>Tail Recursion and While Loops<br />
+<li><a id="org70abf09"></a>Tail Recursion and While Loops<br />
 <div class="outline-text-4" id="text-9-2-16">
 <ul class="org-ul">
 <li>We can relate tail recursion to while loops in imperative languages</li>
@@ -4922,7 +4922,7 @@ e.g. What&rsquo;s the recursive version of:
 </ul>
 </div>
 </li>
-<li><a id="org5986ccb"></a>Implicit vs. Explicit State<br />
+<li><a id="orge4460a7"></a>Implicit vs. Explicit State<br />
 <div class="outline-text-4" id="text-9-2-17">
 <ul class="org-ul">
 <li>Once again, we see that functional languages can express the same patterns as imperative language</li>
@@ -4957,7 +4957,7 @@ e.g. What&rsquo;s the recursive version of:
 <div class="outline-text-3" id="text-abstracting-generative-recursion">
 </div>
 <ol class="org-ol">
-<li><a id="org010b2a2"></a>Objective<br />
+<li><a id="org161e569"></a>Objective<br />
 <div class="outline-text-4" id="text-10-1-1">
 <ul class="org-ul">
 <li>Goals
@@ -4971,7 +4971,7 @@ e.g. What&rsquo;s the recursive version of:
 </ul>
 </div>
 </li>
-<li><a id="orgfac3790"></a>Higher-Order Genrative Recursion: Folds<br />
+<li><a id="org4ab0ab9"></a>Higher-Order Genrative Recursion: Folds<br />
 <div class="outline-text-4" id="text-10-1-2">
 <ul class="org-ul">
 <li>Recall: higher-order polymorphic functions let us turn design patterns into functions
@@ -4986,7 +4986,7 @@ e.g. What&rsquo;s the recursive version of:
 </ul>
 </div>
 </li>
-<li><a id="orgceb5021"></a>Recall: Tail-Recursion Template<br />
+<li><a id="org51c0912"></a>Recall: Tail-Recursion Template<br />
 <div class="outline-text-4" id="text-10-1-3">
 <ul class="org-ul">
 <li>Make a helper with an extra argument
@@ -5003,7 +5003,7 @@ e.g. What&rsquo;s the recursive version of:
 </ul>
 </div>
 </li>
-<li><a id="org636f7d9"></a>Foldl: The Idea<br />
+<li><a id="orge1ace7d"></a>Foldl: The Idea<br />
 <div class="outline-text-4" id="text-10-1-4">
 <ul class="org-ul">
 <li>We can make &ldquo;update the accumulator&rdquo; concrete as a function</li>
@@ -5019,10 +5019,10 @@ e.g. What&rsquo;s the recursive version of:
 </ul>
 </div>
 </li>
-<li><a id="org42ecc40"></a>Foldl (Fold Left)<br />
+<li><a id="org934893a"></a>Foldl (Fold Left)<br />
 <div class="outline-text-4" id="text-10-1-5">
 <div class="org-src-container">
-<pre class="src src-racket" id="org585661f"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">foldl</span> <span style="color: #50a14f;">[</span>f <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #b751b6;">'a</span> <span style="color: #b751b6;">'b</span> <span style="color: #a626a4;">-&gt;</span> <span style="color: #b751b6;">'b</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
+<pre class="src src-racket" id="org6124290"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">foldl</span> <span style="color: #50a14f;">[</span>f <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #b751b6;">'a</span> <span style="color: #b751b6;">'b</span> <span style="color: #a626a4;">-&gt;</span> <span style="color: #b751b6;">'b</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
 &nbsp;   &nbsp;   &nbsp;   &nbsp;  <span style="color: #50a14f;">[</span>accum <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">'b</span><span style="color: #50a14f;">]</span>
 &nbsp;   &nbsp;   &nbsp;   &nbsp;  <span style="color: #50a14f;">[</span>xs <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> <span style="color: #b751b6;">'a</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">'b</span>
 &nbsp; <span style="color: #a626a4;">(</span>type-case <span style="color: #50a14f;">(</span><span style="color: #986801;">Listof</span> <span style="color: #b751b6;">'a</span><span style="color: #50a14f;">)</span> xs
@@ -5047,7 +5047,7 @@ e.g. What&rsquo;s the recursive version of:
 </ul>
 </div>
 </li>
-<li><a id="orgae26500"></a>Example: Reverse using folds<br />
+<li><a id="orgee8c5f2"></a>Example: Reverse using folds<br />
 <div class="outline-text-4" id="text-10-1-6">
 <div class="org-src-container">
 <pre class="src src-racket">
@@ -5075,7 +5075,7 @@ e.g. What&rsquo;s the recursive version of:
 </ul>
 </div>
 </li>
-<li><a id="orgf737481"></a>Reasoning with foldl<br />
+<li><a id="orgd46a41f"></a>Reasoning with foldl<br />
 <div class="outline-text-4" id="text-10-1-7">
 <ul class="org-ul">
 <li><code>(foldl f init (list a b c d))</code> gives:
@@ -5098,7 +5098,7 @@ e.g. What&rsquo;s the recursive version of:
 </ul>
 </div>
 </li>
-<li><a id="orgfabf601"></a>Foldl is a for-loop<br />
+<li><a id="orgfbe6f67"></a>Foldl is a for-loop<br />
 <div class="outline-text-4" id="text-10-1-8">
 <div class="org-src-container">
 <pre class="src src-C++"><span style="color: #986801;">int</span> <span style="color: #6a1868;">A</span>[N];
@@ -5128,14 +5128,14 @@ e.g. What&rsquo;s the recursive version of:
 </ul>
 </div>
 </li>
-<li><a id="org853344c"></a>Example: Fibonacci with Foldl<br />
+<li><a id="org8065baa"></a>Example: Fibonacci with Foldl<br />
 <div class="outline-text-4" id="text-10-1-9">
 <ul class="org-ul">
 <li>See Dr. Racket</li>
 </ul>
 </div>
 </li>
-<li><a id="org1216ca2"></a>Non-tail Folds<br />
+<li><a id="orgddc8551"></a>Non-tail Folds<br />
 <div class="outline-text-4" id="text-10-1-10">
 <ul class="org-ul">
 <li>Recall our pattern for normal (non-tail) recursion</li>
@@ -5151,7 +5151,7 @@ e.g. What&rsquo;s the recursive version of:
 </ul>
 </div>
 </li>
-<li><a id="orga47c0af"></a>Constructing Foldr (Fold Right)<br />
+<li><a id="org663bacc"></a>Constructing Foldr (Fold Right)<br />
 <div class="outline-text-4" id="text-10-1-11">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">foldr</span> <span style="color: #50a14f;">[</span>f <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #b751b6;">'a</span> <span style="color: #b751b6;">'b</span> <span style="color: #a626a4;">-&gt;</span> <span style="color: #b751b6;">'b</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
@@ -5173,7 +5173,7 @@ has the accumulator for all elements <i>after</i> the current element</li>
 </ul>
 </div>
 </li>
-<li><a id="org71ff88b"></a>Example: Map as a fold<br />
+<li><a id="org655110c"></a>Example: Map as a fold<br />
 <div class="outline-text-4" id="text-10-1-12">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">map-via-fold</span> <span style="color: #50a14f;">[</span>f <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #b751b6;">'a</span> <span style="color: #a626a4;">-&gt;</span> <span style="color: #b751b6;">'b</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
@@ -5205,7 +5205,7 @@ has the accumulator for all elements <i>after</i> the current element</li>
 </ul>
 </div>
 </li>
-<li><a id="orgd29def9"></a>Example: Filter as a fold<br />
+<li><a id="org188313a"></a>Example: Filter as a fold<br />
 <div class="outline-text-4" id="text-10-1-13">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">filter-via-fold</span> <span style="color: #50a14f;">[</span>p <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #b751b6;">'a</span> <span style="color: #a626a4;">-&gt;</span> <span style="color: #986801;">Boolean</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
@@ -5225,7 +5225,7 @@ has the accumulator for all elements <i>after</i> the current element</li>
 </ul>
 </div>
 </li>
-<li><a id="org83d8235"></a>Example: ConcatAll as a fold<br />
+<li><a id="orgdfad184"></a>Example: ConcatAll as a fold<br />
 <div class="outline-text-4" id="text-10-1-14">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">concatAll-via-fold</span> <span style="color: #50a14f;">[</span>lists <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Listof</span> <span style="color: #4078f2;">(</span><span style="color: #986801;">Listof</span> <span style="color: #b751b6;">'a</span><span style="color: #4078f2;">)</span><span style="color: #b751b6;">)</span> <span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
@@ -5239,7 +5239,7 @@ has the accumulator for all elements <i>after</i> the current element</li>
 </div>
 </div>
 </li>
-<li><a id="org55a95c8"></a>List Recursion, Once And For All<br />
+<li><a id="orgf9731bf"></a>List Recursion, Once And For All<br />
 <div class="outline-text-4" id="text-10-1-15">
 <ul class="org-ul">
 <li><code>foldr</code> is the higher-order function version of pattern matching on lists
@@ -5257,7 +5257,7 @@ has the accumulator for all elements <i>after</i> the current element</li>
 </ul>
 </div>
 </li>
-<li><a id="orge4fc71e"></a>Folds for other types<br />
+<li><a id="org7871b4b"></a>Folds for other types<br />
 <div class="outline-text-4" id="text-10-1-16">
 <ul class="org-ul">
 <li><code>foldl</code> only works with lists or list-like types
@@ -5285,7 +5285,7 @@ has the accumulator for all elements <i>after</i> the current element</li>
 <div class="outline-text-3" id="text-the-big-picture">
 </div>
 <ol class="org-ol">
-<li><a id="org8808a1c"></a>Life of a program<br />
+<li><a id="org5769f6e"></a>Life of a program<br />
 <div class="outline-text-4" id="text-11-1-1">
 <ul class="org-ul">
 <li>The Language Pipeline:</li>
@@ -5366,7 +5366,7 @@ has the accumulator for all elements <i>after</i> the current element</li>
 </table>
 </div>
 </li>
-<li><a id="orgb7515e0"></a>Syntax vs Semantics<br />
+<li><a id="org7295392"></a>Syntax vs Semantics<br />
 <div class="outline-text-4" id="text-11-1-2">
 <ul class="org-ul">
 <li>Can have many syntaxes that parse to the same abstract syntax
@@ -5386,7 +5386,7 @@ has the accumulator for all elements <i>after</i> the current element</li>
 <div class="outline-text-3" id="text-describing-syntax">
 </div>
 <ol class="org-ol">
-<li><a id="org8e3cf4d"></a>EBNF<br />
+<li><a id="org230676b"></a>EBNF<br />
 <div class="outline-text-4" id="text-11-2-1">
 <ul class="org-ul">
 <li>Extended Backus-Naur form
@@ -5411,7 +5411,7 @@ has the accumulator for all elements <i>after</i> the current element</li>
 </ul>
 </div>
 </li>
-<li><a id="org4913b43"></a>Example<br />
+<li><a id="orga071f74"></a>Example<br />
 <div class="outline-text-4" id="text-11-2-2">
 <div class="org-src-container">
 <pre class="src src-nil">&lt;expr&gt; ::=
@@ -5439,7 +5439,7 @@ has the accumulator for all elements <i>after</i> the current element</li>
 </ul>
 </div>
 </li>
-<li><a id="orgf46c0b2"></a>Generating a string<br />
+<li><a id="org63cf405"></a>Generating a string<br />
 <div class="outline-text-4" id="text-11-2-3">
 <ul class="org-ul">
 <li>Start with a single non-terminal
@@ -5469,7 +5469,7 @@ has the accumulator for all elements <i>after</i> the current element</li>
 </ul>
 </div>
 </li>
-<li><a id="orgf2b562c"></a>The Language Described by a BNF<br />
+<li><a id="org22c49d4"></a>The Language Described by a BNF<br />
 <div class="outline-text-4" id="text-11-2-4">
 <ul class="org-ul">
 <li>All possible ways of generating strings
@@ -5492,7 +5492,7 @@ has the accumulator for all elements <i>after</i> the current element</li>
 <div class="outline-text-3" id="text-parsing-and-abstract-syntax">
 </div>
 <ol class="org-ol">
-<li><a id="org0533043"></a>This Looks Familiar<br />
+<li><a id="org54a7d11"></a>This Looks Familiar<br />
 <div class="outline-text-4" id="text-11-3-1">
 <ul class="org-ul">
 <li>An expression was:
@@ -5505,7 +5505,7 @@ has the accumulator for all elements <i>after</i> the current element</li>
 </ul>
 </div>
 </li>
-<li><a id="org725b237"></a>Parse Trees<br />
+<li><a id="org037dafb"></a>Parse Trees<br />
 <div class="outline-text-4" id="text-11-3-2">
 <ul class="org-ul">
 <li>Notice that the different replacements didn&rsquo;t affect each other
@@ -5523,7 +5523,7 @@ has the accumulator for all elements <i>after</i> the current element</li>
 </ul>
 </div>
 </li>
-<li><a id="orge1243ec"></a>Abstract Syntax<br />
+<li><a id="org2e95407"></a>Abstract Syntax<br />
 <div class="outline-text-4" id="text-11-3-3">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #a626a4;">define-type</span> <span style="color: #6a1868;">Expr</span>
@@ -5543,7 +5543,7 @@ has the accumulator for all elements <i>after</i> the current element</li>
 </ul>
 </div>
 </li>
-<li><a id="org53c2ad2"></a>Parsing<br />
+<li><a id="org8810414"></a>Parsing<br />
 <div class="outline-text-4" id="text-11-3-4">
 <ul class="org-ul">
 <li>The process of turning source code (linear string) into abstract syntax (tree)
@@ -5559,7 +5559,7 @@ has the accumulator for all elements <i>after</i> the current element</li>
 </ul>
 </div>
 </li>
-<li><a id="org6c9f98b"></a>Parsing in this class<br />
+<li><a id="org55e66e5"></a>Parsing in this class<br />
 <div class="outline-text-4" id="text-11-3-5">
 <ul class="org-ul">
 <li>Parsing is an interesting problem</li>
@@ -5574,7 +5574,7 @@ has the accumulator for all elements <i>after</i> the current element</li>
 </ul>
 </div>
 </li>
-<li><a id="org261b86b"></a>The S-Expression Type<br />
+<li><a id="org41e2476"></a>The S-Expression Type<br />
 <div class="outline-text-4" id="text-11-3-6">
 <ul class="org-ul">
 <li>Symbolic expressions
@@ -5599,7 +5599,7 @@ We can imagine it as being something like:
 </ul>
 </div>
 </li>
-<li><a id="orgb86bc40"></a>The Symbol Type<br />
+<li><a id="org4163121"></a>The Symbol Type<br />
 <div class="outline-text-4" id="text-11-3-7">
 <ul class="org-ul">
 <li>A useful built-in Flit type for names of things
@@ -5633,7 +5633,7 @@ Only relevant operation is:
 </ul>
 </div>
 </li>
-<li><a id="org6fcb547"></a>S-Expression in Flit<br />
+<li><a id="orgb3a70ce"></a>S-Expression in Flit<br />
 <div class="outline-text-4" id="text-11-3-8">
 <ul class="org-ul">
 <li><p>
@@ -5655,7 +5655,7 @@ The backtick <code>`</code> in Racket says &ldquo;interpret the next thing as an
 </ul>
 </div>
 </li>
-<li><a id="org5e8dc8e"></a>S-Expression Operations<br />
+<li><a id="org26c7a36"></a>S-Expression Operations<br />
 <div class="outline-text-4" id="text-11-3-9">
 <ul class="org-ul">
 <li><p>
@@ -5684,7 +5684,7 @@ Many useful built-in functions
 </ul>
 </div>
 </li>
-<li><a id="org4b99360"></a>From S-exp to AST<br />
+<li><a id="org7acd135"></a>From S-exp to AST<br />
 <div class="outline-text-4" id="text-11-3-10">
 <ul class="org-ul">
 <li>S-expression is a tree
@@ -5711,10 +5711,10 @@ Many useful built-in functions
 </ul>
 </div>
 </li>
-<li><a id="orgf218ee1"></a>Example Parser<br />
+<li><a id="org0f6d173"></a>Example Parser<br />
 <div class="outline-text-4" id="text-11-3-11">
 <div class="org-src-container">
-<pre class="src src-racket" id="org5279bb3"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">parse</span> <span style="color: #50a14f;">[</span>s <span style="color: #a626a4;">:</span> S-Exp<span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> Exp
+<pre class="src src-racket" id="org2602db2"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">parse</span> <span style="color: #50a14f;">[</span>s <span style="color: #a626a4;">:</span> S-Exp<span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> Exp
 &nbsp; <span style="color: #a626a4;">(</span><span style="color: #e45649;">cond</span>
 &nbsp;   <span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span>s-exp-match? <span style="color: #b751b6;">`NUMBER</span> s<span style="color: #b751b6;">)</span> <span style="color: #b751b6;">(</span>num <span style="color: #4078f2;">(</span>s-exp-&gt;number s<span style="color: #4078f2;">)</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
 &nbsp;   <span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span>s-exp-match? <span style="color: #4078f2;">`</span><span style="color: #4078f2;">{</span><span style="color: #a626a4;">+</span> ANY ANY<span style="color: #4078f2;">}</span> s<span style="color: #b751b6;">)</span>
@@ -5728,7 +5728,7 @@ Many useful built-in functions
 </div>
 </div>
 </li>
-<li><a id="orgf752601"></a>What you need to know about parsers<br />
+<li><a id="org91d83d5"></a>What you need to know about parsers<br />
 <div class="outline-text-4" id="text-11-3-12">
 <ul class="org-ul">
 <li>Should know:
@@ -5760,7 +5760,7 @@ Many useful built-in functions
 <div class="outline-text-3" id="text-interpreters-overview">
 </div>
 <ol class="org-ol">
-<li><a id="orga3364e3"></a>What is an interpreter?<br />
+<li><a id="orgc84f3a5"></a>What is an interpreter?<br />
 <div class="outline-text-4" id="text-12-1-1">
 <ul class="org-ul">
 <li>A program
@@ -5783,7 +5783,7 @@ Many useful built-in functions
 </ul>
 </div>
 </li>
-<li><a id="orgba6ba5f"></a>The Church Turing Thesis<br />
+<li><a id="orgedcb59b"></a>The Church Turing Thesis<br />
 <div class="outline-text-4" id="text-12-1-2">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
@@ -5836,9 +5836,9 @@ Many useful built-in functions
 </table>
 </div>
 </li>
-<li><a id="orgd2cdc76"></a>The Church Turing Thesis<br />
+<li><a id="orga68e859"></a>The Church Turing Thesis<br />
 <ol class="org-ol">
-<li><a id="org896bee8"></a>Turing Completeness<br />
+<li><a id="org5dfdfe2"></a>Turing Completeness<br />
 <div class="outline-text-5" id="text-12-1-3-1">
 <ul class="org-ul">
 <li>The following can all simulate each other:
@@ -5855,10 +5855,10 @@ Many useful built-in functions
 </ul>
 </div>
 </li>
-<li><a id="org0ecc3a4"></a>All Turing Complete Languages can simulate each other<br /></li>
+<li><a id="org66b7050"></a>All Turing Complete Languages can simulate each other<br /></li>
 </ol>
 </li>
-<li><a id="orged71ca9"></a>Turing Completeness and Interpreters<br />
+<li><a id="orgcda9be5"></a>Turing Completeness and Interpreters<br />
 <div class="outline-text-4" id="text-12-1-4">
 <ul class="org-ul">
 <li>You can write an interpreter for any language in any Turing-complete language</li>
@@ -5869,7 +5869,7 @@ Many useful built-in functions
 </ul>
 </div>
 </li>
-<li><a id="orge761004"></a>Keeping it all straight<br />
+<li><a id="orge2138d4"></a>Keeping it all straight<br />
 <div class="outline-text-4" id="text-12-1-5">
 <ul class="org-ul">
 <li>The implementation language is NOT the language you&rsquo;re interpreting</li>
@@ -5886,7 +5886,7 @@ Many useful built-in functions
 </ul>
 </div>
 </li>
-<li><a id="org31e0964"></a>General Form of an Interpreter<br />
+<li><a id="orgbe060c4"></a>General Form of an Interpreter<br />
 <div class="outline-text-4" id="text-12-1-6">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">interp</span> <span style="color: #50a14f;">[</span>e <span style="color: #a626a4;">:</span> Expr<span style="color: #50a14f;">]</span>
@@ -5907,7 +5907,7 @@ Many useful built-in functions
 </ul>
 </div>
 </li>
-<li><a id="org4aaf33f"></a>Our First AST Type<br />
+<li><a id="orgde09ccf"></a>Our First AST Type<br />
 <div class="outline-text-4" id="text-12-1-7">
 <ul class="org-ul">
 <li><code>Exp</code> is:
@@ -5923,7 +5923,7 @@ Many useful built-in functions
 </ul></li>
 </ul>
 <div class="org-src-container">
-<pre class="src src-racket" id="org908369b"><span style="color: #4078f2;">(</span><span style="color: #a626a4;">define-type-alias</span> <span style="color: #6a1868;">Value</span> <span style="color: #986801;">Number</span><span style="color: #4078f2;">)</span>
+<pre class="src src-racket" id="org9995f08"><span style="color: #4078f2;">(</span><span style="color: #a626a4;">define-type-alias</span> <span style="color: #6a1868;">Value</span> <span style="color: #986801;">Number</span><span style="color: #4078f2;">)</span>
 <span style="color: #4078f2;">(</span><span style="color: #a626a4;">define-type</span> <span style="color: #6a1868;">Exp</span>
 &nbsp; <span style="color: #a626a4;">(</span>num <span style="color: #50a14f;">[</span>n <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
 &nbsp; <span style="color: #a626a4;">(</span>plus <span style="color: #50a14f;">[</span>left <span style="color: #a626a4;">:</span> Exp<span style="color: #50a14f;">]</span>
@@ -5934,7 +5934,7 @@ Many useful built-in functions
 </div>
 </div>
 </li>
-<li><a id="org85d9804"></a>Structure of Interpreter<br />
+<li><a id="org44a0d51"></a>Structure of Interpreter<br />
 <div class="outline-text-4" id="text-12-1-8">
 <ul class="org-ul">
 <li>Idea: if we know what the values of sub-expressions are, we can then look at what kind of AST node we have to determine what to do with those values
@@ -5954,7 +5954,7 @@ Many useful built-in functions
 </ul>
 </div>
 </li>
-<li><a id="orgd921484"></a>Our First Interpreter<br />
+<li><a id="org5907998"></a>Our First Interpreter<br />
 <div class="outline-text-4" id="text-12-1-9">
 <ul class="org-ul">
 <li>Interpreting arithmetic, so values are just Flit <code>Number</code>
@@ -5964,7 +5964,7 @@ Many useful built-in functions
 </ul>
 
 <div class="org-src-container">
-<pre class="src src-racket" id="org15a4791">
+<pre class="src src-racket" id="org8a320a8">
 
 <span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">interp</span> <span style="color: #50a14f;">[</span>e <span style="color: #a626a4;">:</span> Exp<span style="color: #50a14f;">]</span> <span style="color: #a626a4;">)</span>
 &nbsp;   &nbsp;   <span style="color: #a626a4;">:</span> Value
@@ -5991,12 +5991,12 @@ Many useful built-in functions
 </li>
 </ol>
 </div>
-<div id="outline-container-org25405a2" class="outline-3">
-<h3 id="org25405a2"><span class="section-number-3">12.2.</span> Extending Curly-Arith to Curly-Cond</h3>
+<div id="outline-container-orgbb59bf7" class="outline-3">
+<h3 id="orgbb59bf7"><span class="section-number-3">12.2.</span> Extending Curly-Arith to Curly-Cond</h3>
 <div class="outline-text-3" id="text-12-2">
 </div>
 <ol class="org-ol">
-<li><a id="orgafa525b"></a>Adding features<br />
+<li><a id="orgf4aec15"></a>Adding features<br />
 <div class="outline-text-4" id="text-12-2-1">
 <ul class="org-ul">
 <li>Need to update
@@ -6013,10 +6013,10 @@ Many useful built-in functions
 </ul>
 </div>
 </li>
-<li><a id="org917c586"></a>Updating the dataype<br />
+<li><a id="org82d79f5"></a>Updating the dataype<br />
 <div class="outline-text-4" id="text-12-2-2">
 <div class="org-src-container">
-<pre class="src src-racket" id="org336deb6"><span style="color: #4078f2;">(</span><span style="color: #a626a4;">define-type</span> <span style="color: #6a1868;">Expr</span>
+<pre class="src src-racket" id="org05aa18f"><span style="color: #4078f2;">(</span><span style="color: #a626a4;">define-type</span> <span style="color: #6a1868;">Expr</span>
 &nbsp; <span style="color: #a626a4;">(</span>num <span style="color: #50a14f;">[</span>n <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
 &nbsp; <span style="color: #a626a4;">(</span>plus <span style="color: #50a14f;">[</span>left <span style="color: #a626a4;">:</span> Exp<span style="color: #50a14f;">]</span>
 &nbsp;   &nbsp;   <span style="color: #50a14f;">[</span>right <span style="color: #a626a4;">:</span> Exp<span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
@@ -6031,7 +6031,7 @@ Many useful built-in functions
 </div>
 </div>
 </li>
-<li><a id="orgb5cb047"></a>Updating the parser<br />
+<li><a id="orgd439a82"></a>Updating the parser<br />
 <div class="outline-text-4" id="text-12-2-3">
 <div class="org-src-container">
 <pre class="src src-racket">&nbsp;   <span style="color: #4078f2;">[</span><span style="color: #a626a4;">(</span>s-exp-match? <span style="color: #4078f2;">`</span><span style="color: #50a14f;">{</span>if0 ANY ANY ANY<span style="color: #50a14f;">}</span> s<span style="color: #a626a4;">)</span>
@@ -6042,7 +6042,7 @@ Many useful built-in functions
 </div>
 </div>
 </li>
-<li><a id="orgde3595f"></a>Updating the interpreter<br />
+<li><a id="orgac3fb35"></a>Updating the interpreter<br />
 <div class="outline-text-4" id="text-12-2-4">
 <div class="org-src-container">
 <pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">interp</span> <span style="color: #50a14f;">[</span>e <span style="color: #a626a4;">:</span> Exp<span style="color: #50a14f;">]</span> <span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span>
@@ -6074,7 +6074,7 @@ Many useful built-in functions
 </ul>
 </div>
 </li>
-<li><a id="orgdc9eb65"></a>Syntax vs. Values<br />
+<li><a id="org6e1d0d9"></a>Syntax vs. Values<br />
 <div class="outline-text-4" id="text-12-2-5">
 <ul class="org-ul">
 <li>Why couldn&rsquo;t we just compare <code>test</code> to <code>zero?</code></li>
@@ -6097,7 +6097,7 @@ Many useful built-in functions
 </ul>
 </div>
 </li>
-<li><a id="org11571eb"></a>Keeping it all Straight<br />
+<li><a id="org9f6f55c"></a>Keeping it all Straight<br />
 <div class="outline-text-4" id="text-12-2-6">
 <ul class="org-ul">
 <li>We want equivalent expressions to produce equivalent results
@@ -6119,17 +6119,299 @@ Many useful built-in functions
 </ol>
 </div>
 </div>
-<div id="outline-container-desugaring-our-first-elaborator" class="outline-2">
-<h2 id="desugaring-our-first-elaborator"><span class="section-number-2">13.</span> Desugaring: Our First Elaborator</h2>
-<div class="outline-text-2" id="text-desugaring-our-first-elaborator">
+<div id="outline-container-values-dyntype" class="outline-2">
+<h2 id="values-dyntype"><span class="section-number-2">13.</span> Values, Dynamic Typing and Desugaring</h2>
+<div class="outline-text-2" id="text-values-dyntype">
+</div>
+<div id="outline-container-orge70acde" class="outline-3">
+<h3 id="orge70acde"><span class="section-number-3">13.1.</span> Introducing Boolean</h3>
+<div class="outline-text-3" id="text-13-1">
+</div>
+<ol class="org-ol">
+<li><a id="orgfda3eb1"></a>Booleans<br />
+<div class="outline-text-4" id="text-13-1-1">
+<ul class="org-ul">
+<li><code>if0</code> was an awkward feature
+<ul class="org-ul">
+<li>Can&rsquo;t really do <code>and</code>, <code>or</code></li>
+<li>e.g. What should <code>{and 1 1}</code> be?
+<ul class="org-ul">
+<li>Any non-zero value has the right properties</li>
+</ul></li>
+</ul></li>
+<li>We want our interpreter to have multiple <i>types</i>
+<ul class="org-ul">
+<li>Numbers and Booleans</li>
+</ul></li>
+</ul>
+</div>
+</li>
+<li><a id="org2f03fbe"></a>Dynamic vs. Static Typing<br />
+<div class="outline-text-4" id="text-13-1-2">
+<ul class="org-ul">
+<li>Static typing: types are checked <i>before</i> a program runs
+<ul class="org-ul">
+<li>E.g. Flit, C++, Go, Java, Swift, Rust, Haskell, TypeScript, etc.</li>
+</ul></li>
+<li>Dynamic typing: types are checked at run-time
+<ul class="org-ul">
+<li>Don&rsquo;t check if an operation is valid until we&rsquo;re actually doing that operation</li>
+<li>E.g. Python, Ruby, JavaScript, PHP, Racket, Lua</li>
+</ul></li>
+<li>Recall: implementation language features are <i>separate</i> from features of language being implemented</li>
+<li>We can implement a dynamically-typed language (Curly-Bool) in a statically typed language (Flit)</li>
+</ul>
+</div>
+</li>
+<li><a id="orgb6244c0"></a>New Syntax<br />
+<div class="outline-text-4" id="text-13-1-3">
+<div class="org-src-container">
+<pre class="src src-nil">&lt;expr&gt; ::=
+|  &lt;number&gt;
+|  &lt;boolean&gt;
+| {+ &lt;expr&gt; &lt;expr&gt;}
+| {* &lt;expr&gt; &lt;expr&gt;}
+| {if &lt;expr&gt; &lt;expr&gt; &lt;expr&gt;}
+| {zero? &lt;expr&gt; }
+</pre>
+</div>
+<ul class="org-ul">
+<li>Allow boolean literals</li>
+<li><code>if</code> instead of <code>if0</code></li>
+<li>One operation producing a boolean</li>
+</ul>
+</div>
+</li>
+<li><a id="orge5a6a17"></a>Example Programs<br />
+<div class="outline-text-4" id="text-13-1-4">
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #4078f2;">{</span><span style="color: #e45649;">if</span> <span style="color: #a626a4;">{</span><span style="color: #a626a4;">zero?</span> <span style="color: #50a14f;">{</span><span style="color: #a626a4;">+</span> <span style="color: #b751b6;">{</span><span style="color: #a626a4;">*</span> <span style="color: #da8548; font-weight: bold;">40</span> <span style="color: #da8548; font-weight: bold;">50</span><span style="color: #b751b6;">}</span>
+&nbsp;   &nbsp;   &nbsp;   <span style="color: #b751b6;">{</span><span style="color: #a626a4;">*</span> <span style="color: #b751b6;">-1</span> <span style="color: #da8548; font-weight: bold;">2000</span><span style="color: #b751b6;">}</span><span style="color: #50a14f;">}</span><span style="color: #a626a4;">}</span>
+&nbsp;   <span style="color: #da8548; font-weight: bold;">1</span>
+&nbsp;   <span style="color: #b751b6;">-1</span><span style="color: #4078f2;">}</span>
+</pre>
+</div>
+</div>
+</li>
+<li><a id="orgd7ca012"></a>Representing Booleans<br />
+<div class="outline-text-4" id="text-13-1-5">
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #a626a4;">define-type</span> <span style="color: #6a1868;">Value</span>
+&nbsp; <span style="color: #a626a4;">(</span>numV <span style="color: #50a14f;">[</span>n <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
+&nbsp; <span style="color: #a626a4;">(</span>boolV <span style="color: #50a14f;">[</span>b <span style="color: #a626a4;">:</span> <span style="color: #986801;">Boolean</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+</pre>
+</div>
+<ul class="org-ul">
+<li>Datatype
+<ul class="org-ul">
+<li>Value can be number OR a boolean</li>
+<li>Use pattern-matching to check what a value</li>
+</ul></li>
+<li>The constructor records run-time type information</li>
+</ul>
+</div>
+</li>
+<li><a id="orgfd8ee73"></a>Abstract Syntax<br />
+<div class="outline-text-4" id="text-13-1-6">
+<ul class="org-ul">
+<li>Rename Expression constructors for consistency
+<ul class="org-ul">
+<li>Add <code>E</code> to names for Expression</li>
+<li><code>V</code> was for Value</li>
+</ul></li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #a626a4;">define-type</span> <span style="color: #6a1868;">Exp</span>
+&nbsp; <span style="color: #a626a4;">(</span>numE <span style="color: #50a14f;">[</span>n <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
+&nbsp; <span style="color: #a626a4;">(</span>boolE <span style="color: #50a14f;">[</span>b <span style="color: #a626a4;">:</span> <span style="color: #986801;">Boolean</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
+&nbsp; <span style="color: #a626a4;">(</span>plusE <span style="color: #50a14f;">[</span>left <span style="color: #a626a4;">:</span> Exp<span style="color: #50a14f;">]</span>
+&nbsp;   &nbsp;   <span style="color: #50a14f;">[</span>right <span style="color: #a626a4;">:</span> Exp<span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
+&nbsp; <span style="color: #a626a4;">(</span>timesE <span style="color: #50a14f;">[</span>left <span style="color: #a626a4;">:</span> Exp<span style="color: #50a14f;">]</span>
+&nbsp;   &nbsp;   &nbsp;<span style="color: #50a14f;">[</span>right <span style="color: #a626a4;">:</span> Exp<span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
+&nbsp; <span style="color: #a626a4;">(</span>cndE <span style="color: #50a14f;">[</span>test <span style="color: #a626a4;">:</span> Exp<span style="color: #50a14f;">]</span>
+&nbsp;   &nbsp;  <span style="color: #50a14f;">[</span>thenCase <span style="color: #a626a4;">:</span> Exp<span style="color: #50a14f;">]</span>
+&nbsp;   &nbsp;  <span style="color: #50a14f;">[</span>elseCase <span style="color: #a626a4;">:</span> Exp<span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+</pre>
+</div>
+</div>
+</li>
+<li><a id="org795a289"></a>Following the Types<br />
+<div class="outline-text-4" id="text-13-1-7">
+<ul class="org-ul">
+<li>Interpreter now gives an error</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">interp</span> <span style="color: #50a14f;">[</span>e <span style="color: #a626a4;">:</span> Exp<span style="color: #50a14f;">]</span> <span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> Value
+&nbsp; <span style="color: #a626a4;">(</span>type-case Exp e
+&nbsp;   <span style="color: #e45649;">...</span>
+&nbsp;   <span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span>plusE l r<span style="color: #b751b6;">)</span>
+&nbsp;   &nbsp;<span style="color: #b751b6;">(</span><span style="color: #a626a4;">+</span> <span style="color: #4078f2;">(</span>interp l<span style="color: #4078f2;">)</span> <span style="color: #4078f2;">(</span>interp r<span style="color: #4078f2;">)</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span> <span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">TYPE ERROR</span>
+</pre>
+</div>
+<ul class="org-ul">
+<li><code>(interp l)</code> and <code>(interp r)</code> produce <code>Value</code></li>
+<li><code>+</code> expects <code>Number</code></li>
+</ul>
+</div>
+</li>
+<li><a id="orgf22558a"></a>Dynamic Type Checks<br />
+<div class="outline-text-4" id="text-13-1-8">
+<ul class="org-ul">
+<li>Can define <i>lifting</i> function which turns a number-operation into value-operation</li>
+<li>Main idea:
+<ul class="org-ul">
+<li>Pattern-match on values</li>
+<li>If they&rsquo;re both numbers, then do the operation
+<ul class="org-ul">
+<li>and wrap the result in <code>numV</code> to get a Value</li>
+</ul></li>
+<li>Otherwise, raise an error</li>
+</ul></li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">lift-binop</span> <span style="color: #50a14f;">[</span>op <span style="color: #a626a4;">:</span> <span style="color: #b751b6;">(</span><span style="color: #986801;">Number</span> <span style="color: #986801;">Number</span> <span style="color: #a626a4;">-&gt;</span> <span style="color: #986801;">Number</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
+&nbsp;   &nbsp;   &nbsp;   &nbsp;   &nbsp;   <span style="color: #50a14f;">[</span>v1 <span style="color: #a626a4;">:</span> Value<span style="color: #50a14f;">]</span>
+&nbsp;   &nbsp;   &nbsp;   &nbsp;   &nbsp;   <span style="color: #50a14f;">[</span>v2 <span style="color: #a626a4;">:</span> Value<span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
+&nbsp; <span style="color: #a626a4;">(</span>type-case Value v1
+&nbsp;   <span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span>numV n1<span style="color: #b751b6;">)</span>
+&nbsp;   &nbsp;<span style="color: #b751b6;">(</span>type-case Value v2
+&nbsp;   &nbsp;  <span style="color: #4078f2;">[</span><span style="color: #a626a4;">(</span>numV n2<span style="color: #a626a4;">)</span>
+&nbsp;   &nbsp;   <span style="color: #a626a4;">(</span>numV <span style="color: #50a14f;">(</span>op n1 n2<span style="color: #50a14f;">)</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">]</span>
+&nbsp;   &nbsp;  <span style="color: #4078f2;">[</span><span style="color: #e45649;">else</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">error</span> <span style="color: #b751b6;">'lift-binop</span> <span style="color: #50a14f;">"expects RHS to be a number"</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">]</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
+&nbsp;   <span style="color: #50a14f;">[</span><span style="color: #e45649;">else</span> <span style="color: #b751b6;">(</span><span style="color: #a626a4;">error</span> <span style="color: #b751b6;">'lift-binop</span> <span style="color: #50a14f;">"expects LHS to be a number"</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+</pre>
+</div>
+</div>
+</li>
+<li><a id="org093b692"></a>Using the Lifting<br />
+<div class="outline-text-4" id="text-13-1-9">
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">interp</span> <span style="color: #50a14f;">[</span>e <span style="color: #a626a4;">:</span> Exp<span style="color: #50a14f;">]</span> <span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> Value
+&nbsp; <span style="color: #a626a4;">(</span>type-case Exp e
+&nbsp;   <span style="color: #e45649;">...</span>
+&nbsp;   <span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span>plusE l r<span style="color: #b751b6;">)</span>
+&nbsp;   &nbsp;<span style="color: #b751b6;">(</span>lift-binop <span style="color: #a626a4;">+</span> <span style="color: #4078f2;">(</span>interp l<span style="color: #4078f2;">)</span> <span style="color: #4078f2;">(</span>interp r<span style="color: #4078f2;">)</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
+&nbsp;   <span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span>timesE l r<span style="color: #b751b6;">)</span>
+&nbsp;   &nbsp;<span style="color: #b751b6;">(</span>lift-binop <span style="color: #a626a4;">*</span> <span style="color: #4078f2;">(</span>interp l<span style="color: #4078f2;">)</span> <span style="color: #4078f2;">(</span>interp r<span style="color: #4078f2;">)</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
+</pre>
+</div>
+<ul class="org-ul">
+<li>Using a higher-order function means we can use for <code>plus</code> and <code>times</code></li>
+<li>Textbook just defines <code>add</code> operation that works on values</li>
+</ul>
+</div>
+</li>
+<li><a id="org70cdaa8"></a>Interpreting Booleans<br />
+<div class="outline-text-4" id="text-13-1-10">
+<ul class="org-ul">
+<li>Boolean literals: no work to do
+<ul class="org-ul">
+<li>Why return <code>boolV</code> and not <code>boolE</code> ?</li>
+</ul></li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">interp</span> <span style="color: #50a14f;">[</span>e <span style="color: #a626a4;">:</span> Exp<span style="color: #50a14f;">]</span> <span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> Value
+&nbsp; <span style="color: #a626a4;">(</span>type-case Exp e
+&nbsp;   <span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span>boolE b<span style="color: #b751b6;">)</span>
+&nbsp;   &nbsp;<span style="color: #b751b6;">(</span>boolV b<span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
+</pre>
+</div>
+</div>
+</li>
+<li><a id="org7e65ad3"></a>Dynamic Typing of Conditionals<br />
+<div class="outline-text-4" id="text-13-1-11">
+<ul class="org-ul">
+<li>Want the thing we&rsquo;re testing to be boolean
+<ul class="org-ul">
+<li>Don&rsquo;t care about the types of the other things</li>
+</ul></li>
+<li>Otherwise, same as <code>if0</code></li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">Evaluate Expressions</span>
+<span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">interp</span> <span style="color: #50a14f;">[</span>e <span style="color: #a626a4;">:</span> Exp<span style="color: #50a14f;">]</span> <span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> Value
+&nbsp; <span style="color: #a626a4;">(</span>type-case Exp e
+&nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #e45649;">...</span>
+&nbsp; <span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span>cndE test thn els<span style="color: #b751b6;">)</span>
+&nbsp;   <span style="color: #b751b6;">(</span>type-case Value <span style="color: #4078f2;">(</span>interp test<span style="color: #4078f2;">)</span>
+&nbsp;   &nbsp;   <span style="color: #4078f2;">[</span><span style="color: #a626a4;">(</span>boolV b<span style="color: #a626a4;">)</span>
+&nbsp;   &nbsp;   &nbsp; <span style="color: #a626a4;">(</span><span style="color: #e45649;">if</span> b
+&nbsp;   &nbsp;   &nbsp;   <span style="color: #50a14f;">(</span>interp thn<span style="color: #50a14f;">)</span>
+&nbsp;   &nbsp;   &nbsp;   <span style="color: #50a14f;">(</span>interp els<span style="color: #50a14f;">)</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">]</span>
+&nbsp;   &nbsp;   <span style="color: #4078f2;">[</span><span style="color: #e45649;">else</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">error</span> <span style="color: #b751b6;">'interp</span> <span style="color: #50a14f;">"Non-boolean given to if"</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">]</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
+</pre>
+</div>
+</div>
+</li>
+<li><a id="org280777e"></a>Boolean-Producing Expression<br />
+<div class="outline-text-4" id="text-13-1-12">
+<ul class="org-ul">
+<li>Booleans not much good unless we can use them</li>
+<li>Comparison <code>{zero? x}</code></li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">interp</span> <span style="color: #50a14f;">[</span>e <span style="color: #a626a4;">:</span> Exp<span style="color: #50a14f;">]</span> <span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> Value
+&nbsp; <span style="color: #a626a4;">(</span>type-case Exp e
+&nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #e45649;">...</span>
+&nbsp;  <span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span>zero?E e<span style="color: #b751b6;">)</span>
+&nbsp;   &nbsp;<span style="color: #b751b6;">(</span>type-case Value <span style="color: #4078f2;">(</span>interp e<span style="color: #4078f2;">)</span>
+&nbsp;   &nbsp;  <span style="color: #4078f2;">[</span><span style="color: #a626a4;">(</span>numV n<span style="color: #a626a4;">)</span>
+&nbsp;   &nbsp;   <span style="color: #a626a4;">(</span>boolV <span style="color: #50a14f;">(</span><span style="color: #a626a4;">=</span> n <span style="color: #da8548; font-weight: bold;">0</span><span style="color: #50a14f;">)</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">]</span>
+&nbsp;   &nbsp;  <span style="color: #4078f2;">[</span><span style="color: #e45649;">else</span>
+&nbsp;   &nbsp;   <span style="color: #a626a4;">(</span><span style="color: #a626a4;">error</span> <span style="color: #b751b6;">'interp</span> <span style="color: #50a14f;">"Expected number"</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">]</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
+</pre>
+</div>
+</div>
+</li>
+<li><a id="orgce0a7d6"></a>Design Decision<br />
+<div class="outline-text-4" id="text-13-1-13">
+<ul class="org-ul">
+<li>We have <code>{zero? #t}</code> as a type error</li>
+<li>This is not the only choice
+<ul class="org-ul">
+<li><code>#t</code> and <code>#f</code> are not zero, so we could produce false</li>
+</ul></li>
+<li>Likewise, we could make <code>if</code> work on numbers
+<ul class="org-ul">
+<li>e.g. in Untyped Racket, <code>#f</code> is false and everything else is true</li>
+</ul></li>
+</ul>
+</div>
+</li>
+<li><a id="org8c54d01"></a>Dynamic Typing of Expressions<br />
+<div class="outline-text-4" id="text-13-1-14">
+<ul class="org-ul">
+<li>With dynamic types, values have types, but expressions do not</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #4078f2;">{</span><span style="color: #e45649;">if</span> <span style="color: #a626a4;">{</span><span style="color: #a626a4;">zero?</span> <span style="color: #da8548; font-weight: bold;">5</span><span style="color: #a626a4;">}</span> <span style="color: #b751b6;">#t</span> <span style="color: #da8548; font-weight: bold;">10</span><span style="color: #4078f2;">}</span>
+</pre>
+</div>
+<ul class="org-ul">
+<li>Valid Curly-Bool program
+<ul class="org-ul">
+<li>Runs without error</li>
+</ul></li>
+<li>Type isn&rsquo;t checked until we run the branch
+<ul class="org-ul">
+<li>Doesn&rsquo;t care that <code>#t</code> and <code>10</code> have different types</li>
+</ul></li>
+<li>The same is not true of Flit
+<ul class="org-ul">
+<li>e.g. try it out</li>
+</ul></li>
+</ul>
+</div>
+</li>
+</ol>
 </div>
 <div id="outline-container-syntactic-sugar" class="outline-3">
-<h3 id="syntactic-sugar"><span class="section-number-3">13.1.</span> Syntactic Sugar</h3>
+<h3 id="syntactic-sugar"><span class="section-number-3">13.2.</span> Desugaring</h3>
 <div class="outline-text-3" id="text-syntactic-sugar">
 </div>
 <ol class="org-ol">
-<li><a id="org5fbfd68"></a>What is syntactic sugar<br />
-<div class="outline-text-4" id="text-13-1-1">
+<li><a id="org656ec74"></a>What is syntactic sugar<br />
+<div class="outline-text-4" id="text-13-2-1">
 <ul class="org-ul">
 <li>Some language features strictly increase the power of a language
 <ul class="org-ul">
@@ -6146,8 +6428,32 @@ Many useful built-in functions
 </ul>
 </div>
 </li>
-<li><a id="org64492ab"></a>Desugaring<br />
-<div class="outline-text-4" id="text-13-1-2">
+<li><a id="orgb9ddb3f"></a>Example of Sugar<br />
+<div class="outline-text-4" id="text-13-2-2">
+<div class="org-src-container">
+<pre class="src src-c++"><span style="color: #e45649;">for</span> (<span style="color: #986801;">int</span> <span style="color: #6a1868;">i</span> = <span style="color: #da8548; font-weight: bold;">0</span>; i &lt; <span style="color: #da8548; font-weight: bold;">10</span>; i++){
+&nbsp; f();
+&nbsp;}
+<span style="color: #9ca0a4;">// </span><span style="color: #9ca0a4;">same as</span>
+<span style="color: #986801;">int</span> <span style="color: #6a1868;">i</span> = <span style="color: #da8548; font-weight: bold;">0</span>;
+<span style="color: #e45649;">while</span> (i &lt; <span style="color: #da8548; font-weight: bold;">10</span>){
+&nbsp; f();
+&nbsp; i++;
+&nbsp;}
+</pre>
+</div>
+<ul class="org-ul">
+<li>The C++ compiler doesn&rsquo;t need to know about for-loops</li>
+<li>Can do an AST-&gt;AST transformation
+<ul class="org-ul">
+<li>One less case to handle in the compiler</li>
+<li>Simplifies the core language</li>
+</ul></li>
+</ul>
+</div>
+</li>
+<li><a id="org5538472"></a>Desugaring<br />
+<div class="outline-text-4" id="text-13-2-3">
 <ul class="org-ul">
 <li>When one feature can be expressed in terms of another, sometimes we implement it by <i>desugaring</i>
 <ul class="org-ul">
@@ -6166,9 +6472,10 @@ Many useful built-in functions
 </ul>
 </div>
 </li>
-<li><a id="orgf4afa76"></a>Example: Subtraction<br />
-<div class="outline-text-4" id="text-13-1-3">
+<li><a id="org68a43a2"></a>Example: Subtraction<br />
+<div class="outline-text-4" id="text-13-2-4">
 <ul class="org-ul">
+<li><code>{- &lt;expr&gt; &lt;expr&gt;}</code></li>
 <li>We&rsquo;ll add subtraction to our language
 <ul class="org-ul">
 <li><i>without changing the interpreter at all</i></li>
@@ -6178,31 +6485,40 @@ Many useful built-in functions
 </ul>
 </div>
 </li>
-<li><a id="org88368fa"></a>Subtraction: Datatype<br />
-<div class="outline-text-4" id="text-13-1-4">
+<li><a id="org9ecb278"></a>Subtraction: Datatype<br />
+<div class="outline-text-4" id="text-13-2-5">
 <ul class="org-ul">
 <li>First need the surface AST</li>
 </ul>
 <div class="org-src-container">
-<pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #a626a4;">define-type</span> <span style="color: #6a1868;">SurfExp</span>
-&nbsp; <span style="color: #a626a4;">(</span>SurfNumLit <span style="color: #50a14f;">[</span>n <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
-&nbsp; <span style="color: #a626a4;">(</span>SurfPlus <span style="color: #50a14f;">[</span>left <span style="color: #a626a4;">:</span> SurfExp<span style="color: #50a14f;">]</span>
-&nbsp;   &nbsp;   <span style="color: #50a14f;">[</span>right <span style="color: #a626a4;">:</span> SurfExp<span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
-&nbsp; <span style="color: #a626a4;">(</span>SurfTimes <span style="color: #50a14f;">[</span>left <span style="color: #a626a4;">:</span> SurfExp<span style="color: #50a14f;">]</span>
-&nbsp;   &nbsp;   &nbsp;<span style="color: #50a14f;">[</span>right <span style="color: #a626a4;">:</span> SurfExp<span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
-&nbsp; <span style="color: #a626a4;">(</span>SurfIf0 <span style="color: #50a14f;">[</span>test <span style="color: #a626a4;">:</span> SurfExp<span style="color: #50a14f;">]</span>
-&nbsp;   &nbsp;  <span style="color: #50a14f;">[</span>thenBranch <span style="color: #a626a4;">:</span> SurfExp<span style="color: #50a14f;">]</span>
-&nbsp;   &nbsp;  <span style="color: #50a14f;">[</span>elseBranch <span style="color: #a626a4;">:</span> SurfExp<span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
-&nbsp; <span style="color: #a626a4;">(</span>SurfSub <span style="color: #50a14f;">[</span>left <span style="color: #a626a4;">:</span> SurfExp<span style="color: #50a14f;">]</span>
-&nbsp;   &nbsp;  <span style="color: #50a14f;">[</span>right <span style="color: #a626a4;">:</span> SurfExp<span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+<pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #a626a4;">define-type</span> <span style="color: #6a1868;">ExpS</span>
+&nbsp; <span style="color: #a626a4;">(</span>numS <span style="color: #50a14f;">[</span>n <span style="color: #a626a4;">:</span> <span style="color: #986801;">Number</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
+&nbsp; <span style="color: #a626a4;">(</span>plusS <span style="color: #50a14f;">[</span>left <span style="color: #a626a4;">:</span> ExpS<span style="color: #50a14f;">]</span>
+&nbsp;   &nbsp;   <span style="color: #50a14f;">[</span>right <span style="color: #a626a4;">:</span> ExpS<span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
+&nbsp; <span style="color: #a626a4;">(</span>timesS <span style="color: #50a14f;">[</span>left <span style="color: #a626a4;">:</span> ExpS<span style="color: #50a14f;">]</span>
+&nbsp;   &nbsp;   &nbsp;<span style="color: #50a14f;">[</span>right <span style="color: #a626a4;">:</span> ExpS<span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
+&nbsp; <span style="color: #a626a4;">(</span>cndS <span style="color: #50a14f;">[</span>test <span style="color: #a626a4;">:</span> ExpS<span style="color: #50a14f;">]</span>
+&nbsp;   &nbsp;  <span style="color: #50a14f;">[</span>thenBranch <span style="color: #a626a4;">:</span> ExpS<span style="color: #50a14f;">]</span>
+&nbsp;   &nbsp;  <span style="color: #50a14f;">[</span>elseBranch <span style="color: #a626a4;">:</span> ExpS<span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
+&nbsp; <span style="color: #a626a4;">(</span>subS <span style="color: #50a14f;">[</span>left <span style="color: #a626a4;">:</span> ExpS<span style="color: #50a14f;">]</span>
+&nbsp;   &nbsp;  <span style="color: #50a14f;">[</span>right <span style="color: #a626a4;">:</span> ExpS<span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
 </pre>
 </div>
+<ul class="org-ul">
+<li>Exact same as core AST, but with subtraction</li>
+</ul>
 </div>
 </li>
-<li><a id="orgac418bc"></a>Subtraction: Parser Case<br />
-<div class="outline-text-4" id="text-13-1-5">
+<li><a id="org14b6950"></a>Subtraction: Parser Case<br />
+<div class="outline-text-4" id="text-13-2-6">
+<ul class="org-ul">
+<li>Parser now produces a surface expression
+<ul class="org-ul">
+<li>We&rsquo;ll add another pass to make a core expression</li>
+</ul></li>
+</ul>
 <div class="org-src-container">
-<pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">parse</span> <span style="color: #50a14f;">[</span>s <span style="color: #a626a4;">:</span> S-Exp<span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> SurfExp
+<pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">parse</span> <span style="color: #50a14f;">[</span>s <span style="color: #a626a4;">:</span> S-Exp<span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> ExpS
 &nbsp; <span style="color: #e45649;">...</span>
 &nbsp;   <span style="color: #a626a4;">[</span><span style="color: #50a14f;">(</span>s-exp-match? <span style="color: #4078f2;">`</span><span style="color: #b751b6;">{</span><span style="color: #a626a4;">-</span> ANY ANY<span style="color: #b751b6;">}</span> s<span style="color: #50a14f;">)</span>
 &nbsp;   &nbsp;<span style="color: #50a14f;">(</span>SurfSub <span style="color: #b751b6;">(</span>parse <span style="color: #4078f2;">(</span><span style="color: #a626a4;">second</span> <span style="color: #a626a4;">(</span>s-exp-&gt;list s<span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span><span style="color: #b751b6;">)</span>
@@ -6211,27 +6527,85 @@ Many useful built-in functions
 </div>
 </div>
 </li>
-<li><a id="org753dca0"></a>Subtraction: Elaborator<br />
-<div class="outline-text-4" id="text-13-1-6">
+<li><a id="orga57a183"></a>Desugaring: Core Cases<br />
+<div class="outline-text-4" id="text-13-2-7">
 <ul class="org-ul">
-<li>Define function that translates from <code>SurfExp</code> to <code>Expr</code></li>
+<li>Define function that translates from <code>ExpS</code> to <code>Exp</code></li>
 </ul>
 <div class="org-src-container">
-<pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">elab</span> <span style="color: #50a14f;">[</span>surf <span style="color: #a626a4;">:</span> SurfExp<span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> Expr
-&nbsp; <span style="color: #a626a4;">(</span>type-case SurfExp surf
-&nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span>SurfNumLit n<span style="color: #b751b6;">)</span> <span style="color: #b751b6;">(</span>NumLit n<span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
-&nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span>SurfPlus x y<span style="color: #b751b6;">)</span> <span style="color: #b751b6;">(</span>Plus x y<span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
-&nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span>SurfTimes x y<span style="color: #b751b6;">)</span> <span style="color: #b751b6;">(</span>Times x y<span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
-&nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span>SurfIf0 test thn els<span style="color: #b751b6;">)</span> <span style="color: #b751b6;">(</span>If0 test thn els<span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
-&nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #9ca0a4;">;; </span><span style="color: #9ca0a4;">Sub isn't in our core syntax</span>
-&nbsp;   &nbsp;   &nbsp;   &nbsp;<span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span>SurfSub x y<span style="color: #b751b6;">)</span> <span style="color: #b751b6;">(</span>Plus x <span style="color: #4078f2;">(</span>Times <span style="color: #a626a4;">(</span>NumLit <span style="color: #b751b6;">-1</span><span style="color: #a626a4;">)</span> y<span style="color: #4078f2;">)</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span>
-&nbsp; <span style="color: #4078f2;">)</span>
+<pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">desugar</span> <span style="color: #50a14f;">[</span>es <span style="color: #a626a4;">:</span> ExpS<span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> Exp
+&nbsp; <span style="color: #a626a4;">(</span>type-case ExpS es
+&nbsp;   <span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span>numS n<span style="color: #b751b6;">)</span>
+&nbsp;   &nbsp;  <span style="color: #b751b6;">(</span>numE n<span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
+&nbsp;   <span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span>boolS b<span style="color: #b751b6;">)</span>
+&nbsp;   &nbsp;  <span style="color: #b751b6;">(</span>boolE b<span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
+&nbsp;   <span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span>plusS l r<span style="color: #b751b6;">)</span>
+&nbsp;   &nbsp;  <span style="color: #b751b6;">(</span>plusE <span style="color: #4078f2;">(</span>desugar l<span style="color: #4078f2;">)</span> <span style="color: #4078f2;">(</span>desugar r<span style="color: #4078f2;">)</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
+&nbsp;   <span style="color: #50a14f;">[</span><span style="color: #b751b6;">(</span>timesS l r<span style="color: #b751b6;">)</span>
+&nbsp;   &nbsp;  <span style="color: #b751b6;">(</span>timesE <span style="color: #4078f2;">(</span>desugar l<span style="color: #4078f2;">)</span> <span style="color: #4078f2;">(</span>desugar r<span style="color: #4078f2;">)</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">]</span>
+&nbsp;   <span style="color: #e45649;">...</span>
 </pre>
 </div>
+<ul class="org-ul">
+<li>For features that are in the core
+<ul class="org-ul">
+<li>Pattern match</li>
+<li>Recursively <code>desugar</code> the parts</li>
+<li>Re-assemble with the corresponding <code>Exp</code> constructor</li>
+</ul></li>
+</ul>
 </div>
 </li>
-<li><a id="org0021722"></a>Compilation vs. Elaboration vs. Desugaring<br />
-<div class="outline-text-4" id="text-13-1-7">
+<li><a id="orgb6317e0"></a>Desugaring: Subtraction<br />
+<div class="outline-text-4" id="text-13-2-8">
+<ul class="org-ul">
+<li>There is no <code>subE</code> in the <code>Exp</code> definition
+<ul class="org-ul">
+<li>Could add it, but don&rsquo;t need to</li>
+<li>Instead, translate it into <i>existing</i> features of <code>Exp</code>
+<ul class="org-ul">
+<li>e.g. Our <i>core syntax</i></li>
+</ul></li>
+</ul></li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">desugar</span> <span style="color: #50a14f;">[</span>es <span style="color: #a626a4;">:</span> ExpS<span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> Exp
+&nbsp; <span style="color: #e45649;">...</span>
+&nbsp;   <span style="color: #a626a4;">[</span><span style="color: #50a14f;">(</span>subS l r<span style="color: #50a14f;">)</span>
+&nbsp;   &nbsp;<span style="color: #50a14f;">(</span>plusE <span style="color: #b751b6;">(</span>desugar l<span style="color: #b751b6;">)</span>
+&nbsp;   &nbsp;   &nbsp;   <span style="color: #b751b6;">(</span>timesE <span style="color: #4078f2;">(</span>numE <span style="color: #b751b6;">-1</span><span style="color: #4078f2;">)</span> <span style="color: #4078f2;">(</span>desugar r<span style="color: #4078f2;">)</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">)</span><span style="color: #a626a4;">]</span>
+</pre>
+</div>
+<ul class="org-ul">
+<li>e.g. <code>{- x y}</code> becomes <code>{+ x {* -1 y}}</code></li>
+<li>Why did we desugar <code>l</code> and <code>r</code>?
+<ul class="org-ul">
+<li>Can&rsquo;t give to <code>plusE</code> until they&rsquo;re expressions</li>
+<li>e.g. what if <code>-</code> occurs deep in an expression</li>
+</ul></li>
+</ul>
+</div>
+</li>
+<li><a id="org717b785"></a>Advantages of Desugaring<br />
+<div class="outline-text-4" id="text-13-2-9">
+<ul class="org-ul">
+<li>We added subtraction to Curly
+<ul class="org-ul">
+<li><i>without</i> changing <code>Exp</code> or <code>interp</code></li>
+</ul></li>
+<li>Avoids repetition of code
+<ul class="org-ul">
+<li>Any <code>+</code> bug-fixes/optimizations now also affect <code>-</code></li>
+</ul></li>
+<li>Simplifies the interpreter
+<ul class="org-ul">
+<li><code>interp</code> is usually the most complicated part</li>
+</ul></li>
+</ul>
+</div>
+</li>
+<li><a id="org6a936bb"></a>Compilation vs. Desugaring<br />
+<div class="outline-text-4" id="text-13-2-10">
 <ul class="org-ul">
 <li>Technically we just wrote our first compiler
 <ul class="org-ul">
@@ -6244,13 +6618,65 @@ Many useful built-in functions
 </ul>
 </div>
 </li>
+<li><a id="orgb08fa22"></a>More Examples: Equality<br />
+<div class="outline-text-4" id="text-13-2-11">
+<ul class="org-ul">
+<li><code>{= x y}</code>
+<ul class="org-ul">
+<li>produces a boolean for if they&rsquo;re equal</li>
+</ul></li>
+<li>Can we implement a boolean-returning equality check
+<ul class="org-ul">
+<li>Using just what we have now?</li>
+</ul></li>
+<li><code>x = y</code> if and only if <code>x - y = 0</code>
+<ul class="org-ul">
+<li>Excluding <code>NaN/inf</code></li>
+</ul></li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #4078f2;">(</span><span style="color: #a626a4;">define-type</span> <span style="color: #6a1868;">ExpS</span>
+&nbsp; <span style="color: #e45649;">...</span>
+&nbsp; <span style="color: #a626a4;">(</span>eqS <span style="color: #50a14f;">[</span>l <span style="color: #a626a4;">:</span> ExpS<span style="color: #50a14f;">]</span> <span style="color: #50a14f;">[</span> r <span style="color: #a626a4;">:</span> ExpS<span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span><span style="color: #4078f2;">)</span>
+&nbsp;
+<span style="color: #4078f2;">(</span><span style="color: #e45649;">define</span> <span style="color: #a626a4;">(</span><span style="color: #a626a4;">desugar</span> <span style="color: #50a14f;">[</span>es <span style="color: #a626a4;">:</span> ExpS<span style="color: #50a14f;">]</span><span style="color: #a626a4;">)</span> <span style="color: #a626a4;">:</span> Exp
+&nbsp; <span style="color: #e45649;">...</span>
+&nbsp;   <span style="color: #a626a4;">[</span><span style="color: #50a14f;">(</span>eqS l r<span style="color: #50a14f;">)</span>
+&nbsp;   &nbsp;  <span style="color: #50a14f;">(</span>desugar <span style="color: #b751b6;">(</span>zero?S <span style="color: #4078f2;">(</span>subS l r<span style="color: #4078f2;">)</span><span style="color: #b751b6;">)</span><span style="color: #50a14f;">)</span><span style="color: #a626a4;">]</span>
+</pre>
+</div>
+<ul class="org-ul">
+<li>Why didn&rsquo;t we <code>desugar</code> on <code>l</code> and <code>r</code>?</li>
+</ul>
+</div>
+</li>
+<li><a id="org8601844"></a>More Examples: Boolean Operations<br />
+<div class="outline-text-4" id="text-13-2-12">
+<ul class="org-ul">
+<li>Can we add <code>and</code>, <code>or</code>, and <code>not</code>?</li>
+<li>E.g. <code>and</code>
+<ul class="org-ul">
+<li>Want <code>and #t #t</code> to be <code>#t</code>, false otherwise</li>
+<li>Notice: if first arg is <code>#t</code>, then second arg is the result of the whole <code>and</code></li>
+</ul></li>
+<li><code>{and e1 e2}</code> becomes <code>{if e1 e2 #f}</code>
+<ul class="org-ul">
+<li>See Dr. Racket</li>
+</ul></li>
+<li><code>{or e1 e2}</code> becomes <code>{if e1 #t e2}</code></li>
+<li><code>{not e1 }</code> becomes <code>{if e1 #f #t}</code></li>
+<li>See Curly-Desugar in URCourses for full implementation</li>
+</ul>
+</div>
+</li>
 </ol>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: Dr. Joseph Eremondi</p>
-<p class="date">Created: 2025-02-26 Wed 12:33</p>
+<p class="date">Created: 2025-02-28 Fri 17:22</p>
 </div>
 </body>
 </html>

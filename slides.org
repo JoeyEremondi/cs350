@@ -3667,15 +3667,178 @@ for (int i = 0; i < N; i++){
   + ~Exp~ is abstract syntax, uninterpreted expressions
   + ~Value~ is the result of interpreting
     - What we want to do addition/multiplication/zero-checking on
-
-* Desugaring: Our First Elaborator
+* Values, Dynamic Typing and Desugaring
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides013-desugar.pdf
+:EXPORT_FILE_NAME: pdf/slides013-dyntype.pdf
 :header-args:racket: :results code :lang flit
-:CUSTOM_ID: desugaring-our-first-elaborator
+:CUSTOM_ID: values-dyntype
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
-** Syntactic Sugar
+
+** Introducing Boolean
+
+
+*** Booleans
+- ~if0~ was an awkward feature
+  + Can't really do ~and~, ~or~
+  + e.g. What should ~{and 1 1}~ be?
+    - Any non-zero value has the right properties
+- We want our interpreter to have multiple /types/
+  +  Numbers and Booleans
+*** Dynamic vs. Static Typing
+- Static typing: types are checked /before/ a program runs
+  + E.g. Flit, C++, Go, Java, Swift, Rust, Haskell, TypeScript, etc.
+- Dynamic typing: types are checked at run-time
+  + Don't check if an operation is valid until we're actually doing that operation
+  + E.g. Python, Ruby, JavaScript, PHP, Racket, Lua
+- Recall: implementation language features are /separate/ from features of language being implemented
+- We can implement a dynamically-typed language (Curly-Bool) in a statically typed language (Flit)
+*** New Syntax
+#+begin_src
+<expr> ::=
+|  <number>
+|  <boolean>
+| {+ <expr> <expr>}
+| {* <expr> <expr>}
+| {if <expr> <expr> <expr>}
+| {zero? <expr> }
+#+end_src
+- Allow boolean literals
+- ~if~ instead of ~if0~
+- One operation producing a boolean
+*** Example Programs
+#+begin_src racket
+{if {zero? {+ {* 40 50}
+            {* -1 2000}}}
+    1
+    -1}
+#+end_src
+*** Representing Booleans
+#+begin_src  racket
+(define-type Value
+  (numV [n : Number])
+  (boolV [b : Boolean]))
+#+end_src
+- Datatype
+  + Value can be number OR a boolean
+  + Use pattern-matching to check what a value
+- The constructor records run-time type information
+*** Abstract Syntax
+- Rename Expression constructors for consistency
+  + Add ~E~ to names for Expression
+  + ~V~ was for Value
+#+begin_src racket
+(define-type Exp
+  (numE [n : Number])
+  (boolE [b : Boolean])
+  (plusE [left : Exp]
+        [right : Exp])
+  (timesE [left : Exp]
+         [right : Exp])
+  (cndE [test : Exp]
+       [thenCase : Exp]
+       [elseCase : Exp]))
+#+end_src
+*** Following the Types
+- Interpreter now gives an error
+#+begin_src racket
+(define (interp [e : Exp] ) : Value
+  (type-case Exp e
+    ...
+    [(plusE l r)
+     (+ (interp l) (interp r))] ;; TYPE ERROR
+#+end_src
+- ~(interp l)~ and ~(interp r)~ produce ~Value~
+- ~+~ expects ~Number~
+*** Dynamic Type Checks
+- Can define /lifting/ function which turns a number-operation into value-operation
+- Main idea:
+  + Pattern-match on values
+  + If they're both numbers, then do the operation
+    - and wrap the result in ~numV~ to get a Value
+  + Otherwise, raise an error
+#+begin_src racket
+(define (lift-binop [op : (Number Number -> Number)]
+                    [v1 : Value]
+                    [v2 : Value])
+  (type-case Value v1
+    [(numV n1)
+     (type-case Value v2
+       [(numV n2)
+        (numV (op n1 n2))]
+       [else (error 'lift-binop "expects RHS to be a number")])]
+    [else (error 'lift-binop "expects LHS to be a number")]))
+#+end_src
+*** Using the Lifting
+#+begin_src racket
+(define (interp [e : Exp] ) : Value
+  (type-case Exp e
+    ...
+    [(plusE l r)
+     (lift-binop + (interp l) (interp r))]
+    [(timesE l r)
+     (lift-binop * (interp l) (interp r))]
+#+end_src
+- Using a higher-order function means we can use for ~plus~ and ~times~
+- Textbook just defines ~add~ operation that works on values
+*** Interpreting Booleans
+- Boolean literals: no work to do
+  +  Why return ~boolV~ and not ~boolE~ ?
+#+begin_src racket
+(define (interp [e : Exp] ) : Value
+  (type-case Exp e
+    [(boolE b)
+     (boolV b)]
+#+end_src
+*** Dynamic Typing of Conditionals
+- Want the thing we're testing to be boolean
+  + Don't care about the types of the other things
+- Otherwise, same as ~if0~
+#+begin_src racket
+;; Evaluate Expressions
+(define (interp [e : Exp] ) : Value
+  (type-case Exp e
+             ...
+  [(cndE test thn els)
+    (type-case Value (interp test)
+        [(boolV b)
+          (if b
+            (interp thn)
+            (interp els))]
+        [else (error 'interp "Non-boolean given to if")])]
+#+end_src
+*** Boolean-Producing Expression
+- Booleans not much good unless we can use them
+- Comparison ~{zero? x}~
+#+begin_src racket
+(define (interp [e : Exp] ) : Value
+  (type-case Exp e
+             ...
+   [(zero?E e)
+     (type-case Value (interp e)
+       [(numV n)
+        (boolV (= n 0))]
+       [else
+        (error 'interp "Expected number")])]
+#+end_src
+*** Design Decision
+- We have ~{zero? #t}~ as a type error
+- This is not the only choice
+  + ~#t~ and ~#f~ are not zero, so we could produce false
+- Likewise, we could make ~if~ work on numbers
+  +  e.g. in Untyped Racket, ~#f~ is false and everything else is true
+*** Dynamic Typing of Expressions
+- With dynamic types, values have types, but expressions do not
+#+begin_src racket
+{if {zero? 5} #t 10}
+#+end_src
+- Valid Curly-Bool program
+  + Runs without error
+- Type isn't checked until we run the branch
+  + Doesn't care that ~#t~ and ~10~ have different types
+- The same is not true of Flit
+  + e.g. try it out
+** Desugaring
 :PROPERTIES:
 :CUSTOM_ID: syntactic-sugar
 :END:
@@ -3686,6 +3849,22 @@ for (int i = 0; i < N; i++){
   + Otherwise we'd just code in machine code/assembly all the time
 - These "nice to haves" are called /syntactic sugar/
   + They "sweeten" the experience of programming
+*** Example of Sugar
+#+begin_src c++
+for (int i = 0; i < 10; i++){
+  f();
+ }
+// same as
+int i = 0;
+while (i < 10){
+  f();
+  i++;
+ }
+#+end_src
+- The C++ compiler doesn't need to know about for-loops
+- Can do an AST->AST transformation
+  + One less case to handle in the compiler
+  + Simplifies the core language
 *** Desugaring
 - When one feature can be expressed in terms of another, sometimes we implement it by /desugaring/
   + Translating the AST for a feature into other language features
@@ -3696,6 +3875,7 @@ for (int i = 0; i < N; i++){
   + Surface AST
   + Core AST
 *** Example: Subtraction
+- ~{- <expr> <expr>}~
 - We'll add subtraction to our language
   + /without changing the interpreter at all/
 - Separate AST into surface and core AST
@@ -3703,49 +3883,106 @@ for (int i = 0; i < N; i++){
 *** Subtraction: Datatype
 - First need the surface AST
 #+begin_src racket
-(define-type SurfExp
-  (SurfNumLit [n : Number])
-  (SurfPlus [left : SurfExp]
-        [right : SurfExp])
-  (SurfTimes [left : SurfExp]
-         [right : SurfExp])
-  (SurfIf0 [test : SurfExp]
-       [thenBranch : SurfExp]
-       [elseBranch : SurfExp])
-  (SurfSub [left : SurfExp]
-       [right : SurfExp]))
+(define-type ExpS
+  (numS [n : Number])
+  (plusS [left : ExpS]
+        [right : ExpS])
+  (timesS [left : ExpS]
+         [right : ExpS])
+  (cndS [test : ExpS]
+       [thenBranch : ExpS]
+       [elseBranch : ExpS])
+  (subS [left : ExpS]
+       [right : ExpS]))
 #+end_src
+- Exact same as core AST, but with subtraction
 *** Subtraction: Parser Case
+- Parser now produces a surface expression
+  + We'll add another pass to make a core expression
 #+begin_src racket
-(define (parse [s : S-Exp]) : SurfExp
+(define (parse [s : S-Exp]) : ExpS
   ...
     [(s-exp-match? `{- ANY ANY} s)
      (SurfSub (parse (second (s-exp->list s)))
             (parse (third (s-exp->list s))))])
 #+end_src
-*** Subtraction: Elaborator
-- Define function that translates from ~SurfExp~ to ~Expr~
+*** Desugaring: Core Cases
+- Define function that translates from ~ExpS~ to ~Exp~
 #+begin_src racket
-(define (elab [surf : SurfExp]) : Expr
-  (type-case SurfExp surf
-             [(SurfNumLit n) (NumLit n)]
-             [(SurfPlus x y) (Plus x y)]
-             [(SurfTimes x y) (Times x y)]
-             [(SurfIf0 test thn els) (If0 test thn els)]
-             ;; Sub isn't in our core syntax
-             [(SurfSub x y) (Plus x (Times (NumLit -1) y))])
-  )
+(define (desugar [es : ExpS]) : Exp
+  (type-case ExpS es
+    [(numS n)
+       (numE n)]
+    [(boolS b)
+       (boolE b)]
+    [(plusS l r)
+       (plusE (desugar l) (desugar r))]
+    [(timesS l r)
+       (timesE (desugar l) (desugar r))]
+    ...
 #+end_src
-*** Compilation vs. Elaboration vs. Desugaring
+- For features that are in the core
+  + Pattern match
+  + Recursively ~desugar~ the parts
+  + Re-assemble with the corresponding ~Exp~ constructor
+*** Desugaring: Subtraction
+- There is no ~subE~ in the ~Exp~ definition
+  + Could add it, but don't need to
+  + Instead, translate it into /existing/ features of ~Exp~
+    - e.g. Our /core syntax/
+#+begin_src racket
+(define (desugar [es : ExpS]) : Exp
+  ...
+    [(subS l r)
+     (plusE (desugar l)
+            (timesE (numE -1) (desugar r)))]
+#+end_src
+- e.g. ~{- x y}~ becomes ~{+ x {* -1 y}}~
+- Why did we desugar ~l~ and ~r~?
+  + Can't give to ~plusE~ until they're expressions
+  + e.g. what if ~-~ occurs deep in an expression
+
+*** Advantages of Desugaring
+- We added subtraction to Curly
+  + /without/ changing ~Exp~ or ~interp~
+- Avoids repetition of code
+  + Any ~+~ bug-fixes/optimizations now also affect ~-~
+- Simplifies the interpreter
+  + ~interp~ is usually the most complicated part
+*** Compilation vs. Desugaring
 - Technically we just wrote our first compiler
   + Translated a small language into an even smaller one
 - Compilation is just a bunch of desugaring passes
   + Simpler and simpler languages until we have something simple enough for assembly code
+*** More Examples: Equality
+- ~{= x y}~
+  + produces a boolean for if they're equal
+- Can we implement a boolean-returning equality check
+  + Using just what we have now?
+- ~x = y~ if and only if ~x - y = 0~
+  + Excluding ~NaN/inf~
 
+#+begin_src racket
+(define-type ExpS
+  ...
+  (eqS [l : ExpS] [ r : ExpS]))
 
-
-
-
+(define (desugar [es : ExpS]) : Exp
+  ...
+    [(eqS l r)
+       (desugar (zero?S (subS l r)))]
+#+end_src
+- Why didn't we ~desugar~ on ~l~ and ~r~?
+*** More Examples: Boolean Operations
+- Can we add ~and~, ~or~, and ~not~?
+- E.g. ~and~
+  + Want ~and #t #t~ to be ~#t~, false otherwise
+  + Notice: if first arg is ~#t~, then second arg is the result of the whole ~and~
+- ~{and e1 e2}~ becomes ~{if e1 e2 #f}~
+  + See Dr. Racket
+- ~{or e1 e2}~ becomes ~{if e1 #t e2}~
+- ~{not e1 }~ becomes ~{if e1 #f #t}~
+- See Curly-Desugar in URCourses for full implementation
 * Functions, Variables and Substitution :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides014-subst.pdf
@@ -3979,18 +4216,18 @@ for (int i = 0; i < N; i++){
 *** Curly-Sub
 - Adds ~{- x y}~
 - ~interp~ unchanged from Curly-Cond
-- Introduces an intermediate AST type ~SurfExpr~
+- Introduces an intermediate AST type ~ExpS~
   + Expressions with syntactic sugar
-- /Desugaring/ converts ~SurfExpr~ to ~Expr~
+- /Desugaring/ converts ~ExpS~ to ~Expr~
   + Translate away certain features
   + Also called /elaboration/
 - ~{- x y}~ is the same as ~{+ x {* -1 y}}~
-- String $\to_\text{backtick}$ S-Exp $\to_\text{parse}$ SurfExp $\\ \qquad\qquad \to_{elab}$ Expr $\to_\text{interp}$ Number
+- String $\to_\text{backtick}$ S-Exp $\to_\text{parse}$ ExpS $\\ \qquad\qquad \to_{elab}$ Expr $\to_\text{interp}$ Number
 *** Curly-Fun
 - Adds function definitions and function calls
   + Single parameter functions, number in, number out
 - Functions have /parameters/
-  + So we add variables to ~Expr~ and ~SurfExpr~
+  + So we add variables to ~Expr~ and ~ExpS~
 - Interpreter now parameterized by list of function definitions
   + Parsed separately
 - Function calls interpreted by /substitution/
@@ -4335,7 +4572,7 @@ emptyEnv
   (Fun [arg : Symbol]
        [body : Expr]))
 #+end_src
-- Similar for ~SurfExpr~
+- Similar for ~ExpS~
 - Notice that ~Fun~ and ~FunV~ have the /exact/ same fields
   + Functions /are/ values
   + A function is saying "here's a computation to do later", so once we've got a Lambda, there's no more evaluation to do
@@ -5006,20 +5243,20 @@ myFunction().then(
   + Doesn't matter if do substitution or environment-based version, translation is the exact same
 *** AST for Multi-Argument Functions
 #+begin_src racket
-(define-type SurfExpr
+(define-type ExpS
 ....
  (SurfFun [xs : (Listof Symbol)]
-          [body : SurfExpr]))
- (SurfCall [fun : SurfExpr]
-           [args : (Listof SurfExpr)])
+          [body : ExpS]))
+ (SurfCall [fun : ExpS]
+           [args : (Listof ExpS)])
 #+end_src
 - Functions now take a list of variables
 - Calls now take a list of arguments
 *** Elaborating Multi-Argument Functions
 - Use recursion to iterate through the list
   #+begin_src racket
-  (define (elab [surfExpr : SurfExpr])
-    (type-case SurfExpr surfExpr
+  (define (elab [surfExpr : ExpS])
+    (type-case ExpS surfExpr
                ....
      [(SurfFun xs body)
        (type-case (Listof Symbol) xs
@@ -5034,9 +5271,9 @@ myFunction().then(
 - At least one argument: curry the rest of the arguments, and wrap the result in a lambda
 *** Multi-Argument Calls with Tail Recursion
 #+begin_src racket
-  (define (callHelper [args : (Listof SurfExpr)]
+  (define (callHelper [args : (Listof ExpS)]
                       [accum : Expr]) : Expr
-    (type-case (Listof SurfExpr) args
+    (type-case (Listof ExpS) args
         [empty accum]
         [(cons arg rest)
            ;; tail recursion
@@ -5045,8 +5282,8 @@ myFunction().then(
 - Given a list of argument to apply, build up one giant expression with nested calls
 ***  Building The Entire Call
 #+begin_src racket
-  (define (elab [surfExpr : SurfExpr])
-    (type-case SurfExpr surfExpr
+  (define (elab [surfExpr : ExpS])
+    (type-case ExpS surfExpr
                ....
      [(SurfCall funExpr args)
         (callHelper args (elab funExpr))]))
@@ -5063,8 +5300,8 @@ myFunction().then(
 - Recall that ~letvar~ let us define a local variable to have the value of some expression, that we could then use to build another expression
 - We can make ~letvar~ syntactic sugar using lambda
 #+begin_src  racket
-  (define (elab [surfExpr : SurfExpr])
-    (type-case SurfExpr surfExpr
+  (define (elab [surfExpr : ExpS])
+    (type-case ExpS surfExpr
                ....
      [(SurfLetVar x xExpr body)
         (Call (Fun x (elab body))
