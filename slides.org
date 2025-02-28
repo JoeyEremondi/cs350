@@ -3983,7 +3983,7 @@ while (i < 10){
 - ~{or e1 e2}~ becomes ~{if e1 #t e2}~
 - ~{not e1 }~ becomes ~{if e1 #f #t}~
 - See Curly-Desugar in URCourses for full implementation
-* Functions, Variables and Substitution :noexport:
+* Bindings, Variables, and Functions
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides014-subst.pdf
 :header-args:racket: :results code :lang flit
@@ -3997,8 +3997,8 @@ while (i < 10){
 *** Adding functions to the language
 - Want to be able to re-use code, compute in terms of variables
 - Two new Curly features
-- Function definitions
-  + ~{define {f x} {+ x 3}}~
+- First-class functions
+  + ~{lambda {x} {+ x 3}}~
 - Function calls
   + Sometimes called /function applications/
   + ~{f 10}~, produces ~13~
@@ -4150,90 +4150,6 @@ while (i < 10){
             [funBody (mkFunDef-body def)])
        (interp defs (subst argVar (NumLit argVal) funBody)))]
 #+end_src
-* Review :noexport:
-:PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides008-review.pdf
-:header-args:racket: :results code :lang flit
-:CUSTOM_ID: review
-:END:
-#+beamer: \beamerdefaultoverlayspecification{<+->}
-
-** Overview
-:PROPERTIES:
-:CUSTOM_ID: overview-0
-:END:
-
-*** The Story So Far
-- Functional Programming
-  + Immutable variables
-  + Recursion
-  + Data-types
-  + Type-case
-- Interpreters
-  + BNF
-  + Abstract Syntax
-  + Parsing
-  + Interpretation
-  + Desugaring
-  + Substitution
-
-** Functional Programming
-:PROPERTIES:
-:CUSTOM_ID: functional-programming
-:END:
-*** How to evaluate functional programs
-- Repeat until we have a value:
-  + Take all the functions defined with ~define~
-  + Replace them with their definitions, with arguments replacing parameters
-  + Simplify any ~if~, ~cond~, ~type-case~ etc.
-
-** The Languages We've Built
-:PROPERTIES:
-:CUSTOM_ID: the-languages-weve-built
-:END:
-
-*** Curly
-- Many different languages
-  + Gradually adding features
-  + I'll give them names so we can tell them apart
-- Each time we add a new feature, is a new language
-- Called "curly because" we write with Curly-brackets
-- Write as S-expression strings
-  + Racket backtick ~`~ turns strings into S-expressions
-  + Separates different names/symbols and nests brackets
-  + Parse turns S-expressions into AST
-*** Curly-Arith
-  + Just has addition, multiplication, and numbers
-  + AST type ~Expr~
-  + Value type ~Number~
-  + Pipeline:
-    - String $\to_\text{backtick}$ S-Exp $\to_\text{parse}$ Expr $\to_\text{interp}$ Number
-*** Curly-Cond
-- Adds ~if0~
-  + Conditional expressions, branching depending on whether a value is 0
-  + Adds a constructor to ~Expr~
-  + Adds case to parser and interp
-*** Curly-Sub
-- Adds ~{- x y}~
-- ~interp~ unchanged from Curly-Cond
-- Introduces an intermediate AST type ~ExpS~
-  + Expressions with syntactic sugar
-- /Desugaring/ converts ~ExpS~ to ~Expr~
-  + Translate away certain features
-  + Also called /elaboration/
-- ~{- x y}~ is the same as ~{+ x {* -1 y}}~
-- String $\to_\text{backtick}$ S-Exp $\to_\text{parse}$ ExpS $\\ \qquad\qquad \to_{elab}$ Expr $\to_\text{interp}$ Number
-*** Curly-Fun
-- Adds function definitions and function calls
-  + Single parameter functions, number in, number out
-- Functions have /parameters/
-  + So we add variables to ~Expr~ and ~ExpS~
-- Interpreter now parameterized by list of function definitions
-  + Parsed separately
-- Function calls interpreted by /substitution/
-  + Replace variable with value of concrete argument
-
-
 * Environments, Binding, and Scope :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides015-environments.pdf
@@ -4514,7 +4430,7 @@ emptyEnv
   + Behavior of ~subst~ on bound variables
   + What environment ~interp~ is passed for function bodies
 
-** Implementing Lambdas with Substitution and Dynamic Typing
+* Implementing Lambdas with Substitution and Dynamic Typing
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides012-dyntype.pdf
 :header-args:racket: :results code :lang flit

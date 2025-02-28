@@ -1,15 +1,18 @@
 #lang flit
 
-;; Curly-Let: A programming language with booleans
+;; Curly-Desugar: A programming language with subtraction and equality
 
-;; BNF for Curly-Bool
-;; We have proper if instead of if0,
-;; and we have #t and #f as boolean literals,
-;; and an expression to check if a number is zero
+;; BNF for Curly-Desugar 
+;; Adds subtraction, boolean operations, and equality comparison by desugaring
 ;; 
 ;;  <expr> ::=
 ;;     "{" "+" <expr> <expr> "}"
 ;;   | "{" "*" <expr> <expr> "}"
+;;   | "{" "=" <expr> <expr> "}"
+;;   | "{" "-" <expr> <expr> "}"
+;;   | "{" "and" <expr> <expr> "}"
+;;   | "{" "or" <expr> <expr> "}"
+;;   | "{" "not" <expr> "}"
 ;;   | "{" "if" <expr> <expr> <expr> "}"
 ;;   | "{" "zero?" <expr> "}"
 ;;   | NUMBER
@@ -37,7 +40,14 @@
   ;; NEW
   ;; This is NOT in Exp
   (subS [l : ExpS]
-        [r : ExpS]))
+        [r : ExpS])
+  (eqS [l : ExpS]
+       [r : ExpS])
+  (andS [l : ExpS]
+        [r : ExpS])
+  (orS [l : ExpS]
+       [r : ExpS])
+  (notS [e : ExpS]))
 
 ;; Abstract syntax for Curly-Cond
 ;; Represents expressions in our interpreter
@@ -87,6 +97,17 @@
     [(s-exp-match? `{- ANY ANY} s)
      (subS (parse (second (s-exp->list s)))
            (parse (third (s-exp->list s))))]
+    [(s-exp-match? `{= ANY ANY} s)
+     (eqS (parse (second (s-exp->list s)))
+          (parse (third (s-exp->list s))))]
+    [(s-exp-match? `{and ANY ANY} s)
+     (andS (parse (second (s-exp->list s)))
+           (parse (third (s-exp->list s))))]
+    [(s-exp-match? `{or ANY ANY} s)
+     (orS (parse (second (s-exp->list s)))
+          (parse (third (s-exp->list s))))]
+    [(s-exp-match? `{not ANY} s)
+     (notS (parse (second (s-exp->list s))))]
     [(s-exp-match? `{if ANY ANY ANY} s)
      (cndS (parse (second (s-exp->list s)))
            (parse (third (s-exp->list s)))
@@ -136,6 +157,16 @@
      ;; So we build the corresponding tree after desugaring l and r
      (plusE (desugar l)
             (timesE (numE -1) (desugar r)))]
+    [(eqS l r)
+     ;; Equality: subtract and see if it's zero
+     (desugar (zero?S (subS l r)))]
+    ;; Can do the boolean operations using if
+    [(andS l r)
+     (cndE (desugar l) (desugar r) (boolE #f))]
+    [(orS l r)
+     (cndE (desugar l) (boolE #t) (desugar r))]
+    [(notS es)
+     (cndE (desugar es) (boolE #f) (boolE #t))]
     ))
 
 
@@ -209,3 +240,35 @@
 (test/exn (run `{if 3 4 5}) "boolean")
 (test/exn (run `{+ #t 5}) "number")
 (test/exn (run `{if {if #t 4 #f} 4 5}) "boolean")
+
+;; Tests for desugaring
+(test (run `{- 5 3})
+      (numV 2))
+
+(test (run `{= 5 {+ 2 3}})
+      (boolV #t))
+(test (run `{= 6 {+ 2 3}})
+      (boolV #f))
+
+(test (run `{and {= 3 3} {= 4 5}})
+      (boolV #f))
+(test (run `{and {= 3 3} {= 4 4}})
+      (boolV #t))
+
+(test (run `{or {= 3 3} {= 4 5}})
+      (boolV #t))
+(test (run `{or {= 3 4} {= 4 5}})
+      (boolV #f))
+
+(test (run `{not {= 3 5}})
+      (boolV #t))
+
+(test (run `{if {not
+                 {and
+                  {= 3 5}
+                  {or
+                   #t
+                   {= 5 22}}}}
+                 99
+                 100})
+      (numV 99))

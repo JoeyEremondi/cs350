@@ -1,6 +1,6 @@
 #lang flit
 
-;; Curly-Let: A programming language with booleans
+;; Curly-Bool: A programming language with booleans
 
 ;; BNF for Curly-Bool
 ;; We have proper if instead of if0,
@@ -15,35 +15,15 @@
 ;;   | NUMBER
 ;;   | BOOLEAN
 
-;; NEW
-;; Intermediate Abstract Syntax
-;; We desugar this into Exp
-(define-type ExpS
-  ;; Constant numbers
-  (numS [n : Number])
-  ;; Constant Booleans
-  (boolS [b : Boolean])
-  ;; {+ e1 e2}
-  (plusS [left : ExpS]
-         [right : ExpS])
-  ;; {* e1 e2}
-  (timesS [left : ExpS]
-          [right : ExpS])
-  ;; {if e1 e2 e3}
-  (cndS [test : ExpS]
-        [thenCase : ExpS]
-        [elseCase : ExpS])
-  (zero?S [e : ExpS])
-  ;; NEW
-  ;; This is NOT in Exp
-  (subS [l : ExpS]
-        [r : ExpS]))
-
 ;; Abstract syntax for Curly-Cond
 ;; Represents expressions in our interpreter
+;; NEW: we add E to the constructors
+;; to show that they're Expression constructors,
+;; not Value constructors
 (define-type Exp
   ;; Constant numbers
   (numE [n : Number])
+  ;; NEW
   ;; Constant Booleans
   (boolE [b : Boolean])
   ;; {+ e1 e2}
@@ -52,12 +32,15 @@
   ;; {* e1 e2}
   (timesE [left : Exp]
           [right : Exp])
+  ;; NEW
   ;; {if e1 e2 e3}
   (cndE [test : Exp]
         [thenCase : Exp]
         [elseCase : Exp])
+  ;; NEW
   (zero?E [e : Exp]))
 
+;; NEW:
 ;; We now allow values to be either Numbers or Booleans,
 ;; So we define a datatype for possible values
 (define-type Value
@@ -67,34 +50,33 @@
 ;; Parse
 ;; Takes an S-expression and turns it into an Exp
 ;; Raises an error if it doesn't represent a valid program
-(define (parse [s : S-Exp]) : ExpS
+(define (parse [s : S-Exp]) : Exp
   (cond
     ;; Constant number e.g. 5
-    [(s-exp-match? `NUMBER s) (numS (s-exp->number s))]
+    [(s-exp-match? `NUMBER s) (numE (s-exp->number s))]
+    ;; NEW
     ;; Constant boolean e.g. #t, #f
-    [(s-exp-match? `#t s) (boolS #t)]
-    [(s-exp-match? `#f s) (boolS #f)]
+    [(s-exp-match? `#t s) (boolE #t)]
+    [(s-exp-match? `#f s) (boolE #f)]
     ;; {+ s1 s2}
     [(s-exp-match? `{+ ANY ANY} s)
-     (plusS (parse (second (s-exp->list s)))
+     (plusE (parse (second (s-exp->list s)))
             (parse (third (s-exp->list s))))]
     ;; {* s1 s2}
     [(s-exp-match? `{* ANY ANY} s)
-     (timesS (parse (second (s-exp->list s)))
+     (timesE (parse (second (s-exp->list s)))
              (parse (third (s-exp->list s))))]
-    ;; NEW
-    ;; We can parse and desugar subtraction without changing the interpreter
-    [(s-exp-match? `{- ANY ANY} s)
-     (subS (parse (second (s-exp->list s)))
-           (parse (third (s-exp->list s))))]
+    ;; NEW: just like if0
     [(s-exp-match? `{if ANY ANY ANY} s)
-     (cndS (parse (second (s-exp->list s)))
+     (cndE (parse (second (s-exp->list s)))
            (parse (third (s-exp->list s)))
            (parse (fourth (s-exp->list s))))]
+    ;; NEW for booleans
     [(s-exp-match? `{zero? ANY} s)
-     (zero?S (parse (second (s-exp->list s))))]
+     (zero?E (parse (second (s-exp->list s))))]
     [else (error 'parse "invalid input")]))
 
+;; NEW
 ;; Lifting operations on Numbers to Values
 (define (lift-binop [op : (Number Number -> Number)]
                     [v1 : Value]
@@ -106,38 +88,6 @@
         (numV (op n1 n2))]
        [else (error 'lift-binop "expects RHS to be a number")])]
     [else (error 'lift-binop "expects LHS to be a number")]))
-
-;; NEW
-;; Desugar Expressions into Core Syntax
-(define (desugar [es : ExpS]) : Exp
-  (type-case ExpS es
-    ;; For expressions in the core syntax,
-    ;; We just pattern match, desugar the parts,
-    ;; and put them back together with the Exp constructor
-    [(numS n)
-     (numE n)]
-    [(boolS b)
-     (boolE b)]
-    [(plusS l r)
-     (plusE (desugar l) (desugar r))]
-    [(timesS l r)
-     (timesE (desugar l) (desugar r))]
-    [(cndS test thn els)
-     (cndE (desugar test)
-           (desugar thn)
-           (desugar els))]
-    [(zero?S e)
-     (zero?E (desugar e))]
-    ;; The remaining features aren't covered by the core syntax
-    ;; So we have to transform them into core syntax that does something equivalent.
-    [(subS l r)
-     ;; The translation: (- x y) is the same as
-     ;; (+ x (* -1 y))
-     ;; So we build the corresponding tree after desugaring l and r
-     (plusE (desugar l)
-            (timesE (numE -1) (desugar r)))]
-    ))
-
 
 ;; Evaluate Expressions
 (define (interp [e : Exp] ) : Value
@@ -155,6 +105,7 @@
     ;; Works the same but for times
     [(timesE l r)
      (lift-binop * (interp l) (interp r))]
+    ;; NEW
     ;; {if test thn els} evaluates test and checks if it's zero
     ;; if it is, then we evaluate thn
     ;; otherwise we evaluate els
@@ -179,8 +130,7 @@
 ;; then interpreting it into a number
 ;; Implicit: we can turn strings into s-expressions using Racket's quote
 ;; i.e. `{+ 3 4} generates an S-expression directly
-(define (run s-exp) (interp (desugar
-                             (parse s-exp))))
+(define (run s-exp) (interp (parse s-exp)))
 
 (test (run `3)
       (numV 3))
