@@ -4073,7 +4073,16 @@ while (i < 10){
   ...
 | | {let1 {<var> <expr>} <expr>}
 #+end_src
-*** New Abstract Syntax
+*** Variable Binding
+- ~{let1 {x val} body}~
+  + Can refer to ~x~ in ~boxy~
+  + Should give the value of ~body~
+    - But with ~x~ replaced by value of ~val~
+- We say that the ~let1~ expression *binds* the variable ~x~
+  + ~x~ is *bound* in ~body~
+  + e.g. it's defined in ~body~ and can be referred to there
+  + Will shadow any previous definitions of ~x~ inside ~body~
+***  New Abstract Syntax
 - Variable can be used as an expression
 - ~let1~ has the name of the variable, its value, and where it's used
 #+begin_src racket
@@ -4092,6 +4101,34 @@ while (i < 10){
          [body : Exp]))
 #+end_src
 *** Desugaring
+- Nothing different, just recursively desugar the parts
+
+#+begin_src racket
+;; Desugar Expressions into Core Syntax
+(define (desugar [es : ExpS]) : Exp
+  (type-case ExpS es
+     ...
+    [(varS x)
+     (varE x)]
+    [(let1S var val body)
+     (let1E var (desugar val) (desugar body))]
+    ))
+
+#+end_src
+*** What We Need to Interpret
+#+begin_src racket
+(define (interp [e : Exp] ) : Value
+  (type-case Exp e
+    ...
+    [(let1E var val body)
+     (let* ([valV (interp val)]
+            [subbedBody TODO])
+       (interp subbedBody))]
+#+end_src
+- Evaluate the value for the variable ~var~
+- Replace ~var~ with that value in ~body~
+  + Need a new helper function to do this!
+-  Then, evaluate the body /after the substitution/
 *** Substitution
 **** How can we replace a variable in an expression?
 - More recursion!
@@ -4102,51 +4139,116 @@ while (i < 10){
   + Variable ~y~: check if ~y~ = ~x~ i.e. it's the variable the one we're replacing
     - If it is, produce ~s~
     - Otherwise, produce ~y~ again
+  + Literal: just return the literal unchanged
+    - since it doesn't contain the variable
+  + ~let1~ expressions: replace in the body and the value
+    - *unless* the bound variable is the variable we're replacing
+    - Then, only substitute in the ~value~
+      + since the variable in the body is a "new" shadowing variable
   + Everything else: recursively substitute in the sub-expressions
-    - Will have more complex cases later
-*** Code for Substitution
-#+name: subst-start
+*** Code for Substitution: Base Cases
+- Literals: don't do anything
+- Variables: replace if it's what we're trying to replace
+  + Otherwise, don't do anything
 #+begin_src racket
-;; `(subst x s t)` replaces all occurences of `x` in `t` with `s`.
-;; We use this to implement function calls
 (define (subst [toReplace : Symbol]
-               [replacedBy : Expr]
-               [replaceIn : Expr]) : Expr
-  (type-case Expr replaceIn
-    ;; Base case: we're replacing a variable in an expression
-    ;; where that expression is a variable
-    [(Var x)
-     ;; Check if it's the variable we're replacing
-     (if (equal? x toReplace)
-         replacedBy ;; If so, produce what we're replacing it with
-         (Var x))] ;; else produce the original variable
-    ;; Number is a leaf, no sub-expressions
-    ;; so return it unchanged
-    [(NumLit n) (NumLit n)]
-    ;; ...
+               [replacedBy : Exp]
+               [e : Exp] ) : Exp
+  (type-case Exp e
+    [(varE x)
+     (if (symbol=? x toReplace)
+         replacedBy
+         (varE x))]
+    [(numE n)
+     (numE n)]
+    [(boolE b)
+     (boolE b)]
 #+end_src
-*** Code for Substitution (ctd)
-#+begin_src racket :noweb strip-export
-    <<subst-start>>
-    ;; Plus has two sub-expressions,
-    ;; so we replace the variable in both sub-expressions
-    [(Plus l r)
-     (Plus (subst toReplace replacedBy l)
-           (subst toReplace replacedBy r))]
-    ;; other operations work similarly
-    [(Times l r)
-     (Times (subst toReplace replacedBy l)
-           (subst toReplace replacedBy r))]
-    [(If0 test thn els)
-     (If0 (subst toReplace replacedBy test)
+
+*** Code for Substitution: Bound Variable
+#+name: subst-start
+- Replace varible in value and body /unless/ that variable is bound in body
+#+begin_src racket
+(define (subst [toReplace : Symbol]
+               [replacedBy : Exp]
+               [e : Exp])
+  : Exp
+  (type-case Exp e
+             ...
+   [(let1E var val body)
+      (let1E var
+        (subst toReplace replacedBy val)
+        (if (symbol=? var toReplace)
+                body
+                (subst toReplace replacedBy body)))]
+#+end_src
+
+*** Code for Substitution: Recursive Cases
+- Just recursively substitute in the parts
+#+begin_src racket
+(define (subst [toReplace : Symbol]
+               [replacedBy : Exp]
+               [e : Exp])
+  : Exp
+  (type-case Exp e
+             ...
+    [(plusE l r)
+     (plusE (subst toReplace replacedBy l)
+            (subst toReplace replacedBy r))]
+    [(timesE l r)
+     (timesE (subst toReplace replacedBy l)
+             (subst toReplace replacedBy r))]
+    [(cndE test thn els)
+     (cndE (subst toReplace replacedBy test)
            (subst toReplace replacedBy thn)
            (subst toReplace replacedBy els))]
-    ;; Have to decide how to handle namespaces
-    ;; For now, functions and variables are different namespaces
-    ;; so we don't ever replace a function name in subst
-    [(Call funName arg)
-     (Call funName (subst toReplace replacedBy arg))]))
+    [(zero?E e)
+     (zero?E (subst toReplace replacedBy e))]
 #+end_src
+*** Lifting Values back into Expressions
+- Substitution works on expressions, not values
+  + But want to plug values in for variables
+#+begin_src racket
+(define (Value->Exp [v : Value])
+  : Exp
+  (type-case Value v
+    [(boolV b)
+     (boolE b)]
+    [(numV n)
+     (numE n)]))
+#+end_src
+*** Putting It All Together
+- This gives us everything we need to interpret ~let1~
+  #+begin_src racket
+(define (interp [e : Exp] ) : Value
+  (type-case Exp e
+    ...
+    [(let1E var val body)
+     (let* ([valV (interp val)]
+            [subbedBody (subst var (Value->Exp valV) body)])
+       (interp subbedBody))]
+  #+end_src
+*** Interpreting Variables
+- When interpreting ~let~, we replace the bound ~x~ /before/ we interpret the body
+- What if we hit a variable when interpreting?
+  + Then it wasn't replaced by interpreting ~let1~
+  + So it wasn't defined by ~let1~
+- It is an *undefined variable*
+  + Raise an error!
+- Can detect this statically, but we won't because we're lazy
+  #+begin_src racket
+(define (interp [e : Exp] ) : Value
+  (type-case Exp e
+    ...
+    [(varE x)
+     (error 'interp
+        (string-append "Undefined variable: "
+                       (symbol->string x)))]
+  #+end_src
+
+
+
+
 * Environments, Binding, and Scope :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides015-environments.pdf
