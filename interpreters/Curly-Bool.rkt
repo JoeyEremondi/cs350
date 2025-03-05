@@ -101,6 +101,9 @@
      (boolV b)]
     ;; {+ e1 e2} evaluates e1 and e2, then adds the results together
     [(plusE l r)
+     ;; DON'T WANT this:
+     ;; (type-case l
+     ;;    [(numE x) ...]
      (lift-binop + (interp l) (interp r))]
     ;; Works the same but for times
     [(timesE l r)

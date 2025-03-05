@@ -286,7 +286,7 @@ To learn:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides002-flit.pdf
 :header-args:racket: :results code :lang flit
-:CUSTOM_ID: functional-programming-1-recursion-and-immutable-data
+:CUSTOM_ID: expressions-immutable-data
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 
@@ -715,7 +715,7 @@ where ~[x => EXPR]body~ is ~body~ with all non-shadowed occurrences of ~x~ repla
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides003-types.pdf
 :header-args:racket: :results code :lang flit
-:CUSTOM_ID: functional-programming-1-recursion-and-immutable-data
+:CUSTOM_ID: types-in-flit
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 ** Programming with Holes
@@ -919,7 +919,7 @@ TODO3 : Number
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides004-recursion.pdf
 :header-args:racket: :results code :lang flit
-:CUSTOM_ID: fun-prog-recursion
+:CUSTOM_ID: recursion-lists
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 ** Functional Thinking and Recursion
@@ -1439,7 +1439,7 @@ good (factorial 5) at line 12
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides005-datatypes.pdf
 :header-args:racket: :results code :lang flit
-:CUSTOM_ID: functional-programming-2-defining-data-types
+:CUSTOM_ID: defining-data-types
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 
@@ -2200,7 +2200,7 @@ pub enum Option<T> {
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides007-lambda.pdf
 :header-args:racket: :results code :lang flit
-:CUSTOM_ID: functional-programming-2-first-class-functions
+:CUSTOM_ID: first-class-functions
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 ** Higher Order Functions
@@ -2780,7 +2780,7 @@ f(3,-4)
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides009-tailrec.pdf
 :header-args:racket: :results code :lang flit
-:CUSTOM_ID: generative-recursion-and-tail-recursion
+:CUSTOM_ID: tail-recursion
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 ** Broad Goals
@@ -3000,7 +3000,7 @@ return g(x);
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides010-fold.pdf
 :header-args:racket: :results code :lang flit
-:CUSTOM_ID: generative-recursion-and-tail-recursion
+:CUSTOM_ID: folds
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 ** Abstracting Generative Recursion
@@ -3708,8 +3708,8 @@ for (int i = 0; i < N; i++){
 - One operation producing a boolean
 *** Example Programs
 #+begin_src racket
-{if {zero? {+ {* 40 50}
-            {* -1 2000}}}
+{if {zero? {+ {* 40 50}}
+    {* -1 2000}}
     1
     -1}
 #+end_src
@@ -3761,6 +3761,7 @@ for (int i = 0; i < N; i++){
 (define (lift-binop [op : (Number Number -> Number)]
                     [v1 : Value]
                     [v2 : Value])
+  : Value
   (type-case Value v1
     [(numV n1)
      (type-case Value v2
@@ -3880,6 +3881,15 @@ while (i < 10){
   + /without changing the interpreter at all/
 - Separate AST into surface and core AST
 - Add translation from surface to core AST
+*** Different Syntax Tree Types
+- We will define two separate Abstract Syntax Tree types
+  + ~ExpS~ for "Surface expressions"
+    - S for "surface", or "sugar"
+    - Corresponds directly to the source code
+    - Program before desugaring
+  + ~Exp~ for core expressions
+    - The result of desugaring
+    - The type of tree we give to ~interp~ to actually run
 *** Subtraction: Datatype
 - First need the surface AST
 #+begin_src racket
@@ -3925,23 +3935,86 @@ while (i < 10){
   + Pattern match
   + Recursively ~desugar~ the parts
   + Re-assemble with the corresponding ~Exp~ constructor
-*** Desugaring: Subtraction
+*** Desugaring: Subtraction Helper Function
+- Desugaring is about /source-to-source transformations/
+- Given some syntax trees, how can we:
+  + make a new syntax tree
+  + that evaluates to the result of the desired operation
+  + without
+    - running the code
+    - inspecting the trees
+- Example:
+*** Desugaring: Subtraction Helper Function
 - There is no ~subE~ in the ~Exp~ definition
   + Could add it, but don't need to
   + Instead, translate it into /existing/ features of ~Exp~
     - e.g. Our /core syntax/
+      #+begin_src racket
+    (define (subE [l : Exp]
+                  [r : Exp])
+      : Exp
+      (plusE l
+             (timesE (numE -1) r)))
+      #+end_src
+- e.g. ~{- x y}~ becomes ~{+ x {* -1 y}}~
+- Note: ~subE~ is a function, /not/ a constructor
+*** Desugaring: Subtraction
+- Can use our helper function in desugar now
 #+begin_src racket
 (define (desugar [es : ExpS]) : Exp
-  ...
-    [(subS l r)
-     (plusE (desugar l)
-            (timesE (numE -1) (desugar r)))]
+  (type-case ExpS es
+   ...
+   [(subS l r)
+      (subE (desugar l) (desugar r))]
 #+end_src
-- e.g. ~{- x y}~ becomes ~{+ x {* -1 y}}~
 - Why did we desugar ~l~ and ~r~?
   + Can't give to ~plusE~ until they're expressions
   + e.g. what if ~-~ occurs deep in an expression
+*** More Examples: Equality
+- ~{= x y}~
+  + produces a boolean for if they're equal
+- Can we implement a boolean-returning equality check
+  + Using just what we have now?
+- ~x = y~ if and only if ~x - y = 0~
 
+#+begin_src racket
+(define-type ExpS
+  ...
+  (eqS [l : ExpS] [ r : ExpS]))
+
+
+(define (eqE [l : Exp]
+              [r : Exp])
+  : Exp
+  (zero?E (subE l r)))
+
+(define (desugar [es : ExpS]) : Exp
+  ...
+    [(eqS l r)
+       (eqE (desugar l) (desugar r))]
+#+end_src
+*** More Examples: Boolean Operations
+- Can we add ~and~, ~or~, and ~not~?
+- E.g. ~and~
+  + Want ~and #t #t~ to be ~#t~, false otherwise
+  + Notice: if first arg is ~#t~, then second arg is the result of the whole ~and~
+#+begin_src racket
+(define (andE [l : Exp]
+              [r : Exp])
+  : Exp
+  (cndE l
+        r
+        (boolE #f)))
+
+(define (orE [l : Exp]
+             [r : Exp])
+  (cndE l (boolE #t) r))
+
+(define (notE [e : Exp])
+  (cndE e (boolE #f) boolE #t))
+
+#+end_src
+- See Curly-Desugar in URCourses for full implementation
 *** Advantages of Desugaring
 - We added subtraction to Curly
   + /without/ changing ~Exp~ or ~interp~
@@ -3954,35 +4027,17 @@ while (i < 10){
   + Translated a small language into an even smaller one
 - Compilation is just a bunch of desugaring passes
   + Simpler and simpler languages until we have something simple enough for assembly code
-*** More Examples: Equality
-- ~{= x y}~
-  + produces a boolean for if they're equal
-- Can we implement a boolean-returning equality check
-  + Using just what we have now?
-- ~x = y~ if and only if ~x - y = 0~
-  + Excluding ~NaN/inf~
-
-#+begin_src racket
-(define-type ExpS
-  ...
-  (eqS [l : ExpS] [ r : ExpS]))
-
-(define (desugar [es : ExpS]) : Exp
-  ...
-    [(eqS l r)
-       (desugar (zero?S (subS l r)))]
-#+end_src
-- Why didn't we ~desugar~ on ~l~ and ~r~?
-*** More Examples: Boolean Operations
-- Can we add ~and~, ~or~, and ~not~?
-- E.g. ~and~
-  + Want ~and #t #t~ to be ~#t~, false otherwise
-  + Notice: if first arg is ~#t~, then second arg is the result of the whole ~and~
-- ~{and e1 e2}~ becomes ~{if e1 e2 #f}~
-  + See Dr. Racket
-- ~{or e1 e2}~ becomes ~{if e1 #t e2}~
-- ~{not e1 }~ becomes ~{if e1 #f #t}~
-- See Curly-Desugar in URCourses for full implementation
+*** Example
+- ~{if {= {+ 3 3} 3} 4 5}~
+- First we desugar
+  + ~{if   {zero? {- {+ 3 3} 3}}  4 5}~
+  + ~{if  {zero? {+ {+ 3 3} {* -1 3}}}   4 5}~
+  + Actual desugaring happens on trees, not on concrete syntax
+  + But this is more readable
+- Then we interpret
+*** Example ctd
+- Then we interpret
+  - Dynamic type checks left off for readability
 * Bindings, Variables, and Functions
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides014-subst.pdf

@@ -128,6 +128,60 @@
        [else (error 'lift-binop "expects RHS to be a number")])]
     [else (error 'lift-binop "expects LHS to be a number")]))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Source to Source transformations on Exp,
+;; implementing various operations without interpretation.
+;; We use these in our desugar function below
+
+;; Produce an expression that evaluates
+;; to the difference of the values of l and r
+(define (subE [l : Exp]
+              [r : Exp])
+  : Exp
+  (plusE l
+         (timesE (numE -1) r)))
+
+;; Produce an expression that evaluates to true
+;; if and only if l and r evaluates to equal numbers
+(define (eq?E [l : Exp]
+              [r : Exp])
+  : Exp
+  (zero?E (subE l r)))
+
+;; Produce an expression that evaluates to true if and only if
+;; both its input evaluate to the boolean true.
+(define (andE [l : Exp]
+              [r : Exp])
+  : Exp
+  ;; If the first one is true, then the AND is true if and only if
+  ;; the second one is also true, i.e. the value of the second one.
+  ;; Otherwise, if the first one is false, the AND is false
+  (cndE l
+        r
+        (boolE #f)))
+
+;; Produce an expression that evaluates to true
+;; if either of the given expressions evaluates to true.
+(define (orE [l : Exp]
+             [r : Exp])
+  : Exp
+  ;; If the first one is true, then the OR is true.
+  ;; Otherwise, the OR is true iff the second one is, i.e. it has its value.
+  (cndE l
+        (boolE #t)
+        r))
+
+;; Produce an expression that evaluates to the opposite boolean
+;; of the given expression.
+(define (notE [e : Exp])
+  : Exp
+  (cndE e
+        (boolE #f)
+        (boolE #t)))
+
+
+
 ;; NEW
 ;; Desugar Expressions into Core Syntax
 (define (desugar [es : ExpS]) : Exp
@@ -151,22 +205,17 @@
      (zero?E (desugar e))]
     ;; The remaining features aren't covered by the core syntax
     ;; So we have to transform them into core syntax that does something equivalent.
+    ;; We use the helper functions above to do so.
     [(subS l r)
-     ;; The translation: (- x y) is the same as
-     ;; (+ x (* -1 y))
-     ;; So we build the corresponding tree after desugaring l and r
-     (plusE (desugar l)
-            (timesE (numE -1) (desugar r)))]
+     (subE (desugar l) (desugar r))]
     [(eqS l r)
-     ;; Equality: subtract and see if it's zero
-     (desugar (zero?S (subS l r)))]
-    ;; Can do the boolean operations using if
+     (eq?E (desugar l) (desugar r))]
     [(andS l r)
-     (cndE (desugar l) (desugar r) (boolE #f))]
+     (andE (desugar l) (desugar r))]
     [(orS l r)
-     (cndE (desugar l) (boolE #t) (desugar r))]
-    [(notS es)
-     (cndE (desugar es) (boolE #f) (boolE #t))]
+     (orE (desugar l) (desugar r))]
+    [(notS e)
+     (notE (desugar e))]
     ))
 
 
@@ -269,6 +318,6 @@
                   {or
                    #t
                    {= 5 22}}}}
-                 99
-                 100})
+                99
+                100})
       (numV 99))
