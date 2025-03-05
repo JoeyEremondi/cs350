@@ -4529,7 +4529,7 @@ emptyEnv
   + Behavior of ~subst~ on bound variables
   + What environment ~interp~ is passed for function bodies
 
-* Implementing Lambdas with Substitution and Dynamic Typing
+* Implementing Lambdas with Substitution and Dynamic Typing :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides012-dyntype.pdf
 :header-args:racket: :results code :lang flit
