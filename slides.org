@@ -4049,100 +4049,49 @@ while (i < 10){
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides014-subst.pdf
 :header-args:racket: :results code :lang flit
-:CUSTOM_ID: functions-variables-and-substitution
+:CUSTOM_ID: local-vars-bindings
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
-** Overview: Functions
+** Overview: Variables
 :PROPERTIES:
 :CUSTOM_ID: overview-functions
 :END:
-*** Adding functions to the language
-- Want to be able to re-use code, compute in terms of variables
-- Two new Curly features
-- First-class functions
-  + ~{lambda {x} {+ x 3}}~
-- Function calls
-  + Sometimes called /function applications/
-  + ~{f 10}~, produces ~13~
-  + To start: single argument, inputs and outputs number
-*** Syntax: Definitions
-- New datatype for function definitions
-#+begin_src racket
-(define-type FunDef
-  (mkFunDef [name : Symbol]
-            [arg : Symbol]
-            [body : Expr]))
+*** Syntax for Variables
+- Want a way to:
+  + Define variables as having certain values
+  + Use those values later in a Curly program
+- New syntax:
+  + Variables are expressions
+    - Anywhere you can use a number, you can use a variable representing a number
+  + ~let1~ for defining variables
+    - Called ~let1~ because we can only define 1 variable at a time
+#+begin_src
+<expr> ::=
+|  <number>
+|  <boolean>
+|  <var> ;; new
+  ...
+| | {let1 {<var> <expr>} <expr>}
 #+end_src
-*** Parser: Definitions
-- New parser
-  + Note: function definition is not an expression
-  + Need to elaborate body after parsing
+*** New Abstract Syntax
+- Variable can be used as an expression
+- ~let1~ has the name of the variable, its value, and where it's used
 #+begin_src racket
-(define (parse-fundef [s : S-Exp]) : FunDef
-  (cond
-    [(s-exp-match? `{define {SYMBOL SYMBOL} ANY} s)
-     (mkFunDef
-        (s-exp->symbol
-           (first (s-exp->list (second (s-exp->list s)))))
-         (s-exp->symbol
-            (second (s-exp->list (second (s-exp->list s)))))
-         (elab (parse (third (s-exp->list s)))))]
-    [else (error 'parse-fundef "invalid input")]))
-#+end_src
-*** New Expression Syntax
-- We need a way to:
-  + Call a function
-  + Refer to the parameter of a function inside its body
-#+begin_src racket
-(define-type Expr
-  (NumLit [n : Number])
-  (Plus [left : Expr]
-        [right : Expr])
-  (Times [left : Expr]
-         [right : Expr])
-  (If0 [test : Expr]
-       [thenBranch : Expr]
-       [elseBranch : Expr])
-  (Var [x : Symbol])
-  (FunCall [f : Symbol]
-           [arg : Expr]))
-#+end_src
-- Also add variables and calls to surface syntax
-*** Interpreting Variables
-- What is the meaning of a variable in a program?
-  + Variable is just a placeholder for whatever the value is given to the function
-- Interpreting a variable is an *error*
-  + Similar to "out of scope" or "undefined variable" errors
-- Could statically check if variable was out of scope
-  + Might do later in the course
-*** Interpreting Function Calls
-- Function call:
-  + Looks up body of function
-  + Replaces variable with value given
-  + Evaluates the body after that replacement
-- Interpreter needs context now
-  + List of function definitions
-    #+begin_src racket
-     (define (interp [expr : Expr]
-                     [defs : (Listof FunDef)]) : Number
-       ....)
-    #+end_src
-*** Looking up function definitions
-- Iterate through a list of definitions until we find one that matches
-  #+begin_src racket
-(define (get-fundef [s : Symbol] [defs : (Listof FunDef)]) : FunDef
-  (type-case (Listof FunDef) defs
-    ;; If we hit empty list, then we didn't find the function
-    [empty (error 'get-fundef (string-append "No function with name " (to-string s)))]
-    ;; Check if the first one in the list is what we're looking for
-    ;; If it is, return it.
-    ;; Otherwise, look in the rest of the list.
-    [(cons def otherDefs)
-     (if (equal? (mkFunDef-name def) s)
-         def
-         (get-fundef s otherDefs))]))
-  #+end_src
+(define-type ExpS
+  ...
+  (varS [x : Symbol])
+  (let1S [var : Symbol]
+         [val : ExpS]
+         [body : ExpS]))
 
+(define-type Exp
+  ...
+  (varE [x : Symbol])
+  (let1E [var : Symbol]
+         [val : Exp]
+         [body : Exp]))
+#+end_src
+*** Desugaring
 *** Substitution
 **** How can we replace a variable in an expression?
 - More recursion!
@@ -4197,20 +4146,6 @@ while (i < 10){
     ;; so we don't ever replace a function name in subst
     [(Call funName arg)
      (Call funName (subst toReplace replacedBy arg))]))
-#+end_src
-*** Bringing it together
-- Interpret a function call by:
-  + Looking up definition
-  + Evaluating argument
-  + Replacing function parameter with value of argument
-    - using substitution
-#+begin_src racket
-[(Call funName argExpr)
-     (let* ([argVal (interp defs argExpr)]
-            [def (get-fundef funName defs)]
-            [argVar (mkFunDef-arg def)]
-            [funBody (mkFunDef-body def)])
-       (interp defs (subst argVar (NumLit argVal) funBody)))]
 #+end_src
 * Environments, Binding, and Scope :noexport:
 :PROPERTIES:
