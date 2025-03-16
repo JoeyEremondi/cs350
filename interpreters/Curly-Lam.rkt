@@ -1,24 +1,31 @@
 #lang flit
 
-;; Curly-Desugar: A programming language with subtraction and equality
+;; Curly-Let: A programming language with subtraction and equality
 
-;; BNF for Curly-Desugar 
+;; BNF for Curly-Let
 ;; Adds subtraction, boolean operations, and equality comparison by desugaring
 ;; 
 ;;  <expr> ::=
-;;     "{" "+" <expr> <expr> "}"
-;;   | "{" "*" <expr> <expr> "}"
-;;   | "{" "=" <expr> <expr> "}"
-;;   | "{" "-" <expr> <expr> "}"
-;;   | "{" "and" <expr> <expr> "}"
-;;   | "{" "or" <expr> <expr> "}"
-;;   | "{" "not" <expr> "}"
-;;   | "{" "if" <expr> <expr> <expr> "}"
-;;   | "{" "zero?" <expr> "}"
 ;;   | NUMBER
 ;;   | BOOLEAN
+;;   | VARIABLE ;; NEW
+;;   | { + <expr> <expr> }
+;;   | { * <expr> <expr> }
+;;   | { = <expr> <expr> }
+;;   | { - <expr> <expr> }
+;;   | { and <expr> <expr> }
+;;   | { or <expr> <expr> }
+;;   | { not <expr> }
+;;   | { if <expr> <expr> <expr> }
+;;   | { zero? <expr> }
+;;   | {let1 {VARIABLE <expr>} <expr> }
+;;   ;; NEW
+;;   | {lam VARIABLE <expr>} ;; function definition
+;;   | {<expr> <expr>} ;; function calling
 
-;; NEW
+;; The expression {let1 {x e1} e2} means "x has value e1 in e2"
+
+
 ;; Intermediate Abstract Syntax
 ;; We desugar this into Exp
 (define-type ExpS
@@ -26,6 +33,10 @@
   (numS [n : Number])
   ;; Constant Booleans
   (boolS [b : Boolean])
+  ;; Variables ;; NEW
+  ;; Represent variables as Flit symbols
+  ;;  that we can compare with symbol=?
+  (varS [x : Symbol])
   ;; {+ e1 e2}
   (plusS [left : ExpS]
          [right : ExpS])
@@ -37,8 +48,6 @@
         [thenCase : ExpS]
         [elseCase : ExpS])
   (zero?S [e : ExpS])
-  ;; NEW
-  ;; This is NOT in Exp
   (subS [l : ExpS]
         [r : ExpS])
   (eqS [l : ExpS]
@@ -47,7 +56,16 @@
         [r : ExpS])
   (orS [l : ExpS]
        [r : ExpS])
-  (notS [e : ExpS]))
+  (notS [e : ExpS])
+  ;; Let-expressions
+  (let1S [var : Symbol]
+         [val : ExpS]
+         [body : ExpS])
+  ;; Functions and function calls (application)
+  (lamS [var : Symbol]
+        [body : ExpS])
+  (appS [fun : ExpS] [arg : ExpS])
+  )
 
 ;; Abstract syntax for Curly-Cond
 ;; Represents expressions in our interpreter
@@ -56,6 +74,9 @@
   (numE [n : Number])
   ;; Constant Booleans
   (boolE [b : Boolean])
+  ;; NEW
+  ;; Variables are in the core language
+  (varE [x : Symbol])
   ;; {+ e1 e2}
   (plusE [left : Exp]
          [right : Exp])
@@ -66,13 +87,25 @@
   (cndE [test : Exp]
         [thenCase : Exp]
         [elseCase : Exp])
-  (zero?E [e : Exp]))
+  (zero?E [e : Exp])
+  ;; Let-expressions are in the core language
+  (let1E [var : Symbol]
+         [val : Exp]
+         [body : Exp])
+  ;; Functions and applications (function calls) are in the core language
+  (lamE [var : Symbol] [vody : Exp])
+  (appE [fun : Exp] [arg : Exp])
+  )
 
-;; We now allow values to be either Numbers or Booleans,
-;; So we define a datatype for possible values
+;; We now allow values to be either Numbers, Booleans, or Functions
 (define-type Value
   [numV (n : Number)]
-  [boolV (b : Boolean)])
+  [boolV (b : Boolean)]
+  ;; NEW
+  ;; Note that functions as values contain the exact same data as function expressions.
+  ;; Now Values and Expressions are mutually defined.
+  [lamV (var : Symbol)
+        (body : Exp)])
 
 ;; Parse
 ;; Takes an S-expression and turns it into an Exp
@@ -84,6 +117,9 @@
     ;; Constant boolean e.g. #t, #f
     [(s-exp-match? `#t s) (boolS #t)]
     [(s-exp-match? `#f s) (boolS #f)]
+    ;; NEW
+    ;; Variables e.g. x
+    [(s-exp-match? `SYMBOL s) (varS (s-exp->symbol s))]
     ;; {+ s1 s2}
     [(s-exp-match? `{+ ANY ANY} s)
      (plusS (parse (second (s-exp->list s)))
@@ -92,7 +128,6 @@
     [(s-exp-match? `{* ANY ANY} s)
      (timesS (parse (second (s-exp->list s)))
              (parse (third (s-exp->list s))))]
-    ;; NEW
     ;; We can parse and desugar subtraction without changing the interpreter
     [(s-exp-match? `{- ANY ANY} s)
      (subS (parse (second (s-exp->list s)))
@@ -114,6 +149,21 @@
            (parse (fourth (s-exp->list s))))]
     [(s-exp-match? `{zero? ANY} s)
      (zero?S (parse (second (s-exp->list s))))]
+    ;; Variable definitions
+    ;; {let1 {x val} body}
+    [(s-exp-match? `{let1 {SYMBOL ANY} ANY} s)
+     (let1S (s-exp->symbol (first (s-exp->list (second (s-exp->list s)))))
+            (parse (second (s-exp->list (second (s-exp->list s)))))
+            (parse (third (s-exp->list s))))]
+    ;; NEW:
+    ;; Lambdas and function calls
+    [(s-exp-match? `{lam SYMBOL ANY} s)
+     (lamS (s-exp->symbol (second (s-exp->list s)))
+            (parse (third (s-exp->list s))))]
+    ;; Catch-all case for function calls/applications
+    [(s-exp-match? `{ANY ANY} s)
+     (appS (parse (first (s-exp->list (second (s-exp->list s)))))
+           (parse (second (s-exp->list (second (s-exp->list s))))))]
     [else (error 'parse "invalid input")]))
 
 ;; Lifting operations on Numbers to Values
@@ -181,8 +231,6 @@
         (boolE #t)))
 
 
-
-;; NEW
 ;; Desugar Expressions into Core Syntax
 (define (desugar [es : ExpS]) : Exp
   (type-case ExpS es
@@ -194,8 +242,7 @@
     [(boolS b)
      (boolE b)]
     [(plusS l r)
-     (plusE (desugar l) (desugar r))
-     ]
+     (plusE (desugar l) (desugar r))]
     [(timesS l r)
      (timesE (desugar l) (desugar r))]
     [(cndS test thn els)
@@ -217,8 +264,102 @@
      (orE (desugar l) (desugar r))]
     [(notS e)
      (notE (desugar e))]
+    ;; No interesting desugaring to do for Variables and Let,
+    ;; but note we don't need to recursively call (desugar ...)
+    ;; on the symbol itself
+    [(varS x)
+     (varE x)]
+    [(let1S var val body)
+     (let1E var (desugar val) (desugar body))]
+    ;; No interesting desugaring for functions, just recursively desugar the parts
+    [(lamS x body)
+     (lamE x (desugar body))]
+    [(appS fun args)
+     (appE (desugar fun) (desugar args))]
     ))
 
+;; NEW
+;;;;;;;;;;;;;;;;;;;;;;
+;; Substitution
+;; Replace the variable with the given expression
+;; in some other expression e.
+;; Has shadowing: we don't replace a variable x
+;; in a scope where x is bound (redefined).
+
+(define (subst [toReplace : Symbol]
+               [replacedBy : Exp]
+               [e : Exp])
+  : Exp
+  (type-case Exp e
+    ;; Variable case
+    ;; If the variable is the one we're trying to replace,
+    ;; then replace it, otherwise just leave it unchanged.
+    [(varE x)
+     (if (symbol=? x toReplace)
+         replacedBy ;; variable match, so replace with new expression
+         (varE x))] ;; didn't match, so just leave the variable unchanged
+    ;; Literals don't contain variables,
+    ;; so no replacing to be done
+    [(numE n)
+     (numE n)]
+    [(boolE b)
+     (boolE b)]
+    ;; Remaining expressions: they don't (directly) bind or use variables,
+    ;; so we just recursively substitute in the parts
+    [(plusE l r)
+     (plusE (subst toReplace replacedBy l)
+            (subst toReplace replacedBy r))]
+    [(timesE l r)
+     (timesE (subst toReplace replacedBy l)
+             (subst toReplace replacedBy r))]
+    [(cndE test thn els)
+     (cndE (subst toReplace replacedBy test)
+           (subst toReplace replacedBy thn)
+           (subst toReplace replacedBy els))]
+    [(zero?E e)
+     (zero?E (subst toReplace replacedBy e))]
+    ;; Function calls work just like normal
+    [(appE fun arg)
+       (appE (subst toReplace replacedBy fun)
+             (subst toReplace replacedBy arg))]
+    ;; Shadowing:
+    ;; {let1 {x val} body} *binds* x in body,
+    ;; so if we're replacing x in the let1 expression,
+    ;; we dont replace it in the body, since we're defining a "new"
+    ;; x that shadows the old one
+    [(let1E var val body)
+     (let1E var
+            (subst toReplace replacedBy val)
+            (if (symbol=? var toReplace)
+                body
+                (subst toReplace replacedBy body)))]
+  ;; NEW:
+  ;; Shadowing on functions works like on let:
+  ;; don't replace in the body if the function's variable is what we're replacing,
+  ;; so that the function variable shadows the outer variable
+  [(lamE var body)
+   (lamE var
+         (if (symbol=? var toReplace)
+             body
+             (subst toReplace replacedBy body)))]
+  ))
+
+
+;; Substitution works with expressions,
+;; so we need a way to convert values back to expressions.
+;; We just convert boolean values to literals, same with numbers.
+(define (Value->Exp [v : Value])
+  : Exp
+  (type-case Value v
+    [(boolV b)
+     (boolE b)]
+    [(numV n)
+     (numE n)]
+    ;; NEW
+    ;; We can turn function values into function expressions,
+    ;; since they contain the exact same data, we just change the constructor
+    [(lamV x body)
+       (lamE x body)]))
 
 ;; Evaluate Expressions
 (define (interp [e : Exp] ) : Value
@@ -253,7 +394,39 @@
        [(numV n)
         (boolV (= n 0))]
        [else
-        (error 'interp "Expected number")])]))
+        (error 'interp "Expected number")])]
+    ;; To interpret a let-expression,
+    ;; we evaluate the value for the variable.
+    ;; Then we replace the variable with that expression everywhere
+    ;; in the body, and evaluate the body.
+    [(let1E var val body)
+     (let* ([valV (interp val)]
+            [subbedBody (subst var (Value->Exp valV) body)])
+       (interp subbedBody))]
+    ;; If we encounter a variable that we haven't substituted away,
+    ;; then we must have had an undefined variable error
+    [(varE x)
+     (error 'interp (string-append "Undefined variable: " (symbol->string x)))]
+    ;; NEW
+    ;; Interpreting functions is a no-op: we just wrap the function as a value.
+    ;; This is because functions store computation to be done later, after some substitutions.
+    [(lamE var body)
+       (lamV var body)]
+    ;; NEW
+    ;; Interpreting function calls (applications)
+    ;; Two things to do: make sure the thing we're calling is a function,
+    ;; then replace its variable with the argument's value in the body.
+    ;; Finally, we interpret the body.
+    [(appE fun arg)
+       (type-case Value (interp fun)
+         [(lamV var body)
+            ;; Do the substitution,
+            ;; then interpret the result
+            (let* ([argExp (Value->Exp (interp arg))]
+                   [subbedBody (subst var argExp body)])
+              (interp subbedBody))]
+         [else
+            (error 'interp "Tried to call non-function")])]))
 
 ;; The Language Pipeline
 ;; We run  program by parsing an s-expression into an expression
@@ -322,3 +495,9 @@
                 99
                 100})
       (numV 99))
+
+;; NEW
+(test (run
+       `{let1 {x {+ 9900 99}}
+              {+ x {* x {if {zero? x} x {- x x}}}}})
+      (numV 9999))

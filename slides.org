@@ -3913,7 +3913,7 @@ while (i < 10){
 (define (parse [s : S-Exp]) : ExpS
   ...
     [(s-exp-match? `{- ANY ANY} s)
-     (SurfSub (parse (second (s-exp->list s)))
+     (subS (parse (second (s-exp->list s)))
             (parse (third (s-exp->list s))))])
 #+end_src
 *** Desugaring: Core Cases
