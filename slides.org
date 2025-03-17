@@ -3627,7 +3627,7 @@ for (int i = 0; i < N; i++){
 *** Updating the interpreter
 #+begin_src racket :noweb strip-export :exports both
 (define (interp [e : Exp] ) : Number
-  (type-case Expr e
+  (type-case Exp e
              [(num n) n]
              [(plus l r)
                 (+ (interp l) (interp r))]
@@ -4249,6 +4249,347 @@ while (i < 10){
 
 
 
+
+* Implementing Lambdas with Substitution
+:PROPERTIES:
+:EXPORT_FILE_NAME: pdf/slides012-lambda-subst.pdf
+:header-args:racket: :results code :lang flit
+:CUSTOM_ID: implementing-lambdas-with-substitution-and-dynamic-typing
+:END:
+#+beamer: \beamerdefaultoverlayspecification{<+->}
+** Broad Strategy
+:PROPERTIES:
+:CUSTOM_ID: broad-strategy
+:END:
+*** Implementation Strategy
+- Have the the machinery we need to represent functions
+  + Treat functions as values
+    - Dynamic type checks
+  + Substitution for replacing function arguments
+    - Already have from Let
+- Need to decide:
+  + How to substitute within functions/calls
+  + How to interpret functions/calls
+*** Syntax and Parsing
+- ~{lam {SYMBOL} <expr>}~
+  + ~{lam {x} body}~ is anonymous function with argument ~x~ and body ~body~
+  + ~lam~ instead of lambda to distinguish Curly vs Flit
+#+begin_src racket
+(define (parse s-expr)
+  (cond
+    ....
+    [(s-exp-match? `{lam {SYMBOL} ANY} s)
+     (lamS (s-exp->symbol
+              (first (s-exp->list
+                        (second (s-exp->list s)))))
+           (parse (third (s-exp->list s))))]))
+#+end_src
+*** Parsing Calls
+- Function application
+  + Another name for function calls
+- Same as before, but now we need to allow any expression in function position, not just symbols
+  + Has to be the last case in the parser
+  + Parse as function call if first thing in ~{...}~ is not a keyword
+#+begin_src racket
+[(s-exp-match? `{ANY ANY} s)
+     (appS (parse (first (s-exp->list s))
+               (parse (second (s-exp->list s))))]
+#+end_src
+*** Lambdas in our ASTs
+#+begin_src racket
+(define-type Exp
+  ....
+  (lamE [arg : Symbol]
+       [body : Expr]))
+  (appE [fun : Exp]
+        [arg : Exp])
+#+end_src
+- Similar for ~ExpS~
+*** Functions as Values
+- Add a function constructor
+#+begin_src racket
+(define-type Value
+  (numV [num : Number])
+  (boolV [b : Boolean])
+  (lamV [arg : Symbol]
+        [body : Expr]))
+#+end_src
+- The result of interpretation is called a /value/
+  + Number, or a function
+  + Function stores the info we need to call it
+*** Functions as Internalized Expressions
+- Notice that ~lamE~ and ~lamV~ have the /exact/ same fields
+  + First-class functions functions in Curly let us treat /expressions/ as values
+    - A computation to be performed later
+    - In some other context
+- The value of a function is the code to be run later
+*** Substitution for Calls and Lambda
+- ~appE~ works just like plus, times, etc.
+  + Doesn't bind anything, so we just substitute in the parts
+- ~lamE~ binds its variable
+  + Similar to ~let1~
+- Don't substitute in a Lambda body if the variable we're replacing matches the function variable
+  + Ensures that the function variable shadows any previous declarations
+#+begin_src racket
+(define (subst [toReplace : Symbol]
+               [replacedBy : Expr]
+               [replaceIn : Expr]) : Expr
+  (type-case Exp replaceIn
+  ....
+    [(lamE var body)
+       (lamE var
+         (if (symbol=? var toReplace)
+             body
+             (subst toReplace replacedBy body)))]
+  ))
+#+end_src
+*** Evaluating Functions
+#+begin_src racket
+(define (interp expr)
+  (type-case Exp interp
+     ....
+     [(lamE x body)
+       (lamV x body)] ))
+#+end_src
+- Nothing to do to turn function into a value
+  + Just package up the data in the Value type
+  + Store the expression to be evaluated later
+*** Calls
+#+begin_src racket
+(define (interp expr)
+  (type-case Exp interp
+    [(appE fun arg)
+       (type-case Value (interp fun)
+         [(lamV var body)
+            (let* ([argExp (Value->Exp (interp arg))]
+                   [subbedBody (subst var argExp body)])
+              (interp subbedBody))]
+         [else
+            (error 'interp "Tried to call non-function")])]
+#+end_src
+- The thing we're calling might not be a Lambda /yet/
+  + So we evaluate it recursively
+  + Dynamic check that result is a function
+- Then, we have a ~lamV~ and an argument expression
+  + Evaluate the argument
+  + Replace the function variable with the argument
+  + Finally, evaluate the substituted body
+*** Example
+#+begin_src racket
+{let1 {double {lam x {* 2 x}}}
+      {+ 3 {double 5}}}
+#+end_src
+- We'll write in syntax, but ~interp~ works with AST
+- ~{{+ 3 {{lam x {* 2 x}} 5}}}~
+  + Substitution from interpreting ~let1~
+  + 3 evaluates to itself (e.g. ~(numV 3)~)
+-  ~{+ 3 {{lam x {* 2 x}} 5}}~
+  + Lambda evaluates to ~(lamV 'x (timesE ...))~
+  + 5 evaluates to ~numV 5~
+  + Substitution: replace ~x~ with ~5~ in ~{* 2 x}~
+- ~{+ 3 {* 2 5}}~
+  + There was computation left to do in the function body
+    - Why ~interp~ the body when interpreting a call
+  + Get ~{+ 3 10}~, finally ~(numV 30)~
+
+*** Capturing the environment
+- Functions might contain /free variables/
+  + Variables that are not bound/defined by the function itself
+- Subst /will/ replace those variables when concrete values are given
+  #+begin_src racket
+  {letvar
+     f {lam {x} {lam {y} {+ x y}}}
+     {f 3}}
+  #+end_src
+  - For any ~x~, ~f~ produces another function that adds its argument to ~x~
+  - ~x~ is /free/ in ~{lam {y} {+ x y}}~
+  - Interp replaces ~f~ with the fun
+  - Calling ~f~ with ~3~ replaces ~x~ with ~3~
+    + Result: ~{lam {y} {+ 3 y}}~
+    + e.g. The function that adds 3 to its argument
+  - Substitution lets us build new functions at run time based on values to other functions
+
+*** Our Language Is Now Turing Complete!
+- Curly-Lambda can simulate every computer program ever written
+  + Not counting syscalls, IO, networking, effects, etc.
+- Just because we /can/ write an equivalent Curly-Lambda program, doesn't mean it's easy/succinct
+- We can now write Curly-Lambda programs that run forever
+#+begin_src racket
+{let1 f {lam x {x x}}
+  {f f}}
+#+end_src
+- Replaces ~f~ with ~{{lam {x} {x x}} {lam x {x x}}}~ calling itself
+- Function call: takes body ~{x x}~, replaces ~x~ with argument ~{lam {x} {x x}}~
+- Result is ~{{lam {x} {x x}} {lam {x} {x x}}}~, exactly what we started with!
+- ~interp~ runs forever
+*** A First Taste of Laziness
+- How we implement ~if~ really matters now
+  + Code might run forever
+  + Don't want to run code in the branch we don't take
+- What if we did this?
+  #+begin_src racket
+  ;; BAD! Don't do this
+  (define (interp expr
+    (type-case Exp expr
+        [(cndE test thn els)
+        (let ([thenVal (interp thn)]
+              [elseVal (interl els)])
+          (if (= 0 (checkAndGetNum (interp test)))
+                 thenVal
+                 elseVal))])))
+  (run `{if {zero? 0}
+             {+ 1 1}
+             {let1 f {lam x {x x}} {f f}}})
+  #+end_src
+- Loops because it evaluates the untaken branch
+
+
+* Lazy Evaluation
+:PROPERTIES:
+:EXPORT_FILE_NAME: pdf/slides013-lazy.pdf
+:header-args:racket: :results code :lang flit
+:CUSTOM_ID: lazy-evaluation
+:END:
+#+beamer: \beamerdefaultoverlayspecification{<+->}
+** Lazy Evaluation
+:PROPERTIES:
+:CUSTOM_ID: lazy-evaluation-0
+:END:
+*** Overview
+- Objectives
+  + To understand the design space of evaluation order
+- Key Concepts
+  + Lazy evaluation
+  + Strict evaluation
+  + Strictness points
+  + Thunks
+*** The Type of Substitution
+- We could replace a variable with /any expression/ in substitution
+  + Doesn't have to be a value
+#+begin_src racket
+(define (subst [toReplace : Symbol]
+               [replacedBy : Exp]
+               [replaceIn : Exp]) : Exp ....)
+#+end_src
+*** Substituting Expressions vs. Values
+#+begin_src racket
+(define (interp expr)
+  (type-case Exp interp
+  ....
+    [(appE fun arg)
+       (type-case Value (interp fun)
+         [(lamV var body)
+            (let* ([argExp (Value->Exp (interp arg))]
+                   [subbedBody (subst var argExp body)])
+              (interp subbedBody))]
+         [else
+            (error 'interp "Tried to call non-function")])]
+#+end_src
+- We evaluate the argument before substituting it into the function body
+  + Why do we have to do this?
+  + We don't
+*** Substitution-Based Lazy Evaluation
+#+begin_src racket
+(define (interp expr)
+  (type-case Exp interp
+  ....
+    [(appE fun arg)
+       (type-case Value (interp fun)
+         [(lamV var body)
+            (let* ([subbedBody (subst var arg body)])
+              (interp subbedBody))]
+         [else
+            (error 'interp "Tried to call non-function")])]
+#+end_src
+- Don't interpret argument to a value before substituting it
+- Works just as well, /but we get different behaviour/
+*** Classifying Languages
+- Many ways to classify programming languages
+- Sometimes presence/absence of features
+  + e.g. has lambda, mutable variables, objects, etc.
+- Others, there are /design choices/ which every language must make
+  + Lazy vs. Strict is one
+  + We'll see more
+*** Strict vs. Lazy Semantics
+- *Strict evaluation order* is when we evaluate function arguments to a value before substituting them into the function body
+  + Also called *eager* semantics
+- *Lazy evaluation order* is when we don't evaluate function parameters before substituting them into function bodies
+*** Differences between Lazy and Strict
+
+- In a language with no side effects:
+  + Lazy and strict produce /the exact same results/ with strict and lazy semantics
+- Difference is with side-effects
+  + Lazy: some code might run later
+    - Or not run at all
+- If strict succeeds, lazy succeeds
+- Sometimes, strict fails but lazy succeeds
+*** Example: Error
+#+begin_src racket
+{let1 f {lam x {lam y {if {zero? x} y x}}}
+        {{f #t} {+ 3 #t}}}
+#+end_src
+- Strict evaluation:
+  + Evaluates ~{+ 3 #t}~ before substituting it in the function body
+  + Raises an error because it's undefined
+- Lazy: no error
+  + Replaces ~y~ with ~{+ 3 #t}~ /without evaluating/
+  + When we substitute, it only ends up in the branch of the ~if~ that we don't take
+*** Example: Loop
+#+begin_src racket
+{let1 f {lam x {lam y {if {zero? x} y {* x 2}}}}
+        {{f 3}
+           {{lam x {x x}} {lam x {x x}}}
+           }}
+#+end_src
+- ~{{lam x {x x}} {lam x {x x}}}~ runs forever
+- Strict evaluation:
+  + Evaluates the argument that runs forever
+  + never gets to substituting
+- Terminates with lazy evaluation
+  + Never evaluate the function calling itself
+  + When substitute, it only ends up in the branch of the ~if~ that we don't take
+*** The General Rule
+- For function calls
+  + Lazy: substitute the argument /expression/ into the body, then evaluate the body
+  + Strict: evaluate the argument to a value, then substitute into the body, then evaluate the body
+*** Non-Function Recursion
+- Recall: with recursion, we needed to have all recursive references in the body of a lambda
+- With lazy evaluation, we don't need this, because we won't try to evaluate the variable
+- Lets us define *infinite data structures* using recursion
+  + As long as we only ever access a finite part of the structure, program will terminate
+  + e.g. "the list of all natural numbers"
+- See Racket examples in ~lazy.rkt~
+*** Strictness Points
+- Some features /had/ to evaluate their arguments before using them
+  + e.g. the number we're testing in ~if~
+    - Can't progress until it's a value
+  + These are /strictness points/
+    - Places an un-evaluated argument will be evaluated
+- Include
+  + Boolean tested in ~if~
+  + Arguments to plus or times
+  + The /function/ in a function call
+    - not the argument
+*** Laziness in real languages
+- Python and JavaScript have /generators/
+  + A structure we can iterate from, that doesn't generate the entire list we're going through
+  + This is basically just a lazy list, implemented similar way
+- Can probably do something similar with iterators in C++
+*** Laziness via lambda
+- We can simulate laziness in an eager language using just functions
+- A function that ignores its argument acts like a lazy value
+  + To force it back to a value, you call it with any value
+*** Laziness via lambda example
+#+begin_src racket
+{let1 f {lam x {lam y {if {zero? z} {y 0} {* x 2}}}}
+        {{f 3} {lam {x} {+ x #t}}}}
+#+end_src
+- Plus of boolean behind a lambda, so no error
+  + Function body stored as /expression/
+  + Never run unless function called
+  + Only called in un-taken ~if~ branch
+- In strict language, has the same behaviour as the lazy version
+
 * Environments, Binding, and Scope :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides015-environments.pdf
@@ -4353,7 +4694,7 @@ emptyEnv
 (define (interp [env : Env]
                 [defs : (Listof FunDef)]
                 [e : Expr] ) : Number
-  (type-case Expr e
+  (type-case Exp e
              ....))
 #+end_src
 *** Case: Plus etc.
@@ -4423,16 +4764,16 @@ emptyEnv
 *** Curly-Let
 - New language: Curly-Let
 - Curly-Fundef, but with one new feature
-  + ~{letvar x e1 e2}~
+  + ~{let1 x e1 e2}~
     - Gives ~x~ the value ~e1~ in the expression ~e2~
-    - Called letvar so we don't confuse with Flit
+    - Called let1 so we don't confuse with Flit
 - We'll implement with both substitution and environments
 
 *** Abstract Syntax
 #+begin_src racket
 (type-def Expr
   ....
-  [(Letvar [x : Symbol]
+  [(Let1 [x : Symbol]
            [xval : Expr]
            [body : Expr])]
           )
@@ -4449,24 +4790,24 @@ emptyEnv
 #+begin_src racket
 (define (interp [defs : (Listof FunDef)] ;;NEW
                 [e : Expr] ) : Number
-  (type-case Expr e
+  (type-case Exp e
         ;; ....
-     [(LetVar x xexp body)
+     [(Let1 x xexp body)
         (interp defs (subst x (NumLit (interp defs xexp)) body))])
 #+end_src
 
 
 *** Substituting in a Let Expression
-- ~{letvar x e1 e2}~ /binds/ ~x~ in e2
+- ~{let1 x e1 e2}~ /binds/ ~x~ in e2
 - So when substituting in ~e2~ we don't ever replace x
 - Implements shadowing
 #+begin_src racket
 (define (subst [toReplace : Symbol]
                [replacedBy : Expr]
                [replaceIn : Expr]) : Expr
-  (type-case Expr replaceIn
-    [(LetVar x xexp body)
-       (LetVar x
+  (type-case Exp replaceIn
+    [(Let1 x xexp body)
+       (Let1 x
                (subst toReplace replacedBy xexp)
                (if (symbol=? x toReplace)
                    body
@@ -4481,9 +4822,9 @@ emptyEnv
 (define (interp [env : Env]
                 [defs : (Listof FunDef)]
                 [e : Expr] ) : Number
-  (type-case Expr e
+  (type-case Exp e
         ;; ....
-     [(Letvar x xexp body)
+     [(Let1 x xexp body)
       (let ([xval (interp env defs xexp)])
         (interp (extendEnv (bind x xval) env)
                 defs body))])
@@ -4515,7 +4856,7 @@ emptyEnv
   + When finished eval, Flit returns is to part waiting for the result
 
 *** Shadowing Example
-- ~{letvar x 3 {letvar x 4 {+ 3 x}}}~
+- ~{let1 x 3 {let1 x 4 {+ 3 x}}}~
   + Looks at most recent definition
   + So should be 7
 - Substitution: ~subst~ doesn't replace ~x~ in ~{+ 3 x}~ because it is bound
@@ -4528,271 +4869,6 @@ emptyEnv
 - Decisions *are made concrete* in the implementation
   + Behavior of ~subst~ on bound variables
   + What environment ~interp~ is passed for function bodies
-
-* Implementing Lambdas with Substitution and Dynamic Typing :noexport:
-:PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides012-dyntype.pdf
-:header-args:racket: :results code :lang flit
-:CUSTOM_ID: implementing-lambdas-with-substitution-and-dynamic-typing
-:END:
-#+beamer: \beamerdefaultoverlayspecification{<+->}
-** Broad Strategy
-:PROPERTIES:
-:CUSTOM_ID: broad-strategy
-:END:
-*** Implementation Strategy
-- In some ways, it's /easier/ to implement first-class functions with substitution than top-level functions
-  + We can get rid of the whole list-of-definitions
-  + Functions as a value: function carries a parameter name and a variable body
-- Non-trivial parts:
-  + Now we have /two/ possible kinds of values
-  + Functions are not numbers
-  + Need to implement *dynamic typing*
-*** Syntax and Parsing
-- ~{fun {SYMBOL} <expr>}~
-  + ~{fun {x} body}~ is anonymous function with argument ~x~ and body ~body~
-  + fun instead of lambda to distinguish Curly vs Flit
-#+begin_src racket
-(define (parse s-expr)
-  (cond
-    ....
-    [(s-exp-match? `{fun {SYMBOL} ANY} s)
-     (SurfFun (s-exp->symbol
-              (first (s-exp->list
-                        (second (s-exp->list s)))))
-           (parse (third (s-exp->list s))))]))
-#+end_src
-*** Parsing Calls
-- Same as before, but now we need to allow any expression in function position, not just symbols
-#+begin_src racket
-[(s-exp-match? `{ANY ANY} s)
-     (SurfCall (parse (first (s-exp->list s))
-               (parse (second (s-exp->list s))))]
-#+end_src
-*** The Value Type
-#+begin_src racket
-(define-type Value
-  (NumV [num : Number])
-  (FunV [arg : Symbol]
-        [body : Expr]))
-#+end_src
-
-- The result of interpretation is called a /value/
-  + Number, or a function
-  + Function stores the info we need to call it
-*** Lambdas in our ASTs
-#+begin_src racket
-(define-type Expr
-  ....
-  (Fun [arg : Symbol]
-       [body : Expr]))
-#+end_src
-- Similar for ~ExpS~
-- Notice that ~Fun~ and ~FunV~ have the /exact/ same fields
-  + Functions /are/ values
-  + A function is saying "here's a computation to do later", so once we've got a Lambda, there's no more evaluation to do
-  + We'll see more of this for ~interp~
-*** Values to Expressions
-- We're going to need to substitute values into expressions
-  + But ~subst~ works on expressions, not values
-#+begin_src racket
-(define (value->expr [v : Value]) : Expr
-  (type-case Value v
-             [(NumV v) (NumLit v)]
-             [(FunV x body) (Fun x body)]))
-#+end_src
-- ~Value~ is /embedded/ in ~Expr~
-  + Want  ~(interp (value->expr v))~ to produce ~v~
-- Not actually doing any computation, just changing the constructors
-  so the type checker is happy
-- In a more sophisticated implementation language, we could make values a /subtype/ of expressions, but that's beyond this course
-*** Substitution for Calls
-- Needs to substitute in function and body
-*** Substitution for Lambda
-- Fun binds its variable
-  + Similar to LetVar
-- Don't substitute in a Lambda body if the variable we're replacing matches the function variable
-  + Ensures that the function variable shadows any previous declarations
-#+begin_src racket
-(define (subst [toReplace : Symbol]
-               [replacedBy : Expr]
-               [replaceIn : Expr]) : Expr
-  (type-case Expr replaceIn
-  ....
-  [(Fun x body)
-     ;; Don't substitute if variable is shadowed
-     (if (symbol=? x toReplace)
-         (Fun x body)
-         (Fun x (subst toReplace replacedBy body)))]
-  ))
-#+end_src
-*** The Problem: Interpretation
-- We want ~interp~ to produce a ~Value~
-  + So that we can produce functions as the result of expressions
-- Our previous interpreter assumed that ~interp~ always returned a number
-- We need to introduce *dynamic type checking* in Curly-Fun
-*** Aside: Type-Based Refactoring
-- We can use the Flit type inference to help us write our implementation
-- Change ~interp~ to produce ~Value~ instead of ~Number~
-- The type-checker sees an error
-- Repeat until there are no type errors:
-  + Go to the first type error
-  + Change the code to have the right type
-    - Wrap numeric results in ~NumV~
-    - Perform dynamic type checks to extract fields
-*** Dynamic Typing
-- Curly now has two different types of things, ~FunV~ and ~NumV~
-- It's possible
-- /Dynamic type checking/ checks that the inputs to an operation are valid before running that operation
-  + Make sure that Plus and Times are only given numbers
-  + Make sure that the condition of ~if0~ is a number
-  + Make sure the thing in a Call is actually a function
-- /Dynamic/ because we check /while the program is running/
-  + If we checked before it ran, it would be /static type checking/
-*** Type Safety
-- Racket is pretty safe
-  + Can't write to arbitrary memory
-- In other languages like C++, type errors (e.g. improper casts) can lead to safety issues, security bugs, etc.
-- Curly is safe because Racket is, but we'll define our own notion of "type safety":
-  + Want to raise an error with an informative message when a Curly program performs a type-unsafe operation, instead of a generic Racket error message
-  + e.g. Dynamic type checks make sure that our interpreter, rather than Racket's built in functions, discover the error
-  + Good practice for programming in less safe languages
-*** Defining some helper functions
-#+begin_src racket
-(define (checkAndGetNum [v : Value]) : Number
-  (type-case Value v
-     [(NumV n) n]
-     [else
-     (error 'curlyTypeError
-             (string-append "Expected Number, got function:"
-                             (to-string v)))]))
-(define (checkAndGetFun [v : Value]) : (Symbol * Expr)
-  (type-case Value v
-     [(FunV x body)
-      (pair x body)]
-     [else
-     (error 'curlyTypeError
-             (string-append "Expected Function, got number:"
-                             (to-string v)))]))
-#+end_src
-- Lets us turn a Value into Number/Function
-  + Better error-message than e.g. ~NumV-num~ gives
-*** Evaluating Functions
-#+begin_src racket
-(define (interp expr)
-  (type-case Expr interp
-     ....
-     [(Fun x body)
-       (FunV x body)] ))
-#+end_src
-- Interp no longer needs a list of function definitions
-  + Can use let + lambda for the same effect
-- Nothing to do to turn function into a value
-  + Just package up the data in the Value type
-*** Calls
-#+begin_src racket
-(define (interp expr)
-  (type-case Expr interp
-  ....
-    [(Call funExpr argExpr)
-      (let* ([argVal (interp argExpr)]
-             [funVal (checkAndGetFun (interp funExpr))]
-             [funParam (fst funVal)]
-             [funBody (snd funVal)]))
-        (interp (subst funParam
-                       (value->expr argVal )
-                       funBody))] ))
-#+end_src
-- Mostly the same as for Curly-Fundef
-  + Except don't have to look up the function body + param
-- The thing we're calling might not be a Lambda /yet/
-  + So we evaluate it recursively
-  + Do a dynamic type check to make sure the result is a function, not a number
-
-*** Capturing the environment
-- Functions might contain /free variables/
-  + Variables that are not bound/defined by the function itself
-- Subst /will/ replace those variables when concrete values are given
-  #+begin_src racket
-  {letvar
-     f {fun {x} {fun {y} {+ x y}}}
-     {f 3}}
-  #+end_src
-  - For any ~x~, ~f~ produces another function that adds its argument to ~x~
-  - ~x~ is /free/ in ~{fun {y} {+ x y}}~
-  - Interp replaces ~f~ with the fun
-  - Calling ~f~ with ~3~ replaces ~x~ with ~3~
-    + Result: ~{fun {y} {+ 3 y}}~
-    + e.g. The function that adds 3 to its argument
-  - Substitution lets us build new functions at run time based on values to other functions
-
-*** Fixing the rest of the interpreter
-- Need to change operations to use Value instead of Number
-  + Mostly just adding calls to ~checkAndGetNum~
-  + See in-class file / Curly-Lambda for full details
-- Don't need to change If0 branches or Let, since they don't do numeric operations
-   + Can have an if that produces a function
-#+begin_src racket
-(define (interp expr)
-  (type-case Expr expr
-        [(If0 test thn els)
-           (let ([testNum (checkAndGetNum (interp test))])
-             (if (= 0 testNum)
-                 (interp thn)
-                 (interp els)))]))
-#+end_src
-*** A Helpful Higher Order Function
-#+begin_src racket
-(define (liftVal2 [f : (Number Number -> Number)]
-                  [x : Value]
-                  [y : Value]) : Value
-  (let ([nx (checkAndGetNum x)]
-        [ny (checkAndGetNum y)])
-    (NumV (f nx ny))))
-#+end_src
-- Then can write:
-  #+begin_src racket
-(define (interp expr)
-  (type-case Expr expr
-     [(Plus l r)
-       (liftVal2 + (interp l) (interp r))]
-     [(Times l r)
-       (liftVal2 * (interp l) (interp r))]))
-
-  #+end_src
-*** Our Language Is Now Turing Complete!
-- Curly-Lambda can simulate every computer program ever written
-  + Not counting syscalls, IO, networking, effects, etc.
-- Just because we /can/ write an equivalent Curly-Lambda program, doesn't mean it's easy/succinct
-- We can now write Curly-Lambda programs that run forever
-#+begin_src racket
-{letvar f {fun x {x x}}
-  {f f}}
-#+end_src
-- Replaces ~f~ with ~{{fun {x} {x x}} {fun x {x x}}}~ calling itself
-- Function call: takes body ~{x x}~, replaces ~x~ with argument ~{fun {x} {x x}}~
-- Result is ~{{fun {x} {x x}} {fun {x} {x x}}}~, exactly what we started with!
-- ~interp~ runs forever
-*** A First Taste of Laziness
-- How we implement ~if0~ really matters now
-  + Code might run forever
-  + Don't want to run code in the branch we don't take
-- What if we did this?
-  #+begin_src racket
-  ;; BAD! Don't do this
-  (define (interp expr
-    (type-case Expr expr
-        [(If0 test thn els)
-        (let ([thenVal (interp thn)]
-              [elseVal (interl els)])
-          (if (= 0 (checkAndGetNum (interp test)))
-                 thenVal
-                 elseVal))])))
-  (run `{if0 0
-             {+ 1 1}
-             {letvar f {fun x {x x}} {f f}}})
-  #+end_src
-- Loops because it evaluates the untaken branch
 
 * Implementing Lambdas with Environments: Closures :noexport:
 :PROPERTIES:
@@ -4843,18 +4919,18 @@ emptyEnv
   +  Functions consist of their argument and the body to execute
 #+begin_src racket
 (define-type Value
-  (NumV [num : Number])
-  (FunV [arg : Symbol]
+  (numV [num : Number])
+  (lamV [arg : Symbol]
         [body : Expr]))
 #+end_src
 *** A Wrong First Attempt: Functions Interp
 - As a first attempt, try building functions just like in substitition version
 #+begin_src racket
 (define (interp env expr)
-  (type-case Expr interp
+  (type-case Exp interp
      ....
      [(Fun x body)
-       (FunV x body)] ))
+       (lamV x body)] ))
 #+end_src
 *** A Wrong First Attempt: Calls Interp
 - Just like before
@@ -4863,7 +4939,7 @@ emptyEnv
 - Interpret function body in the environment with the parameter bound to the argument's value
 #+begin_src racket
 (define (interp env expr)
-  (type-case Expr interp
+  (type-case Exp interp
   ....
     [(Call funExpr argExpr)
       (let* ([argVal (interp argExpr)]
@@ -4894,8 +4970,8 @@ emptyEnv
 - Value version of functions contains an environment in addition to its variable and body
 #+begin_src racket
 (define-type Value
-  (NumV [num : Number])
-  ;; Like FunV but with an environment
+  (numV [num : Number])
+  ;; Like lamV but with an environment
   (ClosureV [arg : Symbol]
             [body : Expr]
             [env : Env]))
@@ -4918,7 +4994,7 @@ emptyEnv
   + For top-level functions, this is the empty environment
 #+begin_src racket
 (define (interp env expr)
-  (type-case Expr interp
+  (type-case Exp interp
      ....
      [(Fun x body)
        (ClosureV x body env) ;;<------
@@ -4930,7 +5006,7 @@ emptyEnv
 
 #+begin_src racket
 (define (interp env expr)
-  (type-case Expr interp
+  (type-case Exp interp
   ....
     [(Call funExpr argExpr)
       (let* ([argVal (interp argExpr)]
@@ -4949,48 +5025,48 @@ emptyEnv
 - Dynamic scope gives variables values from the environment when the function was /called/
 *** Example: Static Scope
 #+begin_src racket
-{letvar double {fun {x} {* x 2}}
-  {letvar quadruple {fun {y} {double {double y}}}
-    {letvar double 2
+{let1 double {lam {x} {* x 2}}
+  {let1 quadruple {lam {y} {double {double y}}}
+    {let1 double 2
       {quadruple 3}}}}
 #+end_src
-- ~{fun {y} {double {double x}}}~ has one free variable, ~double~
+- ~{lam {y} {double {double x}}}~ has one free variable, ~double~
   + Functions and variables are in /the same namespace/ in Curly-Lambda
-- ~{fun {y} {double {double x}}}~ evaluates to closure
+- ~{lam {y} {double {double x}}}~ evaluates to closure
   + Body is ~{double {double x}}~
-  + Env is ~double := {fun {x} {* x 2}}~
+  + Env is ~double := {lam {x} {* x 2}}~
 - Env at call:
   + ~double := 2~
-  + ~quadruple := {fun {y} {double {double x}}}~
-  + ~double := {fun {x} {* x 2}}~
+  + ~quadruple := {lam {y} {double {double x}}}~
+  + ~double := {lam {x} {* x 2}}~
 *** Example: Static Scope ctd
 #+begin_src racket
-{letvar double {fun {x} {* x 2}}
-  {letvar quadruple {fun {y} {double {double x}}}
-    {letvar double 2
+{let1 double {lam {x} {* x 2}}
+  {let1 quadruple {lam {y} {double {double x}}}
+    {let1 double 2
       {quadruple 3}}}}
 #+end_src
 - Call evaluates ~quadruple~ to closure
 - Finally evaluates ~{double {double x}}~
   + In extended closure environment:
     - ~x := 3~
-    - ~double := {fun {x} {* x 2}}~
+    - ~double := {lam {x} {* x 2}}~
 - Result is 12
 *** Example: Dynamic Scope
 #+begin_src racket
-{letvar double {fun {x} {* x 2}}
-  {letvar quadruple {fun {y} {double {double x}}}
-    {letvar double 2
+{let1 double {lam {x} {* x 2}}
+  {let1 quadruple {lam {y} {double {double x}}}
+    {let1 double 2
       {quadruple 3}}}}
 #+end_src
-- ~{fun {y} {double {double x}}}~ evaluates to closure
+- ~{lam {y} {double {double x}}}~ evaluates to closure
   + Doesn't save environment
 - Call evaluates ~{double {double x}}~
   + In extended /call site/ environment:
     - ~x := 3~
     - ~double := 2~
-    - ~quadruple := {fun {y} {double {double x}}}~
-    - ~double := {fun {x} {* x 2}}~
+    - ~quadruple := {lam {y} {double {double x}}}~
+    - ~double := {lam {x} {* x 2}}~
 - Dynamic type error
   + Can't call 2 as a function
 ** But Professor, When Will I Ever Use This?
@@ -5076,130 +5152,6 @@ myFunction().then(
   #+end_src
 - This is all just lambda with different syntax
 
-* Midterm Review :noexport:
-:PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides014-midterm-review.pdf
-:header-args:racket: :results code :lang flit
-:CUSTOM_ID: midterm-review
-:END:
-#+beamer: \beamerdefaultoverlayspecification{<+->}
-** Overview
-:PROPERTIES:
-:CUSTOM_ID: overview-2
-:END:
-*** The Road So Far
-- Functional programming
-  + Recursion and datatypes
-  + Higher-order functions and lambdas
-- Interpreters
-  + Parsing basics and syntax trees
-  + Arithmetic via recursion on the AST
-  + Adding conditionals: If0
-  + Adding syntactic sugar
-    - Now have Surface AST and Core AST
-    - ~elab~ translates from surface to core
-    - Expresses some features in terms of other ones
-  + Adding functions
-    - Substitution
-    - Environments
-  + Adding variables
-    - Let via substitution
-    - Let via environment extension
-  + First-class functions
-    - Dynamic typing
-    - Closures and environments
-**  Functional Programming Concepts
-:PROPERTIES:
-:CUSTOM_ID: functional-programming-concepts
-:END:
-*** Functional Programming
-- Functions /in the mathematical sense/
-  + Same input always produces same output
-- Variables are /immutable/
-  + Once a variable has a value, it keeps that value for its entire scope
-- The main method of iteration/repetition is recursion
-  + Not loops
-  + Explicit recursion: a function calling itself on different (smaller) arguments
-  + Higher-order functions: capture patterns of recursion that can be re-used many times
-*** Programming With Recursion 1: Shape
-- Identify the shape of the problem
-  + Types of inputs
-  + Types of outputs
-  + Other assumptions not expressible with types
-    - e.g. Can we assume numbers are integers? Positive? etc.
-    - e.g. Can we assume a list is non-empty
-- Now you can write tests, since you know what valid inputs are
-*** Programming With Recursion: Template
-- What are the cases you have to handle?
-  + Numbers: ~0~ vs. ~(+ n 1)~
-  + List: ~empty~ vs. ~(cons h t)~
-  + Datatype: each constructor
-- What are the sub-values for each case?
-  + List: head and tail for cons case
-  + Datatype: fields for that constructor
-- Write a template that looks at the input and has a placeholder for each case
-  + Numbers: branch using ~if~ or ~cond~
-  + Lists or datatype: branch using ~type-case~
-*** Programming With Recursion: Base vs Recursive Case
-- Figure out which cases are base cases and which are recursive cases
-  + Recursive case has a sub-value of input
-  + Might be many base cases for datatype
-    - E.g. in ~Expr~, ~Var x~ and ~NumLit n~ are both base cases
-- For the base case, figure out the solution for that case
-  + Depends on the problem you're looking at
-    - E.g. "If my input is 0, what should ~f 0~ be?"
-    - E.g. "If my list is empty, how do I apply a function to each element in it?"
-*** Programming With Recursion: Recursive Calls
-- Figure out what recursive calls you can make in the recursive cases
-- You can ALWAYS assume that the recursive call will produce the correct result
-  + Treat like a magic box that gives the right answer, but only for smaller values
-- Process:
-  + If a sub-value has the same type, can definitely use it as argument to recursive call
-  + Figure out values for other arguments
-    - Problem dependent
-    - E.g. What ~env~ do we pass in ~interp~?
-  + Might be helpful to use ~let*~ to store results of recursive calls in variables
-    - Can always delete if you don't end up using them in the solution
--
-*** Programming With Recursion: Putting It Together
-- Look at what you have in scope
-  + Fields/sub-values of the input
-  + Results of recursive calls
-  + Other arguments
-- Look at the types
-  + Lets you know what you have, and what you need build things together
-- If you don't have what you need, ask:
-  + Could I make a helper function to get what I need?
-    - Helper could also be recursive
-- Compute the result you need for the recursive cases
-  + Problem-specific
-*** Constructing a value of a given type
-- Look at the type of the thing you're trying to produce
-- You must build it using one of:
-  + A variable that is in scope
-  + A literal/constant
-    - e.g. ~4~ or ~#t~ or ~"hello"~
-  + A function or constructor application
-    - Each argument to the function must then be provided
-    - Look at their types and repeat this process
-- Which you choose depends on what you're trying to do
-** Higher Order Functions
-:PROPERTIES:
-:CUSTOM_ID: higher-order-functions-0
-:END:
-*** Designing Higher Order Functions
-- The process is the exact same
-  + Except sometimes you have inputs or outputs that are functions
-- Might use recursion if your input is recursive data
-  + e.g. List or datatype
-- Might not
-  + e.g. If you're writing ~comp : (('b -> 'c) ('a -> 'b) -> ('a -> 'c))~
-    there's nothing to deconstruct/recur on, so you just build the solution directly
-- Same advice applies:
-  + Look at the types of what's in scope
-  + Look at what you can build using what's in scope
-- The way to build a function is with ~lambda~
-
 * Currying and the Lambda Calculus :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides014-currying.pdf
@@ -5234,7 +5186,7 @@ myFunction().then(
 *** Achieving this: Currying
 - We can achieve this with nested lambda expressions
 #+begin_src racket
-{let f {fun {x} {fun {y} {fun {z} {+ x {* y z}}}}}
+{let f {lam {x} {lam {y} {lam {z} {+ x {* y z}}}}}
   ....}
 #+end_src
 - To call, we do nested calls
@@ -5242,8 +5194,8 @@ myFunction().then(
 {{{f 1} 2} 3}
 #+end_src
 - Step by step:
-  + ~f 1~ produces ~{fun {y} {fun {z} {+ 1 {* y z}}}}~
-  + Calling that on 2 produces ~{fun {z} {+ 1 {* 2 z}}}~
+  + ~f 1~ produces ~{lam {y} {lam {z} {+ 1 {* y z}}}}~
+  + Calling that on 2 produces ~{lam {z} {+ 1 {* 2 z}}}~
   + Calling that on 3 produces ~{+ 1 {* 2 3}}}~
     - Exactly what we want for ~{f 1 2 3}~
 *** Definition
@@ -5260,9 +5212,9 @@ myFunction().then(
 #+begin_src racket
 (define-type ExpS
 ....
- (SurfFun [xs : (Listof Symbol)]
+ (lamS [xs : (Listof Symbol)]
           [body : ExpS]))
- (SurfCall [fun : ExpS]
+ (appS [fun : ExpS]
            [args : (Listof ExpS)])
 #+end_src
 - Functions now take a list of variables
@@ -5273,13 +5225,13 @@ myFunction().then(
   (define (elab [surfExpr : ExpS])
     (type-case ExpS surfExpr
                ....
-     [(SurfFun xs body)
+     [(lamS xs body)
        (type-case (Listof Symbol) xs
          [empty
            (elab body)]
          [(cons x rest)
            ;; Could also do with a helper fn
-           (Fun x (elab (SurfFun rest body)))])]))
+           (Fun x (elab (lamS rest body)))])]))
 
   #+end_src
 - No arguments: just produce the body
@@ -5300,7 +5252,7 @@ myFunction().then(
   (define (elab [surfExpr : ExpS])
     (type-case ExpS surfExpr
                ....
-     [(SurfCall funExpr args)
+     [(appS funExpr args)
         (callHelper args (elab funExpr))]))
 
 #+end_src
@@ -5318,7 +5270,7 @@ myFunction().then(
   (define (elab [surfExpr : ExpS])
     (type-case ExpS surfExpr
                ....
-     [(SurfLetVar x xExpr body)
+     [(SurfLet1 x xExpr body)
         (Call (Fun x (elab body))
               (elab xExpr))]))
 #+end_src
@@ -5498,8 +5450,8 @@ myFunction().then(
   + Like C++ ~*x = expr;~
 *** Example
 #+begin_src racket
-{letvar x {box 3}
-  {letvar y x
+{let1 x {box 3}
+  {let1 y x
   {begin {set-box! y 10}
     {unbox x}}}}
 #+end_src
@@ -5597,7 +5549,7 @@ myFunction().then(
 (define (interp [env : Env]
                 [e : Expr]
                 [sto : Store]) : Result
-  (type-case Expr e
+  (type-case Exp e
    [(Plus l r)
      (type-case Result (interp l env sto)
        [(v*s v-l sto-l)
@@ -5636,7 +5588,7 @@ myFunction().then(
 (define (interp [env : Env]
                 [e : Expr]
                 [sto : Store]) : Result
-  (type-case Expr e
+  (type-case Exp e
     [(Plus l r)
      (with [(v-l sto-l) (interp l env sto)]
        (with [(v-r sto-r) (interp r env sto-l)]
@@ -5653,7 +5605,7 @@ myFunction().then(
   (ClosureV [arg : Symbol]
             [body : Expr]
             [env : Env])
-  (NumV [num : Number])
+  (numV [num : Number])
   (BoxV [loc : Location]))
 #+end_src
 *** Interpreting Box
@@ -5765,7 +5717,7 @@ myFunction().then(
 (define (interp [env : Env]
                 [e : Expr]
                 [sto : Store]) : Result
-  (type-case Expr e
+  (type-case Exp e
     [(Var x)
      (v*s (fetch (lookup x env) sto) sto)]
 ....))
@@ -5783,7 +5735,7 @@ myFunction().then(
   (define (interp [env : Env]
                 [e : Expr]
                 [sto : Store]) : Result
-  (type-case Expr e
+  (type-case Exp e
     [(Setvar! x e)
      (with ([e-val e-sto] (interp env e sto))
       (v*s e-val
@@ -5836,7 +5788,7 @@ myFunction().then(
 ;; Everything the same as pass-by-value
 ;; except we check if the argument is a variable
 ;; and use its location instead of the new one if it us
-(type-case Expr argExpr
+(type-case Exp argExpr
   [(Var x)
      (interp (extendEnv (bind argVar (lookup x env)) funEnv)
                   funBody
@@ -5853,8 +5805,8 @@ myFunction().then(
   + e.g. swap two variable's values
 *** Example
 #+begin_src racket
-{letvar y 2
-  {letvar f {fun {x} {begin
+{let1 y 2
+  {let1 f {lam {x} {begin
                        {set-var! x {* x 3}}
                        x}}
             {+ {f y} y}}}
@@ -5891,8 +5843,8 @@ myFunction().then(
 - Changes to one are seen in the other
 *** Example
 #+begin_src racket
-{letvar doublebox! {fun {x} {set-box! x {* 2 {unbox x}}}}
-  {letvar y 3
+{let1 doublebox! {lam {x} {set-box! x {* 2 {unbox x}}}}
+  {let1 y 3
             {begin {doublebox! {get-loc y}}
                    y}}}
 #+end_src
@@ -5955,7 +5907,7 @@ myFunction().then(
   (ClosureV [arg : Symbol]
             [body : Expr]
             [env : Env])
-  (NumV [num : Number])
+  (numV [num : Number])
   (BoxV [loc : Location])
   ;; NEW
   ;; Placeholder for implementing recursion
@@ -5967,7 +5919,7 @@ myFunction().then(
 (define (interp [env : Env]
                 [e : Expr]
                 [sto : Store]) : Result
-  (type-case Expr e
+  (type-case Exp e
    [(LetRec x xexpr body)
      (let* ([x-loc (new-loc sto)] ;; Location for x
             [dummy-sto ;; Put a dummy value at x's location
@@ -5986,7 +5938,7 @@ myFunction().then(
 #+end_src
 *** Example
 #+begin_src racket
-{letrec fact {fun {x}
+{letrec fact {lam {x}
                   {if0 x
                        1
                        {* x {fact {- x 1}}}}}
@@ -6026,7 +5978,7 @@ myFunction().then(
   + Store contains closure at location 0 ....
 *** Example (ct)
 #+begin_src racket
-{letrec fact {fun {x}
+{letrec fact {lam {x}
                   {if0 x
                        1
                        {* x {fact {- x 1}}}}}
@@ -6037,10 +5989,10 @@ myFunction().then(
 - ~3~ evaluates to ~(NumLit 3)~, ~fact~ evaluates to closure from location 0
 - Call evaluates closure body
   + Environment ~x := 1, fact := 0~
-  + Store ~0 ==> (ClosureV ....), 1 ==> (NumV 3)~
+  + Store ~0 ==> (ClosureV ....), 1 ==> (numV 3)~
 - ~If0~ in closure body goes to branch with call
 - ~fact~ in call evaluates to /the same closure/ at location 0
-  + Evaluation repeats, but with ~x~ bound to location with ~NumV 2~
+  + Evaluation repeats, but with ~x~ bound to location with ~numV 2~
   + Etc. until we reach 0 and don't have a recursive call
 *** Landin's Knot
 - This trick is generally applicable
@@ -6136,27 +6088,27 @@ myFunction().then(
   + Refers to the object that the method is being called on, so we can get e.g. field values from methods
 *** Example
 #+begin_src racket
-{letvar mkCircle
-        {fun {r}
+{let1 mkCircle
+        {lam {r}
              {object {{radius r}}
                      ;; All methods take one parameter,
                      ;; so we just ignore the parameter
                      {getArea {x} {* {get this radius}
                                      {* {get this radius} 3.14}}}}}
-        {letvar unitCircle {mkCircle 1}
+        {let1 unitCircle {mkCircle 1}
                 {send unitCircle getArea 0}}}
 #+end_src
 - Produces ~3.14~
 *** Example
 #+begin_src racket
-{letvar mkSquare
-        {fun {w}
+{let1 mkSquare
+        {lam {w}
              {object {{width w}}
                      ;; All methods take one parameter,
                      ;; so we just ignore the parameter
                      {getArea {x} {* {get this width}
                                      {get this width} }}}}
-        {letvar unitSquare {mkSquare 2}
+        {let1 unitSquare {mkSquare 2}
                 {send unitSquare getArea 0}}}
 #+end_src
 - Produces ~4~
@@ -6207,7 +6159,7 @@ myFunction().then(
 #+begin_src racket
 (define (interp [env : Env]
                 [e : Expr] : Value
-  (type-case Expr e
+  (type-case Exp e
     [(Object fields methods)
        ;; Each named field expression gets turned into a name-value pair
        (ObjV (map (lambda ([pr : (Symbol * Expr)])
@@ -6273,10 +6225,10 @@ myFunction().then(
 - Like ~self~ in Python, ~this~ in Java/C++/JS
 *** Example: OOP Lists
 #+begin_src racket
-{letvar empty {object {{length 0}}
+{let1 empty {object {{length 0}}
                       {{head {x} errorNoEmptyListHead}
                       {tail {x} this}}} ;; Note the self reference
-{letvar cons {fun {h t}
+{let1 cons {lam {h t}
                   {object {length {+ 1 {get t length}}}
                           {{head {x} h}
                           {tail {x} t}}}}
@@ -6295,152 +6247,18 @@ myFunction().then(
 - Object with a single "call" method
   + Equivalent to a first-class function
 #+begin_src racket
-{fun {x} body}
+{lam {x} body}
 #+end_src
 - Can even do recursion
 #+begin_src racket
 ;; factorial with objects
-{letvar fact
+{let1 fact
   {object {}
         {call {x}
           {if0 x
                1
                {* x {send this call {- x 1}}}}}}}
 #+end_src
-* Lazy Evaluation :noexport:
-:PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides019-lazy.pdf
-:header-args:racket: :results code :lang flit
-:CUSTOM_ID: lazy-evaluation
-:END:
-#+beamer: \beamerdefaultoverlayspecification{<+->}
-** Lazy Evaluation
-:PROPERTIES:
-:CUSTOM_ID: lazy-evaluation-0
-:END:
-*** Overview
-- Objectives
-  + To understand the design space of evaluation order
-- Key Concepts
-  + Lazy evaluation
-  + Strict evaluation
-  + Strictness points
-  + Thunks
-*** The Type of Substitution
-- We could replace a variable with /any expression/ in subsituttion
-  + Doesn't have to be a value
-#+begin_src racket
-(define (subst [toReplace : Symbol]
-               [replacedBy : Expr]
-               [replaceIn : Expr]) : Expr ....)
-#+end_src
-*** Substituting Expressions vs. Values
-- Think /waaaaayyyy/ back to our substitution-based Curly-Lambda interpreter
-#+begin_src racket
-(define (interp expr)
-  (type-case Expr interp
-  ....
-    [(Call funExpr argExpr)
-      (let* ([argVal (interp argExpr)]
-             [funVal (checkAndGetFun (interp funExpr))]
-             [funParam (fst funVal)]
-             [funBody (snd funVal)]))
-        (interp (subst funParam
-                       (value->expr argVal )
-                       funBody))] ))
-#+end_src
-- We evaluate the argument before substituting it into the function body
-  + Why do we have to do this?
-  + We don't
-*** Substitution-Based Lazy Evaluation
-#+begin_src racket
-(define (interp expr)
-  (type-case Expr interp
-  ....
-    [(Call funExpr argExpr)
-      (let* (;; Interpret the function to a value
-             [funVal (checkAndGetFun (interp funExpr))]
-             [funParam (fst funVal)]
-             [funBody (snd funVal)]))
-        ;; Substitute the parameter value into the function body
-        (interp (subst funParam
-                       argExpr ;; !! <-----------------------
-                       funBody))] ))
-#+end_src
-- Don't interpret argument to a value before substituting it
-- Works just as well, /but we get different behaviour/
-*** Strict vs. Lazy Semantics
-- *Strict evaluation order* is when we evaluate function arguments to a value before substituting them into the function body
-  + Also called *eager* semantics
-- *Lazy evaluation order* is when we don't evaluate function parameters before substituting them into function bodies
-- As long as a language has no mutable state, a program that runs successfully will produce /the exact same results/ with strict and lazy semantics
-  + However, some programs might fail with strict but succeed with lazy
-  + Some programs might run forever with strict, but terminate with lazy
-  + Opposite never true: if strict succeeds, then lazy does too
-*** Example: Error
-#+begin_src racket
-{letvar f {fun {x y} {if0 x y {* x 2}}}
-        {f 3 undefinedVariable}}
-#+end_src
-- Strict evaluation:
-  + Evaluates ~undefinedVariable~ before substituting it in the function body
-  + Raises an error because it's undefined
-- Doesn't raise an error with lazy evaluation
-  + We never evaluate ~undefinedVariable~
-  + When we substitute, it only ends up in the branch of the ~if0~ that we don't take
-*** Example: Loop
-#+begin_src racket
-{letvar f {fun {x y} {if0 x y {* x 2}}}
-        {f 3
-           {{fun {x} {x x}} {fun {x} {x x}}}
-           }}
-#+end_src
-- ~{{fun {x} {x x}} {fun {x} {x x}}}~ runs forever
-  + Midterm bonus
-- Strict evaluation:
-  + Evaluates the application that runs forever, never gets to substituting
-- Terminates with lazy evaluation
-  + We never evaluate the function calling itself
-  + When we substitute, it only ends up in the branch of the ~if0~ that we don't take
-*** The General Rule
-- For function calls
-  + Lazy: substitute the argument /expression/ into the body, then evaluate the body
-  + Strict: evaluate the argument to a value, then substitute into the body, then evaluate the body
-*** Non-Function Recursion
-- Recall: with recursion, we needed to have all recursive references in the body of a lambda
-- With lazy evaluation, we don't need this, because we won't try to evaluate the variable
-- Lets us define *infinite data structures* using recursion
-  + As long as we only ever access a finite part of the structure, program will terminate
-  + e.g. "the list of all natural numbers"
-- See Racket examples in ~lazy.rkt~
-*** Strictness Points
-- Some features /had/ to evaluate their arguments before using them
-  + e.g. the number we're testing in ~if0~
-    - Can't progress until it's a value
-  + These are /strictness points/
-    - Places an un-evaluated argument will be evaluated
-- Include
-  + Number tested in ~if0-
-  + Arguments to plus or times
-  + The /function/ in a function call
-    - not the argument
-*** Laziness in real languages
-- Python and JavaScript have /generators/
-  + A structure we can iterate from, that doesn't generate the entire list we're going through
-  + This is basically just a lazy list, implemented similar way
-- Can probably do something similar with iterators in C++
-*** Laziness via lambda
-- We can simulate laziness in an eager language using just functions
-- A function that ignores its argument acts like a lazy value
-  + To force it back to a value, you call it with any value
-*** Laziness via lambda example
-#+begin_src racket
-{letvar f {fun {x y} {if0 x {y 0} {* x 2}}}
-        {f 3 {fun {x} undefinedVariable}}}
-#+end_src
-- Undefined variable behind a lambda, so no error
-  + Closures store /expressions/, not values
-- In a strict language, this has the same behavior as the lazy version
 * Emacs Variables (please ignore) :noexport:
 Local Variables:
 org-latex-packages-alist: nil
