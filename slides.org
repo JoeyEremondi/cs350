@@ -3358,7 +3358,7 @@ for (int i = 0; i < N; i++){
  #+begin_src racket
 (define-type S-Expr
   (Identifier [x : Symbol])
-  (NumLit [n : Number]
+  (numE [n : Number]
   (BoolLit [b : Boolean]))
   ...
   (List [s-exps : (Listof S-Expr)]))
@@ -4271,14 +4271,14 @@ while (i < 10){
   + How to substitute within functions/calls
   + How to interpret functions/calls
 *** Syntax and Parsing
-- ~{lam {SYMBOL} <expr>}~
-  + ~{lam {x} body}~ is anonymous function with argument ~x~ and body ~body~
+- ~{lam SYMBOL <expr>}~
+  + ~{lam x body}~ is anonymous function with argument ~x~ and body ~body~
   + ~lam~ instead of lambda to distinguish Curly vs Flit
 #+begin_src racket
 (define (parse s-expr)
   (cond
     ....
-    [(s-exp-match? `{lam {SYMBOL} ANY} s)
+    [(s-exp-match? `{lam SYMBOL ANY} s)
      (lamS (s-exp->symbol
               (first (s-exp->list
                         (second (s-exp->list s)))))
@@ -4397,15 +4397,15 @@ while (i < 10){
   + Variables that are not bound/defined by the function itself
 - Subst /will/ replace those variables when concrete values are given
   #+begin_src racket
-  {letvar
-     f {lam {x} {lam {y} {+ x y}}}
+  {let1
+     f {lam x {lam y {+ x y}}}
      {f 3}}
   #+end_src
   - For any ~x~, ~f~ produces another function that adds its argument to ~x~
-  - ~x~ is /free/ in ~{lam {y} {+ x y}}~
+  - ~x~ is /free/ in ~{lam y {+ x y}}~
   - Interp replaces ~f~ with the fun
   - Calling ~f~ with ~3~ replaces ~x~ with ~3~
-    + Result: ~{lam {y} {+ 3 y}}~
+    + Result: ~{lam y {+ 3 y}}~
     + e.g. The function that adds 3 to its argument
   - Substitution lets us build new functions at run time based on values to other functions
 
@@ -4418,9 +4418,9 @@ while (i < 10){
 {let1 f {lam x {x x}}
   {f f}}
 #+end_src
-- Replaces ~f~ with ~{{lam {x} {x x}} {lam x {x x}}}~ calling itself
-- Function call: takes body ~{x x}~, replaces ~x~ with argument ~{lam {x} {x x}}~
-- Result is ~{{lam {x} {x x}} {lam {x} {x x}}}~, exactly what we started with!
+- Replaces ~f~ with ~{{lam x {x x}} {lam x {x x}}}~ calling itself
+- Function call: takes body ~{x x}~, replaces ~x~ with argument ~{lam x {x x}}~
+- Result is ~{{lam x {x x}} {lam x {x x}}}~, exactly what we started with!
 - ~interp~ runs forever
 *** A First Taste of Laziness
 - How we implement ~if~ really matters now
@@ -4442,6 +4442,7 @@ while (i < 10){
              {let1 f {lam x {x x}} {f f}}})
   #+end_src
 - Loops because it evaluates the untaken branch
+
 
 
 * Lazy Evaluation
@@ -4526,7 +4527,7 @@ while (i < 10){
 *** Example: Error
 #+begin_src racket
 {let1 f {lam x {lam y {if {zero? x} y x}}}
-        {{f #t} {+ 3 #t}}}
+        {{f 1} {+ 3 #t}}}
 #+end_src
 - Strict evaluation:
   + Evaluates ~{+ 3 #t}~ before substituting it in the function body
@@ -4582,13 +4583,247 @@ while (i < 10){
 *** Laziness via lambda example
 #+begin_src racket
 {let1 f {lam x {lam y {if {zero? z} {y 0} {* x 2}}}}
-        {{f 3} {lam {x} {+ x #t}}}}
+        {{f 3} {lam x {+ x #t}}}}
 #+end_src
 - Plus of boolean behind a lambda, so no error
   + Function body stored as /expression/
   + Never run unless function called
   + Only called in un-taken ~if~ branch
 - In strict language, has the same behaviour as the lazy version
+
+* Currying and the Lambda Calculus
+:PROPERTIES:
+:EXPORT_FILE_NAME: pdf/slides014-currying.pdf
+:header-args:racket: :results code :lang flit
+:CUSTOM_ID: currying-and-the-lambda-calculus
+:END:
+#+beamer: \beamerdefaultoverlayspecification{<+->}
+** Overview
+:PROPERTIES:
+:CUSTOM_ID: overview-3
+:END:
+*** Objectives
+- Learning Goals
+ - To learn how multi-argument functions can be
+   desugared into single-argument functions
+   + Curly-Curry
+ - To see that /everything/ can be desugared into single-argument functions
+   + by learning about the Lambda Calculus
+- Core Concepts
+  + Currying
+  + Lambda Calculus
+** Currying
+:PROPERTIES:
+:CUSTOM_ID: currying
+:END:
+*** Executing a multiple-argument function
+- Say we allow ~{lam {x y z} {+ x {* y z}}}~ in Curly
+- How can we interpret a call to this function?
+  + ~x,y,z~ replaced by concrete argument values (substitution)
+*** Achieving this: Currying
+- We can achieve this with nested lambda expressions
+#+begin_src racket
+{let f {lam x {lam y {lam z {+ x {* y z}}}}}
+  ....}
+#+end_src
+- To call, we do nested calls
+#+begin_src racket
+{{{f 1} 2} 3}
+#+end_src
+- Step by step:
+  + ~f 1~ produces ~{lam y {lam z {+ 1 {* y z}}}}~
+  + Calling that on 2 produces ~{lam z {+ 1 {* 2 z}}}~
+  + Calling that on 3 produces ~{+ 1 {* 2 3}}}~
+    - Exactly what we want for ~{f 1 2 3}~
+*** Definition
+#+attr_html: :width 100px
+#+attr_latex: :width 100px
+[[./img/HaskellBCurry.jpg]]
+- The approach of simulating multiple-argument functions with nested single-argument functions is called *Currying*
+  + Named after Haskell Curry, and American logician
+    - Also the namesake of the Haskell programming language
+- A function written in this style is /curried/
+*** Desugaring with Currying
+- We can add multiple-argument functions to our Surface Language /without/ changing
+  the core language
+  + Handle in ~desugar~
+*** AST for Multi-Argument Functions
+#+begin_src racket
+(define-type ExpS
+....
+ (lamS [xs : (Listof Symbol)]
+          [body : ExpS]))
+ (appS [fun : ExpS]
+           [args : (Listof ExpS)])
+#+end_src
+- Functions now take a list of variables
+- Calls now take a list of arguments
+*** Elaborating Multi-Argument Functions
+- ~lamE~ has type ~(Symbol Exp -> Exp)~
+  + Can use as argument to fold!
+  #+begin_src racket
+  (define (desugar [se : ExpS])
+    (type-case ExpS surfExpr
+               ....
+     [(lamS xs body)
+        (foldr lamE (elab body) xs)
+       ]))
+
+  #+end_src
+- No arguments: just produce the body
+- At least one argument: curry the rest of the arguments, and wrap the result in a lambda
+  +  ~(lamS '(x y z) body)~ becomes ~(lamS 'x (lamS 'y (lamS 'z body)))~
+*** Multi-Argument Calls
+- Function calls associate in the opposite direction
+  + So need to fold left
+#+begin_src racket
+  (define (desugar [surfExpr : ExpS])
+    (type-case ExpS surfExpr
+               ....
+     [(appS funExpr args)
+        (foldl appE (elab funExpr) args)]))
+
+  #+end_src
+- Given a list of argument to apply, build up one giant expression with nested calls
+- ~{f a b c}~ becomes ~{{{f a} b} c}~
+
+***  Putting Them Together
+- To run ~{{lam {x y z} body} a b c}~:
+  + Desugared into ~{{{{lam x {lam y {lam z body}}} a} b} c}~
+  + Interp makes ~(subst x a {lam y {lam z body}})~
+  + then  ~(subst x a (subst y b {lam z body}))~
+  + then  ~(subst x a (subst y b (subst z c body)))~
+
+*** A Word of Warning
+- Flit/Racket do /not/ use currying by default
+  + Multiple argument functions are /not/ desugared into single-argument ones
+- We can convert between curried and uncurried functions with combinators
+  + See lecture on Higher Order Functions
+- A 0-argument ~(lambda () e)~ is /NOT/ the same as ~e~ in Flit
+  + But it is in Curly, if we use this desugaring
+*** Another Desugaring: Let
+- Recall that ~let1~ let us define a local variable to have the value of some expression, that we could then use to build another expression
+- We can make ~let1~ syntactic sugar using lambda
+#+begin_src  racket
+  (define (desugar [surfExpr : ExpS])
+    (type-case ExpS surfExpr
+               ....
+     [(let1S x xExpr body)
+        (appE (lamE x (elab body))
+              (desugar xExpr))]))
+#+end_src
+- Define a function whose body is the body of the ~let1~
+- Immediately call it with the value we're giving to the defined variable
+- Does the exact same thing as Let1
+** Lambda The Ultimate
+:PROPERTIES:
+:CUSTOM_ID: lambda-the-ultimate
+:END:
+
+*** Functions As Sugar
+- So far we've seen that single argument functions can simulate
+  + Multi-argument functions
+  + Local variable definitions
+- What else can se simulate?
+- *NOTE* I won't ask about the following desugarings on an exam
+  + But they're an important introduction to the "science" of computer science
+    and the "mathematics" of informatics
+*** The Smallest Language We Can Imagine
+#+begin_src racket
+(define-type UTLC
+  ;; A variable
+  (Var [x : Symbol])
+  ;; Function application (call)
+  (App [fun : UTLC]
+       [arg : UTLC])
+  ;; Anonymous function (lambda)
+  (Lam [param : Symbol]
+       [body : UTCL]))
+#+end_src
+- Stands for "Un-Typed Lambda Calculus"
+- All you can do is define an anonymous function (lambda) or call a function (application)
+- *The Untyped Lambda Calculus is Turing Complete*
+  + Any program you can write, you can write an equivalent UTLC Program
+*** Interpreting the UTLC
+- Works just like we've seen so far
+  + ~Lam~ is like ~Fun~
+  + ~App~ is like ~Call~
+- Substitution version
+#+begin_src racket
+(define (interpUTLC [e : UTLC] : UTLC)
+  (type-case UTLC e
+    [(App fun arg)
+       (type-case (interpUTLC fun)
+          [(Lam x body)
+             (interpUTLC (subst x arg body))]
+          [else (error 'x "Undefined variable")])]
+    ;; Function and variables don't do any computation,
+    ;; they just return themselves
+    ;; Could have variables return an error,
+    [else e]))
+#+end_src
+- Can also do with environments, like Curly-Lambda-Env
+*** Booleans
+- Note: I'll write the desugarings as functions, rather than with ~elab~, just to keep things self contained
+- You can imagine these functions as constructors we'd use for the surface syntax, that produce ~UTLC~ directly
+#+begin_src racket
+;; {lam {x y} x}
+(define True
+  (Lam 'x (Lam 'y (Var 'x))))
+;;{lam {x y} y}
+(define False
+  (Lam 'x (Lam 'y (Var 'y))))
+;; curried (test thenCase elseCase)
+(define (If test thenCase elseCase)
+  (App (App test thenCase) elseCase))
+#+end_src
+- If we give ~If~ the boolean ~True~ it produces the then-case
+- If we give ~If~ the boolean ~False~ it produces the else-case
+*** Numbers
+- Define $n$ to be the function that takes in another function and an argument, and applies it $n$ times
+  +  $\lambda f \lambda x \ldotp f (f (f ... (f x)))$
+#+begin_src racket
+;; {lam {f x} x}
+(define Zero
+  (Lam 'f (Lam 'x (Var 'x)))) ;; Function that returns its argument
+;; {lam {f x} {f {n f x}}}
+;; Add one to a number
+(define (Add1 n)
+  (Lam 'f (Lam 'x) (App (Var 'f) (App (App n f) x))))
+;; {lam {f x} {m f {n f x}}}
+(define (Plus m n)
+  (Lam 'f (Lam 'x) ((App m (Var 'f)) (App (App n f) x))))
+#+end_src
+*** Pairs
+- You can view a pair as a function that takes in a boolean and returns either the first or second value depending on that boolean
+#+begin_src racket
+;; {lam z {if z x y}} for the pair (x,y)
+(define (Pair x y)
+  (Lam 'z (If (Var 'z) x y)))
+;; {pr true} gives the first element of pr
+(define (Fst pr)
+  (App pr True))
+;; {pr false} gives the second element of pr
+(define (Snd pr)
+  (App pr False))
+#+end_src
+*** Recursion: The Y Combinator
+- Not the startup funder
+- $\lambda f \ldotp (\lambda x \ldotp f\ (x\ x)) (\lambda x \ldotp f\ (x\ x)))$
+#+begin_src racket
+;;{lam f {{lam x {f {x x}}} {lam x {f {x x}}}}}
+(define Y
+  (Lam 'f (App (Lam 'x (App f (App x x)))
+               (Lam 'x (App f (App x x))))))
+#+end_src
+- Fixed-point function
+  + For any ~g~, have ~{Y g}~ = ~{g {Y g}}~ = ~{g {g {Y g}}}~...
+    - e.g. replace ~g~'s first argument with ~g~, infinitely
+- Takes a function ~f~ with an extra parameter ~self~
+- Makes a new function where each call to ~self~ is replaced by a call to ~f~
+- You don't need to know the details of how this work, just that it's possible to
+  do recursion in the UTLC
+- Once we have recursion, we have loops
 
 * Environments, Binding, and Scope :noexport:
 :PROPERTIES:
@@ -4720,7 +4955,7 @@ emptyEnv
 - Instead of replacing in body, put a variable-value pair in the environment
   + Called /binding/ the variable to its value
 #+begin_src racket
-[(Call funName argExpr)
+[(appE funName argExpr)
      (let* ([argVal (interp env defs argExpr)]
             [def (get-fundef funName defs)]
             [argVar (mkFunDef-arg def)]
@@ -4793,7 +5028,7 @@ emptyEnv
   (type-case Exp e
         ;; ....
      [(Let1 x xexp body)
-        (interp defs (subst x (NumLit (interp defs xexp)) body))])
+        (interp defs (subst x (numE (interp defs xexp)) body))])
 #+end_src
 
 
@@ -4910,7 +5145,7 @@ emptyEnv
 #+begin_src racket
 (define-type Expr
   ....
-  (Fun [arg : Symbol]
+  (lamE [arg : Symbol]
        [body : Expr]))
 #+end_src
 - Goal is to interpret the same language, but with environments
@@ -4929,7 +5164,7 @@ emptyEnv
 (define (interp env expr)
   (type-case Exp interp
      ....
-     [(Fun x body)
+     [(lamE x body)
        (lamV x body)] ))
 #+end_src
 *** A Wrong First Attempt: Calls Interp
@@ -4941,7 +5176,7 @@ emptyEnv
 (define (interp env expr)
   (type-case Exp interp
   ....
-    [(Call funExpr argExpr)
+    [(appE funExpr argExpr)
       (let* ([argVal (interp argExpr)]
              [funVal (checkAndGetFun (interp funExpr))]
              [funParam (fst funVal)]
@@ -4996,7 +5231,7 @@ emptyEnv
 (define (interp env expr)
   (type-case Exp interp
      ....
-     [(Fun x body)
+     [(lamE x body)
        (ClosureV x body env) ;;<------
        ] ))
 #+end_src
@@ -5008,7 +5243,7 @@ emptyEnv
 (define (interp env expr)
   (type-case Exp interp
   ....
-    [(Call funExpr argExpr)
+    [(appE funExpr argExpr)
       (let* ([argVal (interp argExpr)]
              [funVal (checkAndGetClosure (interp funExpr))]
              [funParam (fst (fst funVal))]
@@ -5025,24 +5260,24 @@ emptyEnv
 - Dynamic scope gives variables values from the environment when the function was /called/
 *** Example: Static Scope
 #+begin_src racket
-{let1 double {lam {x} {* x 2}}
-  {let1 quadruple {lam {y} {double {double y}}}
+{let1 double {lam x {* x 2}}
+  {let1 quadruple {lam y {double {double y}}}
     {let1 double 2
       {quadruple 3}}}}
 #+end_src
-- ~{lam {y} {double {double x}}}~ has one free variable, ~double~
+- ~{lam y {double {double x}}}~ has one free variable, ~double~
   + Functions and variables are in /the same namespace/ in Curly-Lambda
-- ~{lam {y} {double {double x}}}~ evaluates to closure
+- ~{lam y {double {double x}}}~ evaluates to closure
   + Body is ~{double {double x}}~
-  + Env is ~double := {lam {x} {* x 2}}~
+  + Env is ~double := {lam x {* x 2}}~
 - Env at call:
   + ~double := 2~
-  + ~quadruple := {lam {y} {double {double x}}}~
-  + ~double := {lam {x} {* x 2}}~
+  + ~quadruple := {lam y {double {double x}}}~
+  + ~double := {lam x {* x 2}}~
 *** Example: Static Scope ctd
 #+begin_src racket
-{let1 double {lam {x} {* x 2}}
-  {let1 quadruple {lam {y} {double {double x}}}
+{let1 double {lam x {* x 2}}
+  {let1 quadruple {lam y {double {double x}}}
     {let1 double 2
       {quadruple 3}}}}
 #+end_src
@@ -5050,23 +5285,23 @@ emptyEnv
 - Finally evaluates ~{double {double x}}~
   + In extended closure environment:
     - ~x := 3~
-    - ~double := {lam {x} {* x 2}}~
+    - ~double := {lam x {* x 2}}~
 - Result is 12
 *** Example: Dynamic Scope
 #+begin_src racket
-{let1 double {lam {x} {* x 2}}
-  {let1 quadruple {lam {y} {double {double x}}}
+{let1 double {lam x {* x 2}}
+  {let1 quadruple {lam y {double {double x}}}
     {let1 double 2
       {quadruple 3}}}}
 #+end_src
-- ~{lam {y} {double {double x}}}~ evaluates to closure
+- ~{lam y {double {double x}}}~ evaluates to closure
   + Doesn't save environment
 - Call evaluates ~{double {double x}}~
   + In extended /call site/ environment:
     - ~x := 3~
     - ~double := 2~
-    - ~quadruple := {lam {y} {double {double x}}}~
-    - ~double := {lam {x} {* x 2}}~
+    - ~quadruple := {lam y {double {double x}}}~
+    - ~double := {lam x {* x 2}}~
 - Dynamic type error
   + Can't call 2 as a function
 ** But Professor, When Will I Ever Use This?
@@ -5152,229 +5387,6 @@ myFunction().then(
   #+end_src
 - This is all just lambda with different syntax
 
-* Currying and the Lambda Calculus :noexport:
-:PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides014-currying.pdf
-:header-args:racket: :results code :lang flit
-:CUSTOM_ID: currying-and-the-lambda-calculus
-:END:
-#+beamer: \beamerdefaultoverlayspecification{<+->}
-** Overview
-:PROPERTIES:
-:CUSTOM_ID: overview-3
-:END:
-*** Objectives
-- Learning Goals
- - To learn how multi-argument functions can be
-   desugared into single-argument functions
-   + Curly-Curry
- - To see that /everything/ can be desugared into single-argument functions
-   + by learning about the Lambda Calculus
-- Core Concepts
-  + Currying
-  + Lambda Calculus
-** Currying
-:PROPERTIES:
-:CUSTOM_ID: currying
-:END:
-*** Executing a multiple-argument function
-- Say we allow ~{lambda {x y z} {+ x {* y z}}}~ in Curly
-- How can we interpret a call to this function?
-  + Evaluate the body with either
-    - ~x,y,z~ replaced by concrete argument values (substitution)
-    - ~x,y,z~ bound to concrete values in an environment
-*** Achieving this: Currying
-- We can achieve this with nested lambda expressions
-#+begin_src racket
-{let f {lam {x} {lam {y} {lam {z} {+ x {* y z}}}}}
-  ....}
-#+end_src
-- To call, we do nested calls
-#+begin_src racket
-{{{f 1} 2} 3}
-#+end_src
-- Step by step:
-  + ~f 1~ produces ~{lam {y} {lam {z} {+ 1 {* y z}}}}~
-  + Calling that on 2 produces ~{lam {z} {+ 1 {* 2 z}}}~
-  + Calling that on 3 produces ~{+ 1 {* 2 3}}}~
-    - Exactly what we want for ~{f 1 2 3}~
-*** Definition
-- The approach of simulating multiple-argument functions with nested single-argument functions is called *Currying*
-  + Named after Haskell Curry, and American logician
-    - Also the namesake of the Haskell programming language
-- A function written in this style is /curried/
-*** Desugaring with Currying
-- We can add multiple-argument functions to our Surface Language /without/ changing
-  the core language
-  + Handle in ~elab~
-  + Doesn't matter if do substitution or environment-based version, translation is the exact same
-*** AST for Multi-Argument Functions
-#+begin_src racket
-(define-type ExpS
-....
- (lamS [xs : (Listof Symbol)]
-          [body : ExpS]))
- (appS [fun : ExpS]
-           [args : (Listof ExpS)])
-#+end_src
-- Functions now take a list of variables
-- Calls now take a list of arguments
-*** Elaborating Multi-Argument Functions
-- Use recursion to iterate through the list
-  #+begin_src racket
-  (define (elab [surfExpr : ExpS])
-    (type-case ExpS surfExpr
-               ....
-     [(lamS xs body)
-       (type-case (Listof Symbol) xs
-         [empty
-           (elab body)]
-         [(cons x rest)
-           ;; Could also do with a helper fn
-           (Fun x (elab (lamS rest body)))])]))
-
-  #+end_src
-- No arguments: just produce the body
-- At least one argument: curry the rest of the arguments, and wrap the result in a lambda
-*** Multi-Argument Calls with Tail Recursion
-#+begin_src racket
-  (define (callHelper [args : (Listof ExpS)]
-                      [accum : Expr]) : Expr
-    (type-case (Listof ExpS) args
-        [empty accum]
-        [(cons arg rest)
-           ;; tail recursion
-           (callHelper rest (Call accum (elab arg)) )]))
-  #+end_src
-- Given a list of argument to apply, build up one giant expression with nested calls
-***  Building The Entire Call
-#+begin_src racket
-  (define (elab [surfExpr : ExpS])
-    (type-case ExpS surfExpr
-               ....
-     [(appS funExpr args)
-        (callHelper args (elab funExpr))]))
-
-#+end_src
-*** A Word of Warning
-- Flit/Racket do /not/ use currying by default
-  + Multiple argument functions are /not/ desugared into single-argument ones
-- We can convert between curried and uncurried functions with combinators
-  + See lecture on Higher Order Functions
-- A 0-argument ~(lambda () e)~ is /NOT/ the same as ~e~ in Flit
-  + But it is in Curly, if we use this desugaring
-*** Another Desugaring: Let
-- Recall that ~letvar~ let us define a local variable to have the value of some expression, that we could then use to build another expression
-- We can make ~letvar~ syntactic sugar using lambda
-#+begin_src  racket
-  (define (elab [surfExpr : ExpS])
-    (type-case ExpS surfExpr
-               ....
-     [(SurfLet1 x xExpr body)
-        (Call (Fun x (elab body))
-              (elab xExpr))]))
-#+end_src
-- Define a function whose body is the body of the ~letvar~
-- Immediately call it with the value we're giving to the defined variable
-- Letvar: executes the body in the environment extended with the variable's value
-  + This does the exact same thing
-** Lambda The Ultimate
-:PROPERTIES:
-:CUSTOM_ID: lambda-the-ultimate
-:END:
-
-*** Functions As Sugar
-- So far we've seen that single argument functions can simulate
-  + Multi-argument functions
-  + Local variable definitions
-- What else can se simulate?
-- *NOTE* I won't ask about the following desugarings on an exam
-  + But they're an important introduction to the "science" of computer science
-    and the "mathematics" of informatics
-*** The Smallest Language We Can Imagine
-#+begin_src racket
-(define-type UTLC
-  ;; A variable
-  (Var [x : Symbol])
-  ;; Function application (call)
-  (App [fun : UTLC]
-       [arg : UTLC])
-  ;; Anonymous function (lambda)
-  (Lam [param : Symbol]
-       [body : UTCL]))
-#+end_src
-- Stands for "Un-Typed Lambda Calculus"
-- All you can do is define an anonymous function (lambda) or call a function (application)
-- *The Untyped Lambda Calculus is Turing Complete*
-  + Any program you can write, you can write an equivalent UTLC Program
-*** Interpreting the UTLC
-- Works just like we've seen so far
-  + ~Lam~ is like ~Fun~
-  + ~App~ is like ~Call~
-- Substitution version
-#+begin_src racket
-(define (interpUTLC [e : UTLC] : UTLC)
-  (type-case UTLC e
-    [(App fun arg)
-       (type-case (interpUTLC fun)
-          [(Lam x body)
-             (interpUTLC (subst x arg body))]
-          [else (error 'x "Undefined variable")])]
-    ;; Function and variables don't do any computation,
-    ;; they just return themselves
-    ;; Could have variables return an error,
-    [else e]))
-#+end_src
-- Can also do with environments, like Curly-Lambda-Env
-*** Booleans
-- Note: I'll write the desugarings as functions, rather than with ~elab~, just to keep things self contained
-- You can imagine these functions as constructors we'd use for the surface syntax, that produce ~UTLC~ directly
-#+begin_src racket
-(define True
-  (Lam 'x (Lam 'y (Var 'x))))
-(define False
-  (Lam 'x (Lam 'y (Var 'y))))
-;; curried (test thenCase elseCase)
-(define (If test thenCase elseCase)
-  (App (App test thenCase) elseCase))
-#+end_src
-- If we give ~If~ the boolean ~True~ it produces the then-case
-- If we give ~If~ the boolean ~False~ it produces the else-case
-*** Numbers
-- Define $n$ to be the function that takes in another function and an argument, and applies it $n$ times
-  +  $\lambda f \lambda x \ldotp f (f (f ... (f x)))$
-#+begin_src racket
-(define Zero
-  (Lam 'f (Lam 'x (Var 'x)))) ;; Function that returns its argument
-;; Add one to a number
-(define (Add1 n)
-  (Lam 'f (Lam 'x) (App (Var 'f) (App (App n f) x))))
-(define (Plus m n)
-  (Lam 'f (Lam 'x) (App m (App (App n f) x))))
-#+end_src
-*** Pairs
-- You can view a pair as a function that takes in a boolean and returns either the first or second value depending on that boolean
-#+begin_src racket
-(define (Pair x y)
-  (Lam 'z (If (Var 'z) x y)))
-(define (Fst pr)
-  (App pr True))
-(define (Snd pr)
-  (App pr False))
-#+end_src
-*** Recursion: The Y Combinator
-- Not the startup funder
-- $\lambda f \ldotp (\lambda x \ldotp f\ (x\ x)) (\lambda x \ldotp f\ (x\ x)))$
-#+begin_src racket
-(define Y
-  (Fun 'f (App (Fun 'x (App f (App x x)))
-               (Fun 'x (App f (App x x))))))
-#+end_src
-- Takes a function ~f~ with an extra parameter ~self~
-- Makes a new function where each call to ~self~ is replaced by a call to ~f~
-- You don't need to know the details of how this work, just that it's possible to
-  do recursion in the UTLC
-- Once we have recursion, we have loops
 * Store Passing and Boxes :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides015-box.pdf
@@ -5758,7 +5770,7 @@ myFunction().then(
   + If the arguments are variables, their values are looked up and copied to the new location
 *** Pass-by-value interp
 #+begin_src racket
-[(Call funExpr argExpr)
+[(appE funExpr argExpr)
      (with ([fun-v fun-sto] (interp env funExpr sto))
         (with ([arg-v arg-sto] (interp env argExpr fun-sto))
           (let* (
@@ -5806,7 +5818,7 @@ myFunction().then(
 *** Example
 #+begin_src racket
 {let1 y 2
-  {let1 f {lam {x} {begin
+  {let1 f {lam x {begin
                        {set-var! x {* x 3}}
                        x}}
             {+ {f y} y}}}
@@ -5843,7 +5855,7 @@ myFunction().then(
 - Changes to one are seen in the other
 *** Example
 #+begin_src racket
-{let1 doublebox! {lam {x} {set-box! x {* 2 {unbox x}}}}
+{let1 doublebox! {lam x {set-box! x {* 2 {unbox x}}}}
   {let1 y 3
             {begin {doublebox! {get-loc y}}
                    y}}}
@@ -5874,7 +5886,7 @@ myFunction().then(
 - We'll do this with a special ~let~ form
   + ~{letrec x <expr> <expr>}~
     - Gives ~{letrec x e1 e2}~ gives ~x~ the value ~e1~ then evaluates ~e2~ with ~x~ in scope
-    - Exactly like ~letvar~, except *~x~ is also in scope in e1*
+    - Exactly like ~let1~, except *~x~ is also in scope in e1*
 *** Bad Recursion
 - We can't give ~x~ a value if we need to evaluate ~x~ to get that value
 - E.g.
@@ -5938,7 +5950,7 @@ myFunction().then(
 #+end_src
 *** Example
 #+begin_src racket
-{letrec fact {lam {x}
+{letrec fact {lam x
                   {if0 x
                        1
                        {* x {fact {- x 1}}}}}
@@ -5954,12 +5966,12 @@ myFunction().then(
 - Evaluating function produces closure:
 #+begin_src racket
 (ClosureV 'x
-   (If0 (Var 'x)
-                (NumLit 1)
+   (cndE (Var 'x)
+                (numE 1)
                 (Times (Var 'x)
-                       (Call (Var 'fact)
+                       (appE (Var 'fact)
                              (Plus (Var 'x)
-                                   (Times (NumLit 1) (NumLit -1))))))
+                                   (Times (numE 1) (numE -1))))))
    (fact := 0))
 #+end_src
 - Never fetch from location 0
@@ -5969,7 +5981,7 @@ myFunction().then(
 *** Example (ctd)
 - Then tie the knot
   + Env: ~fact := 0~
-  + Store: ~0 ==> (ClosureV (Fun 'x ....) (fact := 0))~
+  + Store: ~0 ==> (ClosureV (lamE 'x ....) (fact := 0))~
     - Updated with value for ~fact~
 - Cyclic data structure:
   + Store contains closure at location 0
@@ -5978,7 +5990,7 @@ myFunction().then(
   + Store contains closure at location 0 ....
 *** Example (ct)
 #+begin_src racket
-{letrec fact {lam {x}
+{letrec fact {lam x
                   {if0 x
                        1
                        {* x {fact {- x 1}}}}}
@@ -5986,7 +5998,7 @@ myFunction().then(
 #+end_src
 - Finally evaluate body in updated store
   + Env: ~fact := 0~
-- ~3~ evaluates to ~(NumLit 3)~, ~fact~ evaluates to closure from location 0
+- ~3~ evaluates to ~(numE 3)~, ~fact~ evaluates to closure from location 0
 - Call evaluates closure body
   + Environment ~x := 1, fact := 0~
   + Store ~0 ==> (ClosureV ....), 1 ==> (numV 3)~
@@ -6089,7 +6101,7 @@ myFunction().then(
 *** Example
 #+begin_src racket
 {let1 mkCircle
-        {lam {r}
+        {lam r
              {object {{radius r}}
                      ;; All methods take one parameter,
                      ;; so we just ignore the parameter
@@ -6102,7 +6114,7 @@ myFunction().then(
 *** Example
 #+begin_src racket
 {let1 mkSquare
-        {lam {w}
+        {lam w
              {object {{width w}}
                      ;; All methods take one parameter,
                      ;; so we just ignore the parameter
@@ -6247,7 +6259,7 @@ myFunction().then(
 - Object with a single "call" method
   + Equivalent to a first-class function
 #+begin_src racket
-{lam {x} body}
+{lam x body}
 #+end_src
 - Can even do recursion
 #+begin_src racket
