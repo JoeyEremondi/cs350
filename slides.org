@@ -2189,10 +2189,10 @@ pub enum Option<T> {
 *** A Sneak Preview
 - Math expressions are trees
 #+begin_src racket
-(define-type Expr
+(define-type Exp
   (NumE [x : Number])
-  (PlusE [x : Expr] [y : Expr])
-  (TimesE [x : Expr] [y : Expr]))
+  (PlusE [x : Exp] [y : Exp])
+  (TimesE [x : Exp] [y : Exp]))
 #+end_src
 - We'll learn to evaluate these in the 2nd half of the course
 
@@ -3322,12 +3322,12 @@ for (int i = 0; i < N; i++){
 
 *** Abstract Syntax
 #+begin_src racket
-(define-type Expr
+(define-type Exp
   (num [n : Number])
-  (plus [left : Expr]
-        [right : Expr])
-  (times [left : Expr]
-         [right : Expr]))
+  (plus [left : Exp]
+        [right : Exp])
+  (times [left : Exp]
+         [right : Exp]))
 #+end_src
 - This is called the /abstract syntax/ for the programming language
 - A value of this type is called an /abstract syntax tree/
@@ -3524,14 +3524,14 @@ for (int i = 0; i < N; i++){
 
 *** General Form of an Interpreter
 #+begin_src racket
-(define (interp [e : Expr]
+(define (interp [e : Exp]
                 [x : SomeContext]
                 ...
                 [y : OtherContext])
         : Value
   ....)
 #+end_src
-- ~Expr~ is the is the AST datatype for whatever language we're interpreting
+- ~Exp~ is the is the AST datatype for whatever language we're interpreting
 - What the context arguments and ~Value~ datatype are depend on the language
   + Initially we have no context arguments, and ~Value~ is very simple
   + Will get more complicated as we go through the course
@@ -4300,7 +4300,7 @@ while (i < 10){
 (define-type Exp
   ....
   (lamE [arg : Symbol]
-       [body : Expr]))
+       [body : Exp]))
   (appE [fun : Exp]
         [arg : Exp])
 #+end_src
@@ -4312,7 +4312,7 @@ while (i < 10){
   (numV [num : Number])
   (boolV [b : Boolean])
   (lamV [arg : Symbol]
-        [body : Expr]))
+        [body : Exp]))
 #+end_src
 - The result of interpretation is called a /value/
   + Number, or a function
@@ -4332,8 +4332,8 @@ while (i < 10){
   + Ensures that the function variable shadows any previous declarations
 #+begin_src racket
 (define (subst [toReplace : Symbol]
-               [replacedBy : Expr]
-               [replaceIn : Expr]) : Expr
+               [replacedBy : Exp]
+               [replaceIn : Exp]) : Exp
   (type-case Exp replaceIn
   ....
     [(lamE var body)
@@ -4663,16 +4663,16 @@ while (i < 10){
   + Can use as argument to fold!
   #+begin_src racket
   (define (desugar [se : ExpS])
-    (type-case ExpS surfExpr
+    (type-case ExpS se
                ....
      [(lamS xs body)
-        (foldr lamE (elab body) xs)
+        (foldr lamE (desugar body) xs)
        ]))
 
   #+end_src
 - No arguments: just produce the body
 - At least one argument: curry the rest of the arguments, and wrap the result in a lambda
-  +  ~(lamS '(x y z) body)~ becomes ~(lamS 'x (lamS 'y (lamS 'z body)))~
+  +  ~(lamS '(x y z) body)~ becomes ~(lamE 'x (lamE 'y (lamE 'z body)))~
 *** Multi-Argument Calls
 - Function calls associate in the opposite direction
   + So need to fold left
@@ -4825,289 +4825,9 @@ while (i < 10){
   do recursion in the UTLC
 - Once we have recursion, we have loops
 
-* Environments, Binding, and Scope :noexport:
-:PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides015-environments.pdf
-:header-args:racket: :results code :lang flit
-:CUSTOM_ID: environments-binding-and-scope
-:END:
-#+beamer: \beamerdefaultoverlayspecification{<+->}
-# ** Overview
-:PROPERTIES:
-:CUSTOM_ID: overview-1
-:END:
-
-** Environments
-:PROPERTIES:
-:CUSTOM_ID: environments
-:END:
-
-*** Functions Review
-  + Evaluate their argument
-  + Lookup the function defn (variable, body)
-  + Replace the parameter variable with the argument value in the body
-  + Evaluate the result
-  + If we ever interpret a variable, raise an error
-*** The Problem
-- Each substitution is $\mathcal{O}(n)$ where $n$ is the number of nodes in the function body AST
-- This is /in addition/ to the cost of actually evaluating the function
-  + Very slow!
-- Want a way to have $\mathcal{O}(1)$ function calls
-  + Not including the time to evaluate the function body
-- Substitution is forgetful
-  - Just replaces function variable with expression
-  - Not very useful for debugging
-*** The Solution: Environments
-- Data structure for /deferred substitution/
-  + List of variable/value pairs
-- Intuition:
-  - Instead of replacing all ~x~ with value ~v~, keep a list of replacements you need to do
-  - When you interpret ~x~, check the environment before raising an error
-  - If there's an entry for ~x~ in the environment, return that
-    + Error otherwise
-    + Means reference to undefined variable
-*** The Environment Data Structure: Bindings
-
-   #+name: binding-deftype
-#+begin_src racket
-;; Just a pair, but we get better names than fst and snd
-(define-type Binding
-  (bind [name : Symbol]
-        [val : Number]))
-#+end_src
-#+begin_src racket :exports both :noweb strip-export
-<<binding-deftype>>
-;; Get helper functions from the type-def
-(bind-name (bind 'x 3))
-(bind-val (bind 'x 3))
-#+end_src
-
-*** The Environment Data Structure: Environments
-
-#+begin_src racket :noweb strip-export :exports both
-<<binding-deftype>>
-;; Lets us write Env instead of (Listof Binding)
-;; But it's not defining a new type,
-;; just a new name for the same type.
-(define-type-alias Env (Listof Binding))
-;; Environment is either empty or extended env
-(define emptyEnv : Env
-  empty)
-(define (extendEnv [bnd : Binding]
-                   [env : Env])
-        : Env
-  (cons bnd env))
-
-emptyEnv
-(extendEnv (bind 'x 3) (extendEnv (bind 'y 4) empty))
-#+end_src
-
-*** Looking up variables
-- Find the *first* binding in the environment
-  + This is important for shadowing
-- Just a linear search, like we've seen lots already
-#+begin_src  racket
-(define (lookup [n : Symbol] [env : Env]) : Number
-  (type-case (Listof Binding) env
-   ;; Can't find a variable in an empty env
-   [empty (error 'lookup "undefined variable")]
-   ;; Cons: check if the first binding is the var
-   ;; we're looking for.
-   ;; Return its value  if it is, otherwise
-   ;; keep looking in the rest of the list
-   [(cons b rst-env) (cond
-                       [(symbol=? n (bind-name b))
-                        (bind-val b)]
-                       [else (lookup n rst-env)])]))
-#+end_src
-*** Intepreting CurlyFundef with Environments
-- We can change the implementation /without changing the surface language/
-- Programs should run the exact same in both interpreters
-- Strategy: add an extra context argument for Environment
-  + Unlike fundefs, this will /change across recursive calls/
-#+begin_src racket
-(define (interp [env : Env]
-                [defs : (Listof FunDef)]
-                [e : Expr] ) : Number
-  (type-case Exp e
-             ....))
-#+end_src
-*** Case: Plus etc.
-- Exactly like before, except we have to pass the environment in the recursive call
-- Other operations are similar
-#+begin_src racket
-;; {+ e1 e2} evaluates e1 and e2, then adds the results together
-    [(Plus l r)
-     (+ (interp env defs l) (interp env defs r))]
-#+end_src
-*** Case: Variable
-- Can't return an error, because we might have added a deferred substitution to the environment
-- So we look in the environment and see if there's a value /bound/ to x
-- If there is return it
-  +  Otherwise, variable not found error
-#+begin_src racket
-[(Var x)
-      (lookup x env)]
-#+end_src
-*** Case: Function call
-- Just like before, we get the function body + variable, and value for argument
-- Still interpret body
-- Instead of replacing in body, put a variable-value pair in the environment
-  + Called /binding/ the variable to its value
-#+begin_src racket
-[(appE funName argExpr)
-     (let* ([argVal (interp env defs argExpr)]
-            [def (get-fundef funName defs)]
-            [argVar (mkFunDef-arg def)]
-            [funBody (mkFunDef-body def)])
-       (interp (extendEnv (bind argVar argVal) emptyEnv) ;;<------
-               defs
-               funBody))]
-#+end_src
-*** Static Scoping
-- We evaluated the body of the function in the empty environment, plus a value for its variable
-  + Didn't extend the additional environment
-- Want functions to be /abstractions/
-  + Should be able to predict how a function behaves from how it's called
-  + Don't want result to depend on context, just arguments
-- Gives the same results as substitution.
-- We call this /static scoping/
-- If we extend the environment from the call site, we get /dynamic scoping/
-*** Static Scoping Definition
-- A language has /static scoping/ if undefined variables in a term get their values from the environment where the function is /defined/
-  + Right now, variables come from top-level functions, so undefined variables
-    are always an error
-  + We'll see more of this later
-- A language has /dynamic scoping/ if undefined variables get their values from the point where the function is /called/
-*** Static Scoping Exapmple
-#+begin_src
-{define {f x} {+ x y}}
-{define {g y} {f y}}
-{g 3}
-#+end_src
-- Static scoping says this is an error
-  + No value for ~y~ in body of ~f~
-- Dynamic scoping produces 6
-  + Looks up ~y~ from ~g~ when evaluating ~f~
-- Dynamic scoping is WRONG
-  + You should understand it, but know that static scoping is what we want
-
-** Implementing Let
-:PROPERTIES:
-:CUSTOM_ID: implementing-let
-:END:
-*** Curly-Let
-- New language: Curly-Let
-- Curly-Fundef, but with one new feature
-  + ~{let1 x e1 e2}~
-    - Gives ~x~ the value ~e1~ in the expression ~e2~
-    - Called let1 so we don't confuse with Flit
-- We'll implement with both substitution and environments
-
-*** Abstract Syntax
-#+begin_src racket
-(type-def Expr
-  ....
-  [(Let1 [x : Symbol]
-           [xval : Expr]
-           [body : Expr])]
-          )
-
-#+end_src
-- Parsing and Desugaring are the same as usual
-  + See ~Curly-Let.rkt~
-
-*** Interpreting: Substitution
-- Want variable to have the given value in the body
-  + So just substitute the value for the variable in the body
-- Key detail: expression only evaluated once
-  + Can have exponential speedup in some algorithms
-#+begin_src racket
-(define (interp [defs : (Listof FunDef)] ;;NEW
-                [e : Expr] ) : Number
-  (type-case Exp e
-        ;; ....
-     [(Let1 x xexp body)
-        (interp defs (subst x (numE (interp defs xexp)) body))])
-#+end_src
-
-
-*** Substituting in a Let Expression
-- ~{let1 x e1 e2}~ /binds/ ~x~ in e2
-- So when substituting in ~e2~ we don't ever replace x
-- Implements shadowing
-#+begin_src racket
-(define (subst [toReplace : Symbol]
-               [replacedBy : Expr]
-               [replaceIn : Expr]) : Expr
-  (type-case Exp replaceIn
-    [(Let1 x xexp body)
-       (Let1 x
-               (subst toReplace replacedBy xexp)
-               (if (symbol=? x toReplace)
-                   body
-                   (subst toReplace replacedBy body)))]))
-#+end_src
-
-*** Interpreting: Environments
-- Interpret the variable's value in the current environment
-- Interpret the let body in the /extended/ environment
-- When we hit ~x~ we'll look in the env
-#+begin_src racket
-(define (interp [env : Env]
-                [defs : (Listof FunDef)]
-                [e : Expr] ) : Number
-  (type-case Exp e
-        ;; ....
-     [(Let1 x xexp body)
-      (let ([xval (interp env defs xexp)])
-        (interp (extendEnv (bind x xval) env)
-                defs body))])
-#+end_src
-
-*** Scope
-- Notice that we only add to the env to interp ~body~, not ~xexp~
-- This is because ~x~ is /in scope/ for ~body~ but not ~xexp~
-- We say the *scope of a variable* is the part of the program in which its value is either substituted or bound
-- Let /extends/ scope by adding a variable, while calls /transfer/
-  scope to the function
-- Later we'll see more complex examples of scope
-  + e.g. in vanilla Racket, ~let~ and ~let*~ have different rules for what's in scope
-
-*** The Stack
-
-- Environments have a /stack/ structure
-  + Push on new bindings when variables are defined
-  + Don't directly pop, but will sometimes interpret in the unextended environment
-- If we bind a value to a variable that's already in the environment, we say we /shadow/ the old binding
-  + ~lookup~ always takes the most recent binding
-- Part of the /call stack/
-  + Theoretical in Curly
-  + Actually implemented for most languages
-  + Every time we call a function or define a variable we push onto the call stack
-- Curly-Let and others have an /implicit/ call stack
-  + We don't keep the data structure ourselves
-  + Instead, call ~interp~ recursively to add to the /Flit/ call stack
-  + When finished eval, Flit returns is to part waiting for the result
-
-*** Shadowing Example
-- ~{let1 x 3 {let1 x 4 {+ 3 x}}}~
-  + Looks at most recent definition
-  + So should be 7
-- Substitution: ~subst~ doesn't replace ~x~ in ~{+ 3 x}~ because it is bound
-- Environments: ~(x,4)~ is at the top of the environment, so ~interp~ of ~x~ finds ~4~
-
-*** Design Choices
-- There are /high level design choices/ for programming languages
-  + How to deal with variable name collisions (shadowing)
-  + How to deal with undefined variables (static vs. dynamic scope)
-- Decisions *are made concrete* in the implementation
-  + Behavior of ~subst~ on bound variables
-  + What environment ~interp~ is passed for function bodies
-
 * Implementing Lambdas with Environments: Closures :noexport:
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides013-closures.pdf
+:EXPORT_FILE_NAME: pdf/slides015-closures.pdf
 :header-args:racket: :results code :lang flit
 :CUSTOM_ID: implementing-lambdas-with-environments-closures
 :END:
@@ -5131,35 +4851,116 @@ emptyEnv
 :PROPERTIES:
 :CUSTOM_ID: the-details
 :END:
-*** Substitution to Environments, Review
-- Interpreter takes environment argument
-  #+begin_src racket
-  (define (interp [env : Env]
-                  [expr : Expr])
-          : Value ;; Was Number
-    ....)
-  #+end_src
-- Function-calls evaluate body in environment containing argument
-*** Core and Abstract Syntax
-- Exact same as Curly-Lambda substitution version
-#+begin_src racket
-(define-type Expr
-  ....
-  (lamE [arg : Symbol]
-       [body : Expr]))
+*** The Problem: Practical
+- Each substitution is $\mathcal{O}(n)$ where $n$ is the number of nodes in the function body AST
+- This is /in addition/ to the cost of actually evaluating the function
+  + Very slow!
+- Want a way to have $\mathcal{O}(1)$ function calls
+  + Not including the time to evaluate the function body
+- Substitution is forgetful
+  - Just replaces function variable with expression
+  - Not very useful for debugging
+*** The Problem: Theoretical
+- Interpreter serves as a /definition/ for a language
+- Want to use interpreters to say what a program /means/
+- What does ~{+ x y}~ mean?
+  + Substitution-interpreter: error
+  + But this program isn't meaningless!
+    - Meaning depends on /context/
+*** The Solution: Environments
+- Data structure for /deferred substitution/
+  + List of variable/value pairs
+- Intuition:
+  - Instead of replacing all ~x~ with value ~v~, keep a list of replacements you need to do
+  - When you interpret ~x~, check the environment before raising an error
+  - If there's an entry for ~x~ in the environment, return that
+    + Error otherwise
+    + Means reference to undefined variable
+
+*** The Environment Data Structure
+
+- Data structure associating variable keys with Values
+#+begin_src racket :noweb strip-export :exports both
+(define-type-alias Binding (Symbol * Value)
+(define-type-alias Env (Listof Binding))
+
+;; Environment is either empty or extended env
+(define mt-env : Env
+  empty)
+(define (extend [bnd : Binding]
+                [env : Env])
+        : Env
+  (cons bnd env))
+
 #+end_src
-- Goal is to interpret the same language, but with environments
+- Textbook uses hashtables
+  + The important thing is the interface
+
+*** Looking up variables
+- Find value for a given variable
+- Find the *first* binding in the environment
+  + This is important for shadowing
+- Idea: get all pairs whose variable is what we're looking for
+  + Then take the first
+#+begin_src  racket
+(define (lookup [var : Symbol]
+                [env : Env])
+        : Value
+  (let* ([matching (filter
+                    (lambda (bnd) (equal? (fst bnd) var))
+                    env)])
+    (type-case Env matching
+        [(empty)
+           (error 'lookup
+                  (string-append "Undefined variable: "
+                                 (to-string var)))]
+        [(cons h t)
+           (pairFst h)]))
+#+end_src
+*** Intepreting Curly-Lambda with Environments
+- We can change the implementation
+  + /without changing the surface language/
+  + or the expression datatype
+- Programs should run the exact same in both interpreters
+- Strategy: add an extra context argument for Environment
+  + Pass along with every recursive call
+  + Extend environment for recursive calls with newly defined variable
+
+#+begin_src racket
+(define (interp [env : Env]
+                [e : Exp] ) : Value
+  (type-case Exp e
+             ....))
+#+end_src
+*** Case: Plus etc.
+- Exactly like before, except we have to pass the environment in the recursive call
+- Other operations are similar
+#+begin_src racket
+;; {+ e1 e2} evaluates e1 and e2, then adds the results together
+    [(Plus l r)
+     (+ (interp env l) (interp env r))]
+#+end_src
+*** Case: Variable
+- Can't return an error, because we might have added a deferred substitution to the environment
+- So we look in the environment and see if there's a value /bound/ to x
+- If there is return it
+  +  Otherwise, variable not found error
+#+begin_src racket
+[(Var x)
+      (lookup x env)]
+#+end_src
 *** A (Wrong) First Attempt: Values
 - Define ~Value~ just like in substitution version
   +  Functions consist of their argument and the body to execute
 #+begin_src racket
 (define-type Value
   (numV [num : Number])
+  (boolV [b : Boolean])
   (lamV [arg : Symbol]
-        [body : Expr]))
+        [body : Exp]))
 #+end_src
 *** A Wrong First Attempt: Functions Interp
-- As a first attempt, try building functions just like in substitition version
+- As a first attempt, try building functions just like in substitution version
 #+begin_src racket
 (define (interp env expr)
   (type-case Exp interp
@@ -5206,17 +5007,18 @@ emptyEnv
 #+begin_src racket
 (define-type Value
   (numV [num : Number])
+  (boolV [b : Boolean])
   ;; Like lamV but with an environment
-  (ClosureV [arg : Symbol]
-            [body : Expr]
+  (closureV [arg : Symbol]
+            [body : Exp]
             [env : Env]))
 #+end_src
 *** A New Dynamic Type Checker
 - Same idea as ~checkAndGetFun~, just has an extra piece of data to retrieve
 #+begin_src racket
-(define (checkAndGetClosure [v : Value]) : ((Symbol * Expr) * Env)
+(define (checkAndGetClosure [v : Value]) : ((Symbol * Exp) * Env)
   (type-case Value v
-     [(ClosureV x body env)
+     [(closureV x body env)
       (pair (pair x body) env)]
      [else
      (error 'curlyTypeError
@@ -5232,7 +5034,7 @@ emptyEnv
   (type-case Exp interp
      ....
      [(lamE x body)
-       (ClosureV x body env) ;;<------
+       (closureV x body env) ;;<------
        ] ))
 #+end_src
 *** Properly Interpreting Calls
@@ -5415,7 +5217,7 @@ myFunction().then(
 :CUSTOM_ID: curly-box-a-language-with-mutation
 :END:
 *** Boxes
-*** Expressions vs. Statements
+*** Expessions vs. Statements
 - *Expression:* a program or program fragment that is meant to be evaluated
   + Produces a value
   + e.g. Function arguments in C++/Python are expressions
@@ -5550,7 +5352,7 @@ myFunction().then(
 (define-type Result
   (v*s [v : Value] [s : Store]))
 (define (interp [env : Env]
-                [e : Expr]
+                [e : Exp]
                 [sto : Store]) : Result
   ....)
 #+end_src
@@ -5559,7 +5361,7 @@ myFunction().then(
 *** Updating The Interpreter: Plus
 #+begin_src racket
 (define (interp [env : Env]
-                [e : Expr]
+                [e : Exp]
                 [sto : Store]) : Result
   (type-case Exp e
    [(Plus l r)
@@ -5598,7 +5400,7 @@ myFunction().then(
 *** Using Our Macro
 #+begin_src racket
 (define (interp [env : Env]
-                [e : Expr]
+                [e : Exp]
                 [sto : Store]) : Result
   (type-case Exp e
     [(Plus l r)
@@ -5614,8 +5416,8 @@ myFunction().then(
   + What value is in the box depends on the current store
 #+begin_src racket
 (define-type Value
-  (ClosureV [arg : Symbol]
-            [body : Expr]
+  (closureV [arg : Symbol]
+            [body : Exp]
             [env : Env])
   (numV [num : Number])
   (BoxV [loc : Location]))
@@ -5727,7 +5529,7 @@ myFunction().then(
 *** Interpreting Variables
 #+begin_src racket
 (define (interp [env : Env]
-                [e : Expr]
+                [e : Exp]
                 [sto : Store]) : Result
   (type-case Exp e
     [(Var x)
@@ -5745,7 +5547,7 @@ myFunction().then(
   + Just like ~SetBox~ except we get the location from the environment, instead of by evaluating a box
   #+begin_src racket
   (define (interp [env : Env]
-                [e : Expr]
+                [e : Exp]
                 [sto : Store]) : Result
   (type-case Exp e
     [(Setvar! x e)
@@ -5916,8 +5718,8 @@ myFunction().then(
 *** Interpreting Recursion: Value
 #+begin_src racket
 (define-type Value
-  (ClosureV [arg : Symbol]
-            [body : Expr]
+  (closureV [arg : Symbol]
+            [body : Exp]
             [env : Env])
   (numV [num : Number])
   (BoxV [loc : Location])
@@ -5929,7 +5731,7 @@ myFunction().then(
 *** Interpreting Recursion: Code
 #+begin_src racket
 (define (interp [env : Env]
-                [e : Expr]
+                [e : Exp]
                 [sto : Store]) : Result
   (type-case Exp e
    [(LetRec x xexpr body)
@@ -5965,7 +5767,7 @@ myFunction().then(
 *** Example (ctd)
 - Evaluating function produces closure:
 #+begin_src racket
-(ClosureV 'x
+(closureV 'x
    (cndE (Var 'x)
                 (numE 1)
                 (Times (Var 'x)
@@ -5981,7 +5783,7 @@ myFunction().then(
 *** Example (ctd)
 - Then tie the knot
   + Env: ~fact := 0~
-  + Store: ~0 ==> (ClosureV (lamE 'x ....) (fact := 0))~
+  + Store: ~0 ==> (closureV (lamE 'x ....) (fact := 0))~
     - Updated with value for ~fact~
 - Cyclic data structure:
   + Store contains closure at location 0
@@ -6001,7 +5803,7 @@ myFunction().then(
 - ~3~ evaluates to ~(numE 3)~, ~fact~ evaluates to closure from location 0
 - Call evaluates closure body
   + Environment ~x := 1, fact := 0~
-  + Store ~0 ==> (ClosureV ....), 1 ==> (numV 3)~
+  + Store ~0 ==> (closureV ....), 1 ==> (numV 3)~
 - ~If0~ in closure body goes to branch with call
 - ~fact~ in call evaluates to /the same closure/ at location 0
   + Evaluation repeats, but with ~x~ bound to location with ~numV 2~
@@ -6140,13 +5942,13 @@ myFunction().then(
 #+begin_src racket
 (define-type Expr
   ...
-  (Object [fields : (Listof (Symbol * Expr))]
-           [methods : (Listof (Symbol * (Symbol * Expr)))])
-  (Get [obj-expr : Expr]
+  (Object [fields : (Listof (Symbol * Exp))]
+           [methods : (Listof (Symbol * (Symbol * Exp)))])
+  (Get [obj-expr : Exp]
         [field-name : Symbol])
-  (Send [obj-expr : Expr]
+  (Send [obj-expr : Exp]
          [method-name : Symbol]
-         [arg-expr : Expr]))
+         [arg-expr : Exp]))
 #+end_src
 - Nothing fancy, just the literal tree representation of the previous syntax
   + Object is list of field-name field-expression pairs, and list of method-name, method-param, method-body triples
@@ -6160,7 +5962,7 @@ myFunction().then(
         [methods : (Listof (Symbol * Value))]))
 #+end_src
 - Value version of object
-  + Fields: just like in ~Expr~, except each name has a value, not an expression
+  + Fields: just like in ~Exp~, except each name has a value, not an expression
   + Methods: list of name-value pairs, where each value is assumed to be a closure
 *** Starting Language
 - We'll add objects onto Curly-Lambda
@@ -6170,16 +5972,16 @@ myFunction().then(
 *** Interpreting Object Creation
 #+begin_src racket
 (define (interp [env : Env]
-                [e : Expr] : Value
+                [e : Exp] : Value
   (type-case Exp e
     [(Object fields methods)
        ;; Each named field expression gets turned into a name-value pair
-       (ObjV (map (lambda ([pr : (Symbol * Expr)])
+       (ObjV (map (lambda ([pr : (Symbol * Exp)])
                     (pair (fst pr) (interp env (snd pr))))
                 fields)
                 ;; Each method gets turned into a closure
-              (map (lambda ([pr : (Symbol * (Symbol * Expr))])
-                    (pair (fst pr) (ClosureV (fst (snd pr))
+              (map (lambda ([pr : (Symbol * (Symbol * Exp))])
+                    (pair (fst pr) (closureV (fst (snd pr))
                                            (snd (snd pr))
                                            env)))
                    methods))])
@@ -6218,10 +6020,10 @@ myFunction().then(
            [(ObjV fields methods)
             (let ([param-closure (find methods method-name)])
               (interp (extendEnv (bind 'this obj-val)
-                         (extendEnv (bind (ClosureV-arg param-closure)
+                         (extendEnv (bind (closureV-arg param-closure)
                                           arg-val)
-                                    ClosureV-env))
-                      (ClosureV-body param-closure)))]
+                                    closureV-env))
+                      (closureV-body param-closure)))]
 #+end_src
 - Interpret the object and argument to values
 - Lookup the method by name in the object
@@ -6277,3 +6079,6 @@ org-latex-packages-alist: nil
 org-modern-indent-guide: " "
 indent-bars-mode: 0
 End:
+
+
+

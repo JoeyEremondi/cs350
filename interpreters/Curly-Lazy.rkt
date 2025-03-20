@@ -1,13 +1,16 @@
 #lang flit
 
-;; Curly-Let: A programming language with local variable definitions
+;; Curly-Lazy: A programming language with lazy evaluation
+;; Works just like Curly-Lam, except function arguments are not evaluated
+;; before they are substituted into the function bodies
 
-;; BNF for Curly-Let
+;; BNF 
+;; Adds subtraction, boolean operations, and equality comparison by desugaring
 ;; 
 ;;  <expr> ::=
 ;;   | NUMBER
 ;;   | BOOLEAN
-;;   | VARIABLE ;; NEW
+;;   | VARIABLE 
 ;;   | { + <expr> <expr> }
 ;;   | { * <expr> <expr> }
 ;;   | { = <expr> <expr> }
@@ -17,9 +20,10 @@
 ;;   | { not <expr> }
 ;;   | { if <expr> <expr> <expr> }
 ;;   | { zero? <expr> }
-;;   | {let1 {VARIABLE <expr>} <expr> } ;;NEW
+;;   | {let1 {VARIABLE <expr>} <expr> }
+;;   | {lam VARIABLE <expr>} ;; function definition
+;;   | {<expr> <expr>} ;; function calling
 
-;; The expression {let1 {x e1} e2} means "x has value e1 in e2"
 
 
 ;; Intermediate Abstract Syntax
@@ -29,7 +33,7 @@
   (numS [n : Number])
   ;; Constant Booleans
   (boolS [b : Boolean])
-  ;; Variables ;; NEW
+  ;; Variables 
   ;; Represent variables as Flit symbols
   ;;  that we can compare with symbol=?
   (varS [x : Symbol])
@@ -53,21 +57,23 @@
   (orS [l : ExpS]
        [r : ExpS])
   (notS [e : ExpS])
-  ;; NEW
   ;; Let-expressions
   (let1S [var : Symbol]
          [val : ExpS]
          [body : ExpS])
+  ;; Functions and function calls (application)
+  (lamS [var : Symbol]
+        [body : ExpS])
+  (appS [fun : ExpS] [arg : ExpS])
   )
 
-;; Abstract syntax
+;; Abstract syntax for Curly-Cond
 ;; Represents expressions in our interpreter
 (define-type Exp
   ;; Constant numbers
   (numE [n : Number])
   ;; Constant Booleans
   (boolE [b : Boolean])
-  ;; NEW
   ;; Variables are in the core language
   (varE [x : Symbol])
   ;; {+ e1 e2}
@@ -84,13 +90,20 @@
   ;; Let-expressions are in the core language
   (let1E [var : Symbol]
          [val : Exp]
-         [body : Exp]))
+         [body : Exp])
+  ;; Functions and applications (function calls) are in the core language
+  (lamE [var : Symbol] [vody : Exp])
+  (appE [fun : Exp] [arg : Exp])
+  )
 
-;; We now allow values to be either Numbers or Booleans,
-;; So we define a datatype for possible values
+;; We now allow values to be either Numbers, Booleans, or Functions
 (define-type Value
   [numV (n : Number)]
-  [boolV (b : Boolean)])
+  [boolV (b : Boolean)]
+  ;; Note that functions as values contain the exact same data as function expressions.
+  ;; Now Values and Expressions are mutually defined.
+  [lamV (var : Symbol)
+        (body : Exp)])
 
 ;; Parse
 ;; Takes an S-expression and turns it into an Exp
@@ -102,7 +115,6 @@
     ;; Constant boolean e.g. #t, #f
     [(s-exp-match? `#t s) (boolS #t)]
     [(s-exp-match? `#f s) (boolS #f)]
-    ;; NEW
     ;; Variables e.g. x
     [(s-exp-match? `SYMBOL s) (varS (s-exp->symbol s))]
     ;; {+ s1 s2}
@@ -134,13 +146,20 @@
            (parse (fourth (s-exp->list s))))]
     [(s-exp-match? `{zero? ANY} s)
      (zero?S (parse (second (s-exp->list s))))]
-    ;; NEW
     ;; Variable definitions
     ;; {let1 {x val} body}
     [(s-exp-match? `{let1 {SYMBOL ANY} ANY} s)
      (let1S (s-exp->symbol (first (s-exp->list (second (s-exp->list s)))))
             (parse (second (s-exp->list (second (s-exp->list s)))))
             (parse (third (s-exp->list s))))]
+    ;; Lambdas and function calls
+    [(s-exp-match? `{lam SYMBOL ANY} s)
+     (lamS (s-exp->symbol (second (s-exp->list s)))
+           (parse (third (s-exp->list s))))]
+    ;; Catch-all case for function calls/applications
+    [(s-exp-match? `{ANY ANY} s)
+     (appS (parse (first (s-exp->list s)))
+           (parse (second (s-exp->list s))))]
     [else (error 'parse "invalid input")]))
 
 ;; Lifting operations on Numbers to Values
@@ -248,9 +267,13 @@
      (varE x)]
     [(let1S var val body)
      (let1E var (desugar val) (desugar body))]
+    ;; No interesting desugaring for functions, just recursively desugar the parts
+    [(lamS x body)
+     (lamE x (desugar body))]
+    [(appS fun args)
+     (appE (desugar fun) (desugar args))]
     ))
 
-;; NEW
 ;;;;;;;;;;;;;;;;;;;;;;
 ;; Substitution
 ;; Replace the variable with the given expression
@@ -290,6 +313,10 @@
            (subst toReplace replacedBy els))]
     [(zero?E e)
      (zero?E (subst toReplace replacedBy e))]
+    ;; Function calls work just like normal
+    [(appE fun arg)
+     (appE (subst toReplace replacedBy fun)
+           (subst toReplace replacedBy arg))]
     ;; Shadowing:
     ;; {let1 {x val} body} *binds* x in body,
     ;; so if we're replacing x in the let1 expression,
@@ -300,10 +327,18 @@
             (subst toReplace replacedBy val)
             (if (symbol=? var toReplace)
                 body
-                (subst toReplace replacedBy body)))]))
+                (subst toReplace replacedBy body)))]
+    ;; Shadowing on functions works like on let:
+    ;; don't replace in the body if the function's variable is what we're replacing,
+    ;; so that the function variable shadows the outer variable
+    [(lamE var body)
+     (lamE var
+           (if (symbol=? var toReplace)
+               body
+               (subst toReplace replacedBy body)))]
+    ))
 
 
-;; NEW
 ;; Substitution works with expressions,
 ;; so we need a way to convert values back to expressions.
 ;; We just convert boolean values to literals, same with numbers.
@@ -313,7 +348,11 @@
     [(boolV b)
      (boolE b)]
     [(numV n)
-     (numE n)]))
+     (numE n)]
+    ;; We can turn function values into function expressions,
+    ;; since they contain the exact same data, we just change the constructor
+    [(lamV x body)
+     (lamE x body)]))
 
 ;; Evaluate Expressions
 (define (interp [e : Exp] ) : Value
@@ -349,7 +388,6 @@
         (boolV (= n 0))]
        [else
         (error 'interp "Expected number")])]
-    ;; NEW
     ;; To interpret a let-expression,
     ;; we evaluate the value for the variable.
     ;; Then we replace the variable with that expression everywhere
@@ -358,11 +396,29 @@
      (let* ([valV (interp val)]
             [subbedBody (subst var (Value->Exp valV) body)])
        (interp subbedBody))]
-    ;; NEW
     ;; If we encounter a variable that we haven't substituted away,
     ;; then we must have had an undefined variable error
     [(varE x)
-     (error 'interp (string-append "Undefined variable: " (symbol->string x)))]))
+     (error 'interp (string-append "Undefined variable: " (symbol->string x)))]
+    ;; Interpreting functions is a no-op: we just wrap the function as a value.
+    ;; This is because functions store computation to be done later, after some substitutions.
+    [(lamE var body)
+     (lamV var body)]
+    ;; Interpreting function calls (applications)
+    ;; Two things to do: make sure the thing we're calling is a function,
+    ;; then replace its variable with the argument's value in the body.
+    ;; Finally, we interpret the body.
+    [(appE fun arg)
+     (type-case Value (interp fun)
+       [(lamV var body)
+        ;; NEW
+        ;; This is the only difference between this and Curly-Lam
+        ;; Do the substitution,
+        ;; then interpret the result
+        (let* ([subbedBody (subst var arg body)])
+          (interp subbedBody))]
+       [else
+        (error 'interp "Tried to call non-function")])]))
 
 ;; The Language Pipeline
 ;; We run  program by parsing an s-expression into an expression
@@ -392,7 +448,6 @@
 (test (run `{+ 3 {if #t 10 20}})
       (numV 13))
 
-(test/exn (parse `{1 2}) "invalid input")
 
 ;; Make sure we catch dynamic type errors
 
@@ -432,8 +487,44 @@
                 100})
       (numV 99))
 
-;; NEW
 (test (run
        `{let1 {x {+ 9900 99}}
               {+ x {* x {if {zero? x} x {- x x}}}}})
       (numV 9999))
+
+;; Basic lambda test
+(test (run
+       `{let1 {f {lam x {+ x 3}}}
+              {* {f 1} {f 2}}})
+      (numV 20))
+
+;; Apply lambda directly
+(test (run
+       `{let1 {f {lam x {+ x 3}}}
+              {* {f 1} {{lam x {- x 7}} 2}}})
+      (numV -20))
+
+;; Lambda should be able to refer to variables defined earlier
+(test (run
+       `{let1 {x 99}
+              {let1 {f {lam y {+ x y}}}
+                    {f 1}}})
+      (numV 100))
+
+;; Lambda should be able to be nested
+(test (run
+       `{let1 {f {lam x {lam y {+ x y}}}}
+          {{f 3} 5}})
+      (numV 8))
+
+;; Calling non-function should be error
+(test/exn (run `{1 2}) "")
+
+;; Lazy tests
+
+;; Argument to const contains dynamic type error,
+;; but because we're lazy, it never gets evaluated.
+(test (run
+       `{let1 {const0 {lam x 0}}
+              {const0 {+ 3 #t}}})
+      (numV 0))

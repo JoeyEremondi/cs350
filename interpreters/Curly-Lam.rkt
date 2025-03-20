@@ -1,9 +1,8 @@
 #lang flit
 
-;; Curly-Let: A programming language with subtraction and equality
+;; Curly-Lam: A programming language with first-class functions
 
-;; BNF for Curly-Let
-;; Adds subtraction, boolean operations, and equality comparison by desugaring
+;; BNF
 ;; 
 ;;  <expr> ::=
 ;;   | NUMBER
@@ -23,7 +22,6 @@
 ;;   | {lam VARIABLE <expr>} ;; function definition
 ;;   | {<expr> <expr>} ;; function calling
 
-;; The expression {let1 {x e1} e2} means "x has value e1 in e2"
 
 
 ;; Intermediate Abstract Syntax
@@ -67,7 +65,7 @@
   (appS [fun : ExpS] [arg : ExpS])
   )
 
-;; Abstract syntax for Curly-Cond
+;; Abstract syntax
 ;; Represents expressions in our interpreter
 (define-type Exp
   ;; Constant numbers
@@ -162,8 +160,8 @@
             (parse (third (s-exp->list s))))]
     ;; Catch-all case for function calls/applications
     [(s-exp-match? `{ANY ANY} s)
-     (appS (parse (first (s-exp->list (second (s-exp->list s)))))
-           (parse (second (s-exp->list (second (s-exp->list s))))))]
+     (appS (parse (first (s-exp->list s)))
+           (parse (second (s-exp->list s))))]
     [else (error 'parse "invalid input")]))
 
 ;; Lifting operations on Numbers to Values
@@ -456,7 +454,7 @@
 (test (run `{+ 3 {if #t 10 20}})
       (numV 13))
 
-(test/exn (parse `{1 2}) "invalid input")
+
 
 ;; Make sure we catch dynamic type errors
 
@@ -496,8 +494,48 @@
                 100})
       (numV 99))
 
-;; NEW
+
 (test (run
        `{let1 {x {+ 9900 99}}
               {+ x {* x {if {zero? x} x {- x x}}}}})
       (numV 9999))
+
+;; NEW
+
+;; Basic lambda test
+(test (run
+       `{let1 {f {lam x {+ x 3}}}
+              {* {f 1} {f 2}}})
+      (numV 20))
+
+;; Apply lambda directly
+(test (run
+       `{let1 {f {lam x {+ x 3}}}
+              {* {f 1} {{lam x {- x 7}} 2}}})
+      (numV -20))
+
+;; Lambda should be able to refer to variables defined earlier
+(test (run
+       `{let1 {x 99}
+              {let1 {f {lam y {+ x y}}}
+                    {f 1}}})
+      (numV 100))
+
+;; Lambda should be able to be nested
+(test (run
+       `{let1 {f {lam x {lam y {+ x y}}}}
+          {{f 3} 5}})
+      (numV 8))
+
+;; Calling non-function should be error
+(test/exn (run `{1 2}) "")
+
+;; Make sure we use strict evaluation
+;; Argument to const contains dynamic type error
+(test/exn (run
+       `{let1 {const0 {lam x 0}}
+              {const0 {+ 3 #t}}})
+      "")
+
+
+
