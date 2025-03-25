@@ -1,550 +1,606 @@
-#lang plait
+#lang flit
 
+;; Curly-Env
+;; This language is identical to Curly-Curry,
+;; but implemented using environments, rather than substitution.
+;; This make it more efficient, and has the advantage that
+;; we can say that programs with variables have context-dependent meaning,
+;; rather than just being errors.
 
-;; Curly-Box: A language with curried first-class functions and mutable boxes
-;; Four Questions
-;; Q1: elaborate surface multi-argument calls into core single-argument calls using a fold
-;; Q2: elaborate surface multi-argument functions into core multi-argument functions using a fold
-;; Q3: Implement a version of while-loops for Curly-A5
-;; Q4: Write a Curly-A5 function that takes in two boxes and swaps the values stored in them.
-
-;; BNF for Curly-Box
-;; New forms: {fun {x} body}
+;; BNF 
 ;; 
 ;;  <expr> ::=
-;;   | SYMBOL
 ;;   | NUMBER
-;;   | "{" "+" <expr> <expr> "}"
-;;   | "{" "*" <expr> <expr> "}"
-;;   | "{" "if0" <expr> <expr> <expr> "}"
-;;   | "{" "-" <expr> <expr> "}"
-;;   | "{" "let SYMBOL <expr> <expr> "}"
-;;   | "{" "fun" "{" SYMBOL * "}" <expr> "}" ;; Can define a function with any number of arguments
-;;                                            ;; * indicates "0 or more copies of the preceding thing"
-;;   | "{" <expr> <expr>* "}" ;; Can call any expression with any number of argument
-;;     NEW:
-;;   | "{" "begin" <expr> <expr> "}"
-;;   | "{" "box" <expr> "}"
-;;   | "{" "unbox" <expr> "}"
-;;   | "{" "set-box!" <expr> <expr> "}"
+;;   | BOOLEAN
+;;   | VARIABLE 
+;;   | { + <expr> <expr> }
+;;   | { * <expr> <expr> }
+;;   | { = <expr> <expr> }
+;;   | { - <expr> <expr> }
+;;   | { and <expr> <expr> }
+;;   | { or <expr> <expr> }
+;;   | { not <expr> }
+;;   | { if <expr> <expr> <expr> }
+;;   | { zero? <expr> }
+;;   | {let1 {VARIABLE <expr>} <expr> }
+;;   | {lam VARIABLE <expr>} ;; function definition
+;;   | {lam {VARIABLE*} <expr>} ;; function definition
+;;   | {<expr> <expr>*} ;; function calling
 
 
-;; BNF for Function definitions
-;; <fundef> ::= "{" "define" "{" SYMBOL SYMBOL "}" <expr> "}"
-
-;; Surface AST
-;; Represents an expression before we have desugared
-;; subtraction away using `elab`
-(define-type SurfaceExpr
-  ;; A number e.g. 5
-  (SurfNumLit [n : Number])
-  ;; {+ e1 e2}
-  (SurfPlus [left : SurfaceExpr]
-            [right : SurfaceExpr])
-  ;; {* e1 e2}
-  (SurfTimes [left : SurfaceExpr]
-             [right : SurfaceExpr])
-  ;; {if0 e1 e2 e3}
-  (SurfIf0 [test : SurfaceExpr]
-           [thenCase : SurfaceExpr]
-           [elseCase : SurfaceExpr])
-  ;; {- e1 e2}
-  ;; This constructor is in SurfExpr but not in Expr
-  (SurfSub [left : SurfaceExpr]
-           [right : SurfaceExpr])
-  ;; Variables (will show up in function definitions)
-  (SurfVar [x : Symbol])
-  ;;  Function calls
-  ;;  Function can be any expression, not just a symbol
-  (SurfCall [fun : SurfaceExpr]
-            [arg : (Listof SurfaceExpr)])
-  ;; Anonymous functions
-  (SurfFun [arg : (Listof Symbol)]
-           [body : SurfaceExpr])
-  ;; variable definitions
-  (SurfLetVar [x : Symbol]
-              [xexp : SurfaceExpr]
-              [body : SurfaceExpr])
-  ;; Box creation
-  (SurfBox [init : SurfaceExpr])
-  ;; Getting a Box's value
-  (SurfUnbox [box : SurfaceExpr])
-  ;; Setting a Box's value
-  (SurfSetbox! [box : SurfaceExpr]
-               [newval : SurfaceExpr])
-  ;; Do the first expression purely for its side-effects
-  ;; then evaluate the second one
-  (SurfBegin [e1 : SurfaceExpr]
-             [e2 : SurfaceExpr]))
-
-;; Parse
-;; Takes an S-expression and turns it into an SurfExpr
-;; Raises an error if it doesn't represent a valid program
-(define (parse [s : S-Exp]) : SurfaceExpr
-  (cond
-    ;; Constant number e.g. 5
-    [(s-exp-match? `NUMBER s) (SurfNumLit (s-exp->number s))]
-    ;; x (variable)
-    [(s-exp-match? `SYMBOL s) (SurfVar (s-exp->symbol s))]
-    ;; {+ s1 s2}
-    [(s-exp-match? `{+ ANY ANY} s)
-     (SurfPlus (parse (second (s-exp->list s)))
-               (parse (third (s-exp->list s))))]
-    ;; {* s1 s2}
-    [(s-exp-match? `{* ANY ANY} s)
-     (SurfTimes (parse (second (s-exp->list s)))
-                (parse (third (s-exp->list s))))]
-    ;; Same idea as above, but we're looking for 3 arguments, not 2, for if0
-    [(s-exp-match? `{if0 ANY ANY ANY} s)
-     (SurfIf0 (parse (second (s-exp->list s)))
-              (parse (third (s-exp->list s)))
-              (parse (fourth (s-exp->list s))))]
-    ;; {- s1 s2}
-    [(s-exp-match? `{- ANY ANY} s)
-     (SurfSub (parse (second (s-exp->list s)))
-              (parse (third (s-exp->list s))))]
-    ;; {box e}
-    [(s-exp-match? `{box ANY} s)
-     (SurfBox (parse (second (s-exp->list s))))]
-    ;; {unbox e}
-    [(s-exp-match? `{unbox ANY} s)
-     (SurfUnbox (parse (second (s-exp->list s))))]
-    ;; {set-box! e1 e2}
-    [(s-exp-match? `{set-box! ANY ANY} s)
-     (SurfSetbox! (parse (second (s-exp->list s)))
-                  (parse (third (s-exp->list s))))]
-    ;; {begin e1 e2}
-    [(s-exp-match? `{begin ANY ANY} s)
-     (SurfBegin (parse (second (s-exp->list s)))
-                (parse (third (s-exp->list s))))]
-    ;; Same idea as above, but first arg needs to be symbol
-    [(s-exp-match? `{letvar SYMBOL ANY ANY} s)
-     (SurfLetVar (s-exp->symbol (second (s-exp->list s)))
-                 (parse (third (s-exp->list s)))
-                 (parse (fourth (s-exp->list s))))]
-    ;; Anonymous functions
-    [(s-exp-match? `{fun {SYMBOL ...} ANY} s)
-     (SurfFun (map s-exp->symbol
-                   (s-exp->list
-                    (second (s-exp->list s))))
-              (parse (third (s-exp->list s))))]
-    ;; Function calls {f e1}
-    ;; Has to come last, only treat as a function call if it's not a binary operator
-    [(s-exp-match? `{ANY ANY ...} s)
-     ;;: called function can be any expression
-     (SurfCall (parse (first (s-exp->list s)))
-               (map parse (rest (s-exp->list s))))]
-    
-    [else (error 'parse "invalid input")]))
 
 
-;; Abstract syntax for Curly-Sub
-;; Represents expressions in our interpreter
-(define-type Expr
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; NEW
+;; Code for environments
+;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Environments are association lists,
+;; e.g. symbol-value pairs, that we can
+;; make empty lists, insert into, and lookup the value
+;; for a certain symbol
+
+;; Association lists are lists of key-vaue pairs
+(define-type-alias (AssocList 'key 'value)
+  (Listof ('key * 'value)))
+
+;; We insert by adding to the beginning of a list
+(define (extend [k : 'key]
+                [v : 'value]
+                [al : (AssocList 'key 'value)])
+  : (AssocList 'key 'value)
+  (cons (pair k v) al))
+
+;; To find an entry in the list, we take the first (most recently added)
+;; entry whose key matche the given key
+(define (lookup [k : 'key]
+                [al : (AssocList 'key 'value)])
+  : 'value
+  ;; Filter out all the pairs whose first element is the same as the given key
+  (let* ([filteredList (filter
+                        (lambda (pr)
+                          (equal? (pairFst pr) k))
+                        al)])
+    ;; Take the first one, or raise an error if none present
+    (if (empty? filteredList)
+        (error 'find "Didn't find key in list")
+        (pairSnd (first filteredList)))))
+
+
+
+
+;; Intermediate Abstract Syntax
+;; We desugar this into Exp
+(define-type ExpS
   ;; Constant numbers
-  (NumLit [n : Number])
+  (numS [n : Number])
+  ;; Constant Booleans
+  (boolS [b : Boolean])
+  ;; Variables 
+  ;; Represent variables as Flit symbols
+  ;;  that we can compare with symbol=?
+  (varS [x : Symbol])
   ;; {+ e1 e2}
-  (Plus [left : Expr]
-        [right : Expr])
+  (plusS [left : ExpS]
+         [right : ExpS])
   ;; {* e1 e2}
-  (Times [left : Expr]
-         [right : Expr])
-  ;; {if0 e1 e2 e3}
-  (If0 [test : Expr]
-       [thenCase : Expr]
-       [elseCase : Expr])
-  ;; Variables (will show up in function definitions)
-  (Var [x : Symbol])
-  ;; Function calls
-  ;; function can be any name, not just a symbol
-  (Call [fun : Expr]
-        [arg : Expr])
-  ;; anonymous functions
-  (Fun [arg : Symbol]
-       [body : Expr])
-  ;; variable definition
-  (LetVar [x : Symbol]
-          [xexpr : Expr]
-          [body : Expr])
-  ;; Box creation
-  (Box [init : Expr])
-  ;; Getting a Box's value
-  (Unbox [box : Expr])
-  ;; Setting a Box's value
-  (Setbox! [box : Expr]
-           [newval : Expr])
-  ;; Begin
-  (Begin [l : Expr]
-         [r : Expr])
+  (timesS [left : ExpS]
+          [right : ExpS])
+  ;; {if e1 e2 e3}
+  (cndS [test : ExpS]
+        [thenCase : ExpS]
+        [elseCase : ExpS])
+  (zero?S [e : ExpS])
+  (subS [l : ExpS]
+        [r : ExpS])
+  (eqS [l : ExpS]
+       [r : ExpS])
+  (andS [l : ExpS]
+        [r : ExpS])
+  (orS [l : ExpS]
+       [r : ExpS])
+  (notS [e : ExpS])
+  ;; Let-expressions
+  (let1S [var : Symbol]
+         [val : ExpS]
+         [body : ExpS])
+  ;; NEW:
+  ;; Surface language has n-ary function calls and lambdas
+  ;; These get desugared away
+  (lamS [var : (Listof Symbol)]
+        [body : ExpS])
+  (appS [fun : ExpS] [args : (Listof ExpS)])
   )
 
-;; NEW: Values
-;; Interpreter produces more than just numbers now
-;; So we have a datatype of the different kinds of values it can make
+;; Abstract syntax for Curly-Cond
+;; Represents expressions in our interpreter
+(define-type Exp
+  ;; Constant numbers
+  (numE [n : Number])
+  ;; Constant Booleans
+  (boolE [b : Boolean])
+  ;; Variables are in the core language
+  (varE [x : Symbol])
+  ;; {+ e1 e2}
+  (plusE [left : Exp]
+         [right : Exp])
+  ;; {* e1 e2}
+  (timesE [left : Exp]
+          [right : Exp])
+  ;; {if e1 e2 e3}
+  (cndE [test : Exp]
+        [thenCase : Exp]
+        [elseCase : Exp])
+  (zero?E [e : Exp])
+  ;; Functions and applications (function calls) are in the core language
+  (lamE [var : Symbol] [vody : Exp])
+  (appE [fun : Exp] [arg : Exp])
+  )
+
+;; We now allow values to be either Numbers, Booleans, or Functions
 (define-type Value
-  (ClosureV [arg : Symbol]
-            [body : Expr]
-            [env : Env])
-  (NumV [num : Number])
-  ;; NEW:
-  ;; A box is represented as a location in the store
-  (BoxV [loc : Location]))
-
-(define (helper-SurfCall [args : (Listof SurfaceExpr)]
-                         [accum : Expr]) : Expr
-  (type-case (Listof SurfaceExpr) args
-    [empty accum]
-    [(cons arg rest)
-     (helper-SurfCall rest (Call accum (elab arg)))]))
-
-;; Elaborate (desugar) surface expressions into
-;; core expressions
-;; For every case except for Sub, there's a core constructor
-;; that takes the exact same arguments as the surface constructor
-;; (except that its sub-expressions are core, not surface)
-;; so we can just apply the corresponding Core constructor and apply elab recursively
-;; Exact same as substitution version
-(define (elab [expr : SurfaceExpr]) : Expr
-  (type-case SurfaceExpr expr
-    ;; Trivial cases: expressions that are the same in the surface and core syntax
-    [(SurfNumLit n) (NumLit n)]
-    ;; For plus, times, and if, we need to recursively elaborate the sub-expressions
-    ;; because they might contain a subtraction
-    [(SurfPlus l r) (Plus (elab l) (elab r))]
-    [(SurfTimes l r) (Times (elab l) (elab r))]
-    [(SurfIf0 test thn els) (If0 (elab test) (elab thn) (elab els))]
-    ;; {- e1 e2} becomes {+ e1 {* -1 e2}}
-    [(SurfSub l r)
-     (Plus (elab l) (Times (elab r) (NumLit -1)))]
-    ;; variables are core expressions, so there's nothing to do for desugaring
-    [(SurfVar x) (Var x)]
-    ;; NEW
-    ;; Use recursion to desugar multi-argument function calls
-    ;; into single argument calls using Currying.
-
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    [(SurfCall f args)
-     (helper-SurfCall args (elab f))]
-    
-    [(SurfLetVar x xexp body)
-     (LetVar x (elab xexp) (elab body))]
-    ;; NEW:
-    ;; SurfFun now takes a list of argument variables.
-    ;; Use recursion to desugar mutli-parameter functions
-    ;; into single parameter functions using Currying
-    [(SurfFun xs body)
-     (type-case (Listof Symbol) xs
-       [empty (elab body)]
-       [(cons x rest)
-        (Fun x (elab (SurfFun rest body)))])]
-    ;; Box operations just desugar in the usual way
-    [(SurfBox e)
-     (Box (elab e))]
-    [(SurfUnbox e)
-     (Unbox (elab e))]
-    [(SurfSetbox! e1 e2)
-     (Setbox! (elab e1) (elab e2))]
-    [(SurfBegin e1 e2)
-     (Begin (elab e1) (elab e2))]
-    ))
+  [numV (n : Number)]
+  [boolV (b : Boolean)]
+  ;; NEW
+  ;; Closures:
+  ;; A lambda evaluates to a closure, which stores its variable and body
+  ;; PLUS the environment in which it was evaluated, which is captured
+  ;; to be used when the function is called
+  [closureV (var : Symbol)
+            (body : Exp)
+            (env : Env)])
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Environments are Association Lists
+;; mapping symbols to values
+(define-type-alias Env (AssocList Symbol Value))
 
+(define mt-env empty)
 
-;;;;;;;;;;;;;;;;;;;
-;; helper functions for dynamic type checking.
-;; Check if a value is a number, and get the number if it is
-(define (checkAndGetNum [v : Value]) : Number
-  (type-case Value v
-    [(NumV n) n]
-    [else
-     (error 'curlyTypeError
-            (string-append "Expected Number, got function:"
-                           (to-string v)))]))
-
-;;NEW
-;; Check if a value is a closure, and get its parameter, body and environment if it is
-(define (checkAndGetClosure [v : Value]) : ((Symbol * Expr) * Env)
-  (type-case Value v
-    [(ClosureV x body env)
-     (pair (pair x body) env)]
-    [else
-     (error 'curlyTypeError
-            (string-append "Expected Function, got number:"
-                           (to-string v)))]))
-
-;; Lift a binary operation on Numbers to Values
-(define (liftVal2 [f : (Number Number -> Number)]
-                  [x : Value]
-                  [y : Value]) : Value
-  (let ([nx (checkAndGetNum x)]
-        [ny (checkAndGetNum y)])
-    (NumV (f nx ny))))
-
-
-; Pairs of variable and values
-;; NEW: Value datatype, not just number, in a binding
-(define-type Binding
-  (bind [name : Symbol]
-        [val : Value]))
-
-
-
-;; Lets us write Env instead of (Listof Binding)
-;; But it's not defining a new type,
-;; just a new name for the same type.
-(define-type-alias Env (Listof Binding))
-
-;; Environment is either empty or extended env
-(define emptyEnv : Env
-  empty)
-(define (extendEnv [bnd : Binding]
-                   [env : Env])
-  : Env
-  (cons bnd env))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; The Store data structure and interface
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; NEW Locations
-;; an abstract version of memory addresses
+;; NEW
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Store are association lists
+;; Mapping locations to Values
 (define-type-alias Location Number)
 
-;; NEW: Store locations
-(define-type Storage
-  (cell [location : Location] 
-        [val : Value]))
+(define-type-alias Store (AssocList Number Value))
 
-;; A store is a list of location-value pairs
-;; Basically a very inneficient implementation of dictionaries
-(define-type-alias Store (Listof Storage))
-(define mt-store empty)
+(define mt-store : Store
+  empty)
+(define override-store
+  : (Location Value Store -> Store)
+  extend)
 
-;; Create a new store that's the same as the old one
-;; but with the given value at the given location
-(define override-store : (Storage Store -> Store)
-  cons)
+;; NEW
+;; Code to find the largest index in the store,
+;; so we can use one greater as a fresh location
+(define (new-loc [sto : Store])
+  : Location
+  (+ 1 (max-loc sto)))
 
-;;NEW: Get a location not contained in the given store
-(define (new-loc [sto : Store]) : Location
-  (+ 1 (max-address sto)))
+;; Helper for getting the max location in a store
+(define (max-loc [sto : Store])
+  : Location
+  (foldl max 0 (map pairFst sto)))
 
-;; Helper for new-loc
-(define (max-address [sto : Store]) : Location
-  (type-case (Listof Storage) sto
-    [empty 0]
-    [(cons c rst-sto) (max (cell-location c)
-                           (max-address rst-sto))]))
+;; Parse
+;; Takes an S-expression and turns it into an Exp
+;; Raises an error if it doesn't represent a valid program
+(define (parse [s : S-Exp]) : ExpS
+  (cond
+    ;; Constant number e.g. 5
+    [(s-exp-match? `NUMBER s) (numS (s-exp->number s))]
+    ;; Constant boolean e.g. #t, #f
+    [(s-exp-match? `#t s) (boolS #t)]
+    [(s-exp-match? `#f s) (boolS #f)]
+    ;; Variables e.g. x
+    [(s-exp-match? `SYMBOL s) (varS (s-exp->symbol s))]
+    ;; {+ s1 s2}
+    [(s-exp-match? `{+ ANY ANY} s)
+     (plusS (parse (second (s-exp->list s)))
+            (parse (third (s-exp->list s))))]
+    ;; {* s1 s2}
+    [(s-exp-match? `{* ANY ANY} s)
+     (timesS (parse (second (s-exp->list s)))
+             (parse (third (s-exp->list s))))]
+    ;; We can parse and desugar subtraction without changing the interpreter
+    [(s-exp-match? `{- ANY ANY} s)
+     (subS (parse (second (s-exp->list s)))
+           (parse (third (s-exp->list s))))]
+    [(s-exp-match? `{= ANY ANY} s)
+     (eqS (parse (second (s-exp->list s)))
+          (parse (third (s-exp->list s))))]
+    [(s-exp-match? `{and ANY ANY} s)
+     (andS (parse (second (s-exp->list s)))
+           (parse (third (s-exp->list s))))]
+    [(s-exp-match? `{or ANY ANY} s)
+     (orS (parse (second (s-exp->list s)))
+          (parse (third (s-exp->list s))))]
+    [(s-exp-match? `{not ANY} s)
+     (notS (parse (second (s-exp->list s))))]
+    [(s-exp-match? `{if ANY ANY ANY} s)
+     (cndS (parse (second (s-exp->list s)))
+           (parse (third (s-exp->list s)))
+           (parse (fourth (s-exp->list s))))]
+    [(s-exp-match? `{zero? ANY} s)
+     (zero?S (parse (second (s-exp->list s))))]
+    ;; Variable definitions
+    ;; {let1 {x val} body}
+    [(s-exp-match? `{let1 {SYMBOL ANY} ANY} s)
+     (let1S (s-exp->symbol (first (s-exp->list (second (s-exp->list s)))))
+            (parse (second (s-exp->list (second (s-exp->list s)))))
+            (parse (third (s-exp->list s))))]
+    ;; Single-argument Lambdas, parse as singleton lists
+    [(s-exp-match? `{lam SYMBOL ANY} s)
+     (lamS (list (s-exp->symbol (second (s-exp->list s))))
+           (parse (third (s-exp->list s))))]
+    ;; Multi-argument lambdas, parse the list of symbols
+    [(s-exp-match? `{lam {SYMBOL ...} ANY} s)
+     (lamS (map s-exp->symbol (s-exp->list (second (s-exp->list s))))
+           (parse (third (s-exp->list s))))]
+    ;; FUnction calls
+    ;; Catch-all case for n-ary function calls/applications
+    ;; Just parse as a function application: first thing is the function,
+    ;; rest are the args, so we map parse to parse each of them
+    [(s-exp-match? `{ANY ...} s)
+     (appS (parse (first (s-exp->list s)))
+           (map parse (rest (s-exp->list s))))]
+    [else (error 'parse "invalid input")]))
 
-;; NEW:
-;; Get the value at a particular location in a store,
-;; and return an error if it's not in the store.
-(define (fetch [l : Location] [sto : Store]) : Value
-  (type-case (Listof Storage) sto
-    [empty (error 'interp "unallocated location")]
-    [(cons c rst-sto) (if (equal? l (cell-location c))
-                          (cell-val c)
-                          (fetch l rst-sto))]))
+;; Lifting operations on Numbers to Values
+(define (lift-binop [op : (Number Number -> Number)]
+                    [v1 : Value]
+                    [v2 : Value])
+  (type-case Value v1
+    [(numV n1)
+     (type-case Value v2
+       [(numV n2)
+        (numV (op n1 n2))]
+       [else (error 'lift-binop "expects RHS to be a number")])]
+    [else (error 'lift-binop "expects LHS to be a number")]))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Source to Source transformations on Exp,
+;; implementing various operations without interpretation.
+;; We use these in our desugar function below
+
+;; Produce an expression that evaluates
+;; to the difference of the values of l and r
+(define (subE [l : Exp]
+              [r : Exp])
+  : Exp
+  (plusE l
+         (timesE (numE -1) r)))
+
+;; Produce an expression that evaluates to true
+;; if and only if l and r evaluates to equal numbers
+(define (eq?E [l : Exp]
+              [r : Exp])
+  : Exp
+  (zero?E (subE l r)))
+
+;; Produce an expression that evaluates to true if and only if
+;; both its input evaluate to the boolean true.
+(define (andE [l : Exp]
+              [r : Exp])
+  : Exp
+  ;; If the first one is true, then the AND is true if and only if
+  ;; the second one is also true, i.e. the value of the second one.
+  ;; Otherwise, if the first one is false, the AND is false
+  (cndE l
+        r
+        (boolE #f)))
+
+;; Produce an expression that evaluates to true
+;; if either of the given expressions evaluates to true.
+(define (orE [l : Exp]
+             [r : Exp])
+  : Exp
+  ;; If the first one is true, then the OR is true.
+  ;; Otherwise, the OR is true iff the second one is, i.e. it has its value.
+  (cndE l
+        (boolE #t)
+        r))
+
+;; Produce an expression that evaluates to the opposite boolean
+;; of the given expression.
+(define (notE [e : Exp])
+  : Exp
+  (cndE e
+        (boolE #f)
+        (boolE #t)))
 
 
+;; Desugar Expressions into Core Syntax
+(define (desugar [es : ExpS]) : Exp
+  (type-case ExpS es
+    ;; For expressions in the core syntax,
+    ;; We just pattern match, desugar the parts,
+    ;; and put them back together with the Exp constructor
+    [(numS n)
+     (numE n)]
+    [(boolS b)
+     (boolE b)]
+    [(plusS l r)
+     (plusE (desugar l) (desugar r))]
+    [(timesS l r)
+     (timesE (desugar l) (desugar r))]
+    [(cndS test thn els)
+     (cndE (desugar test)
+           (desugar thn)
+           (desugar els))]
+    [(zero?S e)
+     (zero?E (desugar e))]
+    ;; The remaining features aren't covered by the core syntax
+    ;; So we have to transform them into core syntax that does something equivalent.
+    ;; We use the helper functions above to do so.
+    [(subS l r)
+     (subE (desugar l) (desugar r))]
+    [(eqS l r)
+     (eq?E (desugar l) (desugar r))]
+    [(andS l r)
+     (andE (desugar l) (desugar r))]
+    [(orS l r)
+     (orE (desugar l) (desugar r))]
+    [(notS e)
+     (notE (desugar e))]
+    ;; No interesting desugaring to do for Variables and Let,
+    ;; but note we don't need to recursively call (desugar ...)
+    ;; on the symbol itself
+    [(varS x)
+     (varE x)]
+    ;; NEW: we can curry let1 into lambda
+    [(let1S var val body)
+     (appE (lamE var (desugar body))
+           (desugar val))]
+    ;; NEW
+    ;; Desugar n-ary functions and applications into single ones
+    ;; using currying, by folding
+    [(lamS xs body)
+     (foldr lamE (desugar body) xs)]
+    ;; NEW
+    ;; Args is a list of expS, so we have to map to desugar each one
+    ;; Function applications associate to the left, so we use foldl,
+    ;; and we want the function on the left.
+    ;; Since appE : (Exp Exp -> Exp) the types don't help us know which to apply first.
+    [(appS fun args)
+     (foldl (lambda (arg fun) (appE fun arg)) (desugar fun) (map desugar args))]
+    ))
 
-;; NEW: A value-store pair that interp produces
-(define-type Result
-  (v*s [v : Value] [s : Store]))
+;; NEW: Our interpreter now produces a Value-Store pair
+(define-type-alias Result
+  (Value * Store))
 
-;; NEW: 
-;; with form ----------------------------------------
-;; Racket lets us define our own syntactic sugar
-;; So we can interpret an expression and get both
-;; the name and value that are returned
-(define-syntax-rule
-  (with [(v-id sto-id) call]
-        body)
-  (type-case Result call
-    [(v*s v-id sto-id) body]))
+(define (v*s [v : Value]
+             [s : Store])
+  : Result
+  (pair v s))
 
-
-;; Linear search through environments to find a variable
-;; Returns error if var not found
-;; NEW: returns a Value, not just a Number
-;; so we can have functions in the environment
-(define (lookup [n : Symbol] [env : Env]) : Value
-  (type-case (Listof Binding) env
-    ;; Can't find a variable in an empty env
-    [empty (error 'lookup (string-append "undefined variable " (to-string n)))]
-    ;; Cons: check if the first binding is the var
-    ;; we're looking for.
-    ;; Return its value  if it is, otherwise
-    ;; keep looking in the rest of the list
-    [(cons b rst-env) (cond
-                        [(symbol=? n (bind-name b))
-                         (bind-val b)]
-                        [else (lookup n rst-env)])]))
+;; NEW
+;; Macro for pattern matching on results/values
+;; Makes the code for interp more readable
+(define-syntax with
+  (syntax-rules ()
+    [(with body) body]
+    [(with [(v-id sto-id) call] [(v-ids sto-ids) calls]... body)
+     (let* ([vs call]
+            [v-id (pairFst vs)]
+            [sto-id (pairSnd vs)])
+       (with [(v-ids sto-ids) calls]... body))]))
 
 
 
 
 ;; Evaluate Expressions
-;; NEW: (ish): interpret relative to a given context
+;; NEW
+;; Each expression is evaluated in a given environment,
+;; which gives values for all the free variables
 (define (interp [env : Env]
-                [e : Expr]
-                [sto : Store]) : Result
-  (type-case Expr e
+                [e : Exp]
+                [sto : Store]) : Result ;;NEW
+  (type-case Exp e
     ;; A number evaluates to itself
-    [(NumLit n)
-     (v*s (NumV n) sto)]
-    ;; {+ e1 e2} evaluates e1, giving a value and a store.
-    ;; It then evaluates e2 in that new store, giving a value and a final store.
-    ;; The final store is the result of
-    ;; Except for the box operations, all other expressions cases follow this pattern for state:
-    ;; interpret one sub argument, get a store, then use that to interpret the next sub-argument
-    [(Plus l r)
+    ;; Need to wrap in numV, since result type is value
+    [(numE n)
+     (v*s (numV n)
+          sto)]
+    ;; A boolean evaluates to itself
+    [(boolE b)
+     (v*s (boolV b)
+          sto)]
+    ;; {+ e1 e2} evaluates e1 and e2, then adds the results together
+    [(plusE l r)
      (with [(v-l sto-l) (interp env l sto)]
-           (with [(v-r sto-r) (interp env r sto-l)]
-                 (v*s (liftVal2 + v-l v-r) sto-r)))]
+           ;; Use the store result from the left to interpret the right
+           [(v-r sto-r) (interp env r sto-l)]
+           ;; Use the store from the right as our result store
+           (v*s (lift-binop + v-l v-r)
+                sto-r))]
     ;; Works the same but for times
-    [(Times l r)
+    [(timesE l r)
      (with [(v-l sto-l) (interp env l sto)]
-           (with [(v-r sto-r) (interp env r sto-l)]
-                 (v*s (liftVal2 * v-l v-r) sto-r)))]
-    ;; {if0 test thn els} evaluates test and checks if it's zero
+           ;; Use the store result from the left to interpret the right
+           [(v-r sto-r) (interp env r sto-l)]
+           ;; Use the store from the right as our result store
+           (v*s (lift-binop * v-l v-r)
+                sto-r))]
+    ;; {if test thn els} evaluates test and checks if it's zero
     ;; if it is, then we evaluate thn
     ;; otherwise we evaluate els
-    ;; Note that we have to evaluate the branch in the store from evaluating the test.
-    ;; We only evaluate the branch we take, so the state changes from the other branch are never done.
-    ;; Also note that this evaluating the branch is a tail call.
-    [(If0 test thn els)
-     (with ([v-test sto-test] (interp env test sto))
-           (if (= 0 (checkAndGetNum v-test))
-               (interp env thn sto-test)
-               (interp env els sto-test)))]
-    ;; We interpret variables by looking them up in the environment
-    ;; Variables don't change or the state at all
-    ;; since all mutation is done behind boxes.
-    [(Var x)
+    [(cndE test thn els)
+     (with [(test-v test-sto) (interp env test sto)]
+           (type-case Value test-v
+             [(boolV b)
+              (if b
+                  (interp env thn test-sto)
+                  (interp env els test-sto))]
+             [else (error 'interp "Non-boolean given to if")]))]
+    ;; To check if value is zero, we interpret it,
+    ;; then pattern match on the result
+    [(zero?E e)
+     (with [(e-v e-sto) (interp env e sto)]
+           (type-case Value e-v
+             [(numV n)
+              (v*s (boolV (= n 0))
+                   e-sto)]
+             [else
+              (error 'interp "Expected number")]))]
+    ;; NEW
+    ;; For environments, we can evaluate variables by looking them up in the environment.
+    ;; So the meaning of a program with variables depends on its environment
+    [(varE x)
      (v*s (lookup x env) sto)]
-    ;; Interpreting functions
-    ;; This is where we package the function with its environment to build a closure.
-    ;; No changes to the store, since we're not actually running the function body
-    [(Fun x body)
-     (v*s (ClosureV x body env) sto)] ;; Note how we capture Env
-    ;; NEW: Function calls
-    [(Call funExpr argExpr)
-     (with ([fun-v fun-sto] (interp env funExpr sto))
-           (with ([arg-v arg-sto] (interp env argExpr fun-sto))
-                 (let* ([funPair (checkAndGetClosure fun-v)] ;; Function might be an expression, so have to evaluate
-                        ;; Get the name, body, and environment from the closure
-                        [argVar (fst (fst funPair))]  ;; name of the function param
-                        [funBody (snd (fst funPair))]
-                        [funEnv (snd funPair)]) ;; body of the function
-                   ;; Evaluate the body in the extended *closure* environment
-                   ;; so that we get static scoping 
-                   (interp (extendEnv (bind argVar arg-v) funEnv) ;; <------------
-                           funBody
-                           arg-sto))))]
-    [(LetVar x xexpr body)
-     (with ([x-val x-sto] (interp env xexpr sto))
-           (interp (extendEnv (bind x x-val) env) body x-sto))]
-    [(Box a)
-     ;; Get the value we're putting in the box, and the new memory state 
-     (with [(v sto-v) (interp env a sto)]
-           ;; allocate a new location in memory
-           (let ([l (new-loc sto-v)])
-             ;; Return the new location, wrapped as a Value using BoxV
-             ;; along with the new memory, that has the new location+value added
-             (v*s (BoxV l)
-                  (override-store (cell l v)
-                                  sto-v))))]
-    [(Unbox a)
-     ;; Evaluate the box we're looking up 
-     (with [(v sto-v) (interp env a sto)]
-           ;; If it's a Box value, then use fetch to get the value from the location in memory
-           ;; returning that value and the new state from interpreting the box
-           (type-case Value v
-             [(BoxV l) (v*s (fetch l sto-v)
-                            sto-v)]
-             ;; Otherwise type error
-             [else (error 'interp "not a box")]))]
-    [(Setbox! bx val)
-     ;; Interpret both the box we're assigning to and the value we're putting in it,
-     ;; being careful to use the new memory state from the first when computing the second.
-     
-     (with [(v-b sto-b) (interp env bx sto)]
-           (with [(v-v sto-v) (interp env val sto-b)]
-                 (type-case Value v-b
-                   [(BoxV l)
-                    ;; If the first expression was actually a box,
-                    ;; return the value, with a new memory state
-                    ;; that has the new value (v-v) at the box's location (l)
-                    (v*s v-v
-                         (override-store (cell l v-v)
-                                         sto-v))]
-                   ;; Otherwise type error
-                   [else (error 'interp "not a box")])))]
-    [(Begin l r)
-     (with ([v-l sto-l] (interp env l sto))
-           (interp env r sto-l))]
-    )) 
-
-
-
-
-
-;; A list of helpful function definitions
-;; we can use while testing
-;; This is a function that takes an s-expression and produces another s-expression
-;; using slicing, but you don't need to worry how it works.
-
-(define (withFunctions s-expr)
-  `{letvar add5 {fun {x} {+ x 5}}
-           {letvar double {fun {y} {* 2 y}}
-                   {letvar quadruple {fun {x} {double {double x}}}
-                           {letvar checkIf0 {fun {x} {if0 x 1 0}}
-                                   {letvar const0 {fun {x} {* 0 {+ 2 {+ 3 {if0 0 {- 3 999999} 40000}}}}}
-                                           {letvar shadowTriple {fun {x} {+ x {letvar x {+ x x} x}}} ,s-expr}
-                                           }}}}})
-
-
+    ;; NEW:
+    ;; Interpreting functions with environments: we need to
+    ;; capture the environment for static scope, so that when we call the function,
+    ;; we have values for all of its free variables
+    [(lamE var body)
+     (v*s (closureV var body env)
+          sto)]
+    ;; NEW:
+    ;; Interpreting function calls (applications)
+    ;; We just interpret the body of the function,
+    ;; in the environment *from the closure*, extended with
+    ;; the concrete value of the argument.
+    ;; This is what gives us static scope.
+    [(appE fun arg)
+     ;; Argument and function are interpreted in the same environment as the whole expression
+     ;; e.g. NOT the environment from the closure
+     (with [(argVal arg-sto) (interp env arg sto)]
+            [(funVal fun-sto) (interp env fun arg-sto)]
+       (type-case Value funVal
+         [(closureV var body funEnv)
+          (let* ([envForCall (extend var argVal funEnv)])
+            (interp envForCall body fun-sto))]
+         [else
+          (error 'interp "Tried to call non-function")]))]))
 
 ;; The Language Pipeline
-;; For testing, we have run work by interpreting
-;; in the context of the above definitions
-(define (run s-exp) (v*s-v (interp emptyEnv (elab (parse s-exp)) '())))
+;; We run  program by parsing an s-expression into an expression
+;; then interpreting it into a number
+;; Implicit: we can turn strings into s-expressions using Racket's quote
+;; i.e. `{+ 3 4} generates an S-expression directly
+;; NEW
+;; By default, we evaluate expressions in the empty-environment
+(define (run s-exp) (pairFst
+                     (interp mt-env (desugar
+                                     (parse s-exp))
+                             mt-store)))
 
-;;Like run but has helper functions defined as above
-(define (runWithDefs s-exp) (v*s-v (interp emptyEnv (elab (parse (withFunctions s-exp))) '())))
+(test (run `3)
+      (numV 3))
+(test (run `{+ 1 2})
+      (numV 3))
+(test (run `{* 2 {+ 3 5}})
+      (numV 16))
+
+(test (run `{if {zero? {+ 1 -1}} 1 2})
+      (numV 1))
+
+(test (run `{if {zero? {+ 90 9}}
+                1
+                2})
+      (numV 2))
+(test (run `{if {zero? {* 2 0}} {+ 3 5} {* 3 5}})
+      (numV 8))
+
+(test (run `{+ 3 {if #t 10 20}})
+      (numV 13))
 
 
-;; Test multiple function creation
-(test (run `{letvar f {fun {x y z} {+ x {+ y z}}}
-                    0})
-      (NumV 0))
+;; Make sure we catch dynamic type errors
 
-;; ;; Test multiple function creation
-(test (run `{letvar f {fun {f} {f 1 2 3}}
-                    0})
-      (NumV 0))
+(test/exn (run `{if 3 4 5}) "boolean")
+(test/exn (run `{+ #t 5}) "number")
+(test/exn (run `{if {if #t 4 #f} 4 5}) "boolean")
 
-;; Test calling a curried function
-;; If you're getting 65 you're probably using the wrong fold somewhere
-(test (run `{letvar f {fun {x y z} {* x {+ y z}}}
-                    {f 10 3 5}})
-      (NumV 80))
+;; Tests for desugaring
+(test (run `{- 5 3})
+      (numV 2))
 
-;; Test partially applying a function.
-;; Since a multiple argument function is desugared into nested lambdas,
-;; we can call it with fewer than its full slate of arguments,
-;; and get a function still waiting for more arguments.
-;; If this is wrong, you're maybe using the wrong fold somewhere.
-(test (run `{letvar f {fun {x y z} {* x {+ y z}}}
-                    {letvar f10 {f 10}
-                            {- {f10 3 5} {f10 1 2}}}})
-      (NumV 50))
+(test (run `{= 5 {+ 2 3}})
+      (boolV #t))
+(test (run `{= 6 {+ 2 3}})
+      (boolV #f))
 
-(test (run `{letvar x {box 3}
-                    {letvar y x
-                            {begin {set-box! y 10}
-                                   {unbox x}}}})
-      (NumV 10)
-      )
+(test (run `{and {= 3 3} {= 4 5}})
+      (boolV #f))
+(test (run `{and {= 3 3} {= 4 4}})
+      (boolV #t))
+
+(test (run `{or {= 3 3} {= 4 5}})
+      (boolV #t))
+(test (run `{or {= 3 4} {= 4 5}})
+      (boolV #f))
+
+(test (run `{not {= 3 5}})
+      (boolV #t))
+
+(test (run `{if {not
+                 {and
+                  {= 3 5}
+                  {or
+                   #t
+                   {= 5 22}}}}
+                99
+                100})
+      (numV 99))
+
+(test (run
+       `{let1 {x {+ 9900 99}}
+              {+ x {* x {if {zero? x} x {- x x}}}}})
+      (numV 9999))
+
+;; Basic lambda test
+(test (run
+       `{let1 {f {lam x {+ x 3}}}
+              {* {f 1} {f 2}}})
+      (numV 20))
+
+;; Apply lambda directly
+(test (run
+       `{let1 {f {lam x {+ x 3}}}
+              {* {f 1} {{lam x {- x 7}} 2}}})
+      (numV -20))
+
+;; Lambda should be able to refer to variables defined earlier
+(test (run
+       `{let1 {x 99}
+              {let1 {f {lam y {+ x y}}}
+                    {f 1}}})
+      (numV 100))
+
+;; Lambda should be able to be nested
+(test (run
+       `{let1 {f {lam x {lam y {+ x y}}}}
+              {{f 3} 5}})
+      (numV 8))
+
+;; Calling non-function should be error
+(test/exn (run `{1 2}) "")
+
+;; Multi-argument lambda tests
+(test (run `{let1 {difference {lam {x y}  {- x y}}}
+                  {* {difference 3 5} {difference 5 3}}})
+      (numV -4))
+
+;; Make sure multi-arg still captures free variables correctly
+(test (run `{let1 {x 99}
+                  {let1 {f {lam {y z} {* y {+ x z}}}}
+                        {f 3 1}}})
+      (numV 300))
+
+;; Make sure shadowing works for multi-arg functions
+(test (run `{let1 {x 99}
+                  {let1 {f {lam {x y z} {* y {+ x z}}}}
+                        {f 2 3 1}}})
+      (numV 9))
+
+;; We can have 0-argument functions and calls, which just turn into
+;; non-function expressions
+(test (run `{{+ 33 11}})
+      (numV 44))
+
+(test (run `{lam {} {+ 2 3}})
+      (numV 5))

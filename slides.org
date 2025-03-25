@@ -4915,7 +4915,7 @@ while (i < 10){
                   (string-append "Undefined variable: "
                                  (to-string var)))]
         [(cons h t)
-           (pairFst h)]))
+           (pairSnd h)]))
 #+end_src
 *** Intepreting Curly-Lambda with Environments
 - We can change the implementation
@@ -4973,18 +4973,20 @@ while (i < 10){
   + Evaluate argument to value
   + Evaluate function, make sure it's actually a function, and get its parameter and body
 - Interpret function body in the environment with the parameter bound to the argument's value
+  +  Whenever we see the variable in the function body, we'll use its value
 #+begin_src racket
 (define (interp env expr)
   (type-case Exp interp
   ....
-    [(appE funExpr argExpr)
-      (let* ([argVal (interp argExpr)]
-             [funVal (checkAndGetFun (interp funExpr))]
-             [funParam (fst funVal)]
-             [funBody (snd funVal)]))
-        (interp (extendEnv (bind funParam argVal)
-                           env) ;;<------
-                funBody))] ))
+  [(appE fun arg)
+     ;; Interpret the function and arg
+     (let* ([argVal (interp env arg)]
+            [funVal (interp env fun)])
+       (type-case Value funVal
+         [(lamV var body) ;; Extend current env with argument value
+          (interp (extend var argVal env) body)]
+         [else
+          (error 'interp "Tried to call non-function")]))]
 #+end_src
 *** The problem
 - With a lambda, there could have been many substitutions that were applied to its free variables
@@ -4993,15 +4995,17 @@ while (i < 10){
 - When we actually go to interpret the body, we don't have the environment that the function was created in
   + Just the environment from the time of the call
 - We've implemented *dynamic scoping* by accident!
-*** The Solution: Closures
-- A function should be /closed/ over its environment at the point it's created (interpreted)
-- So we add an extra piece of data to the ~Value~ variant for functions: the environment at the time of creation
-  + The combination of a function variable+body and an environment is called a *closure*
-- Closures give environment interpreters the same behavior as substitution interpreters
 *** Terminology
 - /Static scope/ means a function never changes once it has been *defined*
   + We can still create functions dynamically
   + But once created they're static
+    - e.g. any undefined variables get their values from the environment /where the function was defined/
+- /Dynamic scope/ means that any free (undefined) variables in a function get their values from the environment when the function was /called/ (not defined)
+*** Implementing Static Scope: Closures
+- A function should be /closed/ over its environment at the point it's created (interpreted)
+- So we add an extra piece of data to the ~Value~ variant for functions: the environment at the time of creation
+  + The combination of a function variable+body and an environment is called a *closure*
+- Closures give environment interpreters the same behavior as substitution interpreters
 *** The New Value Type
 - Value version of functions contains an environment in addition to its variable and body
 #+begin_src racket
@@ -5012,18 +5016,6 @@ while (i < 10){
   (closureV [arg : Symbol]
             [body : Exp]
             [env : Env]))
-#+end_src
-*** A New Dynamic Type Checker
-- Same idea as ~checkAndGetFun~, just has an extra piece of data to retrieve
-#+begin_src racket
-(define (checkAndGetClosure [v : Value]) : ((Symbol * Exp) * Env)
-  (type-case Value v
-     [(closureV x body env)
-      (pair (pair x body) env)]
-     [else
-     (error 'curlyTypeError
-             (string-append "Expected Function, got number:"
-                             (to-string v)))]))
 #+end_src
 *** Properly Interpreting Functions
 - When we interpret a lambda, /package the current environment up with it/
@@ -5045,15 +5037,17 @@ while (i < 10){
 (define (interp env expr)
   (type-case Exp interp
   ....
-    [(appE funExpr argExpr)
-      (let* ([argVal (interp argExpr)]
-             [funVal (checkAndGetClosure (interp funExpr))]
-             [funParam (fst (fst funVal))]
-             [funBody (snd (fst funVal))]
-             [funEnv (snd funVal)]))
-        (interp (extendEnv (bind funParam argVal)
-                           funEnv);;<------
-                funBody))] )
+  [(appE fun arg)
+     ;; Argument and function are interpreted in the same environment as the whole expression
+     ;; e.g. NOT the environment from the closure
+     (let* ([argVal (interp env arg)]
+            [funVal (interp env fun)])
+       (type-case Value funVal
+         [(closureV var body funEnv)
+          (let* ([envForCall (extend var argVal funEnv)])
+          (interp envForCall body))]
+         [else
+          (error 'interp "Tried to call non-function")]))]
 #+end_src
 *** Summary: Dynamic vs. Static Scope
 - Free variables in a function body are variables that are
@@ -5150,6 +5144,7 @@ while (i < 10){
 
 
 *** Async in JavaScript
+- The entire JS approach depends on static scope
 - From the w3schools async tutorial
 #+begin_src js
 async function myFunction() {
@@ -5166,30 +5161,7 @@ myFunction().then(
   + Dynamically creates the function that is run when ~myFunction~ actually runs
 - Concurrency in JS is mostly just syntactic sugar for lambda/higher-order functions
 
-*** And More
-- Swift "Closures" are just lambdas
-  #+begin_src swift
-  names.sorted(by:
-    { (s1: String, s2: String) -> Bool
-        in return s1 > s2
-    } )
-  #+end_src
-- C++11 added anonymous functions
-  #+begin_src c++
-  sort(V.begin(), V.end(), [](auto& a, auto& b) -> bool
-  {
-     return a > b;
-  });
-  #+end_src
-- Java 8 added anonymous functions
-  #+begin_src java
-  Arrays.sort(arr,
-    (String a, String b) ->
-              a.length() - b.length());
-  #+end_src
-- This is all just lambda with different syntax
-
-* Store Passing and Boxes :noexport:
+* Store Passing and Boxes
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides015-box.pdf
 :header-args:racket: :results code :lang flit
@@ -5216,8 +5188,7 @@ myFunction().then(
 :PROPERTIES:
 :CUSTOM_ID: curly-box-a-language-with-mutation
 :END:
-*** Boxes
-*** Expessions vs. Statements
+*** Expressions vs. Statements
 - *Expression:* a program or program fragment that is meant to be evaluated
   + Produces a value
   + e.g. Function arguments in C++/Python are expressions
@@ -5228,20 +5199,21 @@ myFunction().then(
 - All of our Curly languages (and Racket) are /expression oriented languages/
   + No notion of statement
   + Syntax consists of nested expressions
-    - If0 branches: expressions
+    - If branches: expressions
     - Function bodies: expressions
 *** Sequencing
 - Expression-oriented version of a statement
-- ~{begin <expr> <expr>}~
-  + Called ~seq~ in the textbook
+- ~{seq <expr> <expr>}~
 - Evaluates the first expression /then discards the result/
   + Only useful if the first expression has side effects
 - Then evaluates the second expression
-- The value of the second expression is the value of the whole ~begin~ expression
-*** Boxes
+- The value of the second expression is the value of the whole ~seq~ expression
+*** Boxes: Mutation in Functional Languages
 - Kind of like C++ References
 - Pointers, but with no notion of pointer arithmetic
-- A box denotes a location in the store (memory, etc.)
+- A box denotes *a location in the store*
+  + Store: the current state of mutable values
+  + e.g. a model of memory/RAM
 - Copies of a box refer to the same part of memory
   + So changes to that part are seen by /all/ copies of that box
 *** Boxes in Curly-Box
@@ -5266,7 +5238,7 @@ myFunction().then(
 #+begin_src racket
 {let1 x {box 3}
   {let1 y x
-  {begin {set-box! y 10}
+  {seq {set-box! y 10}
     {unbox x}}}}
 #+end_src
 - Allocates a new box, with the value 3
@@ -5277,6 +5249,26 @@ myFunction().then(
   + This is the same location that x points to
 - We produce the value from wherever ~x~ points
   + 10, since we updated its value
+*** Boxes are First-Class Values
+- Boxes are a new type of value
+  + Just like pointers are values in C++
+- Functions can create, take, return boxes
+  + e.g. pass a box to a function
+  + do ~set-box!~ on it
+  + After function, new value will be seen
+*** Example
+#+begin_src racket
+{let1 {double! {lam x
+                    {set-box x
+                             {* 2 {unbox x}}}}}
+      {let1 {b {box 3}}}
+        {seq {double! b}
+             {unbox b}}
+#+end_src
+- Result is ~6~
+  + Calling ~double!~ gave the /location/ containing 3, not a copy of the value 3
+  + So the call changed what was at ~b~'s location
+  + So unboxing ~b~ after had the new value
 ** Interpreting Boxes
 :PROPERTIES:
 :CUSTOM_ID: interpreting-boxes
@@ -5285,79 +5277,87 @@ myFunction().then(
 - We /could/ just use Racket mutation to implement boxes
   + But we're not going to
 - Recall: when we define a functional language, we get equations about the functions we define
-  + e.g. ~(interp (Plus x y))~ is /mathematically equal/ to ~(+ (interp x) (interp y))~
+  + e.g. ~(interp (plusE x y))~ is /mathematically equal/ to ~(+ (interp x) (interp y))~
 - Our interpreters aren't just implementations
   + They're /specifications/ for the language
     - Semantics
   + Equations we can use to reason about program behaviour
 - By using a purely functional approach, we define a semantics for Curly, even if it has mutation
 - The semantics is informal, but still a useful tool for /understanding/ stateful programs and languages
+*** New Abstract Syntax
+#+begin_src racket
+(define-type Exp
+  ...
+  ;; Create a new box with the given value
+  (boxE [e : Exp])
+  ;; Write the given value to the given box
+  (set-box!E [theBox : Exp]
+             [valToWrite : Exp])
+  (unboxE [theBox : Exp])
+  (seqE [eFirst : Exp]
+        [eSecond : Exp])
+  )
+#+end_src
 *** The Store
 - Data structure modelling memory
 #+begin_src racket
 (define-type-alias Location Number)
 
-(define-type Storage
-  (cell [location : Location]
-        [val : Value]))
+(define-type-alias Store (AssocList Location Value))
 
-(define-type-alias Store (Listof Storage))
 (define mt-store empty)
+
 #+end_src
-- Store is a list of location-value pairs
-  + Super inefficient version of a key-value store
-    - e.g. Python dictionary with integer keys
-  + Interface is what matters
+- Store has the same interface as Environment
+  + But keys are locations, not symbols
+  + We store locations as numbers, but that's an implementation detail
 *** Store Operations: override-store
 #+begin_src racket
 ;; (Storage Store -> Store)
-(define override-store cons)
+(define override-store extend)
 #+end_src
 - Creates /a new store/ that has the given value at the given location
   + If something was in that location, the new value overwrites it
   + In our implementation, this happens by adding the new value to the start of the list, so a search will always find it first
 - Original store is unchanged
   + Purely functional /implementation language/
+*** Store Operations: lookup
+- ~lookup : (Location Store -> Value)~
+- Get the value at the given location
+  + Finds the first one in the list e.g. from the most recent ~override-store~
 *** Store Operations: new-loc
 #+begin_src racket
-(define (new-loc [sto : Store]) : Location
-  (+ 1 (max-address sto)))
+(define (new-loc [sto : Store])
+  : Location
+  (+ 1 (max-loc sto)))
 
-(define (max-address [sto : Store]) : Location
-  (type-case (Listof Storage) sto
-   [empty 0]
-   [(cons c rst-sto) (max (cell-location c)
-                          (max-address rst-sto))]))
+(define (max-loc [sto : Store])
+  : Location
+  (foldr max 0 (map pairFst sto)))
 #+end_src
  + Get a new ~Location~ that does not yet have a value in the store
-   - ~max-address~ is a helper that enables this
+   - ~max-loc~ is a helper that enables this
+   - Gets the list of all locations in the store
+   - Iterates (folds) to find the largest
  + Used with ~override-store~ to extend a store to a new one with an additional location
-*** Store Operations: fetch
-#+begin_src racket
-(define (fetch [l : Location] [sto : Store]) : Value
-  (type-case (Listof Storage) sto
-   [empty (error 'interp "unallocated location")]
-   [(cons c rst-sto) (if (equal? l (cell-location c))
-                         (cell-val c)
-                         (fetch l rst-sto))]))
-#+end_src
-- Get the value at the given location
-  + Finds the first one in the list e.g. from the most recent ~store-override~
 *** A Store Passing Interpreter
-- Recall how with generative recursion, we added an extra parameter to our function to simulate something being updated
+- Generative recursion: added an extra parameter to our function to simulate something being updated
 - To interpret a language with mutable state, we'll do something similar
   + Add a ~Store~ parameter to ~interp~
   + Make ~interp~ produce both a ~Value~ and an updated ~Store~
+    -  And take ~Store~ as argument
 #+begin_src racket
-(define-type Result
-  (v*s [v : Value] [s : Store]))
+(define-type-alias Result
+  (Value * Store))
+
+(define (v*s [v : Value]
+             [s : Store]) : Result
+  (pair v s))
+
 (define (interp [env : Env]
                 [e : Exp]
-                [sto : Store]) : Result
-  ....)
+                [sto : Store]) : Result ....)
 #+end_src
-- Custom pair-type for value-store pairs
-- ~interp~ takes an expression, and environment, and a store
 *** Updating The Interpreter: Plus
 #+begin_src racket
 (define (interp [env : Env]
@@ -5373,6 +5373,7 @@ myFunction().then(
 #+end_src
 - Interp the left, getting its value and store
 - Interp the right /using the new store from the left/
+  +  Note the sequencing: the store gets threaded through
 - Do the addition, /then return the resulting store from the right/
   + Design choice: which operand we eval first makes a difference
 *** Aside: Racket Macros
@@ -5387,50 +5388,99 @@ myFunction().then(
 - The entire ~Flit~ type system is implemented with Racket macros
 *** A Macro for Interpreting with Stores
 #+begin_src racket
-(define-syntax-rule
-  (with [(v-id sto-id) call]
-    body)
-  (type-case Result call
-    [(v*s v-id sto-id) body]))
+(define-syntax with
+  (syntax-rules ()
+    [(with body) body]
+    [(with [(v-id sto-id) call] [(v-ids sto-ids) calls]... body)
+     (let* ([vs call]
+            [v-id (pairFst vs)]
+            [sto-id (pairSnd vs)])
+       (with [(v-ids sto-ids) calls]... body))]))
 #+end_src
 - I won't ask you to write a macro on an exam
 - I might check whether you know that
   + Macros extend the syntax of a language using the language itself
   + Macros are code that is run at compile-time
+*** Why Bother With a Macro
+- Makes code shorter
+- Makes intent clearer
+  + "Interpret this code, then give a name to the value and store that result"
 *** Using Our Macro
 #+begin_src racket
 (define (interp [env : Env]
                 [e : Exp]
                 [sto : Store]) : Result
   (type-case Exp e
-    [(Plus l r)
-     (with [(v-l sto-l) (interp l env sto)]
-       (with [(v-r sto-r) (interp r env sto-l)]
-         (v*s (liftVal2 + v-l v-r) sto-r)))]
+    [(plusE l r)
+     (with [(v-l sto-l) (interp env l sto)]
+           [(v-r sto-r) (interp env r sto-l)]
+           (v*s (lift-binop + v-l v-r)
+                sto-r))]
 #+end_src
 - Much more succinct: call interp, and immediately give a name to the store and value we get as a result
 - Updating all the other cases is similar
   + See in-class Racket if time permits
+*** Order Matters
+- We chose to evaluate the left side before the right
+  + This is arbitrary
+  + Could have instead
+- The stores we pass reflects the order
+  + ~interp~ of the left argument produces a value
+    - /and/ a new store
+  + ~interp~ of the right happens /after/ the left
+    - So it should see the effects of interpreting the left
+    - So it /starts/ with the store that left /returned/
+*** Order Example
+#+begin_src racket
+{let1 {b {box 3}}
+      {+ {seq {set-box! b {* 3 {unbox b}}}
+              5}
+         {unbox b}}}
+#+end_src
+- The first ~+~ argument is a ~seq~ expression
+  + Sets the value of ~b~
+  + Side-effect!
+- Start with empty store
+- Then store ~3~ at ~b's~ location
+- Then interp ~{seq {set-box! b {* 3 {unbox b}}} 5}~
+  + Store starts with ~b := 3~
+  + Unboxing ~b~ gives ~3~, so ~9~ written as new value for ~b~
+  + ~seq~ throws away the /value/ from ~set-box!~ and produces ~5~
+- Then interp ~{unbox b}~
+  + /starts with new store/ which has ~b := 9~
+  + Unboxing ~b~ gives 9
+- Final result ~14~
 *** Boxes as Values
 - We represent boxes using locations in the store
   + What value is in the box depends on the current store
 #+begin_src racket
 (define-type Value
+  (numV [num : Number])
+  (boolV [bool : Boolean])
   (closureV [arg : Symbol]
             [body : Exp]
             [env : Env])
-  (numV [num : Number])
-  (BoxV [loc : Location]))
+  (boxV [loc : Location]))
 #+end_src
 *** Interpreting Box
 #+begin_src racket
-[(Box a)
-   (with [(v sto-v) (interp a env sto)]
+(define (interp [env : Env]
+                [e : Exp]
+                [sto : Store]) : Result
+(type-case Exp e
+  ...
+  [(boxE a)
+   (with [(v sto-v) (interp env a sto)]
      (let ([l (new-loc sto-v)])
-       (v*s (BoxV l)
-            (override-store (cell l v)
+       (v*s (boxV loc)
+            (override-store loc v
                               sto-v))))]
 #+end_src
+
+#+RESULTS[db368bd57437b08e77b90e58f290ce7f837bf14d]:
+#+begin_src racket
+#+end_src
+
 - Interpret the value we're putting in the box
   + And get the store from this interpretation
 - Create a new store that has the value at a new address
@@ -5439,10 +5489,10 @@ myFunction().then(
 
 *** Interpreting Unbox
 #+begin_src racket
-[(Unbox a)
-     (with [(v sto-v) (interp a env sto)]
+[(unboxE a)
+     (with [(v sto-v) (interp env a sto)]
        (type-case Value v
-         [(BoxV l) (v*s (fetch l sto-v)
+         [(boxV l) (v*s (lookup l sto-v)
                         sto-v)]
          [else (error 'interp "not a box")]))]
 #+end_src
@@ -5454,13 +5504,13 @@ myFunction().then(
   + With the store from evaluating the box
 *** Interpreting Set-box!
 #+begin_src racket
-[(Setbox bx val)
+[(set-box!E bx val)
      (with [(v-b sto-b) (interp bx env sto)]
        (with [(v-v sto-v) (interp val env sto-b)]
          (type-case Value v-b
-           [(BoxV l)
+           [(boxV loc)
             (v*s v-v
-                 (override-store (cell l v-v)
+                 (override-store loc v-v
                                  sto-v))]
            [else (error 'interp "not a box")])))]
 #+end_src
@@ -5470,11 +5520,13 @@ myFunction().then(
   + In the store we previously computed, getting a new store
 - Check that the box value is actually a box
 - Return the other value, /in the new store with the box location overwritten/
-*** Interpreting Begin
+  + Could have also returned dummy value ~0~, ~#t~, etc.
+  + Purpose is the side effect
+*** Interpreting Seq
 #+begin_src racket
-[(Begin l r)
-     (with [(v-l sto-l) (interp l env sto)]
-       (interp r env sto-l))]
+[(seqE l r)
+     (with [(v-l sto-l) (interp env l sto)]
+       (interp env r sto-l))]
 #+end_src
 - Evaluate the first expression /but do nothing with the value/
   + Just get the store that's the result of evaluating it
@@ -5488,7 +5540,7 @@ myFunction().then(
   + We /want/ them to always take the value from the point ~unbox~ is executed
   + Linearly threaded through the program
   + Once we've updated a store (by generating a new one), /we never use the old store again/
-    - ... until we implement more advanced features e.g. undo, backtracking
+    - ... unless we implement more advanced features e.g. undo, backtracking
 * Mutable Variables :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides016-mutvar.pdf
@@ -5533,12 +5585,12 @@ myFunction().then(
                 [sto : Store]) : Result
   (type-case Exp e
     [(Var x)
-     (v*s (fetch (lookup x env) sto) sto)]
+     (v*s (lookup (lookup x env) sto) sto)]
 ....))
 #+end_src
 - Previously, we just looked up a value with ~lookup~
 - Now we lookup a /location/
-  + Have to use ~fetch~ to get its value from the store
+  + Have to use ~lookup~ to get its value from the store
 - Produce that value, along with the unchanged store
 *** Adding mutation: Curly-Mutvar
 - Curly syntax: ~{setvar! SYMBOL <expr>}~
@@ -5554,7 +5606,8 @@ myFunction().then(
      (with ([e-val e-sto] (interp env e sto))
       (v*s e-val
         ;; Get the location from the environment
-        (override-store (cell (lookup x env) e-val)
+        (override-store (lookup x env)
+                        e-value
                         e-sto)))]
   ....))
   #+end_src
@@ -5584,11 +5637,11 @@ myFunction().then(
             [argLoc (new-loc arg-sto)]
             ;; new store with the arg value at the new location
             ;; Use most recent store from arg
-            [body-sto (override-store (cell argLoc arg-v) arg-sto)])
+            [body-sto (override-store argLoc arg-v arg-sto)])
            ;; Evaluate the body in the extended *closure* env
            ;; with the new location bound to the parameter name,
            ;; using the new store with the argument value
-          (interp (extendEnv (bind argVar argLoc) funEnv)
+          (interp (extend (bind argVar argLoc) funEnv)
                   funBody
                   body-sto))))]
 #+end_src
@@ -5604,7 +5657,7 @@ myFunction().then(
 ;; and use its location instead of the new one if it us
 (type-case Exp argExpr
   [(Var x)
-     (interp (extendEnv (bind argVar (lookup x env)) funEnv)
+     (interp (extend (bind argVar (lookup x env)) funEnv)
                   funBody
                   arg-sto))))]
   ;; Otherwise do the same as call-by-value
@@ -5644,12 +5697,12 @@ myFunction().then(
 - To enable passing by reference, we add an /aliasing expression/ to Curly-Mutvar
   +  Like "address-of" operator ~&~ in C++
 - ~{getloc SYMBOL}~ produces a box whose location is the same location as whatever in-scope symbol it is given
-  + e.g. ~{getloc x}~ would produce ~{BoxV l}~ where ~l~ is the location in the environment for ~x~
+  + e.g. ~{getloc x}~ would produce ~{boxV l}~ where ~l~ is the location in the environment for ~x~
 - Interpreting:
   + Like new-box, except we look up the location in the environment instead of getting a new one
 #+begin_src racket
     [(GetLoc x)
-      (v*s (BoxV (lookup x env))
+      (v*s (boxV (lookup x env))
         ;; No changes to the store
         sto)]
 #+end_src
@@ -5711,8 +5764,8 @@ myFunction().then(
   + Generate a new location for the recursive ~x~ being defined
     - Put a dummy value at it
   + Interpret ~e1~ in the environment extended with ~x~'s location
-    - If ever fetch from that location, get the dummy value and raise an error
-    - Shouldn't ever fetch if self-references are in the bodies of functions
+    - If ever lookup from that location, get the dummy value and raise an error
+    - Shouldn't ever lookup if self-references are in the bodies of functions
   + Then, *update the store to contain the value of ~e1~ at the location of ~x~*
   + Then, interpret the body ~e2~ with this updated store
 *** Interpreting Recursion: Value
@@ -5722,7 +5775,7 @@ myFunction().then(
             [body : Exp]
             [env : Env])
   (numV [num : Number])
-  (BoxV [loc : Location])
+  (boxV [loc : Location])
   ;; NEW
   ;; Placeholder for implementing recursion
   ;; If we ever produce this, we should get an error
@@ -5737,18 +5790,18 @@ myFunction().then(
    [(LetRec x xexpr body)
      (let* ([x-loc (new-loc sto)] ;; Location for x
             [dummy-sto ;; Put a dummy value at x's location
-               (override-store (cell x-loc
-                                     (DummyV)) sto)])
+               (override-store x-loc
+                                     (DummyV) sto)])
         (with ([x-val x-sto]
                ;; Interpret xexpr in env with x's location
-                 (interp (extendEnv (bind x x-loc) env)
+                 (interp (extend (bind x x-loc) env)
                           xexpr
                           dummy-sto))
          ;; Interpret body in env with x's location
          ;; and store with x's newly computed value
          ;; plus any side-effects from xexpr
-         (interp (extendEnv (bind x x-loc) env) body
-                 (override-store (cell x-loc x-val) x-sto))))]
+         (interp (extend (bind x x-loc) env) body
+                 (override-store x-loc x-val x-sto))))]
 #+end_src
 *** Example
 #+begin_src racket
@@ -5776,7 +5829,7 @@ myFunction().then(
                                    (Times (numE 1) (numE -1))))))
    (fact := 0))
 #+end_src
-- Never fetch from location 0
+- Never lookup from location 0
   + Interp of function doesn't interp body of function
 - Closure captures environment with ~fact := 0~
   + Only captures environment, *not store*
@@ -5997,7 +6050,7 @@ myFunction().then(
          (snd p)
          (find rst-l name))]))
 #+end_src
-- The same ~lookup~/~fetch~ code we've written a bunch
+- The same ~lookup~ code we've written a bunch
   + Works for pairs, not custom datatype
   + Polymorphic in type of second thing in pair
     - Works for fields and methods
@@ -6019,8 +6072,8 @@ myFunction().then(
          (type-case Value obj-val
            [(ObjV fields methods)
             (let ([param-closure (find methods method-name)])
-              (interp (extendEnv (bind 'this obj-val)
-                         (extendEnv (bind (closureV-arg param-closure)
+              (interp (extend (bind 'this obj-val)
+                         (extend (bind (closureV-arg param-closure)
                                           arg-val)
                                     closureV-env))
                       (closureV-body param-closure)))]
