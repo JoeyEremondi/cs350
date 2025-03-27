@@ -5545,7 +5545,7 @@ myFunction().then(
   + Linearly threaded through the program
   + Once we've updated a store (by generating a new one), /we never use the old store again/
     - ... unless we implement more advanced features e.g. undo, backtracking
-* Mutable Variables :noexport:
+* Mutable Variables
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides017-mutvar.pdf
 :header-args:racket: :results code :lang flit
@@ -5666,7 +5666,7 @@ myFunction().then(
              [(closureV argVar funBody funEnv)
                 (let* ([argLoc (new-loc arg-sto)]
                        [body-sto (override-store argLoc arg-v arg-sto)])
-                (interp (extend (bind argVar argLoc) funEnv)
+                (interp (extend argVar argLoc funEnv)
                         funBody
                         body-sto))]
              [else error 'interp "Tried to call non-function")]))]
@@ -5691,7 +5691,7 @@ myFunction().then(
 ;; and use its location instead of the new one if it us
 (type-case Exp argExpr
   [(varE x)
-     (interp (extend (bind argVar (lookup x env)) funEnv)
+     (interp (extend argVar (lookup x env) funEnv)
                   funBody
                   arg-sto)]
   ;; Otherwise do the same as call-by-value
@@ -5787,7 +5787,7 @@ myFunction().then(
 - These properties are *completely separate from each other*
   + You can mix them in any combination
   + But lazy + mutable state is generally a bad idea
-* Implementing Recursion via State :noexport:
+* Implementing Recursion via State
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides018-recursion.pdf
 :header-args:racket: :results code :lang flit
@@ -5843,6 +5843,7 @@ myFunction().then(
             [body : Exp]
             [env : Env])
   (numV [num : Number])
+  (boolV [b : Boolean])
   (boxV [loc : Location])
   ;; NEW
   ;; Placeholder for implementing recursion
@@ -5855,20 +5856,20 @@ myFunction().then(
                 [e : Exp]
                 [sto : Store]) : Result
   (type-case Exp e
-   [(LetRec x xexpr body)
+   [(letRec! x xexpr body)
      (let* ([x-loc (new-loc sto)] ;; Location for x
             [dummy-sto ;; Put a dummy value at x's location
                (override-store x-loc
                                      (DummyV) sto)])
         (with ([x-val x-sto]
                ;; Interpret xexpr in env with x's location
-                 (interp (extend (bind x x-loc) env)
+                 (interp (extend x x-loc env)
                           xexpr
                           dummy-sto))
          ;; Interpret body in env with x's location
          ;; and store with x's newly computed value
          ;; plus any side-effects from xexpr
-         (interp (extend (bind x x-loc) env) body
+         (interp (extend x x-loc env) body
                  (override-store x-loc x-val x-sto))))]
 #+end_src
 *** Example
@@ -5942,7 +5943,7 @@ myFunction().then(
   + First-class functions/closures
   + Mutable references/variables
 - Useful in typed languages that can't give the Y-combinator a type
-* Objects and OOP :noexport:
+* Objects and OOP
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides019-oop.pdf
 :header-args:racket: :results code :lang flit
@@ -6063,11 +6064,11 @@ myFunction().then(
 #+begin_src racket
 (define-type Expr
   ...
-  (Object [fields : (Listof (Symbol * Exp))]
-           [methods : (Listof (Symbol * (Symbol * Exp)))])
-  (Get [obj-expr : Exp]
+  (objectE [fields : (AssocList Symbol Exp)]
+           [methods : (AssocList Symbol (Symbol * Exp))])
+  (getE [obj-expr : Exp]
         [field-name : Symbol])
-  (Send [obj-expr : Exp]
+  (sendE [obj-expr : Exp]
          [method-name : Symbol]
          [arg-expr : Exp]))
 #+end_src
@@ -6079,7 +6080,7 @@ myFunction().then(
 #+begin_src racket
 (define-type Value
   ....
-  (ObjV [fields : (Listof (Symbol * Value))]
+  (objV [fields : (Listof (Symbol * Value))]
         [methods : (Listof (Symbol * Value))]))
 #+end_src
 - Value version of object
@@ -6095,9 +6096,9 @@ myFunction().then(
 (define (interp [env : Env]
                 [e : Exp] : Value
   (type-case Exp e
-    [(Object fields methods)
+    [(objectE fields methods)
        ;; Each named field expression gets turned into a name-value pair
-       (ObjV (map (lambda ([pr : (Symbol * Exp)])
+       (objV (map (lambda ([pr : (Symbol * Exp)])
                     (pair (fst pr) (interp env (snd pr))))
                 fields)
                 ;; Each method gets turned into a closure
@@ -6107,42 +6108,27 @@ myFunction().then(
                                            env)))
                    methods))])
 #+end_src
-*** A Helper Function for List of Pairs
-#+begin_src racket
-(define (find [l : (Listof (Symbol * 'a))] [name : Symbol]) : 'a
-  (type-case (Listof (Symbol * 'a)) l
-    [empty
-     (error 'find (string-append "not found: " (symbol->string name)))]
-    [(cons p rst-l)
-     (if (symbol=? (fst p) name)
-         (snd p)
-         (find rst-l name))]))
-#+end_src
-- The same ~lookup~ code we've written a bunch
-  + Works for pairs, not custom datatype
-  + Polymorphic in type of second thing in pair
-    - Works for fields and methods
 *** Interpreting Field Lookup
 #+begin_src racket
-[(Get obj-expr field-name)
+[(getE obj-expr field-name)
  ;; Dynamic type check
   (type-case Value (interp env obj-expr)
-      [(ObjV fields methods)
-        (find fields field-name)]
+      [(objV fields methods)
+        (lookup fields field-name)]
         [else (error 'interp "not an object")])]
 #+end_src
 *** Interpreting Method Calls
 #+begin_src racket
-(Send obj-expr method-name arg-expr)
+(sendE obj-expr method-name arg-expr)
        (let [(obj-val (interp env obj-expr))
               (arg-val (interp env arg-expr))]
          ;; dynamic type check
          (type-case Value obj-val
-           [(ObjV fields methods)
-            (let ([param-closure (find methods method-name)])
-              (interp (extend (bind 'this obj-val)
-                         (extend (bind (closureV-arg param-closure)
-                                          arg-val)
+           [(objV fields methods)
+            (let ([param-closure (lookup methods method-name)])
+              (interp (extend 'this obj-val
+                         (extend (closureV-arg param-closure)
+                                          arg-val
                                     closureV-env))
                       (closureV-body param-closure)))]
 #+end_src
