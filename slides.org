@@ -4732,12 +4732,12 @@ while (i < 10){
 #+begin_src racket
 (define-type UTLC
   ;; A variable
-  (Var [x : Symbol])
+  (varE [x : Symbol])
   ;; Function application (call)
-  (App [fun : UTLC]
+  (appE [fun : UTLC]
        [arg : UTLC])
   ;; Anonymous function (lambda)
-  (Lam [param : Symbol]
+  (lamE [param : Symbol]
        [body : UTCL]))
 #+end_src
 - Stands for "Un-Typed Lambda Calculus"
@@ -4752,9 +4752,9 @@ while (i < 10){
 #+begin_src racket
 (define (interpUTLC [e : UTLC] : UTLC)
   (type-case UTLC e
-    [(App fun arg)
+    [(appE fun arg)
        (type-case (interpUTLC fun)
-          [(Lam x body)
+          [(lamE x body)
              (interpUTLC (subst x arg body))]
           [else (error 'x "Undefined variable")])]
     ;; Function and variables don't do any computation,
@@ -4769,13 +4769,13 @@ while (i < 10){
 #+begin_src racket
 ;; {lam {x y} x}
 (define True
-  (Lam 'x (Lam 'y (Var 'x))))
+  (lamE 'x (lamE 'y (varE 'x))))
 ;;{lam {x y} y}
 (define False
-  (Lam 'x (Lam 'y (Var 'y))))
+  (lamE 'x (lamE 'y (varE 'y))))
 ;; curried (test thenCase elseCase)
 (define (If test thenCase elseCase)
-  (App (App test thenCase) elseCase))
+  (appE (appE test thenCase) elseCase))
 #+end_src
 - If we give ~If~ the boolean ~True~ it produces the then-case
 - If we give ~If~ the boolean ~False~ it produces the else-case
@@ -4785,27 +4785,27 @@ while (i < 10){
 #+begin_src racket
 ;; {lam {f x} x}
 (define Zero
-  (Lam 'f (Lam 'x (Var 'x)))) ;; Function that returns its argument
+  (lamE 'f (lamE 'x (varE 'x)))) ;; Function that returns its argument
 ;; {lam {f x} {f {n f x}}}
 ;; Add one to a number
 (define (Add1 n)
-  (Lam 'f (Lam 'x) (App (Var 'f) (App (App n f) x))))
+  (lamE 'f (lamE 'x) (appE (varE 'f) (appE (appE n f) x))))
 ;; {lam {f x} {m f {n f x}}}
-(define (Plus m n)
-  (Lam 'f (Lam 'x) ((App m (Var 'f)) (App (App n f) x))))
+(define (plusE m n)
+  (lamE 'f (lamE 'x) ((appE m (varE 'f)) (appE (appE n f) x))))
 #+end_src
 *** Pairs
 - You can view a pair as a function that takes in a boolean and returns either the first or second value depending on that boolean
 #+begin_src racket
 ;; {lam z {if z x y}} for the pair (x,y)
 (define (Pair x y)
-  (Lam 'z (If (Var 'z) x y)))
+  (lamE 'z (If (varE 'z) x y)))
 ;; {pr true} gives the first element of pr
 (define (Fst pr)
-  (App pr True))
+  (appE pr True))
 ;; {pr false} gives the second element of pr
 (define (Snd pr)
-  (App pr False))
+  (appE pr False))
 #+end_src
 *** Recursion: The Y Combinator
 - Not the startup funder
@@ -4813,8 +4813,8 @@ while (i < 10){
 #+begin_src racket
 ;;{lam f {{lam x {f {x x}}} {lam x {f {x x}}}}}
 (define Y
-  (Lam 'f (App (Lam 'x (App f (App x x)))
-               (Lam 'x (App f (App x x))))))
+  (lamE 'f (appE (lamE 'x (appE f (appE x x)))
+               (lamE 'x (appE f (appE x x))))))
 #+end_src
 - Fixed-point function
   + For any ~g~, have ~{Y g}~ = ~{g {Y g}}~ = ~{g {g {Y g}}}~...
@@ -4937,7 +4937,7 @@ while (i < 10){
 - Other operations are similar
 #+begin_src racket
 ;; {+ e1 e2} evaluates e1 and e2, then adds the results together
-    [(Plus l r)
+    [(plusE l r)
      (+ (interp env l) (interp env r))]
 #+end_src
 *** Case: Variable
@@ -4946,7 +4946,7 @@ while (i < 10){
 - If there is return it
   +  Otherwise, variable not found error
 #+begin_src racket
-[(Var x)
+[(varE x)
       (lookup x env)]
 #+end_src
 *** A (Wrong) First Attempt: Values
@@ -5313,8 +5313,9 @@ myFunction().then(
   + We store locations as numbers, but that's an implementation detail
 *** Store Operations: override-store
 #+begin_src racket
-;; (Storage Store -> Store)
-(define override-store extend)
+(define override-store
+  : (Location Value Store -> Store)
+  extend)
 #+end_src
 - Creates /a new store/ that has the given value at the given location
   + If something was in that location, the new value overwrites it
@@ -5364,12 +5365,15 @@ myFunction().then(
                 [e : Exp]
                 [sto : Store]) : Result
   (type-case Exp e
-   [(Plus l r)
-     (type-case Result (interp l env sto)
-       [(v*s v-l sto-l)
-        (type-case Result (interp r env sto-l)
-          [(v*s v-r sto-r)
-           (v*s (liftVal2 + v-l v-r) sto-r)])])]
+   [(plusE l r)
+     (let* ([lresult (interp env l sto)]
+            [v-l (pairFst lresult)];; Value
+            [sto-l (pairSnd lresult)]
+            [rresult (interp env l sto-l)] ;; sto-l, NOT sto
+            [v-r (pairRst rresult)]
+            [sto-r (pairSnd rresult)]);; sto-l, NOT sto
+       (v*s (lift-binop + v-l v-r)
+            sto-r))] ;; Ending store is the state after evaluating r
 #+end_src
 - Interp the left, getting its value and store
 - Interp the right /using the new store from the left/
@@ -5569,48 +5573,73 @@ myFunction().then(
 *** Bindings with mutable variables
 - Each binding associates a symbol with a /location/
   #+begin_src racket
-(define-type Binding
-  (bind [name : Symbol]
-        [loc : Location]))
+(define-type Binding (Symbol * Location))
   #+end_src
 - All other environment operations are the same
-- Lookup now has type:
+- Lookup for environments now has type:
 #+begin_src racket
-(define (lookup [n : Symbol] [env : Env]) : Location ....)
+(define (env-lookup [n : Symbol] [env : Env]) : Location ....)
 #+end_src
+*** Variables as a Two-Step Process
+- Getting or setting a variable now involves two lookups:
+  + Convert the variable name (symbol) into a ~Location~
+    - By looking up in the environment
+  + Convert the resulting location into a ~Value~
+    - By looking up in the store
+- Static vs. Dynamic
+  + What variables are in scope is a /static/ property
+    - Will always be the same for each call to a given function
+  + What values are in memory is a /dynamic/ property
+    -  Depends on every bit of code that has run before
 *** Interpreting Variables
 #+begin_src racket
 (define (interp [env : Env]
                 [e : Exp]
                 [sto : Store]) : Result
   (type-case Exp e
-    [(Var x)
+    [(varE x)
      (v*s (lookup (lookup x env) sto) sto)]
 ....))
 #+end_src
 - Previously, we just looked up a value with ~lookup~
 - Now we lookup a /location/
-  + Have to use ~lookup~ to get its value from the store
+  + Have to use ~lookup~ again to get its value from the store
+    - Recall, ~lookup~ is polymorphic
+    - ~lookup : ('key (AssocList 'key 'value) -> 'value)~
+    - So ~lookup~ on env gives ~Location~, lookup on store gives ~Value~
 - Produce that value, along with the unchanged store
-*** Adding mutation: Curly-Mutvar
-- Curly syntax: ~{setvar! SYMBOL <expr>}~
-  + ~{setvar! x e}~ changes the value of in-scope variable ~x~ to be the value of ~e~
-- Interpreting
-  + Just like ~SetBox~ except we get the location from the environment, instead of by evaluating a box
+*** Syntax for Mutable Variables
+- ~{setvar! SYMBOL <expr>}~
+  + Sets the value of an in-scope variable
+  + Just like ~set-box!~ except we get the location from the environment, instead of by evaluating a box
+- Can only set the value for a specific variable
+  + Unlike boxes, which can be created/computed at run-time
+- New AST constructor:
+#+begin_src racket
+(define-type Exp
+  ...
+  (setVar!E [var : Symbol]
+            [e : Exp]))
+#+end_src
+*** Interpreting Mutation
   #+begin_src racket
   (define (interp [env : Env]
                 [e : Exp]
                 [sto : Store]) : Result
   (type-case Exp e
-    [(Setvar! x e)
-     (with ([e-val e-sto] (interp env e sto))
-      (v*s e-val
-        ;; Get the location from the environment
-        (override-store (lookup x env)
+    [(setVarE! x e)
+      (with ([e-val e-sto] (interp env e sto))
+        (v*s e-val
+          ;; Get the location from the environment
+          (override-store (lookup x env)
                         e-value
                         e-sto)))]
   ....))
   #+end_src
+  - Interpret the new value for the variable
+    + This gives a value and a new store
+  - Lookup up the location for the variable
+  - Return a store with the new value at that location
 *** Function Calls
 - To call a function, we evaluate the body in the environment extended with the argument value
   + Environment now takes /locations/
@@ -5620,35 +5649,40 @@ myFunction().then(
 - /What if the argument is already a variable?/
   + Have a design decision
 *** Pass-by-value
+- Default in C/C++
 - If we implement function calls using pass-by-value, then:
   + *Each function call generates a new location where its argument values are stored*
   + If the arguments are variables, their values are looked up and copied to the new location
+    - e.g. the normal way to interpret a variable
+- Each function call has:
+  + A new symbol in the environment (the parameter)
+  + Pointing to a new location
 *** Pass-by-value interp
 #+begin_src racket
 [(appE funExpr argExpr)
      (with ([fun-v fun-sto] (interp env funExpr sto))
-        (with ([arg-v arg-sto] (interp env argExpr fun-sto))
-          (let* (
-            [funPair (checkAndGetClosure fun-v)] ;; Function might be an expression, so have to evaluate
-            [argVar (fst (fst funPair))]
-            [funBody (snd (fst funPair))]
-            [funEnv (snd funPair)]
-            ;; Allocate a new location for the argument value
-            [argLoc (new-loc arg-sto)]
-            ;; new store with the arg value at the new location
-            ;; Use most recent store from arg
-            [body-sto (override-store argLoc arg-v arg-sto)])
-           ;; Evaluate the body in the extended *closure* env
-           ;; with the new location bound to the parameter name,
-           ;; using the new store with the argument value
-          (interp (extend (bind argVar argLoc) funEnv)
-                  funBody
-                  body-sto))))]
+           ([arg-v arg-sto] (interp env argExpr fun-sto))
+           (type-case Value fun-v
+             [(closureV argVar funBody funEnv)
+                (let* ([argLoc (new-loc arg-sto)]
+                       [body-sto (override-store argLoc arg-v arg-sto)])
+                (interp (extend (bind argVar argLoc) funEnv)
+                        funBody
+                        body-sto))]
+             [else error 'interp "Tried to call non-function")]))]
 #+end_src
+- Evaluate function and arg
+  + Gives value and stores, threaded linearly
+- New location ~argLoc~ generated for function parameter
+  + New store ~body-sto~ with Parameter value added to this location
+- Evaluate function body
+  + In env from the closure
+  + Extended with new location for ~var~
+  + With the store containing ~arg-v~ at location ~argLoc~
 *** Pass-by-reference
-- Pass-by-reference means that, when a function argument is a variable,
-  the function's body is evaluated in an environment
-  /where the argument variable is bound to the input variable's location/
+- Pass-by-reference means:
+  + when function argument is a variable
+  + function's body is evaluated in an environment /where the argument variable is bound to the input variable's location/
 - Changes to one will be seen in the other
 *** Interpreting
 #+begin_src racket
@@ -5656,13 +5690,16 @@ myFunction().then(
 ;; except we check if the argument is a variable
 ;; and use its location instead of the new one if it us
 (type-case Exp argExpr
-  [(Var x)
+  [(varE x)
      (interp (extend (bind argVar (lookup x env)) funEnv)
                   funBody
-                  arg-sto))))]
+                  arg-sto)]
   ;; Otherwise do the same as call-by-value
   [else ....])
 #+end_src
+- In the variable case, we don't allocate a new location
+  + Evaluate function body in closure environment
+  + Extended to have parameter symbol mapped to *the variable's exiting location*
 *** The Difference
 - Any changes made to the parameter variable are lost in pass-by-value, but kept in pass-by-reference
 - Pass by value means that a function can only mutate locations that it is /explicitly given/
@@ -5701,7 +5738,7 @@ myFunction().then(
 - Interpreting:
   + Like new-box, except we look up the location in the environment instead of getting a new one
 #+begin_src racket
-    [(GetLoc x)
+    [(getLocE x)
       (v*s (boxV (lookup x env))
         ;; No changes to the store
         sto)]
@@ -5719,6 +5756,37 @@ myFunction().then(
 - The ~getloc~ makes a new box whose location is the same as ~y~
 - When ~doublebox!~ runs it alters the value at the location of its box, which was the location of ~y~
 - The final result is 6, since the value of ~y~ was changed
+*** Static Scope and Mutable Variables
+- Mutable variables are still statically scoped
+  + Function is executed in the environment from when it was defined
+  + BUT that environment maps symbols to locations
+    - The location's value might change after the function is defined
+    - But the symbols still map to the same locations
+#+begin_src racket
+{let1 {x 10}
+  {let1 {f {lam y {* x y}}}}
+    {seq {setvar! x 20}
+         {let1 {x 100}
+               {f 5}}
+  }}
+#+end_src
+- In the function body, ~x~ has location from point of definition
+  + This location starts with ~10~
+  + ~setvar~ updates its value to ~20~
+- A new variable ~x~ is defined for the scope that ~f~ is called
+  + Its location contains ~100~
+  + NOT used in the function call, because not in scope for function definition
+*** Evaluation styles
+- 3 different properties of an interpreter
+  + Strict vs lazy
+    - Are function arguments evaluated before substituting or putting in environment
+  + Static scope vs. dynamic scope
+    - In a function call, are free variables looked-up in the environment the function definition environment, or the function call environment?
+  + Call-by-value vs. Call-by-reference
+    - Do function calls on variables create new memory locations, or new symbols pointing to the same location as the argument variables?
+- These properties are *completely separate from each other*
+  + You can mix them in any combination
+  + But lazy + mutable state is generally a bad idea
 * Implementing Recursion via State :noexport:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides018-recursion.pdf
@@ -5821,12 +5889,12 @@ myFunction().then(
 - Evaluating function produces closure:
 #+begin_src racket
 (closureV 'x
-   (cndE (Var 'x)
+   (cndE (varE 'x)
                 (numE 1)
-                (Times (Var 'x)
-                       (appE (Var 'fact)
-                             (Plus (Var 'x)
-                                   (Times (numE 1) (numE -1))))))
+                (timesE (varE 'x)
+                       (appE (varE 'fact)
+                             (plusE (varE 'x)
+                                   (timesE (numE 1) (numE -1))))))
    (fact := 0))
 #+end_src
 - Never lookup from location 0
