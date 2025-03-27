@@ -5163,7 +5163,7 @@ myFunction().then(
 
 * Store Passing and Boxes
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides015-box.pdf
+:EXPORT_FILE_NAME: pdf/slides016-box.pdf
 :header-args:racket: :results code :lang flit
 :CUSTOM_ID: store-passing-and-boxes
 :END:
@@ -5543,7 +5543,7 @@ myFunction().then(
     - ... unless we implement more advanced features e.g. undo, backtracking
 * Mutable Variables :noexport:
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides016-mutvar.pdf
+:EXPORT_FILE_NAME: pdf/slides017-mutvar.pdf
 :header-args:racket: :results code :lang flit
 :CUSTOM_ID: mutable-variables
 :END:
@@ -5721,7 +5721,7 @@ myFunction().then(
 - The final result is 6, since the value of ~y~ was changed
 * Implementing Recursion via State :noexport:
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides017-recursion.pdf
+:EXPORT_FILE_NAME: pdf/slides018-recursion.pdf
 :header-args:racket: :results code :lang flit
 :CUSTOM_ID: implementing-recursion-via-state
 :END:
@@ -5876,7 +5876,7 @@ myFunction().then(
 - Useful in typed languages that can't give the Y-combinator a type
 * Objects and OOP :noexport:
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides018-oop.pdf
+:EXPORT_FILE_NAME: pdf/slides019-oop.pdf
 :header-args:racket: :results code :lang flit
 :CUSTOM_ID: objects-and-oop
 :END:
