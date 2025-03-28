@@ -1,11 +1,10 @@
 #lang flit
 
-;; Curly-Env
-;; This language is identical to Curly-Curry,
-;; but implemented using environments, rather than substitution.
-;; This make it more efficient, and has the advantage that
-;; we can say that programs with variables have context-dependent meaning,
-;; rather than just being errors.
+;; Curly-Box
+;; This language adds Boxes (first-class mutable references) to Curly-Env.
+;; The interpreter works by explicitly passing a store, which
+;; maps memory locations to their values.
+
 
 ;; BNF 
 ;; 
@@ -26,18 +25,25 @@
 ;;   | {lam VARIABLE <expr>} ;; function definition
 ;;   | {lam {VARIABLE*} <expr>} ;; function definition
 ;;   | {<expr> <expr>*} ;; function calling
+;;   ;; NEW
+;;   | {seq <expr> <expr} ;; Run one expression, discard its result, and evaluate the second one
+;;                        ;; only makes sense with side-effects
+;;   | {box <expr>} ;; Make a new box that points to a location in memory, whose initial value
+;;                      is given by the given expression
+;;   | {unbox <expr>} ;; Get the value in memory for a given box's location.
+;;   | {set-box! <expr> <expr>} ;; Overwrite the value at the location that the first expression
+;;                              ;; points to, using the value from the second expression
 
 
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; NEW
-;; Code for environments
+;; Code for Association Lists
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Environments are association lists,
-;; e.g. symbol-value pairs, that we can
-;; make empty lists, insert into, and lookup the value
-;; for a certain symbol
+;; Association lists: lists of key-value pairs
+;; so we can map keys to values,
+;; look up the value for a symbol,
+;; and replace the value for a given symbol.
 
 ;; Association lists are lists of key-vaue pairs
 (define-type-alias (AssocList 'key 'value)
@@ -451,7 +457,10 @@
     [(boolE b)
      (v*s (boolV b)
           sto)]
+    ;; NEW
     ;; {+ e1 e2} evaluates e1 and e2, then adds the results together
+    ;; e2 is evaluated in the store that results from evaluating e1.
+    ;; The other expressions are similar
     [(plusE l r)
      (with [(v-l sto-l) (interp env l sto)]
            ;; Use the store result from the left to interpret the right
@@ -500,7 +509,6 @@
     [(lamE var body)
      (v*s (closureV var body env)
           sto)]
-    ;; NEW:
     ;; Interpreting function calls (applications)
     ;; We just interpret the body of the function,
     ;; in the environment *from the closure*, extended with
@@ -698,6 +706,7 @@
 (test (run `{lam {} {+ 2 3}})
       (numV 5))
 
+;; NEW
 ;; Box tests
 ;; Taken from the examples in the slides
 

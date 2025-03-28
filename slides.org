@@ -5575,6 +5575,17 @@ myFunction().then(
 - To allow variables values to change, we can make one simple change:
   + *Keep locations instead of values in the environment*
   + Then each variable refers to a single store location, whose value can change
+*** Curly-Mutvar
+- Extend Curly-Box with ~{set-var! VARIABLE <expr>}~
+- E.g.
+#+begin_src racket
+{let1 {x 3}
+      {seq {set-var! x {* x 2}}
+           x}}
+#+end_src
+- ~x~ starts out as 3
+- ~set-var!~ changes reads the old value ~3~, then sets the value of ~x~ to double this
+- End result is ~6~, the new value for ~x~
 *** Bindings with mutable variables
 - Each binding associates a symbol with a /location/
   #+begin_src racket
@@ -5715,7 +5726,7 @@ myFunction().then(
 *** Example
 #+begin_src racket
 {let1 {y 2}
-  {let1 {f {lam x {begin
+  {let1 {f {lam x {seq
                        {set-var! x {* x 3}}
                        x}}}
             {+ {f y} y}}}
@@ -5738,12 +5749,12 @@ myFunction().then(
 *** Aliasing
 - To enable passing by reference, we add an /aliasing expression/ to Curly-Mutvar
   +  Like "address-of" operator ~&~ in C++
-- ~{getloc SYMBOL}~ produces a box whose location is the same location as whatever in-scope symbol it is given
-  + e.g. ~{getloc x}~ would produce ~{boxV l}~ where ~l~ is the location in the environment for ~x~
+- ~{address-of SYMBOL}~ produces a box whose location is the same location as whatever in-scope symbol it is given
+  + e.g. ~{address-of x}~ would produce ~{boxV l}~ where ~l~ is the location in the environment for ~x~
 - Interpreting:
   + Like new-box, except we look up the location in the environment instead of getting a new one
 #+begin_src racket
-    [(getLocE x)
+    [(address-ofE x)
       (v*s (boxV (lookup x env))
         ;; No changes to the store
         sto)]
@@ -5754,11 +5765,11 @@ myFunction().then(
 #+begin_src racket
 {let1 {doublebox! {lam x {set-box! x {* 2 {unbox x}}}}}
   {let1 {y 3}
-            {begin {doublebox! {get-loc y}}
+            {seq {doublebox! {address-of y}}
                    y}}}
 #+end_src
 - Function takes in a box, gets its value, doubles it, and writes it to the same location
-- The ~getloc~ makes a new box whose location is the same as ~y~
+- The ~address-of~ makes a new box whose location is the same as ~y~
 - When ~doublebox!~ runs it alters the value at the location of its box, which was the location of ~y~
 - The final result is 6, since the value of ~y~ was changed
 *** Static Scope and Mutable Variables
