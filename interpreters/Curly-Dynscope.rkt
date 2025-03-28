@@ -1,11 +1,9 @@
 #lang flit
 
-;; Curly-Env
-;; This language is identical to Curly-Curry,
-;; but implemented using environments, rather than substitution.
-;; This make it more efficient, and has the advantage that
-;; we can say that programs with variables have context-dependent meaning,
-;; rather than just being errors.
+;; Curly-Dynscope
+;; Like Curly-Env, but with dynamic scoping instead of static scoping.
+;; Note: This is WRONG!
+;; This is here to illustrate the difference, not because you should do this.
 
 ;; BNF 
 ;; 
@@ -53,7 +51,7 @@
 ;; To find an entry in the list, we take the first (most recently added)
 ;; entry whose key matche the given key
 (define (lookup [k : 'key]
-                [al : (AssocList 'key 'value)])
+              [al : (AssocList 'key 'value)])
   : 'value
   ;; Filter out all the pairs whose first element is the same as the given key
   (let* ([filteredList (filter
@@ -62,10 +60,7 @@
                         al)])
     ;; Take the first one, or raise an error if none present
     (if (empty? filteredList)
-        (error 'find (string-append
-                      "Didn't find key "
-                      (string-append (to-string k)
-                                     " in list")))
+        (error 'find "Didn't find key in list")
         (pairSnd (first filteredList)))))
 
 
@@ -106,20 +101,13 @@
   (let1S [var : Symbol]
          [val : ExpS]
          [body : ExpS])
+  ;; NEW:
   ;; Surface language has n-ary function calls and lambdas
   ;; These get desugared away
   (lamS [var : (Listof Symbol)]
         [body : ExpS])
   (appS [fun : ExpS] [args : (Listof ExpS)])
-  ;; NEW:
-  ;; Sequencing of operations (possibly with side-effects)
-  ;; and box operations
-  (seqS [l : ExpS]
-        [r : ExpS])
-  (boxS [e : ExpS])
-  (unboxS [e : ExpS])
-  (set-box!S [ebox : ExpS]
-             [eval : ExpS]))
+  )
 
 ;; Abstract syntax for Curly-Cond
 ;; Represents expressions in our interpreter
@@ -144,66 +132,27 @@
   ;; Functions and applications (function calls) are in the core language
   (lamE [var : Symbol] [vody : Exp])
   (appE [fun : Exp] [arg : Exp])
-  ;; NEW:
-  ;; Sequencing of operations (possibly with side-effects)
-  ;; and box operations
-  (seqE [l : Exp]
-        [r : Exp])
-  (boxE [e : Exp])
-  (unboxE [e : Exp])
-  (set-box!E [ebox : Exp]
-             [eval : Exp])
   )
 
 ;; We now allow values to be either Numbers, Booleans, or Functions
 (define-type Value
   [numV (n : Number)]
   [boolV (b : Boolean)]
+  ;; NEW
   ;; Closures:
   ;; A lambda evaluates to a closure, which stores its variable and body
   ;; PLUS the environment in which it was evaluated, which is captured
   ;; to be used when the function is called
-  [closureV (var : Symbol)
-            (body : Exp)
-            (env : Env)]
-  ;; NEW
-  ;; Boxes let us treat memory locations
-  ;; as values in our language
-  [boxV [loc : Location]])
+  [lamV (var : Symbol)
+        (body : Exp)])
 
-
+;; NEW
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Environments are Association Lists
 ;; mapping symbols to values
 (define-type-alias Env (AssocList Symbol Value))
 
 (define mt-env empty)
-
-;; NEW
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Store are association lists
-;; Mapping locations to Values
-(define-type-alias Location Number)
-
-(define-type-alias Store (AssocList Number Value))
-
-(define mt-store : Store
-  empty)
-(define override-store
-  : (Location Value Store -> Store)
-  extend)
-
-;; NEW
-;; Code to find the largest index in the store,
-;; so we can use one greater as a fresh location
-(define (new-loc [sto : Store])
-  : Location
-  (+ 1 (max-loc sto)))
-
-;; Helper for getting the max location in a store
-(define (max-loc [sto : Store])
-  : Location
-  (foldl max 0 (map pairFst sto)))
 
 ;; Parse
 ;; Takes an S-expression and turns it into an Exp
@@ -260,17 +209,6 @@
     [(s-exp-match? `{lam {SYMBOL ...} ANY} s)
      (lamS (map s-exp->symbol (s-exp->list (second (s-exp->list s))))
            (parse (third (s-exp->list s))))]
-    ;; Box operations and sequencing
-    [(s-exp-match? `{seq ANY ANY} s)
-     (seqS (parse (second (s-exp->list s)))
-           (parse (third (s-exp->list s))))]
-    [(s-exp-match? `{unbox ANY} s)
-     (unboxS (parse (second (s-exp->list s))))]
-    [(s-exp-match? `{box ANY} s)
-     (boxS (parse (second (s-exp->list s))))]
-    [(s-exp-match? `{set-box! ANY ANY} s)
-     (set-box!S (parse (second (s-exp->list s)))
-                (parse (third (s-exp->list s))))]
     ;; FUnction calls
     ;; Catch-all case for n-ary function calls/applications
     ;; Just parse as a function application: first thing is the function,
@@ -383,191 +321,86 @@
     ;; on the symbol itself
     [(varS x)
      (varE x)]
-    ;; we can curry let1 into lambda
+    ;; NEW: we can curry let1 into lambda
     [(let1S var val body)
      (appE (lamE var (desugar body))
            (desugar val))]
+    ;; NEW
     ;; Desugar n-ary functions and applications into single ones
     ;; using currying, by folding
     [(lamS xs body)
      (foldr lamE (desugar body) xs)]
+    ;; NEW
     ;; Args is a list of expS, so we have to map to desugar each one
     ;; Function applications associate to the left, so we use foldl,
     ;; and we want the function on the left.
     ;; Since appE : (Exp Exp -> Exp) the types don't help us know which to apply first.
     [(appS fun args)
      (foldl (lambda (arg fun) (appE fun arg)) (desugar fun) (map desugar args))]
-    ;; NEW
-    ;; No interesting desugaring for boxes, just desugar the parts
-    [(seqS l r)
-     (seqE (desugar l) (desugar r))]
-    [(boxS e)
-     (boxE (desugar e))]
-    [(unboxS e)
-     (unboxE (desugar e))]
-    [(set-box!S ebox evalue)
-     (set-box!E (desugar ebox)
-                (desugar evalue))]
     ))
 
-;; NEW: Our interpreter now produces a Value-Store pair
-(define-type-alias Result
-  (Value * Store))
-
-(define (v*s [v : Value]
-             [s : Store])
-  : Result
-  (pair v s))
-
-;; NEW
-;; Macro for pattern matching on results/values
-;; Makes the code for interp more readable
-(define-syntax with
-  (syntax-rules ()
-    [(with body) body]
-    [(with [(v-id sto-id) call] [(v-ids sto-ids) calls]... body)
-     (let* ([vs call]
-            [v-id (pairFst vs)]
-            [sto-id (pairSnd vs)])
-       (with [(v-ids sto-ids) calls]... body))]))
-
-
-
+;; No need for substitution in the interpreter version
 
 ;; Evaluate Expressions
 ;; NEW
 ;; Each expression is evaluated in a given environment,
 ;; which gives values for all the free variables
 (define (interp [env : Env]
-                [e : Exp]
-                [sto : Store]) : Result ;;NEW
+                [e : Exp]) : Value
   (type-case Exp e
     ;; A number evaluates to itself
     ;; Need to wrap in numV, since result type is value
     [(numE n)
-     (v*s (numV n)
-          sto)]
+     (numV n)]
     ;; A boolean evaluates to itself
     [(boolE b)
-     (v*s (boolV b)
-          sto)]
+     (boolV b)]
     ;; {+ e1 e2} evaluates e1 and e2, then adds the results together
     [(plusE l r)
-     (with [(v-l sto-l) (interp env l sto)]
-           ;; Use the store result from the left to interpret the right
-           [(v-r sto-r) (interp env r sto-l)]
-           ;; Use the store from the right as our result store
-           (v*s (lift-binop + v-l v-r)
-                sto-r))]
+     (lift-binop + (interp env l) (interp env r))]
     ;; Works the same but for times
     [(timesE l r)
-     (with [(v-l sto-l) (interp env l sto)]
-           ;; Use the store result from the left to interpret the right
-           [(v-r sto-r) (interp env r sto-l)]
-           ;; Use the store from the right as our result store
-           (v*s (lift-binop * v-l v-r)
-                sto-r))]
+     (lift-binop * (interp env l) (interp env r))]
     ;; {if test thn els} evaluates test and checks if it's zero
     ;; if it is, then we evaluate thn
     ;; otherwise we evaluate els
     [(cndE test thn els)
-     (with [(test-v test-sto) (interp env test sto)]
-           (type-case Value test-v
-             [(boolV b)
-              (if b
-                  (interp env thn test-sto)
-                  (interp env els test-sto))]
-             [else (error 'interp "Non-boolean given to if")]))]
+     (type-case Value (interp env test)
+       [(boolV b)
+        (if b
+            (interp env thn)
+            (interp env els))]
+       [else (error 'interp "Non-boolean given to if")])]
     ;; To check if value is zero, we interpret it,
     ;; then pattern match on the result
     [(zero?E e)
-     (with [(e-v e-sto) (interp env e sto)]
-           (type-case Value e-v
-             [(numV n)
-              (v*s (boolV (= n 0))
-                   e-sto)]
-             [else
-              (error 'interp "Expected number")]))]
+     (type-case Value (interp env e)
+       [(numV n)
+        (boolV (= n 0))]
+       [else
+        (error 'interp "Expected number")])]
     ;; NEW
     ;; For environments, we can evaluate variables by looking them up in the environment.
     ;; So the meaning of a program with variables depends on its environment
     [(varE x)
-     (v*s (lookup x env) sto)]
+     (lookup x env)]
     ;; NEW:
-    ;; Interpreting functions with environments: we need to
-    ;; capture the environment for static scope, so that when we call the function,
-    ;; we have values for all of its free variables
+    ;; For dynamic scope, we don't capture the environment
     [(lamE var body)
-     (v*s (closureV var body env)
-          sto)]
+     (lamV var body)]
     ;; NEW:
     ;; Interpreting function calls (applications)
     ;; We just interpret the body of the function,
-    ;; in the environment *from the closure*, extended with
-    ;; the concrete value of the argument.
-    ;; This is what gives us static scope.
+    ;; in the current environment, extended with the argument's value
     [(appE fun arg)
-     ;; Argument and function are interpreted in the same environment as the whole expression
-     ;; e.g. NOT the environment from the closure
-     (with [(argVal arg-sto) (interp env arg sto)]
-           [(funVal fun-sto) (interp env fun arg-sto)]
-           (type-case Value funVal
-             [(closureV var body funEnv)
-              (let* ([envForCall (extend var argVal funEnv)])
-                (interp envForCall body fun-sto))]
-             [else
-              (error 'interp "Tried to call non-function")]))]
-    ;;NEW
-    ;; To sequence two expressions, evaluate the first
-    ;; to get the resulting store.
-    ;; Then we evaluate the second in that store.
-    [(seqE l r)
-     (with [(v-l sto-l) (interp env l sto)]
-           (interp env r sto-l))]
-    ;; NEW
-    ;; To evaluate boxing of an expression,
-    ;; we evaluate the expression to get its value
-    ;; and the resulting store.
-    ;; We find an unused memory location in that store,
-    ;; and make a new store where the expression's value
-    ;; is at the new location.
-    ;; We then use that store, and return a new box value
-    ;; that points to the newly created location.
-    [(boxE a)
-     (with [(v sto-v) (interp env a sto)]
-           (let ([loc (new-loc sto-v)])
-             (v*s (boxV loc)
-                  (override-store loc v
-                                  sto-v))))]
-    ;; NEW
-    ;; To unbox an expression, we evaluate it to a value/store
-    ;; Then we do a dynamic type check to ensure it's a boxV.
-    ;; If it is, we return the value that is at that location in the store.
-    [(unboxE a)
-     (with [(v sto-v) (interp env a sto)]
-           (type-case Value v
-             [(boxV l) (v*s (lookup l sto-v)
-                            sto-v)]
-             [else (error 'interp "not a box")]))]
-
-    ;; NEW
-    ;; To overwrite the value at a given location,
-    ;; we evaluate the box-expression to a value/store,
-    ;; then use that store to evaluate the new value's expression to a value/store.
-    ;; We do a dynamic type check that the box's value is a boxV, and if it is,
-    ;; we override that location in the store with the new value.
-    ;; We then return the new value, in the new store with the updated value.
-    [(set-box!E bx val)
-     (with [(v-b sto-b) (interp env bx sto)]
-           [(v-v sto-v) (interp env val sto-b)]
-                 (type-case Value v-b
-                   [(boxV loc)
-                    (v*s v-v
-                         (override-store loc v-v
-                                         sto-v))]
-                   [else (error 'interp "not a box")]))]
-
-    ))
+     (let* ([argVal (interp env arg)]
+            [funVal (interp env fun)])
+       (type-case Value funVal
+         [(lamV var body)
+          ;; Using env here is what gives dynamic scope
+          (interp (extend var argVal env) body)]
+         [else
+          (error 'interp "Tried to call non-function")]))]))
 
 ;; The Language Pipeline
 ;; We run  program by parsing an s-expression into an expression
@@ -576,10 +409,8 @@
 ;; i.e. `{+ 3 4} generates an S-expression directly
 ;; NEW
 ;; By default, we evaluate expressions in the empty-environment
-(define (run s-exp) (pairFst
-                     (interp mt-env (desugar
-                                     (parse s-exp))
-                             mt-store)))
+(define (run s-exp) (interp mt-env (desugar
+                                    (parse s-exp))))
 
 (test (run `3)
       (numV 3))
@@ -697,34 +528,3 @@
 
 (test (run `{lam {} {+ 2 3}})
       (numV 5))
-
-;; Box tests
-;; Taken from the examples in the slides
-
-;; Copying a box just copies the location
-;; so x and y point to the same place in the store
-(test (run `{let1 {x {box 3}}
-                  {let1 {y x}
-                        {seq {set-box! y 10}
-                             {unbox x}}}}
-           )
-      (numV 10))
-
-;; Functions that work on boxes
-;; Side effects are seen after the function call
-(test (run `{let1 {double!
-                   {lam x
-                        {set-box! x
-                                 {* 2 {unbox x}}}}}
-                  {let1 {b {box 3}}
-                  {seq {double! b}
-                       {unbox b}}}})
-      (numV 6))
-
-;; The order we evaluate + args matter,
-;; since there might be side-effects
-(test (run `{let1 {b {box 3}}
-                  {+ {seq {set-box! b {* 3 {unbox b}}}
-                          5}
-                     {unbox b}}} )
-      (numV 14))

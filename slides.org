@@ -5264,11 +5264,11 @@ myFunction().then(
 *** Example
 #+begin_src racket
 {let1 {double! {lam x
-                    {set-box x
+                    {set-box! x
                              {* 2 {unbox x}}}}}
-      {let1 {b {box 3}}}
+      {let1 {b {box 3}}
         {seq {double! b}
-             {unbox b}}
+             {unbox b}}}}
 #+end_src
 - Result is ~6~
   + Calling ~double!~ gave the /location/ containing 3, not a copy of the value 3
