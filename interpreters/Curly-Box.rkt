@@ -62,7 +62,10 @@
                         al)])
     ;; Take the first one, or raise an error if none present
     (if (empty? filteredList)
-        (error 'find "Didn't find key in list")
+        (error 'find (string-append
+                      "Didn't find key "
+                      (string-append (to-string k)
+                                     " in list")))
         (pairSnd (first filteredList)))))
 
 
@@ -103,13 +106,20 @@
   (let1S [var : Symbol]
          [val : ExpS]
          [body : ExpS])
-  ;; NEW:
   ;; Surface language has n-ary function calls and lambdas
   ;; These get desugared away
   (lamS [var : (Listof Symbol)]
         [body : ExpS])
   (appS [fun : ExpS] [args : (Listof ExpS)])
-  )
+  ;; NEW:
+  ;; Sequencing of operations (possibly with side-effects)
+  ;; and box operations
+  (seqS [l : ExpS]
+        [r : ExpS])
+  (boxS [e : ExpS])
+  (unboxS [e : ExpS])
+  (set-box!S [ebox : ExpS]
+             [eval : ExpS]))
 
 ;; Abstract syntax for Curly-Cond
 ;; Represents expressions in our interpreter
@@ -134,20 +144,32 @@
   ;; Functions and applications (function calls) are in the core language
   (lamE [var : Symbol] [vody : Exp])
   (appE [fun : Exp] [arg : Exp])
+  ;; NEW:
+  ;; Sequencing of operations (possibly with side-effects)
+  ;; and box operations
+  (seqE [l : Exp]
+        [r : Exp])
+  (boxE [e : Exp])
+  (unboxE [e : Exp])
+  (set-box!E [ebox : Exp]
+             [eval : Exp])
   )
 
 ;; We now allow values to be either Numbers, Booleans, or Functions
 (define-type Value
   [numV (n : Number)]
   [boolV (b : Boolean)]
-  ;; NEW
   ;; Closures:
   ;; A lambda evaluates to a closure, which stores its variable and body
   ;; PLUS the environment in which it was evaluated, which is captured
   ;; to be used when the function is called
   [closureV (var : Symbol)
             (body : Exp)
-            (env : Env)])
+            (env : Env)]
+  ;; NEW
+  ;; Boxes let us treat memory locations
+  ;; as values in our language
+  [boxV [loc : Location]])
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -238,6 +260,17 @@
     [(s-exp-match? `{lam {SYMBOL ...} ANY} s)
      (lamS (map s-exp->symbol (s-exp->list (second (s-exp->list s))))
            (parse (third (s-exp->list s))))]
+    ;; Box operations and sequencing
+    [(s-exp-match? `{seq ANY ANY} s)
+     (seqS (parse (second (s-exp->list s)))
+           (parse (third (s-exp->list s))))]
+    [(s-exp-match? `{unbox ANY} s)
+     (unboxS (parse (second (s-exp->list s))))]
+    [(s-exp-match? `{box ANY} s)
+     (boxS (parse (second (s-exp->list s))))]
+    [(s-exp-match? `{set-box! ANY ANY} s)
+     (set-box!S (parse (second (s-exp->list s)))
+                (parse (third (s-exp->list s))))]
     ;; FUnction calls
     ;; Catch-all case for n-ary function calls/applications
     ;; Just parse as a function application: first thing is the function,
@@ -350,22 +383,31 @@
     ;; on the symbol itself
     [(varS x)
      (varE x)]
-    ;; NEW: we can curry let1 into lambda
+    ;; we can curry let1 into lambda
     [(let1S var val body)
      (appE (lamE var (desugar body))
            (desugar val))]
-    ;; NEW
     ;; Desugar n-ary functions and applications into single ones
     ;; using currying, by folding
     [(lamS xs body)
      (foldr lamE (desugar body) xs)]
-    ;; NEW
     ;; Args is a list of expS, so we have to map to desugar each one
     ;; Function applications associate to the left, so we use foldl,
     ;; and we want the function on the left.
     ;; Since appE : (Exp Exp -> Exp) the types don't help us know which to apply first.
     [(appS fun args)
      (foldl (lambda (arg fun) (appE fun arg)) (desugar fun) (map desugar args))]
+    ;; NEW
+    ;; No interesting desugaring for boxes, just desugar the parts
+    [(seqS l r)
+     (seqE (desugar l) (desugar r))]
+    [(boxS e)
+     (boxE (desugar e))]
+    [(unboxS e)
+     (unboxE (desugar e))]
+    [(set-box!S ebox evalue)
+     (set-box!E (desugar ebox)
+                (desugar evalue))]
     ))
 
 ;; NEW: Our interpreter now produces a Value-Store pair
@@ -468,13 +510,44 @@
      ;; Argument and function are interpreted in the same environment as the whole expression
      ;; e.g. NOT the environment from the closure
      (with [(argVal arg-sto) (interp env arg sto)]
-            [(funVal fun-sto) (interp env fun arg-sto)]
-       (type-case Value funVal
-         [(closureV var body funEnv)
-          (let* ([envForCall (extend var argVal funEnv)])
-            (interp envForCall body fun-sto))]
-         [else
-          (error 'interp "Tried to call non-function")]))]))
+           [(funVal fun-sto) (interp env fun arg-sto)]
+           (type-case Value funVal
+             [(closureV var body funEnv)
+              (let* ([envForCall (extend var argVal funEnv)])
+                (interp envForCall body fun-sto))]
+             [else
+              (error 'interp "Tried to call non-function")]))]
+    ;;NEW
+    ;; To sequence two expressions, evaluate the first
+    ;; to get the resulting store.
+    ;; Then we evaluate the second in that store.
+    [(seqE l r)
+     (with [(v-l sto-l) (interp env l sto)]
+           (interp env r sto-l))]
+    [(boxE a)
+     (with [(v sto-v) (interp env a sto)]
+           (let ([loc (new-loc sto-v)])
+             (v*s (boxV loc)
+                  (override-store loc v
+                                  sto-v))))]
+    [(unboxE a)
+     (with [(v sto-v) (interp env a sto)]
+           (type-case Value v
+             [(boxV l) (v*s (lookup l sto-v)
+                            sto-v)]
+             [else (error 'interp "not a box")]))]
+
+    [(set-box!E bx val)
+     (with [(v-b sto-b) (interp env bx sto)]
+           (with [(v-v sto-v) (interp env val sto-b)]
+                 (type-case Value v-b
+                   [(boxV loc)
+                    (v*s v-v
+                         (override-store loc v-v
+                                         sto-v))]
+                   [else (error 'interp "not a box")])))]
+
+    ))
 
 ;; The Language Pipeline
 ;; We run  program by parsing an s-expression into an expression
@@ -604,3 +677,11 @@
 
 (test (run `{lam {} {+ 2 3}})
       (numV 5))
+
+;;; Box tests
+(test (run `{let1 {x {box 3}}
+                  {let1 {y x}
+                        {seq {set-box! y 10}
+                             {unbox x}}}}
+           )
+      (numV 10))

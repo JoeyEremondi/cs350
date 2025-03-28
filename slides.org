@@ -5475,7 +5475,7 @@ myFunction().then(
   ...
   [(boxE a)
    (with [(v sto-v) (interp env a sto)]
-     (let ([l (new-loc sto-v)])
+     (let ([loc (new-loc sto-v)])
        (v*s (boxV loc)
             (override-store loc v
                               sto-v))))]
@@ -5509,8 +5509,8 @@ myFunction().then(
 *** Interpreting Set-box!
 #+begin_src racket
 [(set-box!E bx val)
-     (with [(v-b sto-b) (interp bx env sto)]
-       (with [(v-v sto-v) (interp val env sto-b)]
+     (with [(v-b sto-b) (interp env bx sto)]
+       (with [(v-v sto-v) (interp env val sto-b)]
          (type-case Value v-b
            [(boxV loc)
             (v*s v-v
