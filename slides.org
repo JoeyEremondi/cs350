@@ -4415,7 +4415,7 @@ while (i < 10){
 - Just because we /can/ write an equivalent Curly-Lambda program, doesn't mean it's easy/succinct
 - We can now write Curly-Lambda programs that run forever
 #+begin_src racket
-{let1 f {lam x {x x}}
+{let1 {f {lam x {x x}}}
   {f f}}
 #+end_src
 - Replaces ~f~ with ~{{lam x {x x}} {lam x {x x}}}~ calling itself
@@ -4439,7 +4439,7 @@ while (i < 10){
                  elseVal))])))
   (run `{if {zero? 0}
              {+ 1 1}
-             {let1 f {lam x {x x}} {f f}}})
+             {let1 {f {lam x {x x}}} {f f}}})
   #+end_src
 - Loops because it evaluates the untaken branch
 
@@ -4526,7 +4526,7 @@ while (i < 10){
 - Sometimes, strict fails but lazy succeeds
 *** Example: Error
 #+begin_src racket
-{let1 f {lam x {lam y {if {zero? x} y x}}}
+{let1 {f {lam x {lam y {if {zero? x} y x}}}}
         {{f 1} {+ 3 #t}}}
 #+end_src
 - Strict evaluation:
@@ -4537,7 +4537,7 @@ while (i < 10){
   + When we substitute, it only ends up in the branch of the ~if~ that we don't take
 *** Example: Loop
 #+begin_src racket
-{let1 f {lam x {lam y {if {zero? x} y {* x 2}}}}
+{let1 {f {lam x {lam y {if {zero? x} y {* x 2}}}}}
         {{f 3}
            {{lam x {x x}} {lam x {x x}}}
            }}
@@ -4582,7 +4582,7 @@ while (i < 10){
   + To force it back to a value, you call it with any value
 *** Laziness via lambda example
 #+begin_src racket
-{let1 f {lam x {lam y {if {zero? z} {y 0} {* x 2}}}}
+{let1 {f {lam x {lam y {if {zero? z} {y 0} {* x 2}}}}}
         {{f 3} {lam x {+ x #t}}}}
 #+end_src
 - Plus of boolean behind a lambda, so no error
@@ -5056,9 +5056,9 @@ while (i < 10){
 - Dynamic scope gives variables values from the environment when the function was /called/
 *** Example: Static Scope
 #+begin_src racket
-{let1 double {lam x {* x 2}}
-  {let1 quadruple {lam y {double {double y}}}
-    {let1 double 2
+{let1 {double {lam x {* x 2}}}
+  {let1 {quadruple {lam y {double {double y}}}}
+    {let1 {double 2}
       {quadruple 3}}}}
 #+end_src
 - ~{lam y {double {double x}}}~ has one free variable, ~double~
@@ -5072,9 +5072,9 @@ while (i < 10){
   + ~double := {lam x {* x 2}}~
 *** Example: Static Scope ctd
 #+begin_src racket
-{let1 double {lam x {* x 2}}
-  {let1 quadruple {lam y {double {double x}}}
-    {let1 double 2
+{let1 {double {lam x {* x 2}}}
+  {let1 {quadruple {lam y {double {double x}}}}
+    {let1 {double 2}
       {quadruple 3}}}}
 #+end_src
 - Call evaluates ~quadruple~ to closure
@@ -5085,11 +5085,16 @@ while (i < 10){
 - Result is 12
 *** Example: Dynamic Scope
 #+begin_src racket
-{let1 double {lam x {* x 2}}
-  {let1 quadruple {lam y {double {double x}}}
-    {let1 double 2
+{let1 {double {lam x {* x 2}}}
+  {let1 {quadruple {lam y {double {double x}}}
+}    {let1 {double 2}
       {quadruple 3}}}}
 #+end_src
+
+#+RESULTS[6db66fa0326a196ff9a4e39dc18bfda60ec52c91]:
+#+begin_src racket
+#+end_src
+
 - ~{lam y {double {double x}}}~ evaluates to closure
   + Doesn't save environment
 - Call evaluates ~{double {double x}}~
@@ -5236,8 +5241,8 @@ myFunction().then(
   + Like C++ ~*x = expr;~
 *** Example
 #+begin_src racket
-{let1 x {box 3}
-  {let1 y x
+{let1 {x {box 3}}
+  {let1 {y x}
   {seq {set-box! y 10}
     {unbox x}}}}
 #+end_src
@@ -5709,10 +5714,10 @@ myFunction().then(
   + e.g. swap two variable's values
 *** Example
 #+begin_src racket
-{let1 y 2
-  {let1 f {lam x {begin
+{let1 {y 2}
+  {let1 {f {lam x {begin
                        {set-var! x {* x 3}}
-                       x}}
+                       x}}}
             {+ {f y} y}}}
 #+end_src
 - In both pass-by-value and pass-by-reference, the call to ~{f y}~ produces 6
@@ -5747,8 +5752,8 @@ myFunction().then(
 - Changes to one are seen in the other
 *** Example
 #+begin_src racket
-{let1 doublebox! {lam x {set-box! x {* 2 {unbox x}}}}
-  {let1 y 3
+{let1 {doublebox! {lam x {set-box! x {* 2 {unbox x}}}}}
+  {let1 {y 3}
             {begin {doublebox! {get-loc y}}
                    y}}}
 #+end_src
@@ -6024,27 +6029,27 @@ myFunction().then(
   + Refers to the object that the method is being called on, so we can get e.g. field values from methods
 *** Example
 #+begin_src racket
-{let1 mkCircle
+{let1 {mkCircle
         {lam r
-             {object {{radius r}}
+             {object {{radius r}}}
                      ;; All methods take one parameter,
                      ;; so we just ignore the parameter
                      {getArea {x} {* {get this radius}
                                      {* {get this radius} 3.14}}}}}
-        {let1 unitCircle {mkCircle 1}
+        {let1 {unitCircle {mkCircle 1}}
                 {send unitCircle getArea 0}}}
 #+end_src
 - Produces ~3.14~
 *** Example
 #+begin_src racket
-{let1 mkSquare
-        {lam w
+{let1 {mkSquare
+        {lam {w
              {object {{width w}}
                      ;; All methods take one parameter,
                      ;; so we just ignore the parameter
                      {getArea {x} {* {get this width}
-                                     {get this width} }}}}
-        {let1 unitSquare {mkSquare 2}
+                                     {get this width} }}}}}}
+        {let1 {unitSquare {mkSquare 2}}
                 {send unitSquare getArea 0}}}
 #+end_src
 - Produces ~4~
@@ -6146,13 +6151,13 @@ myFunction().then(
 - Like ~self~ in Python, ~this~ in Java/C++/JS
 *** Example: OOP Lists
 #+begin_src racket
-{let1 empty {object {{length 0}}
+{let1 {empty {object {{length 0}}
                       {{head {x} errorNoEmptyListHead}
-                      {tail {x} this}}} ;; Note the self reference
-{let1 cons {lam {h t}
+                      {tail {x} this}}}} ;; Note the self reference
+{let1 {cons {lam {h t}
                   {object {length {+ 1 {get t length}}}
                           {{head {x} h}
-                          {tail {x} t}}}}
+                          {tail {x} t}}}}}
 }}
 #+end_src
 - Instead of having a type with two variants, each list carries its own information
@@ -6173,12 +6178,12 @@ myFunction().then(
 - Can even do recursion
 #+begin_src racket
 ;; factorial with objects
-{let1 fact
+{let1 {fact
   {object {}
         {call {x}
           {if0 x
                1
-               {* x {send this call {- x 1}}}}}}}
+               {* x {send this call {- x 1}}}}}}}}
 #+end_src
 * Emacs Variables (please ignore) :noexport:
 Local Variables:
