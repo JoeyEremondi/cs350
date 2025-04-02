@@ -5625,7 +5625,7 @@ myFunction().then(
     - So ~lookup~ on env gives ~Location~, lookup on store gives ~Value~
 - Produce that value, along with the unchanged store
 *** Syntax for Mutable Variables
-- ~{setvar! SYMBOL <expr>}~
+- ~{set-var! SYMBOL <expr>}~
   + Sets the value of an in-scope variable
   + Just like ~set-box!~ except we get the location from the environment, instead of by evaluating a box
 - Can only set the value for a specific variable
@@ -5634,7 +5634,7 @@ myFunction().then(
 #+begin_src racket
 (define-type Exp
   ...
-  (setVar!E [var : Symbol]
+  (set-var!E [var : Symbol]
             [e : Exp]))
 #+end_src
 *** Interpreting Mutation
@@ -5643,7 +5643,7 @@ myFunction().then(
                 [e : Exp]
                 [sto : Store]) : Result
   (type-case Exp e
-    [(setVarE! x e)
+    [(set-varE! x e)
       (with ([e-val e-sto] (interp env e sto))
         (v*s e-val
           ;; Get the location from the environment
@@ -5781,14 +5781,14 @@ myFunction().then(
 #+begin_src racket
 {let1 {x 10}
   {let1 {f {lam y {* x y}}}}
-    {seq {setvar! x 20}
+    {seq {set-var! x 20}
          {let1 {x 100}
                {f 5}}
   }}
 #+end_src
 - In the function body, ~x~ has location from point of definition
   + This location starts with ~10~
-  + ~setvar~ updates its value to ~20~
+  + ~set-var~ updates its value to ~20~
 - A new variable ~x~ is defined for the scope that ~f~ is called
   + Its location contains ~100~
   + NOT used in the function call, because not in scope for function definition
@@ -5803,13 +5803,60 @@ myFunction().then(
 - These properties are *completely separate from each other*
   + You can mix them in any combination
   + But lazy + mutable state is generally a bad idea
-* Implementing Recursion via State
+* Interpreting Loops and Recursion
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides018-recursion.pdf
+:EXPORT_FILE_NAME: pdf/slides018-while-recursion.pdf
 :header-args:racket: :results code :lang flit
 :CUSTOM_ID: implementing-recursion-via-state
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
+** While Loops with Mutable Variables
+*** Idea
+- No point to ~while~ loops in a purely functional language
+  + Run forever unless can change variables
+  + Use generative recursion/tail recursion instead
+- Curly-Mutvar gives us mutable variables
+  + So it makes sense to have loops again
+*** Syntax
+- ~{while <expr> <expr>}~
+- The expression ~{while cond body}~ checks if ~cond~ is true or false
+  + If true, then run the body
+    - then /the whole loop again!/
+  + If false, then done
+    - Return ~#f~ as a placeholder value
+#+begin_src racket
+(define-type Exp
+  ...
+  (whileE [cond : Exp]
+          [body : Exp]))
+#+end_src
+*** Loops Are Recursive
+- Loops not implemented using recursion in C, Python, etc.
+- But /semantics/ are recursive
+  + What a /while/ loop does after running once is just another while loop
+*** Interpreting Loops
+#+begin_src racket
+(define (interp [env : Env] [e : Exp] [sto : Store]) : Result
+  (type-case Exp e
+    [(whileE cond body)
+         (with [(cond-v cond-sto) (interp env cond sto)]
+           (type-case Value cond-v
+             [(boolV b)
+              (if b
+                (with [(body-v body-sto)  (interp env body cond-sto)]
+                        (interp env (whileE cond body) body-sto))
+                (v*s (boolV #f) cond-sto))]
+             [else
+              (error 'interp "Non-boolean condition in while")]))]
+#+end_src
+- Evaluate the cond
+  + Check if result is boolean
+  + If false
+    - stop executing
+  + If true
+    - Execute the body
+    - Then recursively evaluate loop
+    - /in the updated state/
 ** Recursion via State
 :PROPERTIES:
 :CUSTOM_ID: recursion-via-state
@@ -5820,7 +5867,7 @@ myFunction().then(
   + To see how recursion interacts with environments and stores
 - Key Concepts
   + Landin's Knot
-*** Recursion in Curly-Rec
+*** Recursion in Curly-While-Rec
 - When we are allowed to refer to ~x~ while defining the value that is assigned to ~x~
 - We'll do this with a special ~let~ form
   + ~{letrec x <expr> <expr>}~
@@ -5864,7 +5911,7 @@ myFunction().then(
   ;; NEW
   ;; Placeholder for implementing recursion
   ;; If we ever produce this, we should get an error
-  (DummyV))
+  (dummyV))
 #+end_src
 *** Interpreting Recursion: Code
 #+begin_src racket
@@ -5872,11 +5919,11 @@ myFunction().then(
                 [e : Exp]
                 [sto : Store]) : Result
   (type-case Exp e
-   [(letRec! x xexpr body)
+   [(letrecE x xexpr body)
      (let* ([x-loc (new-loc sto)] ;; Location for x
             [dummy-sto ;; Put a dummy value at x's location
                (override-store x-loc
-                                     (DummyV) sto)])
+                                     (dummyV) sto)])
         (with ([x-val x-sto]
                ;; Interpret xexpr in env with x's location
                  (interp (extend x x-loc env)
@@ -5900,7 +5947,7 @@ myFunction().then(
   + Make a new location ~0~ for ~fact~
   + Evaluate the value for ~fact~
     - Env: ~fact := 0~
-    - Store: ~0 => (DummyV)~
+    - Store: ~0 => (dummyV)~
       ~~
 *** Example (ctd)
 - Evaluating function produces closure:

@@ -527,8 +527,9 @@
     ;; If variables are mutable, then the environment stores locations, not values,
     ;; so after looking a symbol up in the environment, we have to get its value from the Store.
     [(varE x)
-     (v*s (lookup (lookup x env)
-                  sto)
+     (v*s (let* ([xloc (lookup x env)]
+                 [xvalue (lookup xloc sto)])
+            xvalue)
           sto)]
     ;; Interpreting functions with environments: we need to
     ;; capture the environment for static scope, so that when we call the function,
