@@ -5948,7 +5948,6 @@ myFunction().then(
   + Evaluate the value for ~fact~
     - Env: ~fact := 0~
     - Store: ~0 => (dummyV)~
-      ~~
 *** Example (ctd)
 - Evaluating function produces closure:
 #+begin_src racket
