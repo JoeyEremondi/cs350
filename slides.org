@@ -4825,7 +4825,7 @@ while (i < 10){
   do recursion in the UTLC
 - Once we have recursion, we have loops
 
-* Implementing Lambdas with Environments: Closures :noexport:
+* Implementing Lambdas with Environments: Closures
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides015-closures.pdf
 :header-args:racket: :results code :lang flit
