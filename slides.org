@@ -5807,7 +5807,7 @@ myFunction().then(
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides018-while-recursion.pdf
 :header-args:racket: :results code :lang flit
-:CUSTOM_ID: implementing-recursion-via-state
+:CUSTOM_ID: interpreting-loops-and-recursion
 :END:
 #+beamer: \beamerdefaultoverlayspecification{<+->}
 ** While Loops with Mutable Variables
