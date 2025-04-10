@@ -4582,8 +4582,8 @@ while (i < 10){
   + To force it back to a value, you call it with any value
 *** Laziness via lambda example
 #+begin_src racket
-{let1 {f {lam x {lam y {if {zero? z} {y 0} {* x 2}}}}}
-        {{f 3} {lam x {+ x #t}}}}
+{let1 {f {lam x {lam y {if {zero? x} {y 0} x}}}}
+        {{f 1} {lam z {+ 3 #t}}}}
 #+end_src
 - Plus of boolean behind a lambda, so no error
   + Function body stored as /expression/
@@ -6148,11 +6148,10 @@ myFunction().then(
 - Value version of object
   + Fields: just like in ~Exp~, except each name has a value, not an expression
   + Methods: list of name-value pairs, where each value is assumed to be a closure
+    -  No need for separate symbol field, ~closureV~ stores symbol
 *** Starting Language
-- We'll add objects onto Curly-Lambda
+- We'll add objects onto Curly-Curry
   + No stores, just environments
-- Assignment 6 will be integrating Objects and Stores
-  +  Building a small language like Python or JavaScript
 *** Interpreting Object Creation
 #+begin_src racket
 (define (interp [env : Env]
