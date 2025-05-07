@@ -3667,7 +3667,7 @@ for (int i = 0; i < N; i++){
   + ~Exp~ is abstract syntax, uninterpreted expressions
   + ~Value~ is the result of interpreting
     - What we want to do addition/multiplication/zero-checking on
-* Values, Dynamic Typing and Desugaring
+* Values and Dynamic Typing and Desugaring
 :PROPERTIES:
 :EXPORT_FILE_NAME: pdf/slides013-dyntype.pdf
 :header-args:racket: :results code :lang flit
@@ -3839,6 +3839,15 @@ for (int i = 0; i < N; i++){
   + Doesn't care that ~#t~ and ~10~ have different types
 - The same is not true of Flit
   + e.g. try it out
+
+*  Desugaring
+:PROPERTIES:
+:EXPORT_FILE_NAME: pdf/slides014-desugar.pdf
+:header-args:racket: :results code :lang flit
+:CUSTOM_ID: values-dyntype
+:END:
+#+beamer: \beamerdefaultoverlayspecification{<+->}
+
 ** Desugaring
 :PROPERTIES:
 :CUSTOM_ID: syntactic-sugar
@@ -4045,9 +4054,11 @@ while (i < 10){
   + ~(interp {if  #f  4 5})~
   + ~(interp 5)~
   + ~5~
+
+
 * Local Variables and Bindings
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides014-subst.pdf
+:EXPORT_FILE_NAME: pdf/slides015-subst.pdf
 :header-args:racket: :results code :lang flit
 :CUSTOM_ID: local-vars-bindings
 :END:
@@ -4252,7 +4263,7 @@ while (i < 10){
 
 * Implementing Lambdas with Substitution
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides012-lambda-subst.pdf
+:EXPORT_FILE_NAME: pdf/slides016-lambda-subst.pdf
 :header-args:racket: :results code :lang flit
 :CUSTOM_ID: implementing-lambdas-with-substitution-and-dynamic-typing
 :END:
@@ -4447,7 +4458,7 @@ while (i < 10){
 
 * Lazy Evaluation
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides013-lazy.pdf
+:EXPORT_FILE_NAME: pdf/slides017-lazy.pdf
 :header-args:racket: :results code :lang flit
 :CUSTOM_ID: lazy-evaluation
 :END:
@@ -4593,7 +4604,7 @@ while (i < 10){
 
 * Currying and the Lambda Calculus
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides014-currying.pdf
+:EXPORT_FILE_NAME: pdf/slides018-currying.pdf
 :header-args:racket: :results code :lang flit
 :CUSTOM_ID: currying-and-the-lambda-calculus
 :END:
@@ -4681,7 +4692,7 @@ while (i < 10){
     (type-case ExpS surfExpr
                ....
      [(appS funExpr args)
-        (foldl appE (elab funExpr) args)]))
+        (foldl appE (desugar funExpr) args)]))
 
   #+end_src
 - Given a list of argument to apply, build up one giant expression with nested calls
@@ -4709,7 +4720,7 @@ while (i < 10){
     (type-case ExpS surfExpr
                ....
      [(let1S x xExpr body)
-        (appE (lamE x (elab body))
+        (appE (lamE x (desugar body))
               (desugar xExpr))]))
 #+end_src
 - Define a function whose body is the body of the ~let1~
@@ -4827,7 +4838,7 @@ while (i < 10){
 
 * Implementing Lambdas with Environments: Closures
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides015-closures.pdf
+:EXPORT_FILE_NAME: pdf/slides019-closures.pdf
 :header-args:racket: :results code :lang flit
 :CUSTOM_ID: implementing-lambdas-with-environments-closures
 :END:
@@ -5168,7 +5179,7 @@ myFunction().then(
 
 * Store Passing and Boxes
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides016-box.pdf
+:EXPORT_FILE_NAME: pdf/slides020-box.pdf
 :header-args:racket: :results code :lang flit
 :CUSTOM_ID: store-passing-and-boxes
 :END:
@@ -5374,7 +5385,7 @@ myFunction().then(
      (let* ([lresult (interp env l sto)]
             [v-l (pairFst lresult)];; Value
             [sto-l (pairSnd lresult)]
-            [rresult (interp env l sto-l)] ;; sto-l, NOT sto
+            [rresult (interp env r sto-l)] ;; sto-l, NOT sto
             [v-r (pairRst rresult)]
             [sto-r (pairSnd rresult)]);; sto-l, NOT sto
        (v*s (lift-binop + v-l v-r)
@@ -5552,7 +5563,7 @@ myFunction().then(
     - ... unless we implement more advanced features e.g. undo, backtracking
 * Mutable Variables
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides017-mutvar.pdf
+:EXPORT_FILE_NAME: pdf/slides021-mutvar.pdf
 :header-args:racket: :results code :lang flit
 :CUSTOM_ID: mutable-variables
 :END:
@@ -5805,7 +5816,7 @@ myFunction().then(
   + But lazy + mutable state is generally a bad idea
 * Interpreting Loops and Recursion
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides018-while-recursion.pdf
+:EXPORT_FILE_NAME: pdf/slides022-while-recursion.pdf
 :header-args:racket: :results code :lang flit
 :CUSTOM_ID: interpreting-loops-and-recursion
 :END:
@@ -6007,7 +6018,7 @@ myFunction().then(
 - Useful in typed languages that can't give the Y-combinator a type
 * Objects and OOP
 :PROPERTIES:
-:EXPORT_FILE_NAME: pdf/slides019-oop.pdf
+:EXPORT_FILE_NAME: pdf/slides023-oop.pdf
 :header-args:racket: :results code :lang flit
 :CUSTOM_ID: objects-and-oop
 :END:
